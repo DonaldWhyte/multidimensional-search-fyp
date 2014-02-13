@@ -17,6 +17,9 @@
 \usepackage{epstopdf}
 \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
 
+\usepackage{fancyhdr}
+\chead{Donald Whyte}
+
 % Rules for handling pre-zipped figures. To create zipped figs do this:
 % $ head myfigure.eps > myfigure.eps.bb
 % $ gzip myfigure.eps
@@ -50,7 +53,7 @@
 
 \include{cover}          % This is the front page
 
-\pagestyle{plain}        
+\pagestyle{fancy} % so headers are put on pages
 \pagenumbering{roman}    % Set up page numbering
 \setcounter{page}{1}
 
