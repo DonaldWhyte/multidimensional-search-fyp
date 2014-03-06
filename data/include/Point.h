@@ -11,10 +11,10 @@ namespace mdsearch
 	{
 
 	public:
-		Point()
+		Point(Real initialValue = 0)
 		{
 			for (int i = 0; (i < N); i++)
-				values[i] = 0;
+				values[i] = initialValue;
 		}
 
 		Point(Real* initialValues)

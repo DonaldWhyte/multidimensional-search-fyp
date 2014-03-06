@@ -18,6 +18,16 @@ namespace mdsearch
 			this->max = max;
 		}
 
+		const bool operator==(const Interval& other) const
+		{
+			return (min == other.min && max == other.max);
+		}
+
+		const bool operator!=(const Interval& other) const
+		{
+			return !(*this == other);
+		}
+
 		Real min;
 		Real max;
 	};
@@ -31,14 +41,23 @@ namespace mdsearch
 		{
 			for (int i = 0; (i < N); i++)
 			{
-				intervals = Interval();
+				intervals[i] = Interval();
 			}
 		}
+
+		Region(const Interval& initialInterval)
+		{
+			for (int i = 0; (i < N); i++)
+			{
+				intervals[i] = initialInterval;
+			}
+		}
+
 		Region(Interval* dimensionIntervals)
 		{
 			for (int i = 0; (i < N); i++)
 			{
-				intervals = dimensionIntervals[i];
+				intervals[i] = dimensionIntervals[i];
 			}
 		}
 
@@ -50,6 +69,16 @@ namespace mdsearch
 					return false;
 			}
 			return true;
+		}
+
+		inline const Interval& operator[](int index) const
+		{
+			return intervals[index];
+		}
+
+		inline Interval& operator[](int index)
+		{
+			return intervals[index];
 		}
 
 	private:
