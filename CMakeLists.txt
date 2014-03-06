@@ -8,8 +8,14 @@ set (MDSEARCH_MINOR_VERSION 0)
 # Give names for directories in the project
 set (PROJECT_ROOT ${PROJECT_SOURCE_DIR})
 set (DEPENDENCIES ${PROJECT_ROOT}/dependencies)
+
 # Add library search directory and include directories 
 include_directories(${DEPENDENCIES})
+# Add static libraries of all dependencies here
+set( LIBS
+	${DEPENDENCIES}/libgtest.a
+	pthread # for google-test
+)
 
 set_property (GLOBAL PROPERTY RUNTIME_OUTPUT_DIRECTORY ${PROJECT_ROOT}/build)
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_ROOT}/build)

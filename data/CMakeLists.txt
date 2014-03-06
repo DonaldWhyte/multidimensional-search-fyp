@@ -13,7 +13,9 @@ include_directories ("include")
 # Executable for running unit and/or integration tests
 add_executable ( data_tests
 	"tests/TestRunner.cpp"
+	"tests/TestTypes.h"
 )
+include_directories ("tests")
 # Ensure google-test library is linked and include files are in search path
 target_link_libraries ( data_tests ${LIBS} )
 include_directories ({DEPENDENCIES})
