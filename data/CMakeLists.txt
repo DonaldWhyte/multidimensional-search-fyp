@@ -1,11 +1,19 @@
 # Static library containing all data generators/loaders
-file( GLOB LIB_SOURCES src/*.cpp )
-file( GLOB LIB_HEADERS include/*.h )
-add_library( data ${LIB_SOURCES} ${LIB_HEADERS} )
+add_library( data
+	# Source files
+	"src/Dummy.cpp"
+	# Header files
+	"include/DataTypes.h"
+	"include/Point.h"
+	"include/Region.h"
+)
+# Ensure include directory is in search path
+include_directories ("include")
 
 # Executable for running unit and/or integration tests
-file( GLOB TEST_SOURCES tests/*.h tests/*.cpp )
-add_executable ( data_tests ${TEST_SOURCES} )
+add_executable ( data_tests
+	"tests/TestRunner.cpp"
+)
 # Ensure google-test library is linked and include files are in search path
 target_link_libraries ( data_tests ${LIBS} )
 include_directories ({DEPENDENCIES})

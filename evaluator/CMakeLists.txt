@@ -1,7 +1,11 @@
 # Executable for main evaluation program
-file( GLOB LIB_SOURCES src/*.cpp )
-file( GLOB LIB_HEADERS include/*.h )
-add_executable( evaluator ${LIB_SOURCES} ${LIB_HEADERS} )
+add_executable( evaluator
+	# Source files
+	"src/EvaluatorMain.cpp"
+	# Header files
+)
+# Ensure include directory is in search path
+include_directories ("include")
 
 # Link both the data and index structure libraries to evaluator
 target_link_libraries (evaluator data)

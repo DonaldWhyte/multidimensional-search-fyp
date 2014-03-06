@@ -1,11 +1,16 @@
 # Static library containing all implemented index structures
-file( GLOB LIB_SOURCES src/*.cpp )
-file( GLOB LIB_HEADERS include/*.h )
-add_library( index_structures ${LIB_SOURCES} ${LIB_HEADERS} )
+add_library( index_structures
+	# Source files
+	"src/Dummy.cpp"
+	# Header files
+)
+# Ensure include directory is in search path
+include_directories ("include")
 
 # Executable for running unit and/or integration tests
-file( GLOB TEST_SOURCES tests/*.h tests/*.cpp )
-add_executable ( structure_tests ${TEST_SOURCES} )
+add_executable ( structure_tests
+	"tests/TestRunner.cpp"
+)
 # Ensure google-test library is linked and include files are in search path
 target_link_libraries ( structure_tests ${LIBS} )
 include_directories ({DEPENDENCIES})
