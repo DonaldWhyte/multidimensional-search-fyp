@@ -8,35 +8,37 @@
 namespace mdsearch { namespace tests
 {
 
-	class DataTypeTests : public ::testing::Test
+	class PointTests : public ::testing::Test
 	{
 
-	protected:
-		DataTypeTests() { }
-		virtual ~DataTypeTests() { }
 
 	};
 
-	TEST_F(DataTypeTests, Point)
+	TEST_F(PointTests, Point)
 	{
 		// Test with one and two dimensions
-		Point<1> oneA;
-		Point<1> oneB(4);
-		Real value = 5;
-		Point<1> oneC(&value);
+		Point oneA(1);
+		Point oneB(1, 4);
+		Real someValue = 8;
+		Point oneC(1, someValue);
 		EXPECT_EQ(oneA[0], 0);
 		EXPECT_EQ(oneB[0], 4);
-		EXPECT_EQ(oneC[0], 5);
-		Point<2> twoA;
-		Point<2> twoB(3);
-		Real values[] = { 2, 4 };
-		Point<2> twoC(values);
+		EXPECT_EQ(oneC[0], 8);
+		Point twoA(2);
+		Point twoB(2, 3);
+		Real someValues[] = { 2, 4 };
+		Point twoC(2, someValues);
 		EXPECT_EQ(twoA[0], 0); EXPECT_EQ(twoA[1], 0);
 		EXPECT_EQ(twoB[0], 3); EXPECT_EQ(twoB[1], 3);
 		EXPECT_EQ(twoC[0], 2); EXPECT_EQ(twoC[1], 4);
 	}
 
-	TEST_F(DataTypeTests, Interval)
+	class RegionTests : public ::testing::Test
+	{
+
+	};
+
+	TEST_F(RegionTests, Interval)
 	{
 		Interval a;
 		Interval b(3, 5);
@@ -51,25 +53,36 @@ namespace mdsearch { namespace tests
 		EXPECT_FALSE(b != Interval(3, 5));
 	}
 
-	TEST_F(DataTypeTests, Region)
+	TEST_F(RegionTests, Region)
 	{
 		// Test with one and two dimensions
-		Region<1> oneA;
-		Region<1> oneB( Interval(10, 20) );
-		Interval someInterval(30, 40);
-		Region<1> oneC(&someInterval);
+		Region oneA(1);
+		Region oneB(1, Interval(10, 20));
 		EXPECT_EQ(oneA[0], Interval(0, 0));
 		EXPECT_EQ(oneB[0], Interval(10, 20));
-		EXPECT_EQ(oneC[0], Interval(30, 40));
-		Region<2> twoA;
-		Region<2> twoB( Interval(10, 20) );
-		Interval values[] = { Interval(60, 70), Interval(80, 90) };
-		Region<2> twoC(values);
+		Region twoA(2);
+		Region twoB(2, Interval(10, 20));
+		Interval someIntervals[] = { Interval(60, 70), Interval(80, 90) };
+		Region twoC(2, someIntervals);
 		EXPECT_EQ(twoA[0], Interval(0, 0)); EXPECT_EQ(twoA[1], Interval(0, 0));
 		EXPECT_EQ(twoB[0], Interval(10, 20)); EXPECT_EQ(twoB[1], Interval(10, 20));
 		EXPECT_EQ(twoC[0], Interval(60, 70)); EXPECT_EQ(twoC[1], Interval(80, 90));
+		// Test point-inside-region test
+		Real testPointsValues[][2] = {
+			{12, 12}, {19, 12}, {8, 12},
+			{12, 8}, {8, 8}, {0, 0},
+			{1, 1}, {-1, -1}
+		};
 
-		// TODO: test point-inside-region
+		EXPECT_TRUE( twoB.contains(Point(2, testPointsValues[0])) );
+		EXPECT_TRUE( twoB.contains(Point(2, testPointsValues[1])) );
+		EXPECT_FALSE( twoB.contains(Point(2, testPointsValues[2])) );
+		EXPECT_FALSE( twoB.contains(Point(2, testPointsValues[3])) );
+		EXPECT_FALSE( twoB.contains(Point(2, testPointsValues[4])) );
+		// Test with a region that has zero size
+		EXPECT_TRUE( twoA.contains(Point(2, testPointsValues[5])) );
+		EXPECT_FALSE( twoA.contains(Point(2, testPointsValues[6])) );
+		EXPECT_FALSE( twoA.contains(Point(2, testPointsValues[7])) );
 	}	
 
 } }

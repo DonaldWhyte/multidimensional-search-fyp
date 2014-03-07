@@ -12,5 +12,5 @@ add_executable ( structure_tests
 	"tests/TestRunner.cpp"
 )
 # Ensure google-test library is linked and include files are in search path
-target_link_libraries ( structure_tests ${LIBS} )
+target_link_libraries ( structure_tests index_structures ${LIBS} )
 include_directories ({DEPENDENCIES})

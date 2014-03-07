@@ -1,6 +1,7 @@
 #ifndef MDSEARCH_REGION_H
 #define MDSEARCH_REGION_H
 
+#include <vector>
 #include "Point.h"
 
 namespace mdsearch
@@ -8,64 +9,32 @@ namespace mdsearch
 
 	struct Interval
 	{
-		Interval()
-		{
-			min = max = 0;			
-		}
-		Interval(Real min, Real max)
-		{
-			this->min = min;
-			this->max = max;
-		}
+		Interval();
+		Interval(Real min, Real max);
 
-		const bool operator==(const Interval& other) const
-		{
-			return (min == other.min && max == other.max);
-		}
-
-		const bool operator!=(const Interval& other) const
-		{
-			return !(*this == other);
-		}
+		const bool operator==(const Interval& other) const;
+		const bool operator!=(const Interval& other) const;
 
 		Real min;
 		Real max;
 	};
 
-	template<int N>
+	typedef std::vector<Interval> IntervalList;
+
 	class Region
 	{
 
 	public:
-		Region()
-		{
-			for (int i = 0; (i < N); i++)
-			{
-				intervals[i] = Interval();
-			}
-		}
+		Region(int n, const Interval& initialInterval = Interval());
+		Region(int n, const Interval* initialIntervals);
 
-		Region(const Interval& initialInterval)
+		// Inline functions have been declared in the header file
+		// to prevent linker issues
+		inline bool contains(const Point& p)
 		{
-			for (int i = 0; (i < N); i++)
+			for (int i = 0; (i < nDimensions); i++)
 			{
-				intervals[i] = initialInterval;
-			}
-		}
-
-		Region(Interval* dimensionIntervals)
-		{
-			for (int i = 0; (i < N); i++)
-			{
-				intervals[i] = dimensionIntervals[i];
-			}
-		}
-
-		inline bool inside(const Point<N>& p)
-		{
-			for (int i = 0; (i < N); i++)
-			{
-				if (p < intervals[i].min || p > intervals[i].max)
+				if (p[i] < intervals[i].min || p[i] > intervals[i].max)
 					return false;
 			}
 			return true;
@@ -81,9 +50,16 @@ namespace mdsearch
 			return intervals[index];
 		}
 
+		inline unsigned int numDimensions() const
+		{
+			return nDimensions;
+		}
+
+
 	private:
 		// An interval (min-max value) for each dimension
-		Interval intervals[N];
+		IntervalList intervals;
+		unsigned int nDimensions;
 
 	};
 

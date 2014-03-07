@@ -1,7 +1,8 @@
 # Static library containing all data generators/loaders
 add_library( data
 	# Source files
-	"src/Dummy.cpp"
+	"src/Point.cpp"
+	"src/Region.cpp"
 	# Header files
 	"include/DataTypes.h"
 	"include/Point.h"
@@ -17,5 +18,5 @@ add_executable ( data_tests
 )
 include_directories ("tests")
 # Ensure google-test library is linked and include files are in search path
-target_link_libraries ( data_tests ${LIBS} )
+target_link_libraries ( data_tests data ${LIBS} )
 include_directories ({DEPENDENCIES})

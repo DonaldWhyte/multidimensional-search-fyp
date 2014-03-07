@@ -6,30 +6,28 @@
 namespace mdsearch
 {
 
-	template<int N>
 	class Point
 	{
 
 	public:
-		Point(Real initialValue = 0)
-		{
-			for (int i = 0; (i < N); i++)
-				values[i] = initialValue;
-		}
+		Point(int n, Real initialValue = 0);
+		Point(int n, const Real* initialValues);
 
-		Point(Real* initialValues)
-		{
-			for (int i = 0; (i < N); i++)
-				values[i] = initialValues[i];
-		}
-
-		inline Real operator[](int index)
+		// Inline functions have been declared in the header file
+		// to prevent linker issues
+		inline Real operator[](int index) const
 		{
 			return values[index];
 		}
 
+		inline unsigned int numDimensions() const
+		{
+			return nDimensions;
+		}
+
 	private:
-		Real values[N];
+		RealList values;
+		unsigned int nDimensions;
 
 	};
 
