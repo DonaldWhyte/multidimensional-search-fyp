@@ -18,9 +18,14 @@ set( LIBS
 	pthread # for google-test
 )
 
+# Set directory all build files go to
 set_property (GLOBAL PROPERTY RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIR})
 set (EXECUTABLE_OUTPUT_PATH ${BUILD_DIR})
 set (LIBRARY_OUTPUT_PATH ${BUILD_DIR})
+
+# Set compiler flags
+set( EXTRA_CXX_COMPILER_FLAGS -fno-exceptions ) # exceptions are being disabled!
+set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${EXTRA_CXX_COMPILER_FLAGS}" )
 
 # Process all sub-projects
 add_subdirectory(index_structures)
