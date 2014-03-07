@@ -13,6 +13,7 @@ include_directories ("${PROJECT_ROOT}/data/include") # added path to data librar
 # Executable for running unit and/or integration tests
 add_executable ( structure_tests
 	"tests/TestRunner.cpp"
+	"tests/TestSequentialScan.h"
 )
 # Ensure google-test library is linked and include files are in search path
 # NOTE: index_structures library is dependant on the 'data' library for the
