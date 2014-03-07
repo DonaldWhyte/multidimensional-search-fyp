@@ -1,6 +1,7 @@
 #ifndef MDSEARCH_POINT_H
 #define MDSEARCH_POINT_H
 
+#include <iostream>
 #include <vector>
 #include "DataTypes.h"
 
@@ -42,11 +43,15 @@ namespace mdsearch
 			return nDimensions;
 		}
 
+
 	private:
 		RealList values;
 		unsigned int nDimensions;
 
 	};
+
+	// Used to easily print a point
+	std::ostream& operator<<(std::ostream& out, const Point& point);
 
 	typedef std::vector<Point> PointList;
 

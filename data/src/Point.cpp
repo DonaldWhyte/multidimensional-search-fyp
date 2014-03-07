@@ -17,4 +17,12 @@ namespace mdsearch
 			values.push_back(initialValues[i]);
 	}
 
+	std::ostream& operator<<(std::ostream& out, const Point& point)
+	{
+		out << "(";
+		for (int i = 0; (i < point.numDimensions() - 1); i++)
+			out << point[i] << ",";
+		out << point[point.numDimensions() - 1] << ")";
+	}
+
 }

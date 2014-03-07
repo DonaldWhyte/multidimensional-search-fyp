@@ -23,3 +23,5 @@ include_directories ("tests")
 # Ensure google-test library is linked and include files are in search path
 target_link_libraries ( data_tests data ${LIBS} )
 include_directories ({DEPENDENCIES})
+
+file( COPY tests/test_files DESTINATION ${BUILD_DIR} )

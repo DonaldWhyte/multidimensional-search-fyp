@@ -2,7 +2,6 @@
 #define MDSEARCH_TEST_DATASETFILELOADER_H
 
 #include <gtest/gtest.h>
-#include <fstream>
 #include "DatasetFileLoader.h"
 
 namespace mdsearch { namespace tests
@@ -13,7 +12,7 @@ namespace mdsearch { namespace tests
 
 	};
 
-	TEST_F(DatasetFileLoaderTests, InvalidDaa)
+	TEST_F(DatasetFileLoaderTests, InvalidData)
 	{
 		DatasetFileLoader loader;
 
@@ -29,7 +28,8 @@ namespace mdsearch { namespace tests
 		PointList notEnoughDataPoints;
 		for (unsigned int i = 0; (i < NUM_NOT_ENOUGH_DATAPOINTS); i++)
 			notEnoughDataPoints.push_back(Point(3, notEnoughDataPointValues[i]));
-		EXPECT_EQ(loader.load("test_files/not_enough_data.dat"), notEnoughDataPoints);
+		std::cout << "NOT ENOUGH DATA POINTS: " << notEnoughDataPoints.size() << std::endl;
+		EXPECT_EQ(loader.load("test_files/not_enough.dat"), notEnoughDataPoints);
 	}
 
 	TEST_F(DatasetFileLoaderTests, ValidData)
