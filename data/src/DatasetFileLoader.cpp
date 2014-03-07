@@ -2,7 +2,6 @@
 
 #include <fstream>
 #include <sstream>
-#include <iostream>
 
 namespace mdsearch
 {
@@ -46,8 +45,6 @@ namespace mdsearch
 			if (file.eof())
 				break;	
 		}
-
-		std::cout << "FINISHED READING FILE: " << points.size() << std::endl;
 
 		return points;
 	}

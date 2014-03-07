@@ -4,6 +4,7 @@
 // test suite that executes when RUN_ALL_TESTS() is called
 #include "TestTypes.h"
 #include "TestDatasetFileLoader.h"
+#include "TestDatasetGenerators.h"
 
 int main(int argc, char* argv[])
 {

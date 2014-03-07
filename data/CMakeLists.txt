@@ -4,11 +4,13 @@ add_library( data
 	"src/Point.cpp"
 	"src/Region.cpp"
 	"src/DatasetFileLoader.cpp"
+	"src/UniformDatasetGenerator.cpp"
 	# Header files
 	"include/DataTypes.h"
 	"include/Point.h"
 	"include/Region.h"
 	"include/DatasetFileLoader.h"
+	"include/UniformDatasetGenerator.h"
 )
 # Ensure include directory is in search path
 include_directories ("include")
@@ -18,6 +20,7 @@ add_executable ( data_tests
 	"tests/TestRunner.cpp"
 	"tests/TestTypes.h"
 	"tests/TestDatasetFileLoader.h"
+	"tests/TestDatasetGenerators.h"
 )
 include_directories ("tests")
 # Ensure google-test library is linked and include files are in search path

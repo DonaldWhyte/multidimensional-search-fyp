@@ -28,7 +28,6 @@ namespace mdsearch { namespace tests
 		PointList notEnoughDataPoints;
 		for (unsigned int i = 0; (i < NUM_NOT_ENOUGH_DATAPOINTS); i++)
 			notEnoughDataPoints.push_back(Point(3, notEnoughDataPointValues[i]));
-		std::cout << "NOT ENOUGH DATA POINTS: " << notEnoughDataPoints.size() << std::endl;
 		EXPECT_EQ(loader.load("test_files/not_enough.dat"), notEnoughDataPoints);
 	}
 
