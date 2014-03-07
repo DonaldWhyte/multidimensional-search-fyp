@@ -1,5 +1,5 @@
 #include "SequentialScan.h"
-#include "Utility.h"
+#include <algorithm>
 
 namespace mdsearch
 {
@@ -8,10 +8,13 @@ namespace mdsearch
 	{
 		// Pre-allocate necessary memory to add points
 		points.reserve(points.size() + pointsToAdd.size());
-		// Add points in given list to THE END of this structure's point list
-		points.insert(points.end(), pointsToAdd.begin(), pointsToAdd.end());
-		// Ensure there are no duplicates in the resulting array
-		points.erase(util::Uniquify(points.begin(), points.end()), points.end());
+		// Now insert each point incrementally
+		// (done so duplicate checking code can be performed)
+		for (PointList::const_iterator it = pointsToAdd.begin();
+			(it != pointsToAdd.end()); it++)
+		{
+			insert(*it);
+		}
 	}
 
 	const PointList& SequentialScan::allPoints() const
@@ -21,27 +24,66 @@ namespace mdsearch
 	
 	void SequentialScan::insert(const Point& p)
 	{
-		// TODO	
+		// Only insert point if it does not already exist in the structure
+		if (!pointExists(p))
+			points.push_back(p);
 	}
 
 	bool SequentialScan::remove(const Point& p)
 	{
-		// TODO	
+		size_t oldSize = points.size();
+		points.erase( std::remove(points.begin(), points.end(), p), points.end() );
+		// If the size of the vector has changed, then a point was removed!
+		// Therefore, true is returned
+		return (oldSize != points.size());
 	}
 
 	bool SequentialScan::update(const Point& oldPoint, const Point& newPoint)
 	{
-		// TODO	
+		// Find point with given value
+		PointList::iterator currPoint = points.begin();
+		for (currPoint; (currPoint != points.end()); currPoint++)
+		{
+			if (*currPoint == oldPoint) // we've found the desired point!
+			{
+				// Corner case: check points are not the same (do nothing if so)
+				if (oldPoint == newPoint)
+					return true;
+				// Check if the new point already exists. If so, just erase the old point
+				if (pointExists(newPoint))
+					points.erase(currPoint);
+				// Chnage the point if the new one does NOT EXIST
+				else
+					*currPoint = newPoint;
+				// Point was found, so we just return true
+				return true;
+			}
+		}
+		// Never found point to update!
+		return false;
 	}
 	
 	bool SequentialScan::pointExists(const Point& p)
 	{
-		// TODO	
+		for (PointList::const_iterator it = points.begin();
+			(it != points.end()); it++)
+		{
+			if (p == *it)
+				return true;
+		}
+		return false;
 	}
 
-	PointList SequentialScan::pointsInRegion(const Region& r)
+	PointList SequentialScan::pointsInRegion(const Region& region)
 	{
-		// TODO	
+		PointList foundPoints;
+		for (PointList::const_iterator it = points.begin();
+			(it != points.end()); it++)
+		{
+			if (region.contains(*it))
+				foundPoints.push_back(*it);
+		}
+		return foundPoints;
 	}
 
 }

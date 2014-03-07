@@ -30,7 +30,7 @@ namespace mdsearch
 
 		// Inline functions have been declared in the header file
 		// to prevent linker issues
-		inline bool contains(const Point& p)
+		inline bool contains(const Point& p) const
 		{
 			for (int i = 0; (i < nDimensions); i++)
 			{

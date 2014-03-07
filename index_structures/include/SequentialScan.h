@@ -26,7 +26,7 @@ namespace mdsearch
 		bool update(const Point& oldPoint, const Point& newPoint);
 		// Queries
 		bool pointExists(const Point& p);
-		PointList pointsInRegion(const Region& r);
+		PointList pointsInRegion(const Region& region);
 
 	private:
 		PointList points;
