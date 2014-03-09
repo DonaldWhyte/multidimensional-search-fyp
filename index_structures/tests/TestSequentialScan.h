@@ -54,10 +54,10 @@ namespace mdsearch { namespace tests
 
 		// Insert same point twice -- SHOULD ONLY BE INSERTED ONCE
 		// SINCE WE ARE NOT STORING DUPLICATES!
-		structure.insert(testPoints[3]);
+		ASSERT_TRUE( structure.insert(testPoints[3]) );
 		ASSERT_EQ(1, structure.allPoints().size());
 		ASSERT_EQ(testPoints[3], structure.allPoints()[0]);
-		structure.insert(testPoints[3]);
+		ASSERT_FALSE( structure.insert(testPoints[3]) );
 		ASSERT_EQ(1, structure.allPoints().size());
 		ASSERT_EQ(testPoints[3], structure.allPoints()[0]);
 		// Insert two different points and check both points exist, in correct order

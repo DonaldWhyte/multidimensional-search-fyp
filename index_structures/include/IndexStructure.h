@@ -18,7 +18,7 @@ namespace mdsearch
 		}
 
 		// Dynamic operations
-		virtual void insert(const Point& p) = 0;
+		virtual bool insert(const Point& p) = 0;
 		virtual bool remove(const Point& p) = 0;
 		virtual bool update(const Point& oldPoint, const Point& newPoint) = 0;
 		// Queries
@@ -30,7 +30,7 @@ namespace mdsearch
 			return numDimensions;
 		}
 
-	private:
+	protected:
 		unsigned int numDimensions;
 
 	};

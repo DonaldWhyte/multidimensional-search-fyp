@@ -25,7 +25,7 @@ namespace mdsearch
 	{
 
 	public:
-		Region(int n, const Interval& initialInterval = Interval());
+		Region(int n = 1, const Interval& initialInterval = Interval());
 		Region(int n, const Interval* initialIntervals);
 
 		// Inline functions have been declared in the header file
@@ -62,6 +62,8 @@ namespace mdsearch
 		unsigned int nDimensions;
 
 	};
+
+	typedef std::vector<Region> RegionList;
 
 }
 

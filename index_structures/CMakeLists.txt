@@ -2,9 +2,11 @@
 add_library( index_structures
 	# Source files
 	"src/SequentialScan.cpp"
+	"src/Octree.cpp"
 	# Header files
 	"include/IndexStructure.h"
 	"include/SequentialScan.h"
+	"include/Octree.h"
 )
 # Ensure include directory is in search path
 include_directories ("include")
@@ -14,6 +16,7 @@ include_directories ("${PROJECT_ROOT}/data/include") # added path to data librar
 add_executable ( structure_tests
 	"tests/TestRunner.cpp"
 	"tests/TestSequentialScan.h"
+	"tests/TestOctree.h"
 )
 # Ensure google-test library is linked and include files are in search path
 # NOTE: index_structures library is dependant on the 'data' library for the

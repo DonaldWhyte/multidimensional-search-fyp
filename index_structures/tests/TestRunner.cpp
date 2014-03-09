@@ -3,6 +3,7 @@
 // tests, these tests will automatically be added to the
 // test suite that executes when RUN_ALL_TESTS() is called
 #include "TestSequentialScan.h"
+#include "TestOctree.h"
 
 int main(int argc, char* argv[])
 {

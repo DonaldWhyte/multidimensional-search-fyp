@@ -4,6 +4,10 @@
 namespace mdsearch
 {
 
+	SequentialScan::SequentialScan(int numDimensions) : IndexStructure(numDimensions)
+	{
+	}
+
 	void SequentialScan::loadPoints(const PointList& pointsToAdd)
 	{
 		// Pre-allocate necessary memory to add points
@@ -22,11 +26,18 @@ namespace mdsearch
 		return points;
 	}
 	
-	void SequentialScan::insert(const Point& p)
+	bool SequentialScan::insert(const Point& p)
 	{
 		// Only insert point if it does not already exist in the structure
 		if (!pointExists(p))
+		{
 			points.push_back(p);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	bool SequentialScan::remove(const Point& p)

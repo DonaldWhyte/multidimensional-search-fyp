@@ -1,21 +1,22 @@
-#ifndef MDSEARCH_SEQUENTIALSCAN_H
-#define MDSEARCH_SEQUENTIALSCAN_H
+#ifndef MDSEARCH_OCTREE_H
+#define MDSEARCH_OCTREE_H
 
 #include "IndexStructure.h"
+
+
 
 namespace mdsearch
 {
 
-	class SequentialScan : public IndexStructure
+	class Octree : public IndexStructure
 	{
 
 	public:
-		SequentialScan(int numDimensions);
+		Octree(int numDimensions, const Region& boundary);
+		virtual ~Octree();
 
 		// Bulk load points into the structure
 		void loadPoints(const PointList& points);
-		// Return all store points as a raw list
-		const PointList& allPoints() const;
 
 		// Dynamic operations
 		bool insert(const Point& p);
@@ -26,7 +27,16 @@ namespace mdsearch
 		PointList pointsInRegion(const Region& region);
 
 	private:
+		// Sub-divide octree into four sub-regions (nodes)
+		void subdivide();
+
+		static const unsigned int MAX_POINTS_PER_NODE = 8;
+
+		Region boundary;
+		unsigned int numSubdivisionsToMake;
+
 		PointList points;
+		std::vector<Octree*> children;
 
 	};
 
