@@ -67,7 +67,7 @@ namespace mdsearch { namespace tests
 		ASSERT_EQ(256, structure.childrenPerNode());
 	}
 
-	TEST_F(OctreeTests, Insertion)
+	TEST_F(OctreeTests, InsertionAndSubdivide)
 	{
 		Octree structure(NUM_OCTREE_DIMENSIONS, initialBoundary);
 
@@ -89,8 +89,6 @@ namespace mdsearch { namespace tests
 		ASSERT_EQ(closePoints[0], structure.storedPoints()[0]);
 		ASSERT_EQ(0, structure.nodeChildren().size());
 
-		return; // TODO: remove
-
 		// Insert points close together and then a point far away
 		for (unsigned int i = 1; (i < NUM_CLOSE_POINTS); i++)
 		{
@@ -101,29 +99,31 @@ namespace mdsearch { namespace tests
 		ASSERT_EQ(0, structure.storedPoints().size());
 		ASSERT_EQ(structure.childrenPerNode(), structure.nodeChildren().size());
 		// Ensure all children are empty EXCEPT FOR ONE REGION
-		bool foundNonEmpty = false;
+		bool foundCluster = false;
+		bool foundFar = false;
 		const OctreeNodeList& children = structure.nodeChildren();
 		for (OctreeNodeList::const_iterator it = children.begin();
 			(it != children.end()); it++)
 		{
 			const PointList& storedPoints = (*it)->storedPoints();
 			unsigned int nPoints = storedPoints.size();
-			ASSERT_TRUE(nPoints == 1 || nPoints == (Octree::MAX_POINTS_PER_NODE - 1) || nPoints == 0);
-			if (nPoints == 1)
+			if (nPoints == 1) // far away point
 			{
-				ASSERT_EQ(testPoints[1], storedPoints[0]);
+				EXPECT_EQ(testPoints[8], storedPoints[0]);
+				foundFar = true;
 			}
-			else if (nPoints == (Octree::MAX_POINTS_PER_NODE - 1))
+			else if (nPoints == Octree::MAX_POINTS_PER_NODE) // cluster of close points
 			{
-				for (PointList::const_iterator p = storedPoints.begin(); (p!= storedPoints.end()); p++)
-				{
-					ASSERT_EQ(testPoints[0], *p);
-				}
+				EXPECT_EQ(closePoints, storedPoints);
+				foundCluster = true;
+			}
+			else
+			{
+				EXPECT_EQ(0, nPoints);
 			}
 		}
-
-		// NOTE: Test to ensure correct regions for children node were
-		// computed is in the subdivision() test
+		EXPECT_TRUE(foundFar);
+		EXPECT_TRUE(foundCluster);
 	}
 
 	TEST_F(OctreeTests, Removal)
@@ -149,13 +149,6 @@ namespace mdsearch { namespace tests
 		Octree structure(NUM_OCTREE_DIMENSIONS, initialBoundary);
 		// TODO
 	}
-
-	TEST_F(OctreeTests, Subdivision)
-	{
-		Octree structure(NUM_OCTREE_DIMENSIONS, initialBoundary);
-		// TODO
-	}
-
 
 
 } }

@@ -71,9 +71,6 @@ namespace mdsearch
 				else
 					halfValue = intervals[i].min + (intervals[i].max - intervals[i].min) / 2.0f;
 
-				std::cout << (Interval(intervals[i].min, halfValue)) << std::endl;
-				std::cout << (Interval(halfValue, intervals[i].max)) << std::endl;
-
 				subIntervals.push_back(Interval(intervals[i].min, halfValue));
 				subIntervals.push_back(Interval(halfValue, intervals[i].max));
 			}
