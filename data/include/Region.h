@@ -23,6 +23,12 @@ namespace mdsearch
 		Interval();
 		Interval(Real min, Real max);
 
+		/* Return true if given interval overlaps with this one. */
+		inline bool intersects(const Interval& other) const
+		{
+			return (other.min <= max && min <= other.max);
+		}
+
 		const bool operator==(const Interval& other) const;
 		const bool operator!=(const Interval& other) const;
 
@@ -49,6 +55,20 @@ namespace mdsearch
 			for (int i = 0; (i < nDimensions); i++)
 			{
 				if (p[i] < intervals[i].min || p[i] > intervals[i].max)
+					return false;
+			}
+			return true;
+		}
+
+		/* Interval overlapping equation received from:
+		 * http://www.rgrjr.com/emacs/overlap.html */
+		inline bool intersects(const Region& r) const
+		{
+			for (int i = 0; (i < nDimensions); i++)
+			{
+				// If the two regions' intervals for a given dimension
+				// DO NOT OVERLAP, then the regions as a whole don't intersect
+				if (!intervals[i].intersects(r[i]))
 					return false;
 			}
 			return true;

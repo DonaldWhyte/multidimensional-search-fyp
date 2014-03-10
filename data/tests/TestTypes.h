@@ -51,6 +51,15 @@ namespace mdsearch { namespace tests
 		EXPECT_TRUE(a != b);
 		EXPECT_FALSE(b != b);
 		EXPECT_FALSE(b != Interval(3, 5));
+
+		// Interval intersection
+		EXPECT_TRUE(Interval(2, 2).intersects(Interval(2, 2)));
+		EXPECT_TRUE(Interval(2, 2).intersects(Interval(2, 3)));
+		EXPECT_TRUE(Interval(2, 3).intersects(Interval(2, 2)));
+		EXPECT_TRUE(Interval(2, 3).intersects(Interval(1, 4)));
+		EXPECT_TRUE(Interval(1, 4).intersects(Interval(2, 3)));
+		EXPECT_FALSE(Interval(1, 1).intersects(Interval(2, 2)));
+		EXPECT_FALSE(Interval(2, 8).intersects(Interval(17, 24)));
 	}
 
 	TEST_F(RegionTests, Region)
@@ -62,11 +71,14 @@ namespace mdsearch { namespace tests
 		EXPECT_EQ(oneB[0], Interval(10, 20));
 		Region twoA(2);
 		Region twoB(2, Interval(10, 20));
-		Interval someIntervals[] = { Interval(60, 70), Interval(80, 90) };
-		Region twoC(2, someIntervals);
+		Interval twoCIntervals[] = { Interval(60, 70), Interval(80, 90) };
+		Region twoC(2, twoCIntervals);
+		Interval twoDIntervals[] = { Interval(40, 100), Interval(85, 87) };
+		Region twoD(2, twoDIntervals);
 		EXPECT_EQ(twoA[0], Interval(0, 0)); EXPECT_EQ(twoA[1], Interval(0, 0));
 		EXPECT_EQ(twoB[0], Interval(10, 20)); EXPECT_EQ(twoB[1], Interval(10, 20));
 		EXPECT_EQ(twoC[0], Interval(60, 70)); EXPECT_EQ(twoC[1], Interval(80, 90));
+		EXPECT_EQ(twoD[0], Interval(40, 100)); EXPECT_EQ(twoD[1], Interval(85, 87));
 		// Test point-inside-region test
 		Real testPointsValues[][2] = {
 			{12, 12}, {19, 12}, {8, 12},
@@ -83,6 +95,12 @@ namespace mdsearch { namespace tests
 		EXPECT_TRUE( twoA.contains(Point(2, testPointsValues[5])) );
 		EXPECT_FALSE( twoA.contains(Point(2, testPointsValues[6])) );
 		EXPECT_FALSE( twoA.contains(Point(2, testPointsValues[7])) );
+
+		// Region intersection
+		EXPECT_TRUE(twoB.intersects(twoB));
+		EXPECT_FALSE(twoB.intersects(twoC));
+		EXPECT_TRUE(twoC.intersects(twoD));
+		EXPECT_FALSE(twoD.intersects(twoB));
 	}	
 
 	TEST_F(RegionTests, Subdivison)
