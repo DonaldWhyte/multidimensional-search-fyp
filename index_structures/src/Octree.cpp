@@ -57,6 +57,16 @@ namespace mdsearch
 		{
 			return false;
 		}
+		// If this is a non-leaf node
+		else if (!children.empty())
+		{
+			for (OctreeNodeList::iterator it = children.begin();
+				(it != children.end()); it++)
+			{
+	            if ((*it)->insert(p))
+	                return true;
+	        }			
+		}
 		// If there is more space to put shapes in this node, add the shape
 	    else if (points.size() < MAX_POINTS_PER_NODE)
 	    {
@@ -100,7 +110,39 @@ namespace mdsearch
 	
 	bool Octree::pointExists(const Point& p)
 	{
-		// TODO
+		if (boundary.contains(p))
+		{
+			//std::cout << p << " CHILDREN SIZE: " << children.size() << std::endl;
+			if (children.empty())
+			{
+				for (PointList::const_iterator it = points.begin();
+					(it != points.end()); it++)
+				{
+					//std::cout << "\t" << p << " " << *it << std::endl;
+					if (*it == p)
+					{
+						return true;
+					}
+				}
+			}
+			else
+			{
+				for (OctreeNodeList::const_iterator it = children.begin();
+					(it != children.end()); it++)
+				{
+					//std::cout << p << " " << (*it)->storedPoints().size() << " " << (*it)->nodeChildren().size() << std::endl;
+					if ((*it)->pointExists(p))
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	PointList Octree::pointsInRegion(const Region& region)

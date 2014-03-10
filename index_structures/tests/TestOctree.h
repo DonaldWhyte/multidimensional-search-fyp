@@ -141,7 +141,16 @@ namespace mdsearch { namespace tests
 	TEST_F(OctreeTests, PointQueries)
 	{
 		Octree structure(NUM_OCTREE_DIMENSIONS, initialBoundary);
-		// TODO
+		structure.loadPoints(testPoints);
+
+		// Test points that don't exist in structure
+		EXPECT_FALSE( structure.pointExists(Point(1, 0.0f)) );
+		EXPECT_FALSE( structure.pointExists(Point(3, 0.0f)) );
+		EXPECT_FALSE( structure.pointExists(Point(10, 5.6f)) );
+		// Test points that do exist
+		EXPECT_TRUE( structure.pointExists(testPoints[0]) );
+		EXPECT_TRUE( structure.pointExists(testPoints[4]) );
+		EXPECT_TRUE( structure.pointExists(testPoints[9]) );
 	}
 
 	TEST_F(OctreeTests, RegionQueries)
