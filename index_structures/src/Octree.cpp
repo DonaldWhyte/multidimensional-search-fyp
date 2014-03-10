@@ -4,9 +4,10 @@
 namespace mdsearch
 {
 
-	Octree::Octree(int numDimensions, const Region& boundary) : IndexStructure(numDimensions),
-		numChildrenPerNode( pow(2, numDimensions) ),
-		boundary(boundary)
+	Octree::Octree(int numDimensions, const Region& boundary, Octree* nodeParent) :
+		IndexStructure(numDimensions), nodeParent(nodeParent), boundary(boundary),
+		numChildrenPerNode( pow(2, numDimensions) )
+		
 	{
 		// Pre-allocate enough memory to store max amount of points in this node
 		points.reserve(MAX_POINTS_PER_NODE);
@@ -41,6 +42,36 @@ namespace mdsearch
 	{
 		return boundary;
 	}
+
+	Octree* Octree::parent() const
+	{
+		return nodeParent;
+	}
+
+	bool Octree::isLeaf() const
+	{
+		return children.empty();
+	}
+
+	bool Octree::empty() const
+	{
+		if (isLeaf())
+		{
+			return (points.empty());
+		}
+		else
+		{
+			for (OctreeNodeList::const_iterator it = children.begin();
+				(it != children.end()); it++)
+			{
+				// If a child is not empty, immediately return false
+	            if (!(*it)->empty())
+	                return false;
+	        }
+	        // All children were empty, so this node is empty!
+	        return true;
+		}
+	}
 	
 	bool Octree::insert(const Point& p)
 	{
@@ -49,7 +80,7 @@ namespace mdsearch
 			return false;
 		}
 		// If this is a non-leaf node
-		else if (!children.empty())
+		else if (!isLeaf())
 		{
 			for (OctreeNodeList::iterator it = children.begin();
 				(it != children.end()); it++)
@@ -91,7 +122,50 @@ namespace mdsearch
 
 	bool Octree::remove(const Point& p)
 	{
-		// TODO
+		if (isLeaf()) // if leaf node
+		{
+			PointList::iterator it = points.begin();
+			for (it; (it != points.end()); it++)
+			{
+				if (*it == p)
+				{
+					break;
+				}
+			}
+			// If the point was found, then ERASE it and return true!
+			if (it != points.end())
+			{
+				points.erase(it);
+				return true;
+			}
+		}
+		else // if non-leaf
+		{
+			// Try removing point from children
+			// If a node returns true, then keep a pointer to that node
+			OctreeNodeList::iterator nodeModified = children.end();
+			for (OctreeNodeList::iterator it = children.begin();
+				(it != children.end()); it++)
+			{
+	            if ((*it)->remove(p))
+	            {
+	            	nodeModified = it;
+	                break;
+	            }
+	        }
+	        // If a node was modified and it is now empty, remove it!
+	        if (nodeModified != children.end())
+	        {
+	        	if ((*nodeModified)->empty())
+	        	{
+	        		children.erase(nodeModified);
+	        		return true;
+	        	}
+	        }
+		}
+		// Remove point from node
+		// If node is now empty, delete it and REMOVE it from the parent!
+		// If all children in parent are empty, collapse into single node
 	}
 
 	bool Octree::update(const Point& oldPoint, const Point& newPoint)
@@ -103,7 +177,7 @@ namespace mdsearch
 	{
 		if (boundary.contains(p))
 		{
-			if (children.empty())
+			if (isLeaf())
 			{
 				for (PointList::const_iterator it = points.begin();
 					(it != points.end()); it++)
@@ -144,7 +218,7 @@ namespace mdsearch
 	{
 		if (boundary.intersects(region))
 		{
-			if (children.empty())
+			if (isLeaf())
 			{
 				for (PointList::const_iterator it = points.begin();
 					(it != points.end()); it++)
@@ -183,7 +257,8 @@ namespace mdsearch
 		children.reserve(numChildrenPerNode);
 		for (unsigned int i = 0; (i < numChildrenPerNode); i++)
 		{
-		    children.push_back( new Octree(numDimensions, childrenBoundaries[i]) );
+			Octree* child = new Octree(numDimensions, childrenBoundaries[i], this);
+		    children.push_back(child);
 		}
 		// For all the points currently in this node, move them to one of the children
 		unsigned int pointsMoved = 0;

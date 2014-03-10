@@ -19,8 +19,10 @@ namespace mdsearch
 		static const unsigned int MAX_POINTS_PER_NODE = 8;
 
 		// An Octree must be initialised with its dimensionality and the
-		// region of space is covers
-		Octree(int numDimensions, const Region& boundary);
+		// region of space is covers. A pointer to the node's parent (if
+		// the node is not the parent) must also be provided for efficient
+		// removal and updating.
+		Octree(int numDimensions, const Region& boundary, Octree* nodeParent = NULL);
 		virtual ~Octree();
 
 		// Return number of children each non-leaf node has
@@ -30,6 +32,13 @@ namespace mdsearch
 		const PointList& storedPoints() const;
 		const OctreeNodeList& nodeChildren() const;
 		const Region& regionCovered() const;
+		// Read-write accessors
+		Octree* parent() const;
+
+		// Return true if node is a leaf
+		bool isLeaf() const;
+		// Checks if node (including all of its children) are empty
+		bool empty() const;
 
 		// Dynamic operations
 		bool insert(const Point& p);
@@ -50,6 +59,7 @@ namespace mdsearch
 		// end of the recursive algorithm.
 		void recursiveRegionQuery(const Region& region, PointList& foundPoints);
 
+		Octree* nodeParent;
 		Region boundary;
 		unsigned int numChildrenPerNode;
 
