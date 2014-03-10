@@ -173,7 +173,23 @@ namespace mdsearch
 
 	bool Octree::update(const Point& oldPoint, const Point& newPoint)
 	{
-		// TODO
+		// Remove old point from tree
+		bool success = remove(oldPoint);
+		// If point was found and removed, insert new point IF AND 
+		// ONLY IF the new point does not already exist (as we're
+		// only allowed UNIQUE points with this index structure)
+		if (success)
+		{
+			// Don't return result of this since we don't care if 
+			// point is not inserted because it exists -- this
+			// update() operation is still a success
+			insert(newPoint);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	bool Octree::pointExists(const Point& p)

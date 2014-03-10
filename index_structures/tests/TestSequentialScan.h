@@ -97,13 +97,9 @@ namespace mdsearch { namespace tests
 
 	TEST_F(SequentialScanTests, Updating)
 	{
-		SequentialScan structure(NUM_DIMENSIONS);
-		structure.loadPoints(testPoints);
-
-		// Test with points that don't exist in structure
-		EXPECT_FALSE( structure.pointExists(Point(1, 0.0f)) );
-		EXPECT_FALSE( structure.pointExists(Point(3, 0.0f)) );
-		EXPECT_FALSE( structure.pointExists(Point(10, 5.6f)) );
+		SequentialScan structure(IndexStructureTester::NUM_TEST_DIMENSIONS);
+		IndexStructureTester tester;
+		tester.testUpdates(&structure);
 	}
 
 	TEST_F(SequentialScanTests, PointQueries)

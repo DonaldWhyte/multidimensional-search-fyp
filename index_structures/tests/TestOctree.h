@@ -177,13 +177,13 @@ namespace mdsearch { namespace tests
 		ASSERT_TRUE(structure.empty());
 		ASSERT_EQ(0, structure.nodeChildren().size());
 		ASSERT_EQ(0, structure.storedPoints().size());
-		// TODO: remove other node and then see if all nodes are collapsed!!!!
 	}
 
 	TEST_F(OctreeTests, Updating)
 	{
-		Octree structure(NUM_OCTREE_DIMENSIONS, initialBoundary);
-		// TODO
+		Octree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
+		IndexStructureTester tester;
+		tester.testUpdates(&structure);
 	}
 
 	TEST_F(OctreeTests, PointQueries)
