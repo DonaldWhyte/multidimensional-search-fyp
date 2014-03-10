@@ -14,6 +14,8 @@ include_directories ("${PROJECT_ROOT}/data/include") # added path to data librar
 
 # Executable for running unit and/or integration tests
 add_executable ( structure_tests
+	"tests/Common.h"
+	"tests/Common.cpp"
 	"tests/TestRunner.cpp"
 	"tests/TestSequentialScan.h"
 	"tests/TestOctree.h"

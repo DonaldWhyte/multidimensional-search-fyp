@@ -3,6 +3,7 @@
 
 #include <gtest/gtest.h>
 #include "Octree.h"
+#include "Common.h"
 
 namespace mdsearch { namespace tests
 {
@@ -15,15 +16,6 @@ namespace mdsearch { namespace tests
 	protected:
 		virtual void SetUp()
 		{
-			// Construct test dataset
-			Real testPointValues[NUM_TEST_POINTS][NUM_OCTREE_DIMENSIONS] = {
-				{9, 2, 0}, {3, 6, 6}, {4, 0, 3}, {6, 5, 8}, {6, 7, 6},
-				{1, 3, 0}, {6, 9, 0}, {2, 4, 7}, {4, 5, 9}, {5, 6, 0}
-			};
-			testPoints.reserve(NUM_TEST_POINTS);
-			for (unsigned int i = 0; (i < NUM_TEST_POINTS); i++)
-				testPoints.push_back( Point(NUM_OCTREE_DIMENSIONS, testPointValues[i]) );
-
 			Real closePointValues[NUM_CLOSE_POINTS][NUM_OCTREE_DIMENSIONS] = {
 				{ 1, 1, 1 }, { 2, 1, 1 }, { 1, 2, 1 }, { 1, 1, 2 }, 
 				{ 2, 2, 1 }, { 1, 2, 2 }, { 2, 1, 2 }, { 2, 2, 2 }, 
@@ -36,17 +28,9 @@ namespace mdsearch { namespace tests
 			initialBoundary = Region(3, initialBoundaryIntervals);
 		}
 
-		virtual void TearDown()
-		{
-			// Clear test dataset
-			testPoints.clear();
-		}
-
 		// Constants about test data
-		static const unsigned int NUM_TEST_POINTS = 10;
 		static const unsigned int NUM_CLOSE_POINTS = 8;
-		
-		PointList testPoints;
+
 		PointList closePoints;
 		Region initialBoundary;
 
@@ -70,6 +54,8 @@ namespace mdsearch { namespace tests
 	TEST_F(OctreeTests, InsertionAndSubdivide)
 	{
 		Octree structure(NUM_OCTREE_DIMENSIONS, initialBoundary);
+		IndexStructureTester tester;
+		const PointList& testPoints = tester.getTestPoints();
 
 		// Test point that IS NOT CONAINED in the region the octree covers
 		Real outsidePointValues[3] = { 30, 30, 30 };
@@ -140,23 +126,16 @@ namespace mdsearch { namespace tests
 
 	TEST_F(OctreeTests, PointQueries)
 	{
-		Octree structure(NUM_OCTREE_DIMENSIONS, initialBoundary);
-		structure.loadPoints(testPoints);
-
-		// Test points that don't exist in structure
-		EXPECT_FALSE( structure.pointExists(Point(1, 0.0f)) );
-		EXPECT_FALSE( structure.pointExists(Point(3, 0.0f)) );
-		EXPECT_FALSE( structure.pointExists(Point(10, 5.6f)) );
-		// Test points that do exist
-		EXPECT_TRUE( structure.pointExists(testPoints[0]) );
-		EXPECT_TRUE( structure.pointExists(testPoints[4]) );
-		EXPECT_TRUE( structure.pointExists(testPoints[9]) );
+		Octree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
+		IndexStructureTester tester;
+		tester.testPointQueries(&structure);
 	}
 
 	TEST_F(OctreeTests, RegionQueries)
 	{
-		Octree structure(NUM_OCTREE_DIMENSIONS, initialBoundary);
-		// TODO
+		Octree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
+		IndexStructureTester tester;
+		tester.testRegionQueries(&structure);
 	}
 
 

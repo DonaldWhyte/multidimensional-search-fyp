@@ -23,8 +23,6 @@ namespace mdsearch
 		Octree(int numDimensions, const Region& boundary);
 		virtual ~Octree();
 
-		// Bulk load points into the structure
-		void loadPoints(const PointList& points);
 		// Return number of children each non-leaf node has
 		// (fixed number based on dimensionality)
 		unsigned int childrenPerNode() const;
@@ -46,6 +44,11 @@ namespace mdsearch
 		void subdivide();
 		// Return true if this node stores the given point, false otherwise
 		bool storesPoint(const Point& p) const;
+		// Perform recursive search through octree to find all points inside
+		// the given region. At the top level, an empty PointList should be
+		// given. This will be populated with any found points at the
+		// end of the recursive algorithm.
+		void recursiveRegionQuery(const Region& region, PointList& foundPoints);
 
 		Region boundary;
 		unsigned int numChildrenPerNode;

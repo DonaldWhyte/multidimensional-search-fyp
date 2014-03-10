@@ -22,15 +22,6 @@ namespace mdsearch
 		}
 	}
 
-	void Octree::loadPoints(const PointList& pointsToAdd)
-	{
-		for (PointList::const_iterator it = pointsToAdd.begin();
-			(it != pointsToAdd.end()); it++)
-		{
-			insert(*it);
-		}
-	}
-
 	unsigned int Octree::childrenPerNode() const
 	{
 		return numChildrenPerNode;
@@ -112,13 +103,11 @@ namespace mdsearch
 	{
 		if (boundary.contains(p))
 		{
-			//std::cout << p << " CHILDREN SIZE: " << children.size() << std::endl;
 			if (children.empty())
 			{
 				for (PointList::const_iterator it = points.begin();
 					(it != points.end()); it++)
 				{
-					//std::cout << "\t" << p << " " << *it << std::endl;
 					if (*it == p)
 					{
 						return true;
@@ -130,7 +119,6 @@ namespace mdsearch
 				for (OctreeNodeList::const_iterator it = children.begin();
 					(it != children.end()); it++)
 				{
-					//std::cout << p << " " << (*it)->storedPoints().size() << " " << (*it)->nodeChildren().size() << std::endl;
 					if ((*it)->pointExists(p))
 					{
 						return true;
@@ -147,7 +135,38 @@ namespace mdsearch
 
 	PointList Octree::pointsInRegion(const Region& region)
 	{
-		// TODO
+		PointList foundPoints;
+		recursiveRegionQuery(region, foundPoints);
+		return foundPoints;
+	}
+
+	void Octree::recursiveRegionQuery(const Region& region, PointList& foundPoints)
+	{
+		if (boundary.intersects(region))
+		{
+			if (children.empty())
+			{
+				for (PointList::const_iterator it = points.begin();
+					(it != points.end()); it++)
+				{
+					if (region.contains(*it))
+					{
+						foundPoints.push_back(*it);
+					}
+				}
+			}
+			else
+			{
+				for (OctreeNodeList::const_iterator it = children.begin();
+					(it != children.end()); it++)
+				{
+					// NOTE: Calling private method, but allowed because it is
+					// a method of the same class (automatic friend class).
+					// TODO: Code smell! Fix in the future??
+					(*it)->recursiveRegionQuery(region, foundPoints);
+				}
+			}
+		}
 	}
 
 	void Octree::subdivide()

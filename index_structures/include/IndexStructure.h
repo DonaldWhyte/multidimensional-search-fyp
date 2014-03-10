@@ -17,6 +17,15 @@ namespace mdsearch
 		{
 		}
 
+		// Bulk load points into the structure
+		virtual void loadPoints(const PointList& pointsToAdd)
+		{
+			for (PointList::const_iterator it = pointsToAdd.begin();
+				(it != pointsToAdd.end()); it++)
+			{
+				insert(*it);
+			}
+		}
 		// Dynamic operations
 		virtual bool insert(const Point& p) = 0;
 		virtual bool remove(const Point& p) = 0;
