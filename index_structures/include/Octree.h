@@ -58,6 +58,8 @@ namespace mdsearch
 		// given. This will be populated with any found points at the
 		// end of the recursive algorithm.
 		void recursiveRegionQuery(const Region& region, PointList& foundPoints);
+		// Remove all child nodes from this Octree node
+		void removeAllChildren();
 
 		Octree* nodeParent;
 		Region boundary;

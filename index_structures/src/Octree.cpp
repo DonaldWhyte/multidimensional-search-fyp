@@ -15,12 +15,7 @@ namespace mdsearch
 
 	Octree::~Octree()
 	{
-		// Recursively delete child nodes
-		for (OctreeNodeList::iterator it = children.begin();
-			(it != children.end()); it++)
-		{
-			delete *it;
-		}
+		removeAllChildren();
 	}
 
 	unsigned int Octree::childrenPerNode() const
@@ -138,6 +133,10 @@ namespace mdsearch
 				points.erase(it);
 				return true;
 			}
+			else
+			{
+				return false;
+			}
 		}
 		else // if non-leaf
 		{
@@ -153,19 +152,23 @@ namespace mdsearch
 	                break;
 	            }
 	        }
-	        // If a node was modified and it is now empty, remove it!
+	        // If a node was modified...
 	        if (nodeModified != children.end())
 	        {
+	        	// If modified node is now empty, cgeck if this entire node is empty.
+	        	// If so, collapse into single node by removing all children
 	        	if ((*nodeModified)->empty())
-	        	{
-	        		children.erase(nodeModified);
-	        		return true;
-	        	}
+	        		if (empty())
+						removeAllChildren();
+
+	        	// Either way, a point was deleted so return true
+	        	return true;
 	        }
+
+	        return false;
 		}
-		// Remove point from node
-		// If node is now empty, delete it and REMOVE it from the parent!
-		// If all children in parent are empty, collapse into single node
+
+		return false; // here to ensure compilers don't complain
 	}
 
 	bool Octree::update(const Point& oldPoint, const Point& newPoint)
@@ -289,6 +292,17 @@ namespace mdsearch
 				return true;
 		}
 		return false;
+	}
+
+	void Octree::removeAllChildren()
+	{
+		// Recursively delete child nodes
+		for (OctreeNodeList::iterator it = children.begin();
+			(it != children.end()); it++)
+		{
+			delete *it;
+		}
+		children.clear();
 	}
 
 }

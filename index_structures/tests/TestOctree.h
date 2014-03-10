@@ -115,7 +115,69 @@ namespace mdsearch { namespace tests
 	TEST_F(OctreeTests, Removal)
 	{
 		Octree structure(NUM_OCTREE_DIMENSIONS, initialBoundary);
-		// TODO
+		IndexStructureTester tester;
+		const PointList& testPoints = tester.getTestPoints();
+
+		// Point deletion with empty structure
+		EXPECT_FALSE(structure.remove(testPoints[1]));
+
+		structure.insert(testPoints[0]);
+		structure.insert(testPoints[1]);
+		structure.insert(testPoints[2]);
+		PointList expectedPoints;
+		expectedPoints.push_back(testPoints[0]);
+		expectedPoints.push_back(testPoints[1]);
+		expectedPoints.push_back(testPoints[2]);
+		ASSERT_EQ(expectedPoints, structure.storedPoints());
+
+		// Point deletion where point is not in non-empty structure
+		EXPECT_FALSE(structure.remove(testPoints[4]));
+		// Point deletion where point exists
+		EXPECT_TRUE(structure.remove(testPoints[1]));
+		expectedPoints.erase(expectedPoints.begin() + 1);
+		EXPECT_EQ(expectedPoints, structure.storedPoints()); // ensure point has been removed!
+
+
+		// --RECURSIVE NODE COLLAPSING--
+		structure = Octree(NUM_OCTREE_DIMENSIONS, initialBoundary);
+		// Add enough points to cause a subdivision
+		ASSERT_TRUE( structure.insert(testPoints[1]) );
+		for (unsigned int i = 0; (i < NUM_CLOSE_POINTS); i++)
+			ASSERT_TRUE(structure.insert(closePoints[i]));
+		ASSERT_EQ(0, structure.storedPoints().size());
+		const OctreeNodeList& children = structure.nodeChildren();
+		ASSERT_EQ(structure.childrenPerNode(), children.size());
+		// Ensure there are two children with points (one should have 1 point and the other should have 8)
+		const Octree* filledNode = NULL;
+		bool foundSinglePointNode = false;
+		for (OctreeNodeList::const_iterator it = children.begin(); (it != children.end()); it++)
+		{
+			unsigned int nPoints = (*it)->storedPoints().size();
+			if (nPoints == Octree::MAX_POINTS_PER_NODE)
+				filledNode = *it;
+			else if (nPoints == 1)
+				foundSinglePointNode = true;
+			else
+				EXPECT_EQ(0, nPoints);
+		}
+
+		ASSERT_TRUE( (filledNode != NULL) );
+		ASSERT_TRUE(foundSinglePointNode);
+		// Remove all 8 points to cause one of the nodes to be empty
+		for (unsigned int i = 0; (i < NUM_CLOSE_POINTS); i++)
+		{
+			ASSERT_TRUE( structure.remove(closePoints[i]) );
+			unsigned int expectedCount = (Octree::MAX_POINTS_PER_NODE - i - 1);
+			ASSERT_EQ(expectedCount, filledNode->storedPoints().size());
+		}
+		ASSERT_EQ(structure.childrenPerNode(), structure.nodeChildren().size());
+		ASSERT_FALSE(structure.empty());
+		// Remove final node and ensure octree has collapsed to just the root node
+		ASSERT_TRUE(structure.remove(testPoints[1]));
+		ASSERT_TRUE(structure.empty());
+		ASSERT_EQ(0, structure.nodeChildren().size());
+		ASSERT_EQ(0, structure.storedPoints().size());
+		// TODO: remove other node and then see if all nodes are collapsed!!!!
 	}
 
 	TEST_F(OctreeTests, Updating)
