@@ -2,10 +2,21 @@
 #define MDSEARCH_REGION_H
 
 #include <vector>
+#include <cmath>
 #include "Point.h"
 
 namespace mdsearch
 {
+
+	// Classes forward declared so typedefs and << overloads can be declared
+	class Interval;
+	class Region;
+	// Typedefs for convenience
+	typedef std::vector<Interval> IntervalList;
+	typedef std::vector<Region> RegionList;	
+	// Used to easily print intervals and regions
+	std::ostream& operator<<(std::ostream& out, const Interval& interval);
+	std::ostream& operator<<(std::ostream& out, const Region& region);
 
 	struct Interval
 	{
@@ -19,14 +30,17 @@ namespace mdsearch
 		Real max;
 	};
 
-	typedef std::vector<Interval> IntervalList;
-
 	class Region
 	{
 
 	public:
 		Region(int n = 1, const Interval& initialInterval = Interval());
 		Region(int n, const Interval* initialIntervals);
+
+		inline unsigned int numDimensions() const
+		{
+			return nDimensions;
+		}
 
 		// Inline functions have been declared in the header file
 		// to prevent linker issues
@@ -40,6 +54,62 @@ namespace mdsearch
 			return true;
 		}
 
+		// Subdivides the region into a collection of sub-regions by splitting
+		// the original region in half along each dimension. This returns
+		// 2^(numDimensions) sub-regions.
+		inline RegionList subdivide() const
+		{
+			// Compute all possible intervals (two for each dimension)
+			IntervalList subIntervals;
+			subIntervals.reserve(nDimensions * 2);
+			for (unsigned int i = 0; (i < nDimensions); i++)
+			{	
+				Real halfValue;
+				// CORNER CASE: Interval has a size of zero (min == max)
+				if (intervals[i].min == intervals[i].max)
+					halfValue = intervals[i].min;
+				else
+					halfValue = intervals[i].min + (intervals[i].max - intervals[i].min) / 2.0f;
+
+				std::cout << (Interval(intervals[i].min, halfValue)) << std::endl;
+				std::cout << (Interval(halfValue, intervals[i].max)) << std::endl;
+
+				subIntervals.push_back(Interval(intervals[i].min, halfValue));
+				subIntervals.push_back(Interval(halfValue, intervals[i].max));
+			}
+			// Compute total number of sub-regions
+			unsigned int numSubRegions = pow(2, nDimensions);
+			// Create sub-region objects
+			RegionList subRegions;
+			subRegions.reserve(numSubRegions);
+			for (unsigned int i = 0; (i < numSubRegions); i++)
+			{
+				subRegions.push_back(Region(nDimensions));
+			}			
+			// Populate sub-regions with correct intervals
+			for (unsigned int d = 0; (d < nDimensions); d++)
+			{
+				int repeatCount = pow(2, d);
+				repeatCount = std::max(1, repeatCount);
+
+				unsigned int index = 0;
+				for (unsigned int r = 0; (r < subRegions.size()); r++)
+				{
+					subRegions[r][d] = subIntervals[(d * 2) + index];
+					if (((r + 1) % repeatCount) == 0)
+					{
+						index++;
+						if (index >= 2) // TODO: correct?
+						{
+							index = 0;
+						}
+					}
+				}
+			}			
+
+			return subRegions;
+		}
+
 		inline const Interval& operator[](int index) const
 		{
 			return intervals[index];
@@ -50,9 +120,14 @@ namespace mdsearch
 			return intervals[index];
 		}
 
-		inline unsigned int numDimensions() const
+		inline bool operator==(const Region& other) const
 		{
-			return nDimensions;
+			if (nDimensions != other.numDimensions())
+				return false;
+			for (unsigned int i = 0; (i < nDimensions); i++)
+				if (intervals[i] != other[i])
+					return false;
+			return true;
 		}
 
 
@@ -62,8 +137,6 @@ namespace mdsearch
 		unsigned int nDimensions;
 
 	};
-
-	typedef std::vector<Region> RegionList;
 
 }
 

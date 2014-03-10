@@ -85,6 +85,122 @@ namespace mdsearch { namespace tests
 		EXPECT_FALSE( twoA.contains(Point(2, testPointsValues[7])) );
 	}	
 
+	TEST_F(RegionTests, Subdivison)
+	{
+		// Construct test regions
+		Region zeroSizeOneDR = Region(1, Interval(1, 1));
+		Region zeroSizeTwoDR = Region(2, Interval(1, 1));
+		Region zeroSizeThreeDR = Region(3, Interval(1, 1));
+		Region oneDR = Region(1, Interval(1, 3));
+		Region twoDR = Region(2, Interval(1, 3));
+		Region threeDR = Region(3, Interval(1, 3));
+		Region fourDR = Region(4, Interval(1, 3));
+		Interval nonUniformRegionIntervals[2] = { Interval(1, 11), Interval(0.5, 1) };
+		Region nonUniformRegion = Region(2, nonUniformRegionIntervals);
+		// Construct expected subregions for each region
+		Interval twoDSubRegionsIntervals[][2] = {
+			{ Interval(1, 2), Interval(1, 2) },
+			{ Interval(2, 3), Interval(1, 2) },
+			{ Interval(1, 2), Interval(2, 3) },
+			{ Interval(2, 3), Interval(2, 3) }
+		};
+		Interval threeDSubRegionsIntervals[][3] = {
+			{ Interval(1, 2), Interval(1, 2), Interval(1, 2) },
+			{ Interval(2, 3), Interval(1, 2), Interval(1, 2) },
+			{ Interval(1, 2), Interval(2, 3), Interval(1, 2) },
+			{ Interval(2, 3), Interval(2, 3), Interval(1, 2) },
+			{ Interval(1, 2), Interval(1, 2), Interval(2, 3) },
+			{ Interval(2, 3), Interval(1, 2), Interval(2, 3) },
+			{ Interval(1, 2), Interval(2, 3), Interval(2, 3) },
+			{ Interval(2, 3), Interval(2, 3), Interval(2, 3) }
+		};
+		Interval fourDSubRegionsIntervals[][4] = {
+			{ Interval(1, 2), Interval(1, 2), Interval(1, 2), Interval(1, 2) },
+			{ Interval(2, 3), Interval(1, 2), Interval(1, 2), Interval(1, 2) },
+			{ Interval(2, 3), Interval(2, 3), Interval(1, 2), Interval(1, 2) },
+			{ Interval(2, 3), Interval(2, 3), Interval(2, 3), Interval(2, 3) },
+			{ Interval(1, 2), Interval(2, 3), Interval(1, 2), Interval(1, 2) },
+			{ Interval(2, 3), Interval(2, 3), Interval(2, 3), Interval(1, 2) },
+			{ Interval(1, 2), Interval(2, 3), Interval(2, 3), Interval(2, 3) },
+			{ Interval(1, 2), Interval(1, 2), Interval(2, 3), Interval(1, 2) },
+			{ Interval(1, 2), Interval(1, 2), Interval(2, 3), Interval(2, 3) },
+			{ Interval(2, 3), Interval(1, 2), Interval(2, 3), Interval(1, 2) },
+			{ Interval(2, 3), Interval(1, 2), Interval(2, 3), Interval(2, 3) },
+			{ Interval(2, 3), Interval(2, 3), Interval(1, 2), Interval(2, 3) },
+			{ Interval(1, 2), Interval(2, 3), Interval(1, 2), Interval(2, 3) },
+			{ Interval(1, 2), Interval(2, 3), Interval(2, 3), Interval(1, 2) },
+			{ Interval(2, 3), Interval(1, 2), Interval(1, 2), Interval(2, 3) },
+			{ Interval(1, 2), Interval(1, 2), Interval(1, 2), Interval(2, 3) }
+		};
+		Interval nonUniformSubRegionsIntervals[][2] = {
+			{ Interval(1, 6), Interval(0.5, 0.75) },
+			{ Interval(6, 11), Interval(0.5, 0.75) },
+			{ Interval(1, 6), Interval(0.75, 1) },
+			{ Interval(6, 11), Interval(0.75, 1) }
+		};
+
+		RegionList zeroSizeOneDSubRegions;
+		for (unsigned int i = 0; (i < 2); i++)
+			zeroSizeOneDSubRegions.push_back( Region(1, Interval(1, 1)) );
+		RegionList zeroSizeTwoDSubRegions;
+		for (unsigned int i = 0; (i < 4); i++)
+			zeroSizeTwoDSubRegions.push_back( Region(2, Interval(1, 1)) );
+		RegionList zeroSizeThreeDSubRegions;
+		for (unsigned int i = 0; (i < 8); i++)
+			zeroSizeThreeDSubRegions.push_back( Region(3, Interval(1, 1)) );
+		RegionList oneDSubRegions;
+		oneDSubRegions.push_back( Region(1, Interval(1, 2)) );
+		oneDSubRegions.push_back( Region(1, Interval(2, 3)) );
+		RegionList twoDSubRegions;
+		for (unsigned int i = 0; (i < 4); i++)
+			twoDSubRegions.push_back( Region(2, twoDSubRegionsIntervals[i]) );
+		RegionList threeDSubRegions;
+		for (unsigned int i = 0; (i < 8); i++)
+			threeDSubRegions.push_back( Region(3, threeDSubRegionsIntervals[i]) );
+		RegionList fourDSubRegions;
+		for (unsigned int i = 0; (i < 16); i++)
+			fourDSubRegions.push_back( Region(4, fourDSubRegionsIntervals[i]) );
+		RegionList nonUniformSubRegions;
+		for (unsigned int i = 0; (i < 4); i++)
+			nonUniformSubRegions.push_back( Region(2, nonUniformSubRegionsIntervals[i]) );
+
+
+		// Test with one-dimensional region of zero size
+		EXPECT_EQ(zeroSizeOneDSubRegions, zeroSizeOneDR.subdivide());
+		// Test with one-dimensional region
+		EXPECT_EQ(oneDSubRegions, oneDR.subdivide());
+		// Test with two-dimensional region of zero size
+		EXPECT_EQ(zeroSizeTwoDSubRegions, zeroSizeTwoDR.subdivide());
+		// Test with two-dimensional region
+		EXPECT_EQ(twoDSubRegions, twoDR.subdivide());
+		// Test with three-dimensional region of zero size
+		EXPECT_EQ(zeroSizeThreeDSubRegions, zeroSizeThreeDR.subdivide());
+		// Test with three-dimensional region
+		EXPECT_EQ(threeDSubRegions, threeDR.subdivide());
+		// Test four-dimension region
+		RegionList actualSubRegions = fourDR.subdivide();
+		// Manually check for existing of actual region in EXPECTED regions
+		// This way, the order of the expected region list does not matter
+		for (RegionList::const_iterator actualRegion = actualSubRegions.begin();
+			(actualRegion != actualSubRegions.end()); actualRegion++)
+		{
+			bool exists = false;
+			for (RegionList::const_iterator expectedRegion = fourDSubRegions.begin();
+				(expectedRegion != fourDSubRegions.end()); expectedRegion++)			
+			{
+				if ((*expectedRegion) == (*actualRegion))
+				{
+					exists = true;
+					break;
+				}
+			}
+			ASSERT_TRUE(exists);
+		}
+
+		// Test with non-uniform region
+		EXPECT_EQ(nonUniformSubRegions, nonUniformRegion.subdivide());
+	}
+
 } }
 
 #endif

@@ -1,18 +1,21 @@
 #include "Octree.h"
+#include <cmath>
 
 namespace mdsearch
 {
 
 	Octree::Octree(int numDimensions, const Region& boundary) : IndexStructure(numDimensions),
-		numSubdivisionsToMake(2 ^ numDimensions), boundary(boundary)
+		numChildrenPerNode( pow(2, numDimensions) ),
+		boundary(boundary)
 	{
-		// TODO: comment
+		// Pre-allocate enough memory to store max amount of points in this node
 		points.reserve(MAX_POINTS_PER_NODE);
 	}
 
 	Octree::~Octree()
 	{
-		for (std::vector<Octree*>::iterator it = children.begin();
+		// Recursively delete child nodes
+		for (OctreeNodeList::iterator it = children.begin();
 			(it != children.end()); it++)
 		{
 			delete *it;
@@ -27,6 +30,26 @@ namespace mdsearch
 			insert(*it);
 		}
 	}
+
+	unsigned int Octree::childrenPerNode() const
+	{
+		return numChildrenPerNode;
+	}
+
+	const PointList& Octree::storedPoints() const
+	{
+		return points;
+	}
+
+	const OctreeNodeList& Octree::nodeChildren() const
+	{
+		return children;
+	}
+
+	const Region& Octree::regionCovered() const
+	{
+		return boundary;
+	}
 	
 	bool Octree::insert(const Point& p)
 	{
@@ -37,13 +60,22 @@ namespace mdsearch
 		// If there is more space to put shapes in this node, add the shape
 	    else if (points.size() < MAX_POINTS_PER_NODE)
 	    {
-	        points.push_back(p);
+	    	// Check if point already exists. If so, don't add it!
+	    	if (storesPoint(p))
+	    	{
+	    		return false;
+	    	}
+	    	else
+	    	{
+	    		points.push_back(p);
+	    		return true;	
+	    	}
 	    }
 	    // Otherwise, divide node into sub-nodes and add point to the correct child
 	    else
 	    {
 	        subdivide();
-			for (std::vector<Octree*>::iterator it = children.begin();
+			for (OctreeNodeList::iterator it = children.begin();
 				(it != children.end()); it++)
 			{
 	            if ((*it)->insert(p))
@@ -78,19 +110,20 @@ namespace mdsearch
 
 	void Octree::subdivide()
 	{
-		// TODO: comment
+		// Do nothing if the octree has children. This is because a
+		// subdivision has already been performed
 		if (children.size() > 0)
 			return;
 
 		// Construct sub-region for each child (equal size)
-		RegionList childrenBoundaries;
-		childrenBoundaries.reserve(numSubdivisionsToMake);
-		// TODO
+		RegionList childrenBoundaries = boundary.subdivide();
 		
 		// Create the children
-		children.reserve(numSubdivisionsToMake);
-		for (unsigned int i = 0; (i < numSubdivisionsToMake); i++)
+		children.reserve(numChildrenPerNode);
+		for (unsigned int i = 0; (i < numChildrenPerNode); i++)
+		{
 		    children.push_back( new Octree(numDimensions, childrenBoundaries[i]) );
+		}
 		// For all the points currently in this node, move them to one of the children
 		unsigned int pointsMoved = 0;
 		for (unsigned int pointIndex = 0; (pointIndex < points.size()); pointIndex++)
@@ -109,6 +142,17 @@ namespace mdsearch
 		}
 		
 		points.clear();
+	}
+
+	bool Octree::storesPoint(const Point& p) const
+	{
+		for (PointList::const_iterator it = points.begin();
+			(it != points.end()); it++)
+		{
+			if (*it == p)
+				return true;
+		}
+		return false;
 	}
 
 }

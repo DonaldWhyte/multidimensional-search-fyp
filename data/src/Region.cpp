@@ -42,4 +42,18 @@ namespace mdsearch
 		}
 	}
 
+	std::ostream& operator<<(std::ostream& out, const Interval& interval)
+	{
+		out << "[" << interval.min << "-" << interval.max << "]";
+	}
+
+	std::ostream& operator<<(std::ostream& out, const Region& region)
+	{
+		out << "(";
+		for (unsigned int i = 0; (i < region.numDimensions() - 1); i++)
+			out << region[i] << ", ";
+		out << region[region.numDimensions() - 1];
+		out << ")";
+	}	
+
 }
