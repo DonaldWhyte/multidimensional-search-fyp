@@ -3,16 +3,17 @@
 
 #include <gtest/gtest.h>
 #include "UniformDatasetGenerator.h"
+#include "HyperCubeRandomGenerator.h"
 
 namespace mdsearch { namespace tests
 {
 
-	class UniformDatasetGeneratorTests : public ::testing::Test
+	class DatasetGeneratorTests : public ::testing::Test
 	{
 
 	};
 
-	TEST_F(UniformDatasetGeneratorTests, generate)
+	TEST_F(DatasetGeneratorTests, UniformData)
 	{
 		// Construct expected test data
 		Real oneDZeroIntervalValues = 2;
@@ -91,6 +92,43 @@ namespace mdsearch { namespace tests
 		EXPECT_EQ(twoDInterval1P, generator.generate(2, 10, 20, 1));
 		EXPECT_EQ(twoDInterval2P, generator.generate(2, 10, 20, 2));
 		EXPECT_EQ(twoDInterval3P, generator.generate(2, 10, 20, 3));
+	}
+
+	TEST_F(DatasetGeneratorTests, HyperCubeRandomGenerator)
+	{
+		HyperCubeRandomGenerator generator;
+
+		Point minPoint1D(1, 1);
+		Point maxPoint1D(1, 5);
+		Point minPoint10D(10, 2);
+		minPoint10D[2] = 3;
+		Point maxPoint10D(10, 4);
+		maxPoint10D[6] = 5.5; // make boundary point coordinates not all same value
+		// Generate a collection of 1D and 10D points
+		PointList oneDPoints = generator.generate(1, minPoint1D, maxPoint1D, 100);
+		PointList tenDPoints = generator.generate(10, minPoint10D, maxPoint10D, 50);
+		// Ensure enough points were returned
+		ASSERT_EQ(100, oneDPoints.size());
+		ASSERT_EQ(50, tenDPoints.size());
+		// Ensure all points generated are within the correct bounds
+		// NOTE: While the numbers are randomly generated, meaning this is not an
+		// exhaustive test, it has been written to be a quick verifier of the
+		// ckass' behaviour, even if it is not 100% correct
+		for (PointList::const_iterator it = oneDPoints.begin(); (it != oneDPoints.end()); it++)	
+		{
+			const Point& p = *it;
+			ASSERT_GE(p[0], minPoint1D[0]);
+			ASSERT_LE(p[0], maxPoint1D[0]);
+		}
+		for (PointList::const_iterator it = tenDPoints.begin(); (it != tenDPoints.end()); it++)	
+		{
+			const Point& p = *it;
+			for (unsigned int d = 0; (d < 10); d++)
+			{
+				ASSERT_GE(p[d], minPoint10D[d]);
+				ASSERT_LE(p[d], maxPoint10D[d]);
+			}
+		}
 	}
 
 } }
