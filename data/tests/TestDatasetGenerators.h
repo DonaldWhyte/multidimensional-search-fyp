@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 #include "UniformDatasetGenerator.h"
 #include "RandomPointGenerator.h"
+#include "ClusteredDatasetGenerator.h"
 #include "SkewedDatasetGenerator.h"
 
 namespace mdsearch { namespace tests
@@ -143,6 +144,47 @@ namespace mdsearch { namespace tests
 		}
 	}
 
+	TEST_F(DatasetGeneratorTests, ClusteredData)
+	{
+		// NOTE: Tests which validate the generated points are actually clustered
+		// in space will be in the RandomPointGenerator class tests, as the clustered
+		// points are actually generated using that.
+
+		ClusteredDatasetGenerator generator;
+
+		// Construct test data
+		Region testRegions[] = {
+			Region(3, Interval(1, 10)),
+			Region(3, Interval(84, 132)),
+			Region(3, Interval(50, 50))
+		};
+		Point zeroSizedRegionPoint = Point(3, 50);
+
+		std::vector<ClusterSpecification> oneCluster;
+		oneCluster.push_back( ClusterSpecification(testRegions[0], 10) );
+		std::vector<ClusterSpecification> twoClusters;
+		twoClusters.push_back( ClusterSpecification(testRegions[0], 10) );
+		twoClusters.push_back( ClusterSpecification(testRegions[1], 100) );
+		std::vector<ClusterSpecification> twoClustersWithZeroSized;
+		twoClustersWithZeroSized.push_back( ClusterSpecification(testRegions[1], 100) );
+		twoClustersWithZeroSized.push_back( ClusterSpecification(testRegions[2], 5) );
+
+		// Test no cluster specifications given
+		EXPECT_EQ(PointList(), generator.generate(3, std::vector<ClusterSpecification>()));
+		// Test one cluster
+		PointList oneClusterPoints = generator.generate(3, oneCluster); 
+		EXPECT_EQ(10, oneClusterPoints.size());
+		// Test two clusters
+		PointList twoClusterPoints = generator.generate(3, twoClusters);
+		EXPECT_EQ(110, twoClusterPoints.size());
+		// Test two clusters, one with zero-sized region
+		PointList twoClustersWithZeroSizedPoints = generator.generate(3, twoClustersWithZeroSized);
+		EXPECT_EQ(105, twoClustersWithZeroSizedPoints.size());
+		// Ensure zero-sized region's points were generated correctly
+		for (unsigned int i = 100; (i < 105); i++)
+			ASSERT_EQ(twoClustersWithZeroSizedPoints[i], zeroSizedRegionPoint);
+	}
+
 	TEST_F(DatasetGeneratorTests, SkewedDatasetGenerator)
 	{
 		SkewedDatasetGenerator generator;
@@ -186,7 +228,6 @@ namespace mdsearch { namespace tests
 			ASSERT_EQ(minPoint1D, *it);
 		}
 
-
 		// Repeat above tests where the data is skewed towards the upper values
 		skewDir = SKEW_DIRECTION_RIGHT;
 		oneDPoints = generator.generate(1, minPoint1D, maxPoint1D,
@@ -216,11 +257,6 @@ namespace mdsearch { namespace tests
 		{
 			ASSERT_EQ(minPoint1D, *it);
 		}		
-	}
-
-	TEST_F(DatasetGeneratorTests, ClusteredData)
-	{
-		// TODO
 	}
 
 } }
