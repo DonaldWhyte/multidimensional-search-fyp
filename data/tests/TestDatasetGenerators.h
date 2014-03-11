@@ -9,6 +9,10 @@
 namespace mdsearch { namespace tests
 {
 
+	// Constant which determines how many poins to generate when
+	// testing genewrators based on randomness
+	static const unsigned int NUM_RANDOM_POINTS_TO_GENERATE = 1000;
+
 	class DatasetGeneratorTests : public ::testing::Test
 	{
 
@@ -106,11 +110,11 @@ namespace mdsearch { namespace tests
 		Point maxPoint10D(10, 4);
 		maxPoint10D[6] = 5.5; // make boundary point coordinates not all same value
 		// Generate a collection of 1D and 10D points
-		PointList oneDPoints = generator.generate(1, minPoint1D, maxPoint1D, 100);
-		PointList tenDPoints = generator.generate(10, minPoint10D, maxPoint10D, 50);
+		PointList oneDPoints = generator.generate(1, minPoint1D, maxPoint1D, NUM_RANDOM_POINTS_TO_GENERATE);
+		PointList tenDPoints = generator.generate(10, minPoint10D, maxPoint10D, NUM_RANDOM_POINTS_TO_GENERATE);
 		// Ensure enough points were returned
-		ASSERT_EQ(100, oneDPoints.size());
-		ASSERT_EQ(50, tenDPoints.size());
+		ASSERT_EQ(NUM_RANDOM_POINTS_TO_GENERATE, oneDPoints.size());
+		ASSERT_EQ(NUM_RANDOM_POINTS_TO_GENERATE, tenDPoints.size());
 		// Ensure all points generated are within the correct bounds
 		// NOTE: While the numbers are randomly generated, meaning this is not an
 		// exhaustive test, it has been written to be a quick verifier of the
@@ -142,8 +146,76 @@ namespace mdsearch { namespace tests
 	TEST_F(DatasetGeneratorTests, SkewedDatasetGenerator)
 	{
 		SkewedDatasetGenerator generator;
+		SkewDirection skewDir = SKEW_DIRECTION_LEFT;
+		Real skewSeverity = 3.0;
 
-		// TODO
+		Point minPoint1D(1, 1);
+		Point maxPoint1D(1, 5);
+		Point minPoint10D(10, 2);
+		minPoint10D[2] = 3;
+		Point maxPoint10D(10, 4);
+		maxPoint10D[6] = 5.5;
+		// Generate a collection of 1D and 10D points
+		PointList oneDPoints = generator.generate(1, minPoint1D, maxPoint1D,
+			NUM_RANDOM_POINTS_TO_GENERATE, skewSeverity, skewDir);
+		PointList tenDPoints = generator.generate(10, minPoint10D, maxPoint10D,
+			NUM_RANDOM_POINTS_TO_GENERATE, skewSeverity, skewDir);
+		// Ensure enough points were returned
+		ASSERT_EQ(NUM_RANDOM_POINTS_TO_GENERATE, oneDPoints.size());
+		ASSERT_EQ(NUM_RANDOM_POINTS_TO_GENERATE, tenDPoints.size());
+		// Ensure all points generated are within the correct bounds
+		for (PointList::const_iterator it = oneDPoints.begin(); (it != oneDPoints.end()); it++)	
+		{
+			const Point& p = *it;
+			ASSERT_GE(p[0], minPoint1D[0]);
+			ASSERT_LE(p[0], maxPoint1D[0]);
+		}
+		for (PointList::const_iterator it = tenDPoints.begin(); (it != tenDPoints.end()); it++)	
+		{
+			const Point& p = *it;
+			for (unsigned int d = 0; (d < 10); d++)
+			{
+				ASSERT_GE(p[d], minPoint10D[d]);
+				ASSERT_LE(p[d], maxPoint10D[d]);
+			}
+		}
+		// Zero-sized range
+		PointList samePoints = generator.generate(1, minPoint1D, minPoint1D, 10, skewSeverity, skewDir);
+		for (PointList::const_iterator it = samePoints.begin(); (it != samePoints.end()); it++)	
+		{
+			ASSERT_EQ(minPoint1D, *it);
+		}
+
+
+		// Repeat above tests where the data is skewed towards the upper values
+		skewDir = SKEW_DIRECTION_RIGHT;
+		oneDPoints = generator.generate(1, minPoint1D, maxPoint1D,
+			NUM_RANDOM_POINTS_TO_GENERATE, skewSeverity, skewDir);
+		tenDPoints = generator.generate(10, minPoint10D, maxPoint10D,
+			NUM_RANDOM_POINTS_TO_GENERATE, skewSeverity, skewDir);
+		ASSERT_EQ(NUM_RANDOM_POINTS_TO_GENERATE, oneDPoints.size());
+		ASSERT_EQ(NUM_RANDOM_POINTS_TO_GENERATE, tenDPoints.size());
+		for (PointList::const_iterator it = oneDPoints.begin(); (it != oneDPoints.end()); it++)	
+		{
+			const Point& p = *it;
+			ASSERT_GE(p[0], minPoint1D[0]);
+			ASSERT_LE(p[0], maxPoint1D[0]);
+		}
+		for (PointList::const_iterator it = tenDPoints.begin(); (it != tenDPoints.end()); it++)	
+		{
+			const Point& p = *it;
+			for (unsigned int d = 0; (d < 10); d++)
+			{
+				ASSERT_GE(p[d], minPoint10D[d]);
+				ASSERT_LE(p[d], maxPoint10D[d]);
+			}
+		}
+
+		samePoints = generator.generate(1, minPoint1D, minPoint1D, 10, skewSeverity, skewDir);
+		for (PointList::const_iterator it = samePoints.begin(); (it != samePoints.end()); it++)	
+		{
+			ASSERT_EQ(minPoint1D, *it);
+		}		
 	}
 
 } }

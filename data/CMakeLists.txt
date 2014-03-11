@@ -1,6 +1,7 @@
 # Static library containing all data generators/loaders
 add_library( data
 	# Source files
+	"src/Util.cpp"
 	"src/Point.cpp"
 	"src/Region.cpp"
 	"src/DatasetFileLoader.cpp"
@@ -9,6 +10,7 @@ add_library( data
 	"src/SkewedDatasetGenerator.cpp"
 	# Header files
 	"include/DataTypes.h"
+	"include/Util.h"
 	"include/Point.h"
 	"include/Region.h"
 	"include/DatasetFileLoader.h"

@@ -17,7 +17,8 @@ namespace mdsearch
 
 	public:
 		PointList generate(unsigned int numDimensions, const Point& min,
-			const Point& max, Real skewSeverity, SkewDirection skewDirection) const;
+			const Point& max, unsigned int numPoints,
+			Real skewSeverity, SkewDirection skewDirection) const;
 
 	};
 

@@ -39,8 +39,6 @@ namespace mdsearch
 		return points;
 	}
 
-
-
 	std::vector<Real> UniformDatasetGenerator::generateUniformSequence(
 		Real min, Real max, unsigned int n) const
 	{

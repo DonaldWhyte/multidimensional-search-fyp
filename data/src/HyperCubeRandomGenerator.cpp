@@ -1,14 +1,9 @@
 #include "HyperCubeRandomGenerator.h"
-#include <cstdlib>
+#include "Util.h"
 
 namespace mdsearch
 {
 
-	/* Generate random real number r such that minimum <= r <= maximum. */
-	Real generateRandomNumber(Real minimum, Real maximum)
-	{
-		return minimum + static_cast<float>(rand()) / static_cast<float>(RAND_MAX / (maximum - minimum));
-	}
 
 	PointList HyperCubeRandomGenerator::generate(unsigned int numDimensions,
 		const Point& min, const Point& max, unsigned int numPoints) const
