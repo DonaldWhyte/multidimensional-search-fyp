@@ -7,6 +7,7 @@ add_library( data
 	"src/DatasetFileLoader.cpp"
 	"src/UniformDatasetGenerator.cpp"
 	"src/RandomPointGenerator.cpp"
+	"src/ClusteredDatasetGenerator.cpp"
 	"src/SkewedDatasetGenerator.cpp"
 	# Header files
 	"include/DataTypes.h"
@@ -16,6 +17,7 @@ add_library( data
 	"include/DatasetFileLoader.h"
 	"include/UniformDatasetGenerator.h"
 	"include/RandomPointGenerator.h"
+	"include/ClusteredDatasetGenerator.h"
 	"include/SkewedDatasetGenerator.h"
 )
 # Ensure include directory is in search path

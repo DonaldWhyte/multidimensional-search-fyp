@@ -218,6 +218,11 @@ namespace mdsearch { namespace tests
 		}		
 	}
 
+	TEST_F(DatasetGeneratorTests, ClusteredData)
+	{
+		// TODO
+	}
+
 } }
 
 #endif
