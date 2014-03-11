@@ -6,7 +6,6 @@
 #include "RandomPointGenerator.h"
 #include "ClusteredDatasetGenerator.h"
 #include "SkewedDatasetGenerator.h"
-#include "Util.h" // TODO: remove
 
 namespace mdsearch { namespace tests
 {
@@ -184,30 +183,13 @@ namespace mdsearch { namespace tests
 		// Ensure zero-sized region's points were generated correctly
 		for (unsigned int i = 100; (i < 105); i++)
 			ASSERT_EQ(twoClustersWithZeroSizedPoints[i], zeroSizedRegionPoint);
-
-		// TODO: remove code below
-		// Generate shedload of points and write to file
-		Region validateRegion1(2, Interval(5, 10));
-		Region validateRegion2(2, Interval(2, 3));
-		std::vector<ClusterSpecification> clusters;
-		clusters.push_back(ClusterSpecification(validateRegion1, 1000));
-		clusters.push_back(ClusterSpecification(validateRegion2, 200));
-		PointList validatePoints = generator.generate(2, clusters);
-		writePointsToFile("clustered_points.txt", 2, validatePoints);		
 	}
 
 	TEST_F(DatasetGeneratorTests, SkewedDatasetGenerator)
 	{
 		SkewedDatasetGenerator generator;
 		SkewDirection skewDir = SKEW_DIRECTION_LEFT;
-		Real skewSeverity = 3.0;
-
-		Point minPoint2D = Point(2, 5);
-		Point maxPoint2D = Point(2, 10);
-		PointList validatePointsL = generator.generate(2, minPoint2D, maxPoint2D, 5000, 2.5f, SKEW_DIRECTION_LEFT);
-		PointList validatePointsR = generator.generate(2, minPoint2D, maxPoint2D, 5000, 4.0f, SKEW_DIRECTION_RIGHT);
-		writePointsToFile("left_skew_points.txt", 2, validatePointsL);
-		writePointsToFile("right_skew_points.txt", 2, validatePointsR);		
+		Real skewSeverity = 3.0;	
 
 		Point minPoint1D(1, 1);
 		Point maxPoint1D(1, 5);
