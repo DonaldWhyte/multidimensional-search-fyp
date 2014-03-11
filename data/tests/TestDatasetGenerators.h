@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 #include "UniformDatasetGenerator.h"
 #include "HyperCubeRandomGenerator.h"
+#include "SkewedDatasetGenerator.h"
 
 namespace mdsearch { namespace tests
 {
@@ -129,6 +130,20 @@ namespace mdsearch { namespace tests
 				ASSERT_LE(p[d], maxPoint10D[d]);
 			}
 		}
+
+		// Test with zero-sized hyper-cube (same point should always be generated)
+		PointList samePoints = generator.generate(1, minPoint1D, minPoint1D, 10);
+		for (PointList::const_iterator it = samePoints.begin(); (it != samePoints.end()); it++)	
+		{
+			ASSERT_EQ(minPoint1D, *it);
+		}
+	}
+
+	TEST_F(DatasetGeneratorTests, SkewedDatasetGenerator)
+	{
+		SkewedDatasetGenerator generator;
+
+		// TODO
 	}
 
 } }
