@@ -4,8 +4,8 @@
 namespace mdsearch
 {
 
-	Octree::Octree(int numDimensions, const Region& boundary, Octree* nodeParent) :
-		IndexStructure(numDimensions), nodeParent(nodeParent), boundary(boundary),
+	Octree::Octree(int numDimensions, const Region& boundary) :
+		IndexStructure(numDimensions), boundary(boundary),
 		numChildrenPerNode( pow(2, numDimensions) )
 		
 	{
@@ -36,11 +36,6 @@ namespace mdsearch
 	const Region& Octree::regionCovered() const
 	{
 		return boundary;
-	}
-
-	Octree* Octree::parent() const
-	{
-		return nodeParent;
 	}
 
 	bool Octree::isLeaf() const
@@ -276,7 +271,7 @@ namespace mdsearch
 		children.reserve(numChildrenPerNode);
 		for (unsigned int i = 0; (i < numChildrenPerNode); i++)
 		{
-			Octree* child = new Octree(numDimensions, childrenBoundaries[i], this);
+			Octree* child = new Octree(numDimensions, childrenBoundaries[i]);
 		    children.push_back(child);
 		}
 		// For all the points currently in this node, move them to one of the children

@@ -22,7 +22,7 @@ namespace mdsearch
 		// region of space is covers. A pointer to the node's parent (if
 		// the node is not the parent) must also be provided for efficient
 		// removal and updating.
-		Octree(int numDimensions, const Region& boundary, Octree* nodeParent = NULL);
+		Octree(int numDimensions, const Region& boundary);
 		virtual ~Octree();
 
 		// Return number of children each non-leaf node has
@@ -32,8 +32,6 @@ namespace mdsearch
 		const PointList& storedPoints() const;
 		const OctreeNodeList& nodeChildren() const;
 		const Region& regionCovered() const;
-		// Read-write accessors
-		Octree* parent() const;
 
 		// Return true if node is a leaf
 		bool isLeaf() const;
@@ -61,7 +59,6 @@ namespace mdsearch
 		// Remove all child nodes from this Octree node
 		void removeAllChildren();
 
-		Octree* nodeParent;
 		Region boundary;
 		unsigned int numChildrenPerNode;
 
