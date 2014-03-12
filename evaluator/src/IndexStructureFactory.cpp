@@ -3,6 +3,8 @@
 #include "SequentialScan.h"
 #include "Octree.h"
 
+#include <boost/lexical_cast.hpp>
+
 namespace mdsearch
 {
 
@@ -16,8 +18,29 @@ namespace mdsearch
 	IndexStructure* generateOctree(unsigned int numDimensions,
 		const std::vector<std::string>& args)
 	{
-		// TODO
-		return NULL;
+		// Check there are enough arguments to construct n-dimensional boundary
+		if (args.size() < numDimensions * 2) // min + max args needed per dimension
+			return NULL;
+
+		Region boundary(numDimensions);
+		for (unsigned int d = 0; (d < numDimensions); d++)
+		{
+			// Parse string arguments into real numbers
+			try
+			{
+				Real min = boost::lexical_cast<Real>(args[d * 2]);
+				Real max = boost::lexical_cast<Real>(args[d * 2 + 1]);
+				boundary[d] = Interval(min, max);
+			}
+			// If an argument could not be converted into a real number,
+			// return NULL as the structure cannot be constructed 			
+			catch (const boost::bad_lexical_cast& ex)
+			{
+				return NULL;
+			}
+		}
+
+		return new Octree(numDimensions, boundary);
 	}	
 
 
@@ -54,6 +77,5 @@ namespace mdsearch
 			return NULL;
 		}
 	}
-
 
 }
