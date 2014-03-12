@@ -33,7 +33,7 @@ namespace mdsearch
 	private:
 		// If this flag is set to true, then some of the required arguments
 		// are either missing or invalid
-		bool invalidArguments;
+		bool validArguments;
 
 		std::vector<IndexStructureSpecification> specifiedIndexStructures;
 		StringList datasets;
