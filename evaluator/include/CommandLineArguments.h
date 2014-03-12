@@ -16,6 +16,7 @@ namespace mdsearch
 		struct IndexStructureSpecification
 		{
 			std::string type;
+			unsigned int numDimensions;
 			StringList arguments;
 		};
 

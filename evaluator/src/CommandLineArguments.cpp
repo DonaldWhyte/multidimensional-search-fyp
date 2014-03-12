@@ -1,29 +1,18 @@
 #include "CommandLineArguments.h"
 #include <boost/program_options.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace mdsearch
 {
 
 	CommandLineArguments::CommandLineArguments(int argc, char* argv[]) : validArguments(false)
 	{
-		/*// Convert C-string array to StringList
-		StringList args;
-		args.reserve(argc);
-		for (unsigned int i = 0; (i < argc); i++)
-			args.push_back(argv[i]);
-
-		// PROCESS MANDATORY ARGUMENTS
-		// Search for filename to output results to
-		for (StringList::const_iterator it = args.begin(); (it != args.end()); it++)
-		{
-			if (unsigned int i = 0; (i <); i++)
-			{
-
-			}
-		}*/
-
 		// Shortened namespace for more concise code
 		namespace po = boost::program_options; 
+		using boost::lexical_cast;
+		using boost::bad_lexical_cast;
+
 		try
 		{
 			// Define possible command line arguments
@@ -40,8 +29,11 @@ namespace mdsearch
 			// If help message was asked for, print it and DON'T DO ANYTHING ELSE
 			if (parsedArgs.count("help"))
 			{
-				std::cout << "Multi-dimensional Search Structure Evaluator" << std::endl << description << std::endl;
+				std::cout << "Multi-dimensional Search Structure Evaluator"
+					<< std::endl << description << std::endl;
 			}
+
+			po::notify(parsedArgs); // throws exception if error in parse
 
 			// Check output filename was given
 			if (parsedArgs.count("output"))
@@ -49,9 +41,48 @@ namespace mdsearch
 				outputFilename = parsedArgs["output"].as<std::string>();
 				validArguments = true; // all required args given!
 			}
+			// Get all specified index structures, parsing strings to separate
+			// structure type and the structure's additional arguments
+			if (parsedArgs.count("index_structures"))
+			{
+				std::vector<std::string> structures = parsedArgs["index_structures"].as<std::vector<std::string> >();
+				for (std::vector<std::string>::const_iterator str = structures.begin();
+					(str != structures.end()); str++)
+				{
+					// Split the structure into a list of strings using ","
+					std::vector<std::string> fields;
+					boost::split(fields, (*str), boost::is_any_of(","));
+					// If the type and dimensionality of the structure HAS NOT BEEN SPECIFIED,
+					// then ignore the structure
+					if (fields.size() < 2)
+						continue;
+
+					// Use first field as structure type and the rest as the structure's arguments
+					IndexStructureSpecification spec;
+					spec.type = fields[0];
+					try
+					{
+						spec.numDimensions = lexical_cast<unsigned int>(fields[1]);
+					}
+					catch (const bad_lexical_cast &) // IF INVALID DIMENSIONS -- IGNORE STRUCTURE!
+					{
+						continue;
+					}
+					spec.arguments.reserve(fields.size() - 1);
+					for (unsigned int i = 2; (i < fields.size()); i++)
+						spec.arguments.push_back(fields[i]);
+					specifiedIndexStructures.push_back(spec);
+				}
+			}
+			// Get all specified test datasets and operations
+			if (parsedArgs.count("datasets"))
+				datasets = parsedArgs["datasets"].as<std::vector<std::string> >();
+			if (parsedArgs.count("test_operations"))
+				testOperations = parsedArgs["test_operations"].as<std::vector<std::string> >();
 		}
 		catch(po::error& error)
 		{
+			std::cout << error.what() << std::endl;
 			validArguments = false;
 		}
 	}
