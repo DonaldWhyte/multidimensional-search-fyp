@@ -1,10 +1,16 @@
 #include <iostream>
 #include "CommandLineArguments.h"
+#include "IndexStructureFactory.h"
+#include "DatasetFileLoader.h"
+
+#include "Octree.h"
+
+using namespace mdsearch;
 
 int main(int argc, char* argv[])
 {
 	// Parse command line arguments
-	mdsearch::CommandLineArguments args(argc, argv);
+	CommandLineArguments args(argc, argv);
 	// If the arguments are not valid, exit program with failure code 
 	if (!args.isValid())
 	{
@@ -12,7 +18,43 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	std::cout << "Not implemented yet." << std::endl;
+	// Construct specified index structures
+	std::vector<IndexStructure*> structures;
+
+	IndexStructureFactory structureFactory;
+	const std::vector<CommandLineArguments::IndexStructureSpecification> structureSpecs = args.indexStructures();
+	for (unsigned int i = 0; (i < structureSpecs.size()); i++)
+	{
+		// Use specification to load index structure
+		const CommandLineArguments::IndexStructureSpecification& spec = structureSpecs[i];
+		IndexStructure* structure = structureFactory.constructIndexStructure(
+			spec.type, spec.numDimensions, spec.arguments);
+		// If structure could not be constructed, display error message and exist program
+		if (!structure)
+		{
+			std::cout << "Could not load structure \"" << spec.type << "\" with arguments: [ ";
+			for (unsigned int j = 0; (j < spec.arguments.size()); j++)
+			{
+				std::cout << "\"" << spec.arguments[j] << "\" ";
+			}
+			std::cout << "]" << std::endl;
+			return 1;
+		}
+		structures.push_back(structure);
+	}
+
+	// Load specified datasets
+	std::vector<PointList> datasets;
+
+	DatasetFileLoader loader;
+	const StringList& datasetFilenames = args.datasetFilenames();
+	for (unsigned int i = 0; (i < datasetFilenames.size()); i++)
+	{
+		datasets.push_back( loader.load(datasetFilenames[i]) );
+	}
+
+	// Load specified test operations
+	// TODO
 
 	return 0;
 }

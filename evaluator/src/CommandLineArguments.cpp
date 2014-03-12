@@ -82,7 +82,6 @@ namespace mdsearch
 		}
 		catch(po::error& error)
 		{
-			std::cout << error.what() << std::endl;
 			validArguments = false;
 		}
 	}

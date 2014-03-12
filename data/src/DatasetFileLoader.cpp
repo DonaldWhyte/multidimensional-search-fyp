@@ -30,7 +30,6 @@ namespace mdsearch
 		points.reserve(numPoints);
 		// Treat the rest of lines as a point each
 		std::vector<Real> temp(numDimensions); // temporary stores point's values
-		std::string line;
 		std::stringstream ss;
 		for (unsigned int i = 0; (i < numPoints); i++)
 		{
@@ -43,7 +42,7 @@ namespace mdsearch
 			// If we have reached the end of the file, STOP and don't try
 			// reading any more points
 			if (file.eof())
-				break;	
+				break;
 		}
 
 		return points;
