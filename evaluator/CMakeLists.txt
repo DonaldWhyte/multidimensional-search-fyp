@@ -3,9 +3,12 @@ set (EVALUATOR_SRC
 	# Source files
 	"src/CommandLineArguments.cpp"
 	"src/IndexStructureFactory.cpp"
+	"src/TestOperationLoader.cpp"
 	# Header files
 	"include/IndexStructureFactory.h"
 	"include/CommandLineArguments.h"
+	"include/TestOperation.h"
+	"include/TestOperationLoader.h"
 )
 add_executable( evaluator
 	"src/EvaluatorMain.cpp"
@@ -23,6 +26,7 @@ include_directories(${PROJECT_ROOT}/index_structures/include)
 add_executable ( evaluator_tests
 	"tests/TestRunner.cpp"
 	"tests/TestCommandLineArguments.h"
+	"tests/TestTestOperationLoader.h"
 	${EVALUATOR_SRC}
 )
 # Ensure google-test library is linked and include files are in search path

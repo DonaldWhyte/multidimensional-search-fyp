@@ -1,8 +1,7 @@
 #include "IndexStructureFactory.h"
-// 
+
 #include "SequentialScan.h"
 #include "Octree.h"
-
 #include <boost/lexical_cast.hpp>
 
 namespace mdsearch
