@@ -18,16 +18,20 @@ namespace mdsearch
 			OPERATION_TYPE_POINTQUERY,
 		};
 
-		TestOperation(Type type, const Point& value) : type(type), value(value)
-		{
-		}
+		TestOperation(Type type, const Point& value);
+		/* Equality test for two structure test operations. Created for unit tests. */
+		bool operator==(const TestOperation& other) const;
 
+		// Fields
 		Type type;
 		Point value;
 
 	};
 
 	typedef std::vector<TestOperation> TestOperationList;
+
+	/* Convenience function for printing out test operations. */
+	std::ostream& operator<<(std::ostream& out, const TestOperation& op);
 
 }
 

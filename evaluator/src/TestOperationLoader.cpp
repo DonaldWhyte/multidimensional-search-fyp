@@ -27,7 +27,7 @@ namespace mdsearch
 		try
 		{
 			numDimensions = boost::lexical_cast<unsigned int>(fields[0]);
-			numOps =boost::lexical_cast<unsigned int>(fields[1]);
+			numOps = boost::lexical_cast<unsigned int>(fields[1]);
 		}
 		// Return empty operations list if the header line is invalid
 		catch (boost::bad_lexical_cast)

@@ -35,4 +35,5 @@ include_directories ("tests")
 target_link_libraries ( data_tests data ${LIBS} )
 include_directories ({DEPENDENCIES})
 
+# Copy additional test files to build directory
 file( COPY tests/test_files DESTINATION ${BUILD_DIR} )

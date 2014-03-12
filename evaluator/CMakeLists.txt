@@ -3,6 +3,7 @@ set (EVALUATOR_SRC
 	# Source files
 	"src/CommandLineArguments.cpp"
 	"src/IndexStructureFactory.cpp"
+	"src/TestOperation.cpp"
 	"src/TestOperationLoader.cpp"
 	# Header files
 	"include/IndexStructureFactory.h"
@@ -38,3 +39,6 @@ include_directories ({DEPENDENCIES})
 # Add Boost as dependency for evaluator and the unit test
 target_link_libraries(evaluator ${Boost_LIBRARIES})
 target_link_libraries(evaluator_tests ${Boost_LIBRARIES})
+
+# Copy additional test files to build directory
+file( COPY tests/test_files DESTINATION ${BUILD_DIR} )

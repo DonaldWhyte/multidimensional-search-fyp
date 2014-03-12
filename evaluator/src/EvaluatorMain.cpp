@@ -2,8 +2,7 @@
 #include "CommandLineArguments.h"
 #include "IndexStructureFactory.h"
 #include "DatasetFileLoader.h"
-
-#include "Octree.h"
+#include "TestOperationLoader.h"
 
 using namespace mdsearch;
 
@@ -46,15 +45,23 @@ int main(int argc, char* argv[])
 	// Load specified datasets
 	std::vector<PointList> datasets;
 
-	DatasetFileLoader loader;
+	DatasetFileLoader datasetLoader;
 	const StringList& datasetFilenames = args.datasetFilenames();
 	for (unsigned int i = 0; (i < datasetFilenames.size()); i++)
 	{
-		datasets.push_back( loader.load(datasetFilenames[i]) );
+		datasets.push_back( datasetLoader.load(datasetFilenames[i]) );
 	}
 
 	// Load specified test operations
-	// TODO
+	std::vector<TestOperationList> testOperationLists;
+
+	TestOperationLoader testOpLoader;
+	const StringList& testOperationFilenames = args.testOperationFilenames();
+	for (unsigned int i = 0; (i < testOperationFilenames.size()); i++)
+	{
+		testOperationLists.push_back(testOpLoader.loadFromFile(
+			testOperationFilenames[i]) );
+	}
 
 	return 0;
 }
