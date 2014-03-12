@@ -17,6 +17,14 @@ set( LIBS
 	${DEPENDENCIES}/libgtest.a
 	pthread # for google-test
 )
+# Search for Boost library
+set(Boost_USE_STATIC_LIBS ON) 
+set(Boost_USE_MULTITHREADED ON)  
+set(Boost_USE_STATIC_RUNTIME OFF) 
+find_package(Boost 1.46.0 COMPONENTS program_options REQUIRED)
+# NOTE: Variables BOOST_INCLUDE_DIRS and Boost_LIBRARIES contain
+# a list of Boost's include directories and static libraries.
+include_directories(${Boost_INCLUDE_DIRS})
 
 # Set directory all build files go to
 set_property (GLOBAL PROPERTY RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIR})
@@ -24,7 +32,7 @@ set (EXECUTABLE_OUTPUT_PATH ${BUILD_DIR})
 set (LIBRARY_OUTPUT_PATH ${BUILD_DIR})
 
 # Set compiler flags
-set( EXTRA_CXX_COMPILER_FLAGS -fno-exceptions ) # exceptions are being disabled!
+#set( EXTRA_CXX_COMPILER_FLAGS -fno-exceptions ) # exceptions are being disabled!
 set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${EXTRA_CXX_COMPILER_FLAGS}" )
 
 # Process all sub-projects
