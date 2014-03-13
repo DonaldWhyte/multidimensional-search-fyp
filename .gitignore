@@ -20,3 +20,6 @@ CMakeCache.txt
 
 # Misc. build output
 build
+
+# Compile Python scripts
+*.pyc

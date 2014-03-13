@@ -16,8 +16,8 @@ def getOperationProbabilities(args):
 	return operationProbabilities
 
 def normaliseProbabilities(probabilities):
-	total = float(sum(operationProbabilities))
-	return [ p / total for p in operationProbabilities ]
+	total = float(sum(probabilities))
+	return [ p / total for p in probabilities ]
 
 def computeCumulativeProbabilities(probabilities):
 	cumulativeSum = 0
@@ -40,8 +40,12 @@ def generateRandomOperation(numDimensions, cumulativeOpProbs):
 		opType = "P"
 	else:
 		raise RuntimeError("Unknown random value generated in generateRandomOperation()")
-	# Randomly generatr a point
+	# Randomly generate a point
 	point = generatePoint(numDimensions)
+	# Generate another point if the operation is an Update
+	if opType == "U":
+		point += generatePoint(numDimensions)
+		
 	return (opType, point)
 
 def operationToStr(operation):
@@ -53,7 +57,7 @@ if __name__ == "__main__":
 
 	# Parse command line arguments
 	if len(sys.argv) < 3:
-		sys.exit("Usage: {} <numDimensions> <numOperations> <insertProbability> <deleteProbability> <updateProbability> <pqueryProbability".format(sys.argv[0]))
+		sys.exit("Usage: {} <numDimensions> <numOperations> {{<insertProbability> <deleteProbability> <updateProbability> <pqueryProbability>}}".format(sys.argv[0]))
 	numDimensions = 0
 	numOperations = 0
 	try:
