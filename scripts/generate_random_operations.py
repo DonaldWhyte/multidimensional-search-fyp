@@ -8,6 +8,25 @@ OPERATION_TYPE_DELETE = "D"
 OPERATION_TYPE_UPDATE = "U"
 OPERATION_TYPE_POINTQUERY = "P"
 
+def getOperationProbabilities(args):
+	operationProbabilities = [ 1, 1, 1, 1 ]
+	maxIndex = min(4, len(args))
+	for i in range(maxIndex):
+		operationProbabilities[i] = float(args[i])
+	return operationProbabilities
+
+def normaliseProbabilities(probabilities):
+	total = float(sum(operationProbabilities))
+	return [ p / total for p in operationProbabilities ]
+
+def computeCumulativeProbabilities(probabilities):
+	cumulativeSum = 0
+	cumulativeOpProbs = []
+	for p in probabilities:
+		cumulativeSum += p
+		cumulativeOpProbs.append(cumulativeSum)
+	return cumulativeOpProbs
+
 def generateRandomOperation(numDimensions, cumulativeOpProbs):
 	# Randomly choose operation
 	val = random.random()
@@ -17,7 +36,7 @@ def generateRandomOperation(numDimensions, cumulativeOpProbs):
 		opType = "D"
 	elif val >= cumulativeOpProbs[1] and val < cumulativeOpProbs[2]:
 		opType = "U"
-	elif val >= cumulativeOpProbs[2] and val <= 1:
+	elif val >= cumulativeOpProbs[2] and val <= cumulativeOpProbs[3]:
 		opType = "P"
 	else:
 		raise RuntimeError("Unknown random value generated in generateRandomOperation()")
@@ -46,23 +65,12 @@ if __name__ == "__main__":
 			raise ValueError("Negative amount of operations requested")
 	except ValueError as e:
 		sys.exit("Error: {}".format(e))
-	operationProbabilities = [ 1, 1, 1, 1 ]
-	for i in range(4):
-		index = 3 + i
-		if index < len(sys.argv):
-			operationProbabilities[i] = float(sys.argv[index])
-		else:
-			break # no more arguments to process!
+	operationProbabilities = getOperationProbabilities(sys.argv[3:])
 
 	# Normalise probabilities so they're in range 0-1 and sum up to 1
-	total = float(sum(operationProbabilities))
-	operationProbabilities = [ p / total for p in operationProbabilities ]
+	operationProbabilities = normaliseProbabilities(operationProbabilities)
 	# Construct CUMULATIVE probabilities for operations
-	cumulativeOpProbs = [
-		operationProbabilities[0],
-		operationProbabilities[0] + operationProbabilities[1],
-		operationProbabilities[0] + operationProbabilities[1] + operationProbabilities[2] 
-	]
+	cumulativeOpProbs = computeCumulativeProbabilities(operationProbabilities)
 	# Output header (number of dimensions and operations)
 	print("{} {}".format(numDimensions, numOperations))
 	# Generate points and print them on-the-fly
