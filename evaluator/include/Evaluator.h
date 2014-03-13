@@ -37,6 +37,10 @@ namespace mdsearch
 		 OperationListTimings timePerformance(
 			const std::vector<TestOperationList>& testOperationLists) const;
 
+		/* Accessors */
+		bool isVerbose() const;
+		void setVerbose(bool verbose);
+
 	private:
 		Timing runOperations(IndexStructure* structure,
 			const TestOperationList& operations,
@@ -50,6 +54,7 @@ namespace mdsearch
 		std::string generateHeapProfilerFilename(unsigned int testOpListIndex, unsigned int structureIndex) const;
 
 		std::vector<IndexStructure*> structures;
+		bool verbose; // if true, progress log is outputted as test operations are being executed
 
 	};
 

@@ -9,7 +9,7 @@ namespace mdsearch
 {
 
 	Evaluator::Evaluator(const std::vector<IndexStructure*>& structures)
-		: structures(structures)
+		: structures(structures), verbose(false)
 	{
 	}
 
@@ -17,6 +17,12 @@ namespace mdsearch
 		const std::vector<TestOperationList>& testOperationLists) const
 	{
 		// NOTE: reserve() calls are done to minimise the amount of dynamic allocations as possible
+
+		if (verbose)
+		{
+			std::cout << "STARTING PERFORMANCE TESTS USING " << testOperationLists.size()
+				<< " OPERATION SETS FOR" << structures.size() << " INDEX STRUCTUES" << std::endl;
+		}
 
 		OperationListTimings testOpTimings;
 		testOpTimings.reserve(testOperationLists.size());
@@ -26,8 +32,14 @@ namespace mdsearch
 			StructureTimings structureTimings;
 			structureTimings.reserve(structures.size());
 
+			if (verbose)
+				std::cout << "Test Operations (" << t << "):" << std::endl;
+
 			for (unsigned int s = 0; (s < structures.size()); s++)
 			{
+				if (verbose)
+					std::cout << "\tRunning operations on structure (" << s << ")..." << std::endl;
+
 				// Ensure structure is completely empty
 				structures[s]->clear();				
 				// Run test operations on structure
@@ -42,7 +54,20 @@ namespace mdsearch
 			testOpTimings.push_back(structureTimings);
 		}
 
+		if (verbose)
+			std::cout << "PERFORMANCE TESTS FINISHED" << std::endl;
+
 		return testOpTimings;
+	}
+
+	bool Evaluator::isVerbose() const
+	{
+		return verbose;
+	}
+
+	void Evaluator::setVerbose(bool verbose)
+	{
+		this->verbose = verbose;
 	}
 
 	Timing Evaluator::runOperations(IndexStructure* structure,
@@ -113,7 +138,7 @@ namespace mdsearch
 
 		for (unsigned int operationListIndex = 0; (operationListIndex < timings.size()); operationListIndex++)
 		{
-			ss << "Dataset and Operation List (" << operationListIndex << "):" << "\n";
+			ss << "Test Operations (" << operationListIndex << "):" << "\n";
 
 			const StructureTimings& structureTimings = timings[operationListIndex];
 			for (unsigned int structureIndex = 0; (structureIndex < structureTimings.size()); structureIndex++)
