@@ -6,7 +6,8 @@
 namespace mdsearch
 {
 
-	CommandLineArguments::CommandLineArguments(int argc, char* argv[]) : validArguments(false)
+	CommandLineArguments::CommandLineArguments(int argc, char* argv[]) :
+		validArguments(false), verbose(false)
 	{
 		// Shortened namespace for more concise code
 		namespace po = boost::program_options; 
@@ -20,6 +21,7 @@ namespace mdsearch
 			description.add_options()
 				("help,h", "print help message")
 				("output,o", po::value<std::string>()->required(), "filename to store generated results")
+				("verbose,v", "verbose outptu produced by evaluator if this flag is set")
 				("index_structures,s", po::value<std::vector<std::string> >(), "index structure to evaluate")
 				("datasets,d", po::value<std::vector<std::string> >(), "dataset to use for evaluation")
 				("test_operations,t", po::value<std::vector<std::string> >(), "list of test operations to perform");
@@ -41,6 +43,12 @@ namespace mdsearch
 				outputFilename = parsedArgs["output"].as<std::string>();
 				validArguments = true; // all required args given!
 			}
+			// If verbose flag given, set verbose flag to true
+			if (parsedArgs.count("verbose"))
+			{
+				verbose = true;
+			}
+
 			// Get all specified index structures, parsing strings to separate
 			// structure type and the structure's additional arguments
 			if (parsedArgs.count("index_structures"))
@@ -89,6 +97,11 @@ namespace mdsearch
 	bool CommandLineArguments::isValid() const
 	{
 		return validArguments;
+	}
+
+	bool CommandLineArguments::isVerbose() const
+	{
+		return verbose;
 	}
 
 	const std::vector<CommandLineArguments::IndexStructureSpecification>& CommandLineArguments::indexStructures() const

@@ -8,8 +8,8 @@
 namespace mdsearch
 {
 
-	Evaluator::Evaluator(const std::vector<IndexStructure*>& structures)
-		: structures(structures), verbose(false)
+	Evaluator::Evaluator(const std::vector<IndexStructure*>& structures, bool verbose)
+		: structures(structures), verbose(verbose)
 	{
 	}
 

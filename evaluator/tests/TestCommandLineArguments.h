@@ -139,6 +139,20 @@ namespace mdsearch { namespace tests
 		EXPECT_EQ("random1000.ops", operations[1]);
 	}
 
+	TEST_F(CommandLineArgumentsTests, Verbose)
+	{
+		char* testArgs1[] = { "./evaluator", "--output=filename" };
+		char* testArgs2[] = { "./evaluator", "--output=filename", "-v" };
+		char* testArgs3[] = { "./evaluator", "--output=filename", "--verbose" };
+
+		CommandLineArguments parsedArgs(2, testArgs1);
+		ASSERT_FALSE(parsedArgs.isVerbose());
+		parsedArgs = CommandLineArguments(3, testArgs2);
+		ASSERT_TRUE(parsedArgs.isVerbose());
+		parsedArgs = CommandLineArguments(3, testArgs3);
+		ASSERT_TRUE(parsedArgs.isVerbose());
+	}
+
 } }
 
 #endif

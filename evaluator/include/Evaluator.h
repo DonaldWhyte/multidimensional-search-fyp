@@ -24,7 +24,7 @@ namespace mdsearch
 
 	public:
 		/* Construct an evaluator specifically for the given structures. */
-		Evaluator(const std::vector<IndexStructure*>& structures);
+		Evaluator(const std::vector<IndexStructure*>& structures, bool verbose = false);
 
 		/* Given a list of datasets and test operations, run each index
 		 * structure on EACH OPERATION LIST!

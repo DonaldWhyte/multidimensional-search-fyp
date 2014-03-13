@@ -24,6 +24,8 @@ namespace mdsearch
 
 		/* Return true if parsed command line arguments are valid. */
 		bool isValid() const;
+		// If flag set to true, verbose output is expected when evaluator is running		
+		bool isVerbose() const;
 		/* Accessors for parsed command line data. */
 		const std::vector<IndexStructureSpecification>& indexStructures() const;
 		const StringList& datasetFilenames() const;
@@ -35,6 +37,7 @@ namespace mdsearch
 		// If this flag is set to true, then some of the required arguments
 		// are either missing or invalid
 		bool validArguments;
+		bool verbose;
 
 		std::vector<IndexStructureSpecification> specifiedIndexStructures;
 		StringList datasets;
