@@ -2,6 +2,8 @@
 #include <ctime>
 #include <sstream>
 #include <boost/timer.hpp>
+#include <gperftools/profiler.h>
+#include <gperftools/heap-profiler.h>
 
 namespace mdsearch
 {
@@ -19,17 +21,19 @@ namespace mdsearch
 		OperationListTimings testOpTimings;
 		testOpTimings.reserve(testOperationLists.size());
 
-		for (std::vector<TestOperationList>::const_iterator ops = testOperationLists.begin();
-			(ops != testOperationLists.end()); ops++)
+		for (unsigned int t = 0; (t < testOperationLists.size()); t++)
 		{
 			StructureTimings structureTimings;
 			structureTimings.reserve(structures.size());
 
-			for (std::vector<IndexStructure*>::const_iterator structure = structures.begin();
-				(structure != structures.end()); structure++)
+			for (unsigned int s = 0; (s < structures.size()); s++)
 			{
 				// Run operations
-				Timing timeElapsed = runOperations(*structure, *ops);
+				Timing timeElapsed = runOperations(structures[s],
+					testOperationLists[t],
+					generateCPUProfilerFilename(t, s),
+					generateHeapProfilerFilename(t, s)
+				);
 				structureTimings.push_back(timeElapsed);
 
 				// TODO: need to clear index structure here!!!
@@ -42,11 +46,16 @@ namespace mdsearch
 	}
 
 	Timing Evaluator::runOperations(IndexStructure* structure,
-		const TestOperationList& operations) const
+		const TestOperationList& operations,
+		const std::string& cpuProfilerOutputFilename,
+		const std::string& heapProfilerOutputFilename) const
 	{
 		// Keep track of the time the performance test starts
 		boost::timer timer;
 		timer.restart();
+		// Start CPU and heap profilers
+		ProfilerStart(cpuProfilerOutputFilename.c_str());
+		HeapProfilerStart(heapProfilerOutputFilename.c_str());
 
 		// Iteration through all operations
 		for (TestOperationList::const_iterator op = operations.begin();
@@ -70,8 +79,33 @@ namespace mdsearch
 			}
 		}
 
-		// Compute elapsed time and return it
-		return timer.elapsed();
+		// Store time elapsed during execution of the operations
+		Timing elapsed = timer.elapsed();
+		// Stop profilers
+		ProfilerStop();
+		// NOTE: You have to call HeadProfilerDump() to produce the heap
+		// profiling output. HeapProfilerStop() will not produce it for you
+		// like ProfilerStop() does for PCU profiling.
+		HeapProfilerDump(heapProfilerOutputFilename.c_str());
+		HeapProfilerStop();
+
+		return elapsed;
+	}
+
+	std::string Evaluator::generateCPUProfilerFilename(unsigned int testOpListIndex,
+		unsigned int structureIndex) const
+	{
+		std::stringstream ss;
+		ss << "CPU_PROFILE_" << testOpListIndex << "_" << structureIndex << ".prof";
+		return ss.str();
+	}
+	
+	std::string Evaluator::generateHeapProfilerFilename(unsigned int testOpListIndex,
+		unsigned int structureIndex) const
+	{
+		std::stringstream ss;
+		ss << "HEAP_PROFILE_" << testOpListIndex << "_" << structureIndex << ".heap";
+		return ss.str();		
 	}
 
 	std::string generateTimingReport(const OperationListTimings& timings)

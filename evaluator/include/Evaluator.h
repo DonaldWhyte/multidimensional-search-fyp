@@ -39,7 +39,15 @@ namespace mdsearch
 
 	private:
 		Timing runOperations(IndexStructure* structure,
-			const TestOperationList& operations) const;
+			const TestOperationList& operations,
+			const std::string& cpuProfilerOutputFilename,
+			const std::string& heapProfilerOutputFilename) const;
+
+		/* Return filenames for output of CPU and heap profilers,
+		 * which are generated based on current operation list
+		 * and index structure being tested. */
+		std::string generateCPUProfilerFilename(unsigned int testOpListIndex, unsigned int structureIndex) const;
+		std::string generateHeapProfilerFilename(unsigned int testOpListIndex, unsigned int structureIndex) const;
 
 		std::vector<IndexStructure*> structures;
 
