@@ -48,7 +48,7 @@ namespace mdsearch { namespace tests
 		multipleOperations.push_back(TestOperation(
 			TestOperation::OPERATION_TYPE_DELETE, Point(4, 1)));
 		multipleOperations.push_back(TestOperation(
-			TestOperation::OPERATION_TYPE_UPDATE, Point(4, 2.242)));
+			TestOperation::OPERATION_TYPE_UPDATE, Point(4, 2.242), Point(4, -4)));
 		multipleOperations.push_back(TestOperation(
 			TestOperation::OPERATION_TYPE_POINTQUERY, Point(4, 2473.64)));
 		multipleOperations.push_back(TestOperation(

@@ -34,8 +34,8 @@ namespace mdsearch
 		{
 			return operations;
 		}
-		// Use these counts to 
-		std::vector<Real> pointValues(numDimensions);
+		// Use these counts to pre-allocate memory
+		std::vector<Real> pointValues(numDimensions * 2); // '* 2' there so it can hold at most two points (operands)
 		operations.reserve(numOps);
 
 		// Go through each line, looking for another test operation in each
@@ -61,8 +61,19 @@ namespace mdsearch
 				type = TestOperation::OPERATION_TYPE_POINTQUERY;
 			else // ignore operation if the type is not known
 				continue;
+
 			// Read the coordinates of the operation's point
-			for (unsigned int d = 0; (d < numDimensions); d++)
+			unsigned int iterCount = numDimensions;
+			// Read two points if it's an update operation
+			if (type == TestOperation::OPERATION_TYPE_UPDATE)
+			{
+				// Also ensure that there are actually enough fields for the two points
+				// If not, IGNORE THE POINT
+				if (fields.size() < ((numDimensions * 2) + 1))
+					continue;
+				iterCount *= 2;
+			}
+			for (unsigned int d = 0; (d < iterCount); d++)
 			{
 				// Try storing next field as a real number
 				// If this fails, then the point's values are invalid so
@@ -76,9 +87,18 @@ namespace mdsearch
 					continue;
 				}
 			}
-			Point point(numDimensions, &pointValues[0]);
 
-			operations.push_back( TestOperation(type, point) );
+			// Construct the operation object
+			Point operandOne(numDimensions, &pointValues[0]);
+			if (type == TestOperation::OPERATION_TYPE_UPDATE)
+			{
+				Point operandTwo(numDimensions, &pointValues[numDimensions]);
+				operations.push_back( TestOperation(type, operandOne, operandTwo) );
+			}
+			else
+			{
+				operations.push_back( TestOperation(type, operandOne) );
+			}
 		}
 
 		return operations;

@@ -64,17 +64,16 @@ namespace mdsearch
 			switch (op->type)
 			{
 			case TestOperation::OPERATION_TYPE_INSERT:
-				structure->insert(op->value);
+				structure->insert(op->operand1);
 				break;
 			case TestOperation::OPERATION_TYPE_DELETE:
-				structure->remove(op->value);
+				structure->remove(op->operand1);
 				break;
 			case TestOperation::OPERATION_TYPE_UPDATE:
-				// TODO: handle update later!
-				//structure->update(op->value);
+				structure->update(op->operand1, op->operand2);
 				break;
 			case TestOperation::OPERATION_TYPE_POINTQUERY:
-				structure->pointExists(op->value);
+				structure->pointExists(op->operand1);
 				break;
 			}
 		}

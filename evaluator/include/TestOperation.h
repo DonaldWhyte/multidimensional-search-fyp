@@ -18,13 +18,15 @@ namespace mdsearch
 			OPERATION_TYPE_POINTQUERY,
 		};
 
-		TestOperation(Type type, const Point& value);
+		TestOperation(Type type, const Point& operandOne);
+		TestOperation(Type type, const Point& operandOne, const Point& operandTwo);
 		/* Equality test for two structure test operations. Created for unit tests. */
 		bool operator==(const TestOperation& other) const;
 
 		// Fields
 		Type type;
-		Point value;
+		Point operand1;
+		Point operand2;
 
 	};
 
