@@ -9,7 +9,7 @@ namespace mdsearch
 {
 
 	// Types used for timinbg information
-	typedef long Timing;
+	typedef double Timing;
 	typedef std::vector<Timing> StructureTimings;
 	typedef std::vector<StructureTimings> OperationListTimings;
 
@@ -38,7 +38,7 @@ namespace mdsearch
 			const std::vector<TestOperationList>& testOperationLists) const;
 
 	private:
-		long runOperations(IndexStructure* structure,
+		Timing runOperations(IndexStructure* structure,
 			const TestOperationList& operations) const;
 
 		std::vector<IndexStructure*> structures;

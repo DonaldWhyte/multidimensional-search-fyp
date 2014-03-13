@@ -1,6 +1,7 @@
 #include "Evaluator.h"
 #include <ctime>
 #include <sstream>
+#include <boost/timer.hpp>
 
 namespace mdsearch
 {
@@ -28,7 +29,7 @@ namespace mdsearch
 				(structure != structures.end()); structure++)
 			{
 				// Run operations
-				long timeElapsed = runOperations(*structure, *ops);
+				Timing timeElapsed = runOperations(*structure, *ops);
 				structureTimings.push_back(timeElapsed);
 
 				// TODO: need to clear index structure here!!!
@@ -40,16 +41,37 @@ namespace mdsearch
 		return testOpTimings;
 	}
 
-	long Evaluator::runOperations(IndexStructure* structure,
+	Timing Evaluator::runOperations(IndexStructure* structure,
 		const TestOperationList& operations) const
 	{
 		// Keep track of the time the performance test starts
-		long startTime = time(NULL);
+		boost::timer timer;
+		timer.restart();
 
-		// TODO 
+		// Iteration through all operations
+		for (TestOperationList::const_iterator op = operations.begin();
+			(op != operations.end()); op++)
+		{
+			switch (op->type)
+			{
+			case TestOperation::OPERATION_TYPE_INSERT:
+				structure->insert(op->value);
+				break;
+			case TestOperation::OPERATION_TYPE_DELETE:
+				structure->remove(op->value);
+				break;
+			case TestOperation::OPERATION_TYPE_UPDATE:
+				// TODO: handle update later!
+				//structure->update(op->value);
+				break;
+			case TestOperation::OPERATION_TYPE_POINTQUERY:
+				structure->pointExists(op->value);
+				break;
+			}
+		}
 
 		// Compute elapsed time and return it
-		return (time(NULL) - startTime);
+		return timer.elapsed();
 	}
 
 	std::string generateTimingReport(const OperationListTimings& timings)
@@ -63,8 +85,8 @@ namespace mdsearch
 			const StructureTimings& structureTimings = timings[operationListIndex];
 			for (unsigned int structureIndex = 0; (structureIndex < structureTimings.size()); structureIndex++)
 			{
-				long elapsedTime = structureTimings[structureIndex];
-				ss << "\t\tStructure (" << structureIndex << "): " << elapsedTime << "\n";
+				Timing elapsedTime = structureTimings[structureIndex];
+				ss << "\t\tStructure (" << structureIndex << "): " << elapsedTime << " seconds\n";
 			}
 		}
 
