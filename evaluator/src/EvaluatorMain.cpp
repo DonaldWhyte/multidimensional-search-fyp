@@ -67,26 +67,8 @@ int main(int argc, char* argv[])
 	// Create evaluator object and fill it with loaded structures
 	Evaluator evaluator(structures);
 	// Run evaluation on loaded datasets and operation lists
-	std::vector<std::vector<TimingList> > timings = evaluator.timePerformance(datasets, testOperationLists);
-
-	// Display timing results
-	for (unsigned int datasetIndex = 0; (datasetIndex < timings.size()); datasetIndex++)
-	{
-		std::cout << "Dataset " << datasetIndex << ":" << std::endl;
-
-		const std::vector<TimingList>& operationListTimings = timings[datasetIndex];
-		for (unsigned int operationListIndex = 0; (operationListIndex < operationListTimings.size()); operationListIndex++)
-		{
-			std::cout << "\tOperation List " << operationListIndex << ": " << std::endl;
-
-			const TimingList& structureTimings = operationListTimings[operationListIndex];
-			for (unsigned int structureIndex = 0; (structureIndex < structureTimings.size()); structureIndex++)
-			{
-				long elapsedTime = structureTimings[structureIndex];
-				std::cout << "\t\tStructure " << structureIndex << ": " << elapsedTime << std::endl;
-			}
-		}
-	}
+	OperationListTimings timings = evaluator.timePerformance(testOperationLists);
+	std::cout << generateTimingReport(timings) << std::endl;
 
 	return 0;
 }

@@ -1,5 +1,6 @@
 #include "Evaluator.h"
 #include <ctime>
+#include <sstream>
 
 namespace mdsearch
 {
@@ -9,57 +10,65 @@ namespace mdsearch
 	{
 	}
 
-	std::vector<std::vector<TimingList> > Evaluator::timePerformance(
-		const std::vector<PointList>& datasets,
+	OperationListTimings Evaluator::timePerformance(
 		const std::vector<TestOperationList>& testOperationLists) const
 	{
 		// NOTE: reserve() calls are done to minimise the amount of dynamic allocations as possible
 
-		std::vector<std::vector<TimingList> > timings;
-		timings.reserve(datasets.size());
+		OperationListTimings testOpTimings;
+		testOpTimings.reserve(testOperationLists.size());
 
-		// For each dataset, run the specified sets of test operations
-		for (std::vector<PointList>::const_iterator ds = datasets.begin();
-			(ds != datasets.end()); ds++)
+		for (std::vector<TestOperationList>::const_iterator ops = testOperationLists.begin();
+			(ops != testOperationLists.end()); ops++)
 		{
-			std::vector<TimingList> datasetTimings;
-			datasetTimings.reserve(testOperationLists.size());
+			StructureTimings structureTimings;
+			structureTimings.reserve(structures.size());
 
-			for (std::vector<TestOperationList>::const_iterator ops = testOperationLists.begin();
-				(ops != testOperationLists.end()); ops++)
+			for (std::vector<IndexStructure*>::const_iterator structure = structures.begin();
+				(structure != structures.end()); structure++)
 			{
-				TimingList testOperationSetTimings;
-				testOperationSetTimings.reserve(structures.size());
+				// Run operations
+				long timeElapsed = runOperations(*structure, *ops);
+				structureTimings.push_back(timeElapsed);
 
-				for (std::vector<IndexStructure*>::const_iterator structure = structures.begin();
-					(structure != structures.end()); structure++)
-				{
-					// Run operations
-					long timeElapsed = runOperations(*structure, *ds, *ops);
-					testOperationSetTimings.push_back(timeElapsed);
-
-					// TODO: need to clear index structure here!!!
-				}
-
-				datasetTimings.push_back(testOperationSetTimings);
+				// TODO: need to clear index structure here!!!
 			}
 
-			timings.push_back(datasetTimings);
+			testOpTimings.push_back(structureTimings);
 		}
 
-		return timings;
+		return testOpTimings;
 	}
 
 	long Evaluator::runOperations(IndexStructure* structure,
-		const PointList& dataset, const TestOperationList& operations) const
+		const TestOperationList& operations) const
 	{
 		// Keep track of the time the performance test starts
 		long startTime = time(NULL);
 
 		// TODO 
 
-		// ECompute elapsed time and return it
+		// Compute elapsed time and return it
 		return (time(NULL) - startTime);
+	}
+
+	std::string generateTimingReport(const OperationListTimings& timings)
+	{
+		std::stringstream ss;
+
+		for (unsigned int operationListIndex = 0; (operationListIndex < timings.size()); operationListIndex++)
+		{
+			ss << "Dataset and Operation List (" << operationListIndex << "):" << "\n";
+
+			const StructureTimings& structureTimings = timings[operationListIndex];
+			for (unsigned int structureIndex = 0; (structureIndex < structureTimings.size()); structureIndex++)
+			{
+				long elapsedTime = structureTimings[structureIndex];
+				ss << "\t\tStructure (" << structureIndex << "): " << elapsedTime << "\n";
+			}
+		}
+
+		return ss.str();
 	}
 
 }
