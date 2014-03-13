@@ -116,7 +116,7 @@ namespace mdsearch
 					if (((r + 1) % repeatCount) == 0)
 					{
 						index++;
-						if (index >= 2) // TODO: correct?
+						if (index >= 2)
 						{
 							index = 0;
 						}

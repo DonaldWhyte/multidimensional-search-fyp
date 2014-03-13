@@ -49,6 +49,20 @@ namespace mdsearch { namespace tests
 		ASSERT_EQ(testPoints, structure.allPoints());
 	}
 
+	TEST_F(SequentialScanTests, Clear)
+	{
+		SequentialScan structure(NUM_DIMENSIONS);
+		ASSERT_EQ(PointList(), structure.allPoints());
+		// Testing clear with already empty structure
+		structure.clear();
+		ASSERT_EQ(PointList(), structure.allPoints());
+		// Testing c
+		structure.loadPoints(testPoints);
+		ASSERT_EQ(testPoints, structure.allPoints());
+		structure.clear();
+		ASSERT_EQ(PointList(), structure.allPoints());
+	}	
+
 	TEST_F(SequentialScanTests, Insertion)
 	{
 		SequentialScan structure(NUM_DIMENSIONS);

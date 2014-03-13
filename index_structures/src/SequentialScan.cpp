@@ -25,6 +25,12 @@ namespace mdsearch
 	{
 		return points;
 	}
+
+	void SequentialScan::clear()
+	{
+		// NOTE: Not using clear so all heap memory is also de-allocated
+		points = PointList();
+	}
 	
 	bool SequentialScan::insert(const Point& p)
 	{

@@ -63,6 +63,13 @@ namespace mdsearch
 		}
 	}
 	
+	void Octree::clear()
+	{
+		// Remove all child nodes and ensure points are cleared from node
+		removeAllChildren();
+		points = PointList();
+	}
+
 	bool Octree::insert(const Point& p)
 	{
 		if (!boundary.contains(p))

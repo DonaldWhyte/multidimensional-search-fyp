@@ -38,6 +38,8 @@ namespace mdsearch
 		// Checks if node (including all of its children) are empty
 		bool empty() const;
 
+		void clear();
+
 		// Dynamic operations
 		bool insert(const Point& p);
 		bool remove(const Point& p);

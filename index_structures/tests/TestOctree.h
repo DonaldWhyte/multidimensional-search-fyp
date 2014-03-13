@@ -51,6 +51,25 @@ namespace mdsearch { namespace tests
 		ASSERT_EQ(256, structure.childrenPerNode());
 	}
 
+	TEST_F(OctreeTests, Clear)
+	{
+		Octree structure(NUM_OCTREE_DIMENSIONS, initialBoundary);
+		// Test clear with already empty structure
+		ASSERT_EQ(0, structure.storedPoints().size());
+		ASSERT_EQ(0, structure.nodeChildren().size());		
+		structure.clear();
+		ASSERT_EQ(0, structure.storedPoints().size());
+		ASSERT_EQ(0, structure.nodeChildren().size());		
+		// Test clear with filled structure
+		IndexStructureTester tester;
+		const PointList& testPoints = tester.getTestPoints();		
+		structure.loadPoints(testPoints);
+		ASSERT_EQ(8, structure.nodeChildren().size());
+		structure.clear();
+		ASSERT_EQ(0, structure.storedPoints().size());
+		ASSERT_EQ(0, structure.nodeChildren().size());
+	}
+
 	TEST_F(OctreeTests, InsertionAndSubdivide)
 	{
 		Octree structure(NUM_OCTREE_DIMENSIONS, initialBoundary);
@@ -199,7 +218,6 @@ namespace mdsearch { namespace tests
 		IndexStructureTester tester;
 		tester.testRegionQueries(&structure);
 	}
-
 
 } }
 

@@ -28,15 +28,15 @@ namespace mdsearch
 
 			for (unsigned int s = 0; (s < structures.size()); s++)
 			{
-				// Run operations
+				// Ensure structure is completely empty
+				structures[s]->clear();				
+				// Run test operations on structure
 				Timing timeElapsed = runOperations(structures[s],
 					testOperationLists[t],
 					generateCPUProfilerFilename(t, s),
 					generateHeapProfilerFilename(t, s)
 				);
 				structureTimings.push_back(timeElapsed);
-
-				// TODO: need to clear index structure here!!!
 			}
 
 			testOpTimings.push_back(structureTimings);

@@ -17,6 +17,8 @@ namespace mdsearch
 		// Return all store points as a raw list
 		const PointList& allPoints() const;
 
+		void clear();
+
 		// Dynamic operations
 		bool insert(const Point& p);
 		bool remove(const Point& p);

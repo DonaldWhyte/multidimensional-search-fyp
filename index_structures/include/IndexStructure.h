@@ -26,6 +26,10 @@ namespace mdsearch
 				insert(*it);
 			}
 		}
+
+		// Clear all currently stored points in structure
+		virtual void clear() = 0;
+
 		// Dynamic operations
 		virtual bool insert(const Point& p) = 0;
 		virtual bool remove(const Point& p) = 0;
