@@ -5,23 +5,19 @@
 #include "IndexStructure.h"
 #include "Point.h"
 #include "TestOperation.h"
+#include "Timing.h"
 
 namespace mdsearch
 {
 
-	typedef long Timing;
-	typedef std::vector<Timing> TimingList;
-
 	// TODO: comment this file a fair bit
-
 	class Evaluator
 	{
 
 	public:
 		Evaluator(const std::vector<IndexStructure*>& structures);
 
-		std::vector<std::vector<TimingList> > timePerformance(
-			const std::vector<PointList>& datasets,
+		std::vector< timePerformance(const std::vector<PointList>& datasets,
 			const std::vector<TestOperationList>& testOperationLists) const;
 
 	private:

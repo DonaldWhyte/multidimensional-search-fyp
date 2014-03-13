@@ -5,12 +5,14 @@ set (EVALUATOR_SRC
 	"src/IndexStructureFactory.cpp"
 	"src/TestOperation.cpp"
 	"src/TestOperationLoader.cpp"
+	"src/Timing.cpp"
 	"src/Evaluator.cpp"
 	# Header files
 	"include/IndexStructureFactory.h"
 	"include/CommandLineArguments.h"
 	"include/TestOperation.h"
 	"include/TestOperationLoader.h"
+	"include/Timing.h"
 	"include/Evaluator.h"
 )
 add_executable( evaluator
