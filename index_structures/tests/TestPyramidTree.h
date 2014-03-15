@@ -1,27 +1,34 @@
-#ifndef MDSEARCH_TEST_SEQUENTIALSCAN_H
-#define MDSEARCH_TEST_SEQUENTIALSCAN_H
+#ifndef MDSEARCH_TEST_PYRAMIDTREE_H
+#define MDSEARCH_TEST_PYRAMIDTREE_H
 
 #include <gtest/gtest.h>
 #include "Common.h"
-#include "SequentialScan.h"
+#include "PyramidTree.h"
 
 namespace mdsearch { namespace tests
 {
 
-	class SequentialScanTests : public ::testing::Test
+	class PyramidTreeTests : public ::testing::Test
 	{
 
 	protected:
+		virtual void SetUp()
+		{
+			Interval initialBoundaryIntervals[3] = { Interval(0, 10), Interval(0, 10), Interval(0, 10) };
+			initialBoundary = Region(3, initialBoundaryIntervals);			
+		}
+
 		static const unsigned int NUM_DIMENSIONS = 3;
+		Region initialBoundary;
 
 	};
 
-	TEST_F(SequentialScanTests, Construction)
+	TEST_F(PyramidTreeTests, Construction)
 	{
-		SequentialScan structure(NUM_DIMENSIONS);
+		PyramidTree structure(NUM_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
-		const PointList& testPoints = tester.getTestPoints();
-				
+		const PointList& testPoints = tester.getTestPoints();		
+
 		ASSERT_EQ(0, structure.allPoints().size());
 
 		structure.loadPoints(testPoints);
@@ -31,9 +38,9 @@ namespace mdsearch { namespace tests
 		ASSERT_EQ(testPoints, structure.allPoints());
 	}
 
-	TEST_F(SequentialScanTests, Clear)
+	TEST_F(PyramidTreeTests, Clear)
 	{
-		SequentialScan structure(NUM_DIMENSIONS);
+		PyramidTree structure(NUM_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();
 
@@ -46,13 +53,13 @@ namespace mdsearch { namespace tests
 		ASSERT_EQ(testPoints, structure.allPoints());
 		structure.clear();
 		ASSERT_EQ(PointList(), structure.allPoints());
-	}	
+	}
 
-	TEST_F(SequentialScanTests, Insertion)
+	TEST_F(PyramidTreeTests, Insertion)
 	{
-		SequentialScan structure(NUM_DIMENSIONS);
+		PyramidTree structure(NUM_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
-		const PointList& testPoints = tester.getTestPoints();		
+		const PointList& testPoints = tester.getTestPoints();
 
 		// Insert same point twice -- SHOULD ONLY BE INSERTED ONCE
 		// SINCE WE ARE NOT STORING DUPLICATES!
@@ -72,9 +79,9 @@ namespace mdsearch { namespace tests
 		ASSERT_EQ(expectedPoints, structure.allPoints());
 	}
 
-	TEST_F(SequentialScanTests, Removal)
+	TEST_F(PyramidTreeTests, Removal)
 	{
-		SequentialScan structure(NUM_DIMENSIONS);
+		PyramidTree structure(NUM_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();
 
@@ -98,27 +105,26 @@ namespace mdsearch { namespace tests
 		EXPECT_EQ(expectedPoints, structure.allPoints()); // ensure point has been removed!
 	}
 
-	TEST_F(SequentialScanTests, Updating)
+	TEST_F(PyramidTreeTests, Updating)
 	{
-		SequentialScan structure(IndexStructureTester::NUM_TEST_DIMENSIONS);
+		PyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		tester.testUpdates(&structure);
 	}
 
-	TEST_F(SequentialScanTests, PointQueries)
+	TEST_F(PyramidTreeTests, PointQueries)
 	{
-		SequentialScan structure(IndexStructureTester::NUM_TEST_DIMENSIONS);
+		PyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		tester.testPointQueries(&structure);
 	}
 
-	TEST_F(SequentialScanTests, RegionQueries)
+	TEST_F(PyramidTreeTests, RegionQueries)
 	{
-		SequentialScan structure(IndexStructureTester::NUM_TEST_DIMENSIONS);
+		PyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		tester.testRegionQueries(&structure);
 	}
-
 
 } }
 

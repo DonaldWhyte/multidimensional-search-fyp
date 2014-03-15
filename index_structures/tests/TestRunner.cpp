@@ -4,6 +4,7 @@
 // test suite that executes when RUN_ALL_TESTS() is called
 #include "TestSequentialScan.h"
 #include "TestOctree.h"
+#include "TestPyramidTree.h"
 
 int main(int argc, char* argv[])
 {

@@ -3,6 +3,7 @@
 
 #include "DataTypes.h"
 #include "Point.h"
+#include <cmath>
 
 namespace mdsearch
 {
@@ -24,6 +25,21 @@ namespace mdsearch
 	*/
 	bool writePointsToFile(const std::string& filename,
 		unsigned int numDimensions, const PointList& points);
+
+	/* Defined error tolrerance for floating point comparisons. */
+	static const Real EPSILON = 1.0e-7;
+
+	/* Compare two Real values subject to an error tolerance.
+	 * Return -1, 0, 1 respectively if t is less than,
+	 * approximately equal to, or greater than, base. */
+	inline int compare(Real t, Real base)
+	{
+		if (fabs(t - base) < EPSILON)
+			return 0;
+		if (t < base)
+			return -1;
+		return 1;
+	}	
 
 }
 
