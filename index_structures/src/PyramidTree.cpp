@@ -272,7 +272,6 @@ namespace mdsearch
 
 	void PyramidTree::updatePointIndices(unsigned int removedIndex)
 	{
-		// TODO: comment
 		for (OneDMap::iterator entry = hashMap.begin(); (entry != hashMap.end()); entry++)
 		{
 			for (IndexList::iterator index = entry->second.begin();

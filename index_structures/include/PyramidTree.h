@@ -48,7 +48,8 @@ namespace mdsearch
 		int hashPoint(const Point& myPoint);
 		/* Defragments internal point arrays by deleting all unused points. */
 		void defragment();
-		/* TODO */
+		/* Given the index of the last removed point in the 'points' array,
+		 * update the remaining index entries in the hash table. */
 		void updatePointIndices(unsigned int removedIndex);
 
 		// Contains all the full d-dimensional points stored in the Pyramid tree
