@@ -24,7 +24,8 @@ namespace mdsearch
 
 	public:
 		/* Construct an evaluator specifically for the given structures. */
-		Evaluator(const std::vector<IndexStructure*>& structures, bool verbose = false);
+		Evaluator(const std::vector<IndexStructure*>& structures,
+			unsigned int numTestRuns, bool verbose = false);
 
 		/* Given a list of datasets and test operations, run each index
 		 * structure on EACH OPERATION LIST!
@@ -55,6 +56,9 @@ namespace mdsearch
 
 		std::vector<IndexStructure*> structures;
 		bool verbose; // if true, progress log is outputted as test operations are being executed
+		// Number of test runs to perform for each operation list 
+		// Average time of all runs is used for the outputted time
+		unsigned int numTestRuns;
 
 	};
 

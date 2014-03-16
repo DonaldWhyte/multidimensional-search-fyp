@@ -8,8 +8,9 @@
 namespace mdsearch
 {
 
-	Evaluator::Evaluator(const std::vector<IndexStructure*>& structures, bool verbose)
-		: structures(structures), verbose(verbose)
+	Evaluator::Evaluator(const std::vector<IndexStructure*>& structures,
+		unsigned int numTestRuns, bool verbose)
+		: structures(structures), numTestRuns(numTestRuns), verbose(verbose)
 	{
 	}
 
@@ -40,15 +41,22 @@ namespace mdsearch
 				if (verbose)
 					std::cout << "\tRunning operations on structure (" << s << ")..." << std::endl;
 
-				// Ensure structure is completely empty
-				structures[s]->clear();				
-				// Run test operations on structure
-				Timing timeElapsed = runOperations(structures[s],
-					testOperationLists[t],
-					generateCPUProfilerFilename(t, s),
-					generateHeapProfilerFilename(t, s)
-				);
-				structureTimings.push_back(timeElapsed);
+				Timing sumOfTimes = 0;
+				for (unsigned int i = 0; (i < numTestRuns); i++) // multiple runs of operations
+				{
+					// Ensure structure is completely empty
+					structures[s]->clear();
+					// Run test operations on structure and add time elapsed
+					// to the total sum
+					sumOfTimes += runOperations(structures[s],
+						testOperationLists[t],
+						generateCPUProfilerFilename(t, s),
+						generateHeapProfilerFilename(t, s)
+					);
+				}
+				
+				Timing averageTime = sumOfTimes / numTestRuns;
+				structureTimings.push_back(averageTime);
 			}
 
 			testOpTimings.push_back(structureTimings);
