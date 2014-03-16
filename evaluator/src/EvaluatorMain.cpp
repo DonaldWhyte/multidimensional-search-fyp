@@ -18,7 +18,10 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
+
 	// Construct specified index structures
+	if (args.isVerbose())
+		std::cout << "Loading index structures" << std::endl;	
 	std::vector<IndexStructure*> structures;
 
 	IndexStructureFactory structureFactory;
@@ -44,6 +47,8 @@ int main(int argc, char* argv[])
 	}
 
 	// Load specified datasets
+	if (args.isVerbose())
+		std::cout << "Loading datasets" << std::endl;	
 	std::vector<PointList> datasets;
 
 	DatasetFileLoader datasetLoader;
@@ -55,6 +60,8 @@ int main(int argc, char* argv[])
 
 	// Load specified test operations
 	std::vector<TestOperationList> testOperationLists;
+	if (args.isVerbose())
+		std::cout << "Loading test operations" << std::endl;
 
 	TestOperationLoader testOpLoader;
 	const StringList& testOperationFilenames = args.testOperationFilenames();
