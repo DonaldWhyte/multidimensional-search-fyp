@@ -13,6 +13,9 @@ namespace mdsearch
 	{
 
 	public:
+		/* Default number of test runs to perform. */
+		static const unsigned int DEFAULT_TEST_RUNS;
+
 		struct IndexStructureSpecification
 		{
 			std::string type;
@@ -24,8 +27,10 @@ namespace mdsearch
 
 		/* Return true if parsed command line arguments are valid. */
 		bool isValid() const;
-		// If flag set to true, verbose output is expected when evaluator is running		
+		/* If true is returned, verbose output is expected when evaluator is running. */
 		bool isVerbose() const;
+		/* Number of runs to perform of each test operation set (to compute average time). */
+		unsigned int testRunsToPerform() const;
 		/* Accessors for parsed command line data. */
 		const std::vector<IndexStructureSpecification>& indexStructures() const;
 		const StringList& datasetFilenames() const;
@@ -38,6 +43,7 @@ namespace mdsearch
 		// are either missing or invalid
 		bool validArguments;
 		bool verbose;
+		unsigned int runs;
 
 		std::vector<IndexStructureSpecification> specifiedIndexStructures;
 		StringList datasets;

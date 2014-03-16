@@ -18,7 +18,6 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-
 	// Construct specified index structures
 	if (args.isVerbose())
 		std::cout << "Loading index structures" << std::endl;	

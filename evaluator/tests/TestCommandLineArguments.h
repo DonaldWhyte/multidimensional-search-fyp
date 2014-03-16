@@ -14,7 +14,7 @@ namespace mdsearch { namespace tests
 
 	};
 
-	TEST_F(CommandLineArgumentsTests, Core) // required arguments
+	TEST_F(CommandLineArgumentsTests, OutputFilename)
 	{
 		char* testArgs1[] = { "./evaluator", "--output=filename" };
 		char* testArgs2[] = { "./evaluator", "-ofilename" };
@@ -30,10 +30,10 @@ namespace mdsearch { namespace tests
 		EXPECT_EQ("filename", parsedArgs.resultFilename());
 		// Test with NO output filename
 		parsedArgs = CommandLineArguments(1, testArgs3);
-		EXPECT_FALSE(parsedArgs.isValid());
+		EXPECT_TRUE(parsedArgs.isValid());
 		EXPECT_EQ("", parsedArgs.resultFilename());
 		parsedArgs = CommandLineArguments(0, testArgs4);
-		EXPECT_FALSE(parsedArgs.isValid());
+		EXPECT_TRUE(parsedArgs.isValid());
 		EXPECT_EQ("", parsedArgs.resultFilename());
 	}
 
@@ -151,6 +151,19 @@ namespace mdsearch { namespace tests
 		ASSERT_TRUE(parsedArgs.isVerbose());
 		parsedArgs = CommandLineArguments(3, testArgs3);
 		ASSERT_TRUE(parsedArgs.isVerbose());
+	}
+
+	TEST_F(CommandLineArgumentsTests, TestRunCount)
+	{
+		char* testArgs1[] = { "./evaluator" };
+		char* testArgs2[] = { "./evaluator", "-r3" };
+		char* testArgs3[] = { "./evaluator", "--runs=8" };
+		CommandLineArguments parsedArgs(1, testArgs1);
+		EXPECT_EQ(CommandLineArguments::DEFAULT_TEST_RUNS, parsedArgs.testRunsToPerform());
+		parsedArgs = CommandLineArguments(2, testArgs2);
+		EXPECT_EQ(3, parsedArgs.testRunsToPerform());
+		parsedArgs = CommandLineArguments(2, testArgs3);
+		EXPECT_EQ(8, parsedArgs.testRunsToPerform());
 	}
 
 } }
