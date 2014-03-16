@@ -138,6 +138,11 @@ namespace mdsearch
 		return emptyElementIndices;
 	}
 
+	const Region& PyramidTree::getBoundary() const
+	{
+		return boundary;
+	}
+
 	void PyramidTree::insertToStructure(const Point& point, bool searchKeyExists)
 	{
 		// Transform the original data to the encoded data sets.
@@ -261,7 +266,7 @@ namespace mdsearch
 			pointSums.erase(sBegin + (*index));
 			updatePointIndices((*index));
 		}
-		
+
 		emptyElementIndices.clear();
 	}
 

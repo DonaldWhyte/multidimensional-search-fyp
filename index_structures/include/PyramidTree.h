@@ -37,6 +37,7 @@ namespace mdsearch
 		 * to find out which indices of the point list contain deleted pints. */
 		const PointList& allPoints() const;
 		const IndexList& emptyIndices() const;
+		const Region& getBoundary() const;
 
 	private:
 		static const unsigned int MAX_BUCKET_NUMBER = 300000;
