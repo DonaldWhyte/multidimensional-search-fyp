@@ -3,9 +3,11 @@
 namespace mdsearch
 {
 
-	PyramidTree::PyramidTree(unsigned int nDimensions, const Region& treeBoundary)
-		: IndexStructure(nDimensions), boundary(treeBoundary), bucketInterval(1),
-		medianPoint(nDimensions)
+	PyramidTree::PyramidTree(unsigned int nDimensions, const Region& treeBoundary,
+		unsigned int maxEmptyElements) :
+		IndexStructure(nDimensions),
+		maxEmptyElements(maxEmptyElements), boundary(treeBoundary), 
+		bucketInterval(1), medianPoint(nDimensions)
 	{
 		// Compute the interval between buckets 
 		bucketInterval = static_cast<double>(
@@ -36,7 +38,8 @@ namespace mdsearch
 		// (through destructors of containers)
 		points = PointList();
 		pointSums = RealList();
-		Map = OneDMap();
+		hashMap = OneDMap();
+		emptyElementIndices = IndexList();
 	}
 
 	bool PyramidTree::insert(const Point& point)
@@ -56,15 +59,56 @@ namespace mdsearch
 
 	bool PyramidTree::remove(const Point& point)
 	{
-		// TODO
-		return false;
+		// Find bucket the point would belong to
+		int searchKey = hashPoint(point);
+		OneDMap::iterator keyValue = hashMap.find(searchKey);
+		// Bucket has been found, point MIGHT be stored in structure
+		if (keyValue != hashMap.end())
+		{
+			// Search through points in bucket to see if it contains the given point
+			std::vector<int>& indices = keyValue->second;
+			std::vector<int>::iterator pointIndex = indices.begin();
+			for (pointIndex; (pointIndex != indices.end()); pointIndex++)
+			{
+				if (point == points[*pointIndex])
+				{
+					break;
+				}
+			}
+			// If the point was found
+			if (pointIndex != indices.end())
+			{
+				// Add the index to the lsit 
+				emptyElementIndices.push_back(*pointIndex);				
+				// Remove index pointing to the point in the bucket
+				indices.erase(pointIndex);
+				// If the amount of empty elements of the point array is
+				// higher than a certain threshold, DEFRAGMENT the structure
+				if (emptyElementIndices.size() >= maxEmptyElements)
+				{
+					defragment();
+				}
+
+				return true;
+			}
+			// Point is not contained in bucket -- cannot remove
+			else
+			{
+				return false;
+			}
+		}
+		// No bucket found, so point is not being stored in the structure
+		else
+		{
+			return false;
+		}
 	}
 
 	bool PyramidTree::update(const Point& oldPoint, const Point& newPoint)
 	{
-		if (remove(oldPoint))
+		if (remove(oldPoint)) // if point was removed successfully (i.e. it existed)
 		{
-			insert(newPoint);
+			insert(newPoint); // insert a new point in its place!
 			return true;
 		}
 		else
@@ -89,6 +133,11 @@ namespace mdsearch
 		return points;
 	}
 
+	const IndexList& PyramidTree::emptyIndices() const
+	{
+		return emptyElementIndices;
+	}
+
 	void PyramidTree::insertToStructure(const Point& point, bool searchKeyExists)
 	{
 		// Transform the original data to the encoded data sets.
@@ -102,14 +151,14 @@ namespace mdsearch
 		points.push_back(point);
 		pointSums.push_back(sum);
 
-		int searchKey = HashValue(point);
+		int searchKey = hashPoint(point);
 		int currentIndex = points.size() - 1;
 		if (searchKeyExists)
 		{
 			// If there is no inserted data, but there is a search key
-			std::vector<int> value = Map.find(searchKey)->second;
+			std::vector<int> value = hashMap.find(searchKey)->second;
 			value.push_back(currentIndex);
-			Map[searchKey] = value;
+			hashMap[searchKey] = value;
 		}
 		else
 		{
@@ -117,7 +166,7 @@ namespace mdsearch
 			std::vector<int> myVector;
 			myVector.reserve(10);
 			myVector.push_back(currentIndex);
-			Map[searchKey] = myVector;
+			hashMap[searchKey] = myVector;
 		}
 	}
 
@@ -131,10 +180,11 @@ namespace mdsearch
 			pSum += point[d];
 		}
 
-		int searchKey = HashValue(point);
-		if (Map.find(searchKey) != Map.end())
+		int searchKey = hashPoint(point);
+		OneDMap::const_iterator keyValue = hashMap.find(searchKey);
+		if (keyValue != hashMap.end())
 		{
-			std::vector<int> output = Map.find(searchKey)->second;
+			const std::vector<int>& output = keyValue->second;
 			bool contain = false;
 
 			for (int i = 0; i < output.size(); i++)
@@ -163,7 +213,7 @@ namespace mdsearch
 		}
 	}	
 
-	int PyramidTree::HashValue(const Point& point)
+	int PyramidTree::hashPoint(const Point& point)
 	{
 		int searchKey = 0 ;
 		int value[numDimensions];
@@ -188,6 +238,47 @@ namespace mdsearch
 			searchKey = searchKey + temp;
 		}
 		return searchKey;
+	}
+
+	/* Fucntion used to sort integer values in DESCENDING ORDER. */
+	bool descendingSorter(unsigned int i, unsigned int j)
+	{
+		return (i > j);	
+	}
+
+	void PyramidTree::defragment()
+	{
+		// Sort indices list in DESCENDING ORDER
+		// Done so indices aren't changed by previously removed elements
+		std::sort(emptyElementIndices.begin(), emptyElementIndices.end(), descendingSorter);
+		// Remove all empty elements
+		PointList::iterator pBegin = points.begin();
+		RealList::iterator sBegin = pointSums.begin();
+		for (IndexList::const_iterator index = emptyElementIndices.begin();
+			(index != emptyElementIndices.end()); index++)
+		{
+			points.erase(pBegin + (*index));
+			pointSums.erase(sBegin + (*index));
+			updatePointIndices((*index));
+		}
+		
+		emptyElementIndices.clear();
+	}
+
+	void PyramidTree::updatePointIndices(unsigned int removedIndex)
+	{
+		// TODO: comment
+		for (OneDMap::iterator entry = hashMap.begin(); (entry != hashMap.end()); entry++)
+		{
+			for (IndexList::iterator index = entry->second.begin();
+				(index != entry->second.end()); index++)
+			{
+				if (*index > removedIndex)
+				{
+					*index = *index - 1;
+				}
+			}
+		}
 	}
 
 }

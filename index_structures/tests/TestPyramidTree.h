@@ -99,10 +99,10 @@ namespace mdsearch { namespace tests
 
 		// Point deletion where point is not in non-empty structure
 		EXPECT_FALSE(structure.remove(testPoints[4]));
-		// Point deletition where point exists
+		// Point deletion where point exists
+		EXPECT_TRUE(structure.pointExists(testPoints[1]));
 		EXPECT_TRUE(structure.remove(testPoints[1]));
-		expectedPoints.erase(expectedPoints.begin() + 1);
-		EXPECT_EQ(expectedPoints, structure.allPoints()); // ensure point has been removed!
+		EXPECT_FALSE(structure.pointExists(testPoints[1])); // ensure point has been removed!
 	}
 
 	TEST_F(PyramidTreeTests, Updating)
@@ -124,6 +124,41 @@ namespace mdsearch { namespace tests
 		PyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		tester.testRegionQueries(&structure);
+	}
+
+	TEST_F(PyramidTreeTests, Defragment)
+	{
+		// Make max empty elements 2 for testing purposes
+		PyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary, 2);
+		IndexStructureTester tester;
+		const PointList& testPoints = tester.getTestPoints();
+		// Insert some points into the structure
+		structure.insert(testPoints[0]);
+		structure.insert(testPoints[1]);
+		structure.insert(testPoints[2]);
+		structure.insert(testPoints[3]);
+		ASSERT_EQ(4, structure.allPoints().size());
+		ASSERT_TRUE(structure.pointExists(testPoints[0]));
+		ASSERT_TRUE(structure.pointExists(testPoints[1]));
+		ASSERT_TRUE(structure.pointExists(testPoints[2]));
+		ASSERT_TRUE(structure.pointExists(testPoints[3]));		
+		// Remove one point and ensure nothing is deleted from point list
+		structure.remove(testPoints[0]);
+		ASSERT_EQ(4, structure.allPoints().size());
+		ASSERT_EQ(1, structure.emptyIndices().size());
+		ASSERT_EQ(0, structure.emptyIndices()[0]);
+		// Remove another point. Empty indices should now be empty and the two
+		// points should be removed (WITH THE ORIGINAL ORDER OF INSERTION INTACT!)
+		structure.remove(testPoints[2]);
+		ASSERT_EQ(2, structure.allPoints().size());
+		ASSERT_EQ(testPoints[1], structure.allPoints()[0]);
+		ASSERT_EQ(testPoints[3], structure.allPoints()[1]);
+		ASSERT_EQ(0, structure.emptyIndices().size());
+		// Test point queries work correctly after defragmentation
+		EXPECT_FALSE(structure.pointExists(testPoints[0]));
+		EXPECT_TRUE(structure.pointExists(testPoints[1]));
+		EXPECT_FALSE(structure.pointExists(testPoints[2]));
+		EXPECT_TRUE(structure.pointExists(testPoints[3]));
 	}
 
 } }

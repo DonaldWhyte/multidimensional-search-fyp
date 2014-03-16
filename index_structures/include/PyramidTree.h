@@ -22,7 +22,8 @@ namespace mdsearch
 	{
 
 	public:
-		PyramidTree(unsigned int numDimensions, const Region& boundary);
+		PyramidTree(unsigned int numDimensions, const Region& boundary,
+			unsigned int maxEmptyElements = DEFAULT_MAX_EMPTY_ELEMENTS);
 
 		virtual void clear();
 
@@ -32,14 +33,22 @@ namespace mdsearch
 		virtual bool pointExists(const Point& point);
 		virtual PointList pointsInRegion(const Region& region);
 
+		/* NOTE: May contain points recently deleted. Use emptyIndices()
+		 * to find out which indices of the point list contain deleted pints. */
 		const PointList& allPoints() const;
+		const IndexList& emptyIndices() const;
 
 	private:
 		static const unsigned int MAX_BUCKET_NUMBER = 300000;
+		static const unsigned int DEFAULT_MAX_EMPTY_ELEMENTS = 100;
 
 		void insertToStructure(const Point& point, bool searchKeyExists);
 		int getPointIndex(const Point& point);
-		int HashValue(const Point& myPoint);
+		int hashPoint(const Point& myPoint);
+		/* Defragments internal point arrays by deleting all unused points. */
+		void defragment();
+		/* TODO */
+		void updatePointIndices(unsigned int removedIndex);
 
 		// Contains all the full d-dimensional points stored in the Pyramid tree
 		PointList points;
@@ -48,9 +57,17 @@ namespace mdsearch
 		RealList pointSums;
 		// Unordered_map for storing the key values of 1-dimensional interpolated point.
 		// Key = hashed Point, value = list of indices of potential points
-		// Each key can contain MULTIPLE indicies
-		typedef boost::unordered_map<Real, std::vector<int>, ihash> OneDMap;
-		OneDMap Map;    
+		// Each key can contain MULTIPLE indices
+		typedef boost::unordered_map<Real, IndexList, ihash> OneDMap;
+		OneDMap hashMap;   
+		// Stores the indices which are empty in the linear points list
+		// As a point is removed from the structure, the index is removed but
+		// the point is not (as removal from the array is an O(n) operation).
+		// This keeps track of which elements of the point array ARE NOT
+		// being used
+		IndexList emptyElementIndices;
+		// Maximum amount of empty elements allowed before the list is defragmented
+		unsigned int maxEmptyElements;
 
 		// Entire region of space the Pyramid tree covers
 		// (points outside this region are ignored)
