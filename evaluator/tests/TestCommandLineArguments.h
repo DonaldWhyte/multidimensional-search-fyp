@@ -153,6 +153,17 @@ namespace mdsearch { namespace tests
 		ASSERT_TRUE(parsedArgs.isVerbose());
 	}
 
+	TEST_F(CommandLineArgumentsTests, ProfileHeap)
+	{
+		char* testArgs1[] = { "./evaluator" };
+		char* testArgs2[] = { "./evaluator", "--heap" };
+
+		CommandLineArguments parsedArgs(1, testArgs1);
+		ASSERT_FALSE(parsedArgs.profileHeap());
+		parsedArgs = CommandLineArguments(2, testArgs2);
+		ASSERT_TRUE(parsedArgs.profileHeap());
+	}
+
 	TEST_F(CommandLineArgumentsTests, TestRunCount)
 	{
 		char* testArgs1[] = { "./evaluator" };

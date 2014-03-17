@@ -29,6 +29,8 @@ namespace mdsearch
 		bool isValid() const;
 		/* If true is returned, verbose output is expected when evaluator is running. */
 		bool isVerbose() const;
+		/* If true, then the heap will be profiled for heap memory allocation. */
+		bool profileHeap() const;
 		/* Number of runs to perform of each test operation set (to compute average time). */
 		unsigned int testRunsToPerform() const;
 		/* Accessors for parsed command line data. */
@@ -43,6 +45,7 @@ namespace mdsearch
 		// are either missing or invalid
 		bool validArguments;
 		bool verbose;
+		bool profileHeapFlag;
 		unsigned int runs;
 
 		std::vector<IndexStructureSpecification> specifiedIndexStructures;

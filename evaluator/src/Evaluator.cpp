@@ -9,8 +9,9 @@ namespace mdsearch
 {
 
 	Evaluator::Evaluator(const std::vector<IndexStructure*>& structures,
-		unsigned int numTestRuns, bool verbose)
-		: structures(structures), numTestRuns(numTestRuns), verbose(verbose)
+		unsigned int numTestRuns, bool profileHeap, bool verbose)
+		: structures(structures), numTestRuns(numTestRuns),
+		profileHeap(profileHeap), verbose(verbose)
 	{
 	}
 
@@ -83,12 +84,15 @@ namespace mdsearch
 		const std::string& cpuProfilerOutputFilename,
 		const std::string& heapProfilerOutputFilename) const
 	{
+		// Start CPU and heap profilers (heap first so it doesn't affect timings)
+		if (profileHeap)
+		{
+			HeapProfilerStart(heapProfilerOutputFilename.c_str());
+		}
+		ProfilerStart(cpuProfilerOutputFilename.c_str());
 		// Keep track of the time the performance test starts
 		boost::timer timer;
 		timer.restart();
-		// Start CPU and heap profilers
-		ProfilerStart(cpuProfilerOutputFilename.c_str());
-		HeapProfilerStart(heapProfilerOutputFilename.c_str());
 
 		// Iteration through all operations
 		for (TestOperationList::const_iterator op = operations.begin();
@@ -118,8 +122,11 @@ namespace mdsearch
 		// NOTE: You have to call HeadProfilerDump() to produce the heap
 		// profiling output. HeapProfilerStop() will not produce it for you
 		// like ProfilerStop() does for PCU profiling.
-		HeapProfilerDump(heapProfilerOutputFilename.c_str());
-		HeapProfilerStop();
+		if (profileHeap)
+		{
+			HeapProfilerDump(heapProfilerOutputFilename.c_str());
+			HeapProfilerStop();
+		}
 
 		return elapsed;
 	}

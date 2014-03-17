@@ -25,7 +25,7 @@ namespace mdsearch
 	public:
 		/* Construct an evaluator specifically for the given structures. */
 		Evaluator(const std::vector<IndexStructure*>& structures,
-			unsigned int numTestRuns, bool verbose = false);
+			unsigned int numTestRuns, bool profileHeap = false, bool verbose = false);
 
 		/* Given a list of datasets and test operations, run each index
 		 * structure on EACH OPERATION LIST!
@@ -55,6 +55,7 @@ namespace mdsearch
 		std::string generateHeapProfilerFilename(unsigned int testOpListIndex, unsigned int structureIndex) const;
 
 		std::vector<IndexStructure*> structures;
+		bool profileHeap; // if true, the heap is profiled for each test operation ruin
 		bool verbose; // if true, progress log is outputted as test operations are being executed
 		// Number of test runs to perform for each operation list 
 		// Average time of all runs is used for the outputted time

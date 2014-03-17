@@ -9,7 +9,8 @@ namespace mdsearch
 	const unsigned int CommandLineArguments::DEFAULT_TEST_RUNS = 1;
 
 	CommandLineArguments::CommandLineArguments(int argc, char* argv[]) :
-		validArguments(true), verbose(false), runs(DEFAULT_TEST_RUNS)
+		validArguments(true), verbose(false), profileHeapFlag(false),
+		runs(DEFAULT_TEST_RUNS)
 	{
 		// Shortened namespace for more concise code
 		namespace po = boost::program_options; 
@@ -23,7 +24,8 @@ namespace mdsearch
 			description.add_options()
 				("help,h", "print help message")
 				("output,o", po::value<std::string>(), "filename to store generated results")
-				("verbose,v", "verbose outptu produced by evaluator if this flag is set")
+				("verbose,v", "verbose output produced by evaluator if this flag is set")
+				("heap", "heap is profiled if this flag is set")
 				("runs,r", po::value<unsigned int>(), "number of runs to perform of test operations to get AVERAGE time")
 				("index_structures,s", po::value<std::vector<std::string> >(), "index structure to evaluate")
 				("datasets,d", po::value<std::vector<std::string> >(), "dataset to use for evaluation")
@@ -49,6 +51,10 @@ namespace mdsearch
 			if (parsedArgs.count("verbose"))
 			{
 				verbose = true;
+			}
+			if (parsedArgs.count("heap"))
+			{
+				profileHeapFlag = true;
 			}
 			if (parsedArgs.count("runs"))
 			{
@@ -108,6 +114,11 @@ namespace mdsearch
 	bool CommandLineArguments::isVerbose() const
 	{
 		return verbose;
+	}
+
+	bool CommandLineArguments::profileHeap() const
+	{
+		return profileHeapFlag;
 	}
 
 	unsigned int CommandLineArguments::testRunsToPerform() const
