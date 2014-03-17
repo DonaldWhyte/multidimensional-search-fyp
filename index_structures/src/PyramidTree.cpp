@@ -1,4 +1,5 @@
 #include "PyramidTree.h"
+#include "Util.h"
 
 namespace mdsearch
 {

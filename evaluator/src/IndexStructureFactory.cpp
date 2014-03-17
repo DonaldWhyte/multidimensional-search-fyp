@@ -100,6 +100,10 @@ namespace mdsearch
 		const std::string& structureType, unsigned int numDimensions,
 		const std::vector<std::string>& arguments) const
 	{
+		// Cannot construct index structure with zero dimensions
+		if (numDimensions == 0)
+			return NULL;
+
 		// Search map for a generator for the requested structure type
 		GeneratorMap::const_iterator it = generators.find(structureType);
 		if (it != generators.end())

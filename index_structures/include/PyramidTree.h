@@ -4,7 +4,6 @@
 #include <vector>
 #include <boost/unordered_map.hpp>
 #include "IndexStructure.h"
-#include "Util.h"
 
 namespace mdsearch
 {
@@ -25,22 +24,40 @@ namespace mdsearch
 		PyramidTree(unsigned int numDimensions, const Region& boundary,
 			unsigned int maxEmptyElements = DEFAULT_MAX_EMPTY_ELEMENTS);
 
+		/* Clear all points currently stored in the structure. */
 		virtual void clear();
 
+		/* Insert point into the Pyramid Tree.
+		 * Returns true if the point was inserted successfully and
+		 * false if the point is already stored in the structure. */
 		virtual bool insert(const Point& point);
+		/* Remove point from the tree.
+		 * Returns true if the point was removed successfully and
+		 * false if the point was not being stored. */
 		virtual bool remove(const Point& point);
+		/* Update the value of an existing point.
+		 * Returns true if the point was updated and false if the
+		 * old point is not stored in the structure. */
 		virtual bool update(const Point& oldPoint, const Point& newPoint);
+		/* Return true if the given point is being stored in the structure. */
 		virtual bool pointExists(const Point& point);
+		/* Return all points stored in this structure which are contained
+		 * within the given spatial region. */
 		virtual PointList pointsInRegion(const Region& region);
 
-		/* NOTE: May contain points recently deleted. Use emptyIndices()
+		/* Return all points currently stored in the structure's array.
+		 * NOTE: May contain points recently deleted. Use emptyIndices()
 		 * to find out which indices of the point list contain deleted pints. */
 		const PointList& allPoints() const;
+		/* Return indices of all ele,ents of point array which are deleted. */
 		const IndexList& emptyIndices() const;
+		/* Return spatial region this Pyramid covers. */
 		const Region& getBoundary() const;
 
 	private:
 		static const unsigned int MAX_BUCKET_NUMBER = 300000;
+		/* Maximum amount of empty elements in the point array before
+		 * it is defragmented (to ensure contingious memory). */
 		static const unsigned int DEFAULT_MAX_EMPTY_ELEMENTS = 100;
 
 		void insertToStructure(const Point& point, bool searchKeyExists);
