@@ -34,7 +34,7 @@ namespace mdsearch
 	 * approximately equal to, or greater than, base. */
 	inline int compare(Real t, Real base)
 	{
-		if (fabs(t - base) < EPSILON)
+		if (std::fabs(t - base) < EPSILON)
 			return 0;
 		if (t < base)
 			return -1;

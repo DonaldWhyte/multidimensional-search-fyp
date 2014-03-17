@@ -160,15 +160,16 @@ namespace mdsearch
 		int currentIndex = points.size() - 1;
 		if (searchKeyExists)
 		{
-			// If there is no inserted data, but there is a search key
-			std::vector<int> indices = hashMap.find(searchKey)->second;
+			// If there is no inserted data, but there is a search key,
+			// be sure to insert the current index (latest inserted point
+			// index) into that point's bucket (this one)
+			IndexList& indices = hashMap.find(searchKey)->second; // storing REFERFENCE so changes are made
 			indices.push_back(currentIndex);
-			hashMap[searchKey] = indices;
 		}
 		else
 		{
 			// If there is no inserted data and there is no search key
-			std::vector<int> indices;
+			IndexList indices;
 			indices.reserve(10);
 			indices.push_back(currentIndex);
 			hashMap[searchKey] = indices;
