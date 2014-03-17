@@ -41,7 +41,7 @@ namespace mdsearch
 
 	bool Octree::isLeaf() const
 	{
-		// TODO
+		// Using size() not end() because it provide faster during profiling
 		return (children.size() == 0);
 	}
 
@@ -118,7 +118,8 @@ namespace mdsearch
 		if (isLeaf()) // if leaf node
 		{
 			PointList::iterator it = points.begin();
-			for (it; (it != points.end()); it++)
+			PointList::const_iterator pEnd = points.end();
+			for (it; (it != pEnd); it++)
 			{
 				if (*it == p)
 				{
@@ -126,7 +127,7 @@ namespace mdsearch
 				}
 			}
 			// If the point was found, then ERASE it and return true!
-			if (it != points.end())
+			if (it != pEnd)
 			{
 				points.erase(it);
 				totalPointsInsideNode--;
@@ -142,8 +143,8 @@ namespace mdsearch
 			// Try removing point from children
 			// If a node returns true, then keep a pointer to that node
 			OctreeNodeList::iterator nodeModified = children.end();
-			for (OctreeNodeList::iterator it = children.begin();
-				(it != children.end()); it++)
+			OctreeNodeList::const_iterator cEnd = nodeModified;
+			for (OctreeNodeList::iterator it = children.begin(); (it != cEnd); it++)
 			{
 	            if ((*it)->remove(p))
 	            {
@@ -155,7 +156,7 @@ namespace mdsearch
 	            }
 	        }
 	        // If a node was modified...
-	        if (nodeModified != children.end())
+	        if (nodeModified != cEnd)
 	        {
 	        	// If modified node is now empty, check if this entire node is empty.
 	        	// If so, collapse into single node by removing all children
