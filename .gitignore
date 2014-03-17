@@ -23,3 +23,7 @@ build
 
 # Compile Python scripts
 *.pyc
+
+# File containing large test data
+test_data
+test_data/*
