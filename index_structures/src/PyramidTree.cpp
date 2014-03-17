@@ -161,17 +161,17 @@ namespace mdsearch
 		if (searchKeyExists)
 		{
 			// If there is no inserted data, but there is a search key
-			std::vector<int> value = hashMap.find(searchKey)->second;
-			value.push_back(currentIndex);
-			hashMap[searchKey] = value;
+			std::vector<int> indices = hashMap.find(searchKey)->second;
+			indices.push_back(currentIndex);
+			hashMap[searchKey] = indices;
 		}
 		else
 		{
 			// If there is no inserted data and there is no search key
-			std::vector<int> myVector;
-			myVector.reserve(10);
-			myVector.push_back(currentIndex);
-			hashMap[searchKey] = myVector;
+			std::vector<int> indices;
+			indices.reserve(10);
+			indices.push_back(currentIndex);
+			hashMap[searchKey] = indices;
 		}
 	}
 
@@ -198,7 +198,7 @@ namespace mdsearch
 				double sum = pointSums[index];
 				if (compare(sum, pSum) == 0)
 				{
-					Point foundPoint = points[index];
+					const Point& foundPoint = points[index];
 					if (point == foundPoint)
 			  		{
 			  			return index;
