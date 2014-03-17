@@ -39,6 +39,15 @@ namespace mdsearch
 		inline Real operator[](int index) const { return values[index]; }
 		inline unsigned int numDimensions() const { return nDimensions; }
 
+		/* Return sum of all elements/coordinates of this point. */
+		inline Real sum() const
+		{
+			Real s = 0;
+			for (int i = 0; (i < nDimensions); i++)
+				s += values[i];
+			return s;
+		}
+
 
 	private:
 		RealList values;

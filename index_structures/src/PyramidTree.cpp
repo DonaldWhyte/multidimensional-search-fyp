@@ -10,12 +10,12 @@ namespace mdsearch
 		bucketInterval(1), medianPoint(nDimensions)
 	{
 		// Compute the interval between buckets 
-		bucketInterval = static_cast<double>(
+		bucketInterval = static_cast<Real>(
 			MAX_BUCKET_NUMBER / (numDimensions * 2)
 		);
 		bucketInterval = floor(bucketInterval);
 		// Compute initial median value
-		double m = static_cast<double>(1.0 / numDimensions);
+		Real m = static_cast<Real>(1.0 / numDimensions);
 		int div = ceil(pow(MAX_BUCKET_NUMBER, m));
 		for (unsigned int d = 0; d < numDimensions; d++)
 		{
@@ -145,16 +145,9 @@ namespace mdsearch
 
 	void PyramidTree::insertToStructure(const Point& point, bool searchKeyExists)
 	{
-		// Transform the original data to the encoded data sets.
-		double sum = 0;
-
-		for (int j = 0; j < numDimensions; j++) 
-		{
-			sum += point[j];
-		}
 		// Add raw point adn the sum of all its elements to the vectors
 		points.push_back(point);
-		pointSums.push_back(sum);
+		pointSums.push_back(point.sum());
 
 		int searchKey = hashPoint(point);
 		int currentIndex = points.size() - 1;
@@ -178,43 +171,36 @@ namespace mdsearch
 
 	int PyramidTree::getPointIndex(const Point& point)
 	{
-		int finalIndex;
-		double pSum = 0;
-
-		for(int d = 0; d < numDimensions; d++) 
-		{
-			pSum += point[d];
-		}
-
+		// First check if this point's bucket exists
 		int searchKey = hashPoint(point);
 		OneDMap::const_iterator keyValue = hashMap.find(searchKey);
 		if (keyValue != hashMap.end())
 		{
-			const std::vector<int>& output = keyValue->second;
-			bool contain = false;
-
-			for (int i = 0; i < output.size(); i++)
+			// Compute the sum of the point's elements
+			Real pSum = point.sum();
+			// Look through each of the bucket's points
+			const IndexList& indices = keyValue->second;
+			for (IndexList::const_iterator index = indices.begin();
+				(index != indices.end()); index++)
 			{
-				int index = output[i];
-				double sum = pointSums[index];
+				// First check that the sum of the points match!
+				// We can avoid performing many point equality checks by doing this
+				Real sum = pointSums[*index];
 				if (compare(sum, pSum) == 0)
 				{
-					const Point& foundPoint = points[index];
+					const Point& foundPoint = points[*index];
 					if (point == foundPoint)
 			  		{
-			  			return index;
+			  			return *index;
 			  		}
 				}
 		  	}
-			// if there is no inserted data, but there is search key
-			if (!contain)
-			{
-				return -2;
-			}
+			// Return -2, as the point does not exist but its bucket does
+			return -2;
 		}
 		else
 		{
-			// if there is no inserted data
+			// If both the point AND ITS BUCKET do not exist
 			return -1;
 		}
 	}	
@@ -226,7 +212,7 @@ namespace mdsearch
 		for (int d = 0; d < numDimensions; d++ )
 		{
 			value[d] = static_cast<int>(
-				static_cast<double>((point[d] - boundary[d].min) / (boundary[d].max - boundary[d].min))
+				static_cast<Real>((point[d] - boundary[d].min) / (boundary[d].max - boundary[d].min))
 				* medianPoint[d]);
 			if (value[d] >= medianPoint[d])
 			{
