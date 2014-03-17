@@ -63,6 +63,9 @@ namespace mdsearch
 
 		Region boundary;
 		unsigned int numChildrenPerNode;
+		// A count of the total number of points stored in this node,
+		// including the points stored by all of its children
+		unsigned int totalPointsInsideNode;
 
 		PointList points;
 		OctreeNodeList children;

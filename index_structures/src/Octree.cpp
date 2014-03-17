@@ -6,7 +6,8 @@ namespace mdsearch
 
 	Octree::Octree(int numDimensions, const Region& boundary) :
 		IndexStructure(numDimensions), boundary(boundary),
-		numChildrenPerNode( pow(2, numDimensions) )
+		numChildrenPerNode( pow(2, numDimensions) ),
+		totalPointsInsideNode(0)
 		
 	{
 		// Pre-allocate enough memory to store max amount of points in this node
@@ -40,27 +41,13 @@ namespace mdsearch
 
 	bool Octree::isLeaf() const
 	{
-		return children.empty();
+		// TODO
+		return (children.size() == 0);
 	}
 
 	bool Octree::empty() const
 	{
-		if (isLeaf())
-		{
-			return (points.empty());
-		}
-		else
-		{
-			for (OctreeNodeList::const_iterator it = children.begin();
-				(it != children.end()); it++)
-			{
-				// If a child is not empty, immediately return false
-	            if (!(*it)->empty())
-	                return false;
-	        }
-	        // All children were empty, so this node is empty!
-	        return true;
-		}
+		return (totalPointsInsideNode == 0);
 	}
 	
 	void Octree::clear()
@@ -68,6 +55,7 @@ namespace mdsearch
 		// Remove all child nodes and ensure points are cleared from node
 		removeAllChildren();
 		points = PointList();
+		totalPointsInsideNode = 0;
 	}
 
 	bool Octree::insert(const Point& p)
@@ -83,8 +71,12 @@ namespace mdsearch
 				(it != children.end()); it++)
 			{
 	            if ((*it)->insert(p))
+	            {
+	            	totalPointsInsideNode++;
 	                return true;
-	        }			
+	            }
+	        }
+	        return false;
 		}
 		// If there is more space to put shapes in this node, add the shape
 	    else if (points.size() < MAX_POINTS_PER_NODE)
@@ -97,6 +89,7 @@ namespace mdsearch
 	    	else
 	    	{
 	    		points.push_back(p);
+	    		totalPointsInsideNode++;
 	    		return true;	
 	    	}
 	    }
@@ -108,7 +101,10 @@ namespace mdsearch
 				(it != children.end()); it++)
 			{
 	            if ((*it)->insert(p))
+	            {
+	            	totalPointsInsideNode++;
 	                return true;
+	            }
 	        }
 			// If this is reached, point could not be inserted.
 			// NOTE: THIS CODE SHOULD NEVER BE REACHED!
@@ -133,6 +129,7 @@ namespace mdsearch
 			if (it != points.end())
 			{
 				points.erase(it);
+				totalPointsInsideNode--;
 				return true;
 			}
 			else
@@ -150,6 +147,9 @@ namespace mdsearch
 			{
 	            if ((*it)->remove(p))
 	            {
+	            	// Point was successfully removed, so this node now contains one
+	            	// less point overall
+	            	totalPointsInsideNode--;
 	            	nodeModified = it;
 	                break;
 	            }
@@ -157,12 +157,10 @@ namespace mdsearch
 	        // If a node was modified...
 	        if (nodeModified != children.end())
 	        {
-	        	// If modified node is now empty, cgeck if this entire node is empty.
+	        	// If modified node is now empty, check if this entire node is empty.
 	        	// If so, collapse into single node by removing all children
-	        	if ((*nodeModified)->empty())
-	        		if (empty())
-						removeAllChildren();
-
+	        	if (empty())
+					removeAllChildren();
 	        	// Either way, a point was deleted so return true
 	        	return true;
 	        }
@@ -321,6 +319,7 @@ namespace mdsearch
 			delete *it;
 		}
 		children.clear();
+		totalPointsInsideNode = 0;
 	}
 
 }

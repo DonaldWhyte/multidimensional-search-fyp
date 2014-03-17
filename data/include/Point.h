@@ -21,7 +21,7 @@ namespace mdsearch
 		inline bool operator==(const Point& other) const
 		{
 			// Ensure the two points have the same dimensionality
-			if (nDimensions != other.numDimensions())
+			if (nDimensions != other.nDimensions)
 				return false;
 			// Perform equality check element-by-element
 			for (int i = 0; (i < nDimensions); i++)
