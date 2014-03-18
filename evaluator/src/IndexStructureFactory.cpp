@@ -11,12 +11,14 @@ namespace mdsearch
 	Region parseBoundary(unsigned int numDimensions,
 		const std::vector<std::string>& args)
 	{
+		// Parse string arguments into real numbers that define
+		// interval for each dimension
+		Real min = boost::lexical_cast<Real>(args[0]);
+		Real max = boost::lexical_cast<Real>(args[1]);
+		// Construct Regio n object to represent boundary
 		Region boundary(numDimensions);
 		for (unsigned int d = 0; (d < numDimensions); d++)
 		{
-			// Parse string arguments into real numbers
-			Real min = boost::lexical_cast<Real>(args[d * 2]);
-			Real max = boost::lexical_cast<Real>(args[d * 2 + 1]);
 			boundary[d] = Interval(min, max);
 		}
 		return boundary;		
@@ -33,7 +35,7 @@ namespace mdsearch
 		const std::vector<std::string>& args)
 	{
 		// Check there are enough arguments to construct n-dimensional boundary
-		if (args.size() < numDimensions * 2) // min + max args needed per dimension
+		if (args.size() < 2) // min + max args for every dimension
 			return NULL;
 
 		try
@@ -50,7 +52,7 @@ namespace mdsearch
 	IndexStructure* generatePyramidTree(unsigned int numDimensions,
 		const std::vector<std::string>& args)
 	{
-		unsigned int requiredArgCount = numDimensions * 2;
+		unsigned int requiredArgCount = 2;
 		if (args.size() < requiredArgCount)
 			return NULL;
 
