@@ -22,12 +22,17 @@ namespace mdsearch
 		{
 			// Ensure the two points have the same dimensionality
 			if (nDimensions != other.nDimensions)
+			{
 				return false;
-			// Perform equality check element-by-element
-			for (int i = 0; (i < nDimensions); i++)
-				if (values[i] != other.values[i]) // TODO: float equality? how to check?
-					return false;
-			return true;
+			}
+			else
+			{
+				// Perform equality check element-by-element
+				for (int i = 0; (i < nDimensions); i++)
+					if (values[i] != other.values[i]) // TODO: float equality? how to check?
+						return false;
+				return true;
+			}
 		}
 
 		inline bool operator!=(const Point& other) const
@@ -48,16 +53,14 @@ namespace mdsearch
 			return s;
 		}
 
-
 	private:
 		RealList values;
 		unsigned int nDimensions;
 
 	};
 
-	// Used to easily print a point
 	std::ostream& operator<<(std::ostream& out, const Point& point);
-
+	
 	typedef std::vector<Point> PointList;
 
 }

@@ -4,6 +4,7 @@ add_library( data
 	"src/Util.cpp"
 	"src/Point.cpp"
 	"src/Region.cpp"
+	"src/PointFactory.cpp"
 	"src/DatasetFileLoader.cpp"
 	"src/UniformDatasetGenerator.cpp"
 	"src/RandomPointGenerator.cpp"
@@ -14,6 +15,7 @@ add_library( data
 	"include/Util.h"
 	"include/Point.h"
 	"include/Region.h"
+	"include/PointFactory.h"
 	"include/DatasetFileLoader.h"
 	"include/UniformDatasetGenerator.h"
 	"include/RandomPointGenerator.h"
@@ -27,6 +29,7 @@ include_directories ("include")
 add_executable ( data_tests
 	"tests/TestRunner.cpp"
 	"tests/TestTypes.h"
+	"tests/TestPointFactory.h"
 	"tests/TestDatasetFileLoader.h"
 	"tests/TestDatasetGenerators.h"
 )

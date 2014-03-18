@@ -24,5 +24,5 @@ namespace mdsearch
 			out << point[i] << ",";
 		out << point[point.numDimensions() - 1] << ")";
 	}
-
+	
 }
