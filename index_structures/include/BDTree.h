@@ -22,7 +22,25 @@ namespace mdsearch
 		virtual PointList pointsInRegion(const Region& region);
 
 	private:
-		Region boundary;
+		struct BDTreeNode
+		{
+			Region boundary;
+			Region otherBoundary;
+			bool differenceInBoundaries;
+
+			BDTreeNode* left;
+			BDTreeNode* right;
+			BDTreeNode* outer;
+
+			Point point;
+		};
+
+		/* Perform a Splay quadtree promote(x) operation on the given node.
+		 * Return true if the node was successfully promoted and false
+		 * if it wasn't (due to it already being the root). */
+		bool promote(BDTreeNode* node);
+
+		BDTreeNode* root;
 
 	};
 
