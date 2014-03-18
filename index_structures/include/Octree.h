@@ -13,8 +13,6 @@ namespace mdsearch
 	class Octree : public IndexStructure
 	{
 
-		
-
 	public:
 		// Constant that determines the bucket size
 		// That is, how many points can be stored in a single leaf node

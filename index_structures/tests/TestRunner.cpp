@@ -5,6 +5,7 @@
 #include "TestSequentialScan.h"
 #include "TestOctree.h"
 #include "TestPyramidTree.h"
+#include "TestBDTree.h"
 
 int main(int argc, char* argv[])
 {
