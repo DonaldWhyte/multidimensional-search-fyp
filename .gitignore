@@ -1,3 +1,35 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# CMake output
+Makefile
+cmake_install.cmake
+CMakeFiles
+CMakeCache.txt
+
+# Misc. build output
+build
+
+# Compile Python scripts
+*.pyc
+
+# File containing large test data
+test_data
+test_data/*
+
+
+# Stuff for LaTeX documents
 *.aux
 *.log
 *.pdf
