@@ -4,7 +4,6 @@
 %%% packages
 
   \usepackage{a4wide}           % set page size etc
-  \usepackage[dvips]{graphicx}  % to include figures in .eps-format  
   \usepackage{multido}          % used in chapter 3 to repeat text
   \usepackage{setspace}         % provides \onehalfspacing
   \usepackage{url}              % to set URLs, paths, commands ... in tt
@@ -13,22 +12,31 @@
 % \usepackage{times}            % switches to the Times font, saves space
   \usepackage{amssymb,mathptmx} % provides more math symbols
   
-\usepackage{graphicx}
-\usepackage{epstopdf}
-\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+  \usepackage{doc} %special logo commands
+  \usepackage{datetime} % up-to-date, automatically generated times
+  \usepackage{amsfonts}
+  \usepackage{multirow}
+  % For graphic files
+  \usepackage{graphicx}
+  \usepackage{epstopdf}
+  \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
 
-\usepackage{fancyhdr}
-\chead{Donald Whyte}
-\lhead{}
-\rhead{}
+  \usepackage{algorithm}
+  \usepackage{algorithmic}
 
-% Rules for handling pre-zipped figures. To create zipped figs do this:
-% $ head myfigure.eps > myfigure.eps.bb
-% $ gzip myfigure.eps
-\DeclareGraphicsRule{.eps.gz}{eps}{.eps.bb}{`zcat #1}
-\DeclareGraphicsRule{.epsi.gz}{eps}{.epsi.bb}{`zcat #1}
-\DeclareGraphicsRule{.eps.Z}{eps}{.eps.bb}{`zcat #1}
+  \usepackage{pdflscape}
+  \usepackage{rotating}
+  \usepackage{wrapfig}
 
+  \usepackage{cite} 
+  \usepackage{caption}
+
+  \usepackage{fancyhdr}
+  \chead{Donald Whyte}
+  \lhead{}
+  \rhead{}
+
+  \pagestyle{fancy} % so header appears on each page  
   
 
 %%% new commands
@@ -70,8 +78,7 @@
 \include{introduction}       % include the chapters
 \include{methodology}
 \include{background_research}
-\include{decisions}
-\include{design}
+\include{design_and_implementation}
 \include{iteration_1}
 \include{evaluation}
 \include{conclusion}
@@ -84,5 +91,6 @@
 \include{appendixa}
 \include{appendixb}
 \include{appendixc}
+\include{appendixd}
 
 \end{document}
