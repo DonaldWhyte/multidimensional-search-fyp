@@ -76,8 +76,8 @@ namespace mdsearch
 		 * memory pool. */
 		WeakPoint createPoint(unsigned int numDimensions, const Real* values);
 		/* Clear all the values currently stored in the factory.
-		 * NOTE: This does not allocate new memory and the pool still has
-		 * the same size. */
+		 * NOTE: This does not allocate new memory and the pool still
+		 * has the same size. */
 		void clear();
 
 	private:

@@ -115,7 +115,11 @@ namespace mdsearch
 
 	bool Octree::remove(const Point& p)
 	{
-		if (points.size() > 0) // if leaf node
+		if (!boundary.contains(p))
+		{
+			return false;
+		}
+		else if (isLeaf()) // if leaf node
 		{
 			for (PointList::iterator it = points.begin(); (it != points.end()); it++)
 			{
@@ -157,12 +161,10 @@ namespace mdsearch
 
 	bool Octree::update(const Point& oldPoint, const Point& newPoint)
 	{
-		// Remove old point from tree
-		bool success = remove(oldPoint);
 		// If point was found and removed, insert new point IF AND 
 		// ONLY IF the new point does not already exist (as we're
 		// only allowed UNIQUE points with this index structure)
-		if (success)
+		if (remove(oldPoint))
 		{
 			// Don't return result of this since we don't care if 
 			// point is not inserted because it exists -- this
