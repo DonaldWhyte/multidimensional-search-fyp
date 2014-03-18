@@ -27,3 +27,15 @@ build
 # File containing large test data
 test_data
 test_data/*
+
+
+# Stuff for LaTeX documents
+*.aux
+*.log
+*.pdf
+*.pyc
+*synctex*
+*.toc
+*~
+*.blg
+*.bbl

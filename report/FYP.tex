@@ -1,0 +1,96 @@
+\documentclass[11pt,a4paper]{report}
+
+
+%%% packages
+
+  \usepackage{a4wide}           % set page size etc
+  \usepackage{multido}          % used in chapter 3 to repeat text
+  \usepackage{setspace}         % provides \onehalfspacing
+  \usepackage{url}              % to set URLs, paths, commands ... in tt
+  \usepackage{amstext}          % provides \text, which, unlike \mbox, scales
+  \usepackage{amsmath}          % provides align and align*, besides others
+% \usepackage{times}            % switches to the Times font, saves space
+  \usepackage{amssymb,mathptmx} % provides more math symbols
+  
+  \usepackage{doc} %special logo commands
+  \usepackage{datetime} % up-to-date, automatically generated times
+  \usepackage{amsfonts}
+  \usepackage{multirow}
+  % For graphic files
+  \usepackage{graphicx}
+  \usepackage{epstopdf}
+  \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+  \usepackage{algorithm}
+  \usepackage{algorithmic}
+
+  \usepackage{pdflscape}
+  \usepackage{rotating}
+  \usepackage{wrapfig}
+
+  \usepackage{cite} 
+  \usepackage{caption}
+
+  \usepackage{fancyhdr}
+  \chead{Donald Whyte}
+  \lhead{}
+  \rhead{}
+
+  \pagestyle{fancy} % so header appears on each page  
+  
+
+%%% new commands
+  
+  \newcommand{\PD}[2]{\frac{\partial #1}{\partial #2}} % partial derivation
+  \newcommand{\dd}{\,\mathrm{d}} % to be used in differentials
+
+%%% One and a half line spacing
+
+% \renewcommand{\baselinestretch}{1.5}
+  \onehalfspacing % better than \renewcommand{\baselinestretch}{1.5}
+
+
+%%% other styles
+
+  \setcounter{secnumdepth}{3}
+  \setcounter{tocdepth}{4}
+
+
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\include{cover}          % This is the front page
+
+\pagestyle{fancy} % so headers are put on pages
+\pagenumbering{roman}    % Set up page numbering
+\setcounter{page}{1}
+
+\include{summary}        % Summary
+\include{acknowledge}    % Acknowledgements
+\tableofcontents
+\newpage
+
+\pagenumbering{arabic}   % Set up page numbering
+\setcounter{page}{1}
+
+\include{introduction}       % include the chapters
+\include{methodology}
+\include{background_research}
+\include{design_and_implementation}
+\include{iteration_1}
+\include{evaluation}
+\include{conclusion}
+
+\addcontentsline{toc}{chapter}{\numberline { }Bibliography}
+\bibliographystyle{unsrt}
+\bibliography{refs}      % include the bibliography
+
+\appendix                % include the appendices
+\include{appendixa}
+\include{appendixb}
+\include{appendixc}
+\include{appendixd}
+
+\end{document}
