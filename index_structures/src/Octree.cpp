@@ -70,103 +70,86 @@ namespace mdsearch
 			for (OctreeNodeList::iterator it = children.begin();
 				(it != children.end()); it++)
 			{
-	            if ((*it)->insert(p))
-	            {
-	            	totalPointsInsideNode++;
-	                return true;
-	            }
-	        }
-	        return false;
+				if ((*it)->insert(p))
+				{
+					totalPointsInsideNode++;
+					return true;
+				}
+			}
+			return false;
 		}
 		// If there is more space to put shapes in this node, add the shape
-	    else if (points.size() < MAX_POINTS_PER_NODE)
-	    {
-	    	// Check if point already exists. If so, don't add it!
-	    	if (storesPoint(p))
-	    	{
-	    		return false;
-	    	}
-	    	else
-	    	{
-	    		points.push_back(p);
-	    		totalPointsInsideNode++;
-	    		return true;	
-	    	}
-	    }
-	    // Otherwise, divide node into sub-nodes and add point to the correct child
-	    else
-	    {
-	        subdivide();
+		else if (points.size() < MAX_POINTS_PER_NODE)
+		{
+			// Check if point already exists. If so, don't add it!
+			if (storesPoint(p))
+			{
+				return false;
+			}
+			else
+			{
+				points.push_back(p);
+				totalPointsInsideNode++;
+				return true;	
+			}
+		}
+		// Otherwise, divide node into sub-nodes and add point to the correct child
+		else
+		{
+			subdivide();
 			for (OctreeNodeList::iterator it = children.begin();
 				(it != children.end()); it++)
 			{
-	            if ((*it)->insert(p))
-	            {
-	            	totalPointsInsideNode++;
-	                return true;
-	            }
-	        }
+				if ((*it)->insert(p))
+				{
+					totalPointsInsideNode++;
+					return true;
+				}
+			}
 			// If this is reached, point could not be inserted.
 			// NOTE: THIS CODE SHOULD NEVER BE REACHED!
 			// It's here to make the compiler happy.
-	        return false;
-	    }
+			return false;
+		}
 	}
 
 	bool Octree::remove(const Point& p)
 	{
-		if (isLeaf()) // if leaf node
+		if (points.size() > 0) // if leaf node
 		{
-			PointList::iterator it = points.begin();
-			PointList::const_iterator pEnd = points.end();
-			for (it; (it != pEnd); it++)
+			for (PointList::iterator it = points.begin(); (it != points.end()); it++)
 			{
+				// If the point was found, then ERASE it and return true!
 				if (*it == p)
 				{
-					break;
+					points.erase(it);
+					totalPointsInsideNode--;
+					return true;
 				}
 			}
-			// If the point was found, then ERASE it and return true!
-			if (it != pEnd)
-			{
-				points.erase(it);
-				totalPointsInsideNode--;
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			return false;
 		}
 		else // if non-leaf
 		{
 			// Try removing point from children
 			// If a node returns true, then keep a pointer to that node
-			OctreeNodeList::iterator nodeModified = children.end();
-			OctreeNodeList::const_iterator cEnd = nodeModified;
-			for (OctreeNodeList::iterator it = children.begin(); (it != cEnd); it++)
+			for (OctreeNodeList::iterator it = children.begin(); (it != children.end()); it++)
 			{
-	            if ((*it)->remove(p))
-	            {
-	            	// Point was successfully removed, so this node now contains one
-	            	// less point overall
-	            	totalPointsInsideNode--;
-	            	nodeModified = it;
-	                break;
-	            }
-	        }
-	        // If a node was modified...
-	        if (nodeModified != cEnd)
-	        {
-	        	// If modified node is now empty, check if this entire node is empty.
-	        	// If so, collapse into single node by removing all children
-	        	if (empty())
-					removeAllChildren();
-	        	// Either way, a point was deleted so return true
-	        	return true;
-	        }
+				if ((*it)->remove(p))
+				{
+					// Point was successfully removed, so this node now contains one
+					// less point overall
+					totalPointsInsideNode--;
+			   		// If this node is now empty (no points stored in any of the children),
+			   		// collapse into single node by removing all children
+					if (empty())
+						removeAllChildren();
+					// Either way, a point was deleted so return true
+					return true;
+				}
+			}
 
-	        return false;
+			return false;
 		}
 
 		return false; // here to ensure compilers don't complain
@@ -278,23 +261,23 @@ namespace mdsearch
 		for (unsigned int i = 0; (i < numChildrenPerNode); i++)
 		{
 			Octree* child = new Octree(numDimensions, childrenBoundaries[i]);
-		    children.push_back(child);
+			children.push_back(child);
 		}
 		// For all the points currently in this node, move them to one of the children
 		unsigned int pointsMoved = 0;
 		for (unsigned int pointIndex = 0; (pointIndex < points.size()); pointIndex++)
 		{
-		    for (unsigned int childIndex = 0; (childIndex < children.size()); childIndex++)
-		    {
-		        // If true is returned, then we've inserted the shape, so we
-		        // move onto the next by breaking out of child-loop
-		        Octree* child = children[childIndex];
-		        if (child->insert(points[pointIndex]))
-		        {
-		        	pointsMoved++;
-		            break;
-		        }
-		    }
+			for (unsigned int childIndex = 0; (childIndex < children.size()); childIndex++)
+			{
+				// If true is returned, then we've inserted the shape, so we
+				// move onto the next by breaking out of child-loop
+				Octree* child = children[childIndex];
+				if (child->insert(points[pointIndex]))
+				{
+					pointsMoved++;
+					break;
+				}
+			}
 		}
 		
 		points.clear();
