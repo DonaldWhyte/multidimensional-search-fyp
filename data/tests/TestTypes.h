@@ -101,6 +101,21 @@ namespace mdsearch { namespace tests
 		EXPECT_FALSE(twoB.intersects(twoC));
 		EXPECT_TRUE(twoC.intersects(twoD));
 		EXPECT_FALSE(twoD.intersects(twoB));
+
+		// Finding longest dimension of region
+		Interval longestTestRegionIntervals[] = {
+			Interval(0, 10), Interval(0, 10), Interval(2, 4), 
+			Interval(30, 41), Interval(0.535, 0.8)
+		};
+		Region longestTestRegion(5, longestTestRegionIntervals);
+		EXPECT_EQ(-1, Region(0).findLongestDimension());
+		EXPECT_EQ(0, oneA.findLongestDimension());
+		EXPECT_EQ(0, oneB.findLongestDimension());
+		EXPECT_EQ(0, twoA.findLongestDimension());
+		EXPECT_EQ(0, twoB.findLongestDimension());
+		EXPECT_EQ(0, twoC.findLongestDimension());
+		EXPECT_EQ(0, twoD.findLongestDimension());
+		EXPECT_EQ(3, longestTestRegion.findLongestDimension());
 	}	
 
 	TEST_F(RegionTests, Subdivison)

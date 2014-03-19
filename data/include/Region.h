@@ -127,6 +127,23 @@ namespace mdsearch
 			return subRegions;
 		}
 
+		/* Return index of the region's longest dimension (side). */
+		inline int findLongestDimension() const
+		{
+			Real maxLength = -1; // guaranteed to be lower than any dimension
+			int maxLengthIndex = -1;
+			for (unsigned int d = 0; (d < nDimensions); d++)
+			{
+				Real length = (intervals[d].max - intervals[d].min);
+				if (length > maxLength)
+				{
+					maxLength = length;
+					maxLengthIndex = d;
+				}
+			}
+			return maxLengthIndex;
+		}
+
 		inline const Interval& operator[](int index) const
 		{
 			return intervals[index];
