@@ -82,7 +82,44 @@ namespace mdsearch
 
 	bool BDTree::remove(const Point& p)
 	{
-		// TODO
+		/*
+		// Find node that potentially stores p
+		Node* node = findContainingNode(p);
+		if (node)
+		{
+			// If we DO have a node that stores p 
+			if (node->type == LEAF_POINT_NODE && node->point == p)
+			{
+				// Traverse up the tree, removing link between this node and
+				// its parent. If that parent is then empty, remove it that
+				// as well (this process is repeated recursively)
+				Node* currentNode = node;
+				while (currentNode)
+				{
+					Node* directParent = ancestor->parent;
+					Node* sibling = NULL; // sibling node is the other child of the current node's parent
+					if (directParent->leftChild == currentNode)
+						sibling = directParent->rightChild;
+					else
+						sibling = directParent->leftChild;
+					// If sibling contains TODO
+
+				}
+
+				// TODO: modify some high-level mode
+				// Now delete the highest level node we wish to delete
+				delete currentNode;
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}*/
 		return false;
 	}
 

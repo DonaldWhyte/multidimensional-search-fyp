@@ -70,7 +70,7 @@ namespace mdsearch { namespace tests {
 		ASSERT_TRUE(structure.pointExists(testPoints[0]));
 	}
 
-	/*TEST_F(BDTreeTests, Removal)
+	TEST_F(BDTreeTests, Removal)
 	{
 		BDTree structure(NUM_BDTREE_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
@@ -102,7 +102,7 @@ namespace mdsearch { namespace tests {
 		BDTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		tester.testUpdates(&structure);
-	}*/
+	}
 
 	TEST_F(BDTreeTests, PointQueries)
 	{
