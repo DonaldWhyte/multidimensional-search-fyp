@@ -20,21 +20,18 @@ namespace mdsearch
 
 	bool BDTree::Node::contains(const Point& p)
 	{
-		switch (type)
+		if (type == OUTER_NODE)
 		{
-		case SHRINK_NODE:
-		case SPLIT_NODE:
-		case LEAF_BOX_NODE:
-			return boundary.contains(p);
-		case LEAF_POINT_NODE:
-			return (point == p);
-		case OUTER_NODE:
 			// Check if point is in set theoretic difference between the two
 			// boundaries (i.e. is point in parent's outer boundary but NOT
 			// n the boundary of the parent's inner node (split node)
 			const Region& outerBoundary = parent->boundary;
 			const Region& innerBoundary = parent->leftChild->boundary;;
 			return (outerBoundary.contains(p) && (!innerBoundary.contains(p)));
+		}
+		else
+		{
+			return boundary.contains(p);
 		}
 	}
 
@@ -55,23 +52,7 @@ namespace mdsearch
 	bool BDTree::insert(const Point& p)
 	{
 		// Find leaf node that contains point
-		Node* node = root;
-		while (true)
-		{
-			if (node->contains(p))
-			{
-				if (node->leftChild && node->leftChild->contains(p))
-					node = node->leftChild;
-				else if (node->rightChild && node->rightChild->contains(p))
-					node = node->rightChild;
-				else
-					break;
-			}
-			else
-			{
-				node = NULL;
-			}
-		}
+		Node* node = findContainingNode(p);
 		if (!node)
 			return false;
 		// Check if point is actually contained in this leaf node (already exists if so)
@@ -85,9 +66,9 @@ namespace mdsearch
 			node->point = p;
 			return true;
 		}
-		else if (node->type == LEAF_POINT_NODE || node->type == LEAF_BOX_NODE || node->type == OUTER_NODE)
+		else if (node->type == LEAF_POINT_NODE || node->type == LEAF_BOX_NODE || node->type == OUTER_NODE) // all leaf node types
 		{
-			// TODO
+			// Turn this leaf node into a SHRINK NODE
 			shrink(node, p);
 		}
 		else
@@ -95,11 +76,6 @@ namespace mdsearch
 			// NOTE: other types should never happen as they cannot be leaves!
 			return false;
 		}
-
-		// TODO: split E to produce two nodes v and w
-		// v is a node which shrinks from u's outer box to E -- THIS REPLACES u!
-		// w is an INNER CHILD OF V, which is a split node that separates b from p
-		// by inner-left-convention, the LEFT CHILD of w contains b and the right child contains p
 
 		return false;
 	}
@@ -125,8 +101,17 @@ namespace mdsearch
 
 	bool BDTree::pointExists(const Point& p)
 	{
-		// TODO
-		return false;
+		// Find node that potentially stores p
+		Node* node = findContainingNode(p);
+		if (node)
+		{
+			// If it's not a leaf node that stores p, p is NOT stored in the structure
+			return (node->type == LEAF_POINT_NODE && node->point == p);
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	PointList BDTree::pointsInRegion(const Region& region)
@@ -135,27 +120,65 @@ namespace mdsearch
 		return PointList();
 	}
 
+	BDTree::Node* BDTree::findContainingNode(const Point& p)
+	{
+		Node* node = root;
+		while (true)
+		{
+			if (node->contains(p))
+			{
+				if (node->leftChild && node->leftChild->contains(p))
+					node = node->leftChild;
+				else if (node->rightChild && node->rightChild->contains(p))
+					node = node->rightChild;
+				else
+					return node;
+			}
+			else
+			{
+				return NULL;
+			}
+		}		
+	}	
+
 	BDTree::Node* BDTree::split(BDTree::Node* node, const Point& newPoint)
 	{
 		// Compute minimum quadtree box that enclodes the contents of the
 		// containing both points or the point+inner box
-		Region minQuadtreeBox(0);
+		Region minQuadtreeBox(numDimensions);
 		if (node->type == LEAF_POINT_NODE)
 			minQuadtreeBox = minimumBoundingBox(node->point, newPoint);
 		else
 			minQuadtreeBox = minimumBoundingBox(node->boundary, newPoint); // TODO: separate inner box?
-
 		Node* splitNode = new Node(SPLIT_NODE, node, minQuadtreeBox);
-		// Find longest side of minimum quadtree box and use it to split region
-		Region leftSplit = minQuadtreeBox;
-		Region rightSplit = minQuadtreeBox;		
+
+		// Find longest side of minimum quadtree box and use it to split region	
 		unsigned int longestSide = minQuadtreeBox.findLongestDimension();
 
+		// Compute value of longest side to split at
 		Real min = minQuadtreeBox[longestSide].min;
-		Real max = minQuadtreeBox[longestSide].max;
-		Real splitPoint = min + ((max - min) / 2.0f); // split HALFWAY through dimension (TODO: not correct?)
+		Real max = minQuadtreeBox[longestSide].max;			
+		Real diffBetweenContents = 0;
+		if (node->type == LEAF_POINT_NODE)
+		{
+			diffBetweenContents = std::abs(node->point[longestSide] - newPoint[longestSide]);
+		}
+		else
+		{
+			Real innerBoxMin = node->boundary[longestSide].min;
+			Real innerBoxMax = node->boundary[longestSide].max;
+			if (newPoint[longestSide] > innerBoxMax) // if point is to RIGHT of inner box
+				diffBetweenContents = std::abs(newPoint[longestSide] - innerBoxMax);
+			else // if point is to LEFT of inner box
+				diffBetweenContents = std::abs(innerBoxMin - newPoint[longestSide]);
+		}
+		Real splitPoint = min + (diffBetweenContents / 2.0f);
+		// Construct split regions
+		Region leftSplit = minQuadtreeBox;
 		leftSplit[longestSide] = Interval(min, splitPoint);
-		leftSplit[longestSide] = Interval(splitPoint, max);
+		Region rightSplit = minQuadtreeBox;			
+		rightSplit[longestSide] = Interval(splitPoint, max);
+
 		// Determine which split is for 
 		const Region& newPointSplit = (leftSplit.contains(newPoint)) ? leftSplit : rightSplit;
 		const Region& existingContentsSplit = (leftSplit.contains(newPoint)) ? rightSplit : leftSplit;
@@ -170,6 +193,7 @@ namespace mdsearch
 		{
 			splitNode->leftChild = new Node(LEAF_BOX_NODE, splitNode, existingContentsSplit);
 		}
+
 		// Right child alays contains the newly inserted point
 		splitNode->rightChild = new Node(LEAF_POINT_NODE, splitNode, newPointSplit, newPoint);
 
@@ -225,6 +249,14 @@ namespace mdsearch
 			minBoundBox[d].max = std::max(existingContents[d].max, newPoint[d]);
 		}
 		return minBoundBox;
+	}
+
+	std::ostream& operator<<(std::ostream& out, const BDTree::Node& node)
+	{
+		out << "(Type=" << node.type << ", Boundary=" << node.boundary << ", Point=" << node.point
+			<< ", Parent=" << node.parent << ", LeftChild=" << node.leftChild
+			<< ", RightChild=" << node.rightChild << ")";
+		return out;
 	}
 
 }

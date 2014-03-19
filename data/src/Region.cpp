@@ -45,6 +45,7 @@ namespace mdsearch
 	std::ostream& operator<<(std::ostream& out, const Interval& interval)
 	{
 		out << "[" << interval.min << "-" << interval.max << "]";
+		return out;
 	}
 
 	std::ostream& operator<<(std::ostream& out, const Region& region)
@@ -54,6 +55,7 @@ namespace mdsearch
 			out << region[i] << ", ";
 		out << region[region.numDimensions() - 1];
 		out << ")";
+		return out;
 	}	
 
 }

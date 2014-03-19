@@ -55,9 +55,8 @@ namespace mdsearch { namespace tests
 		EXPECT_FALSE( structure->pointExists(Point(3, 0.0f)) );
 		EXPECT_FALSE( structure->pointExists(Point(10, 5.6f)) );
 		// Test points that do exist
-		EXPECT_TRUE( structure->pointExists(testPoints[0]) );
-		EXPECT_TRUE( structure->pointExists(testPoints[4]) );
-		EXPECT_TRUE( structure->pointExists(testPoints[9]) );
+		for (unsigned int i = 0; (i < testPoints.size()); i++)
+			EXPECT_TRUE( structure->pointExists(testPoints[i]) );
 	}
 
 	void IndexStructureTester::testRegionQueries(IndexStructure* structure)

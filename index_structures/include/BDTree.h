@@ -28,11 +28,15 @@ namespace mdsearch
 			OUTER_NODE
 		};
 
-		struct Node
+		class Node
 		{
+
+		public:
 			Node(NodeType type, Node* parent, const Region& boundary, const Point& point = Point(0));
 			virtual ~Node();
 
+			/* Return true if the given node's boundary CONTAINS the given point.
+			 * NOTE: This does not mean that the node STORES the point p. */
 			bool contains(const Point& p);
 
 			NodeType type;
@@ -56,6 +60,10 @@ namespace mdsearch
 		virtual PointList pointsInRegion(const Region& region);
 
 	private:
+		/* Return node which MAY contain the given point.
+		 * This is always a leaf node, which either stores the
+		 * point p or whose REGION contains p (i.e. p is not stored) */
+		Node* findContainingNode(const Point& p);
 		/* Partition node region using orthogonal hyperlane to its longest size,
 		 * creating two children. */
 		Node* split(Node* parentShrinkNode, const Point& newPoint);
@@ -77,6 +85,9 @@ namespace mdsearch
 		Region boundary; // overall boundary of space the tree contains
 
 	};
+
+	// Defined for debugging purposes
+	std::ostream& operator<<(std::ostream& out, const BDTree::Node& node);
 
 }
 

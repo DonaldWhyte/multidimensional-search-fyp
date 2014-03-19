@@ -19,10 +19,18 @@ namespace mdsearch
 
 	std::ostream& operator<<(std::ostream& out, const Point& point)
 	{
-		out << "(";
-		for (int i = 0; (i < point.numDimensions() - 1); i++)
-			out << point[i] << ",";
-		out << point[point.numDimensions() - 1] << ")";
+		if (point.numDimensions() == 0)
+		{
+			out << "(-)";
+		}
+		else
+		{
+			out << "(";
+			for (int i = 0; (i < point.numDimensions() - 1); i++)
+				out << point[i] << ",";
+			out << point[point.numDimensions() - 1] << ")";
+		}
+		return out;
 	}
 	
 }
