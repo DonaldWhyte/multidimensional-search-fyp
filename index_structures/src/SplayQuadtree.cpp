@@ -1,5 +1,7 @@
 #include "SplayQuadtree.h"
 
+#include <sstream>
+
 namespace mdsearch
 {
 
@@ -47,7 +49,9 @@ namespace mdsearch
 					// Replace existing leaf with new shrink-split node
 					ShrinkSplitNode* parent = dynamic_cast<ShrinkSplitNode*>(leaf->parent);
 					if (parent->leftChild == leaf)
+					{
 						parent->leftChild = newNode;
+					}
 					else if (parent->rightChild == leaf)
 						parent->rightChild = newNode;
 					else if (parent->outerChild == leaf)
@@ -111,17 +115,24 @@ namespace mdsearch
 			{
 				if (node->type == SHRINKSPLIT_NODE)
 				{
+
 					ShrinkSplitNode* nonLeaf = dynamic_cast<ShrinkSplitNode*>(node);
 					if (nonLeaf->leftChild && nonLeaf->leftChild->outerBox.contains(p))
+					{
 						node = nonLeaf->leftChild;
-					if (nonLeaf->rightChild && nonLeaf->rightChild->outerBox.contains(p))
+					}
+					else if (nonLeaf->rightChild && nonLeaf->rightChild->outerBox.contains(p))
+					{
 						node = nonLeaf->rightChild;
+					}
 					// If the point is contained in the shrink split node, but NOT
 					// the left or right children regions (which together form the
 					// inner box of the outer child), then the point MUST be in the
 					// outer child!
 					else
+					{
 						node = nonLeaf->outerChild;
+					}
 				}
 				else // leaf node
 				{
@@ -138,16 +149,19 @@ namespace mdsearch
 	SplayQuadtree::ShrinkSplitNode* SplayQuadtree::performShrinkSplit(
 		SplayQuadtree::LeafNode* leaf, const Point& p)
 	{
-		// Compute minimum quadtree box that enclodes the contents of thener box
+		// Compute minimum quadtree BOX that encloses the existing content and new point
 		Region minQuadtreeBox(numDimensions);
 		if (leaf->containsInnerBox)
 			minQuadtreeBox = Region::minimumBoundingBox(leaf->innerBox, p);
 		else
 			minQuadtreeBox = Region::minimumBoundingBox(leaf->point, p);
+		//expandToQuadtreeBox(leaf->outerBox, minQuadtreeBox);
+
 		// Find longest side of minimum quadtree box and use it to split region	
 		unsigned int longestSide = minQuadtreeBox.findLongestDimension();
-		// Compute value of longest side to split at (midpoint of region/point)
-		Real splitPoint = computeSplitPoint(leaf, p, minQuadtreeBox, longestSide);
+		// Compute value of longest side to split at (midpoint of longest side
+		Real splitPoint = minQuadtreeBox[longestSide].min +
+			((minQuadtreeBox[longestSide].max - minQuadtreeBox[longestSide].min) / 2.0f);
 		// Construct split regions
 		Region leftSplit, rightSplit;
 		minQuadtreeBox.split(longestSide, splitPoint, leftSplit, rightSplit);
@@ -155,7 +169,6 @@ namespace mdsearch
 		// Determine which split is for 
 		const Region& newPointSplit = (leftSplit.contains(p)) ? leftSplit : rightSplit;
 		const Region& existingContentsSplit = (leftSplit.contains(p)) ? rightSplit : leftSplit;
-
 		// Construct inner box leaf if the original node contained an inner box
 		LeafNode* leftChild = NULL;
 		if (leaf->containsInnerBox)
@@ -175,28 +188,60 @@ namespace mdsearch
 		return newNode;
 	}	
 
-	Real SplayQuadtree::computeSplitPoint(LeafNode* leaf, const Point& newPoint,
-		const Region& minQuadtreeBox, unsigned int splitDimension)
+	void SplayQuadtree::expandToQuadtreeBox(const Region& parentCell, Region& boxToExpand)
 	{
-		Real min = minQuadtreeBox[splitDimension].min;
-		Real max = minQuadtreeBox[splitDimension].max;
-		Real diffBetweenContents = 0;
-		if (leaf->containsInnerBox)
-		{
-			Real innerBoxMin = leaf->innerBox[splitDimension].min;
-			Real innerBoxMax = leaf->innerBox[splitDimension].max;
-			if (newPoint[splitDimension] > innerBoxMax) // if point is to RIGHT of inner box
-				diffBetweenContents = std::abs(newPoint[splitDimension] - innerBoxMax);
-			else // if point is to LEFT of inner box
-				diffBetweenContents = std::abs(innerBoxMin - newPoint[splitDimension]);	
+		static const Real BOX_GAP_THRESHOLD = 0.5; // to ensure boxes w/ aspect ratio of 1 or 2
 
-			return min + innerBoxMin + (diffBetweenContents / 2.0f);
-		}
-		else
+		// Find length of longest side of box to expand
+		Real longestLength = parentCell.longestLength();
+
+		for (unsigned int d = 0; (d < numDimensions); d++)
 		{
-			diffBetweenContents = std::abs(leaf->point[splitDimension] - newPoint[splitDimension]);
-			return min + (diffBetweenContents / 2.0f);
+			// Gaps between tight bound box and parent cell box
+			Real gapHi = parentCell[d].max - boxToExpand[d].max;
+			Real gapLow = boxToExpand[d].min - parentCell[d].min;
+			if (gapHi < longestLength * BOX_GAP_THRESHOLD) // big enough gap to shrink?
+				boxToExpand[d].max = parentCell[d].max; // no - expand
+			if (gapLow < longestLength * BOX_GAP_THRESHOLD)
+				boxToExpand[d].min = parentCell[d].min;
 		}
+	}
+
+	std::string SplayQuadtree::toString() const
+	{
+		return nodeToString(root);
+	}
+
+	std::string SplayQuadtree::nodeToString(SplayQuadtree::Node* node, int level) const
+	{
+		std::stringstream ss;
+		for (unsigned int i = 0; (i < level); i++)
+			ss << "\t";
+
+		LeafNode* leaf = NULL;
+		ShrinkSplitNode* shrinkSplit = NULL;
+		switch (node->type)
+		{
+		case EMPTY_LEAF_NODE:
+			ss << "LEAF (" << node->outerBox << ") -- EMPTY\n";
+			break;
+		case FILLED_LEAF_NODE:
+			leaf = dynamic_cast<LeafNode*>(node);
+			ss << "LEAF (" << leaf->outerBox << ") -- ";
+			if (leaf->containsInnerBox)
+				ss << "CONTAINS INNER BOX " << leaf->innerBox;
+			else
+				ss << "CONTAINS POINT " << leaf->point;
+			ss << "\n";
+			break;
+		case SHRINKSPLIT_NODE:
+			shrinkSplit = dynamic_cast<ShrinkSplitNode*>(node);
+			ss << "SHRINK-SPLIT (" << shrinkSplit->outerBox << ")\n";
+			ss << nodeToString(shrinkSplit->leftChild, level + 1);
+			ss << nodeToString(shrinkSplit->rightChild, level + 1);
+			ss << nodeToString(shrinkSplit->outerChild, level + 1);
+		}
+		return ss.str();
 	}
 
 }

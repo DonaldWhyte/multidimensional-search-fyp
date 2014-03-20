@@ -191,6 +191,18 @@ namespace mdsearch
 			}
 			return maxLengthIndex;
 		}
+		/* Return length of longest dimension. */
+		inline Real longestLength() const
+		{
+			Real maxLength = -1;
+			for (unsigned int d = 0; (d < nDimensions); d++)
+			{
+				Real length = intervals[d].max - intervals[d].min;
+				if (length > maxLength)
+					maxLength = length;
+			}
+			return maxLength;
+		}
 
 		/* Split given region into two, by splitting across one dimension at the
 		 * given pivot value. 'lowRegion' and 'highRegion' are used to store

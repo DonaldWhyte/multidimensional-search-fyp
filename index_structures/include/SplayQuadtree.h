@@ -92,13 +92,17 @@ namespace mdsearch
 
 		/* Return root node of the splay quadtree. */
 		Node* rootNode();
+		/* Generate textual string representation of Splay Quadtree node hierarhcy. */
+		std::string toString() const;
 
 	private:
 		/* TODO: comment */
 		LeafNode* findContainingNode(const Point& p);
-		ShrinkSplitNode* performShrinkSplit(LeafNode* leaf, const Point& p);
-		Real computeSplitPoint(LeafNode* leaf, const Point& newPoint,
-			const Region& minQuadtreeBox, unsigned int splitDimension);
+		ShrinkSplitNode* performShrinkSplit(LeafNode* leaf, const Point& p);;
+		void expandToQuadtreeBox(const Region& parentCell, Region& boxToExpand);
+
+		/* Recursively generates a nested text representation of a tree node. */
+		std::string nodeToString(Node* node, int level = 0) const;
 
 		Region boundary; // use to initialise root node
 		Node* root;

@@ -14,8 +14,7 @@ namespace mdsearch { namespace tests {
 	protected:
 		virtual void SetUp()
 		{
-			Interval initialBoundaryIntervals[3] = { Interval(0, 10), Interval(0, 10), Interval(0, 10) };
-			initialBoundary = Region(3, initialBoundaryIntervals);
+			initialBoundary = Region(3, Interval(0, 100));
 		}
 
 		Region initialBoundary;
@@ -44,7 +43,7 @@ namespace mdsearch { namespace tests {
 		static const unsigned int NUM_TEST_POINTS = 6;
 		Real testPointValues[][3] = {
 			{9, 2, 0}, {3, 6, 6},
-			{2, 7, 2}, {7, 3, 2}, {4, 3, 2},
+			{20, 20, 20}, {7, 3, 2}, {4, 3, 2},
 			{ 10000, 10000, 10000 }
 		};
 		PointList testPoints;
@@ -70,6 +69,7 @@ namespace mdsearch { namespace tests {
 		SplayQuadtree structure(NUM_SPLAYQUADTREE_DIMENSIONS, initialBoundary);
 		ASSERT_EQ(SplayQuadtree::EMPTY_LEAF_NODE, structure.rootNode()->type);
 		ASSERT_EQ(initialBoundary, structure.rootNode()->outerBox);
+
 		// Test inserting point into empty structure
 		ASSERT_TRUE(structure.insert(testPoints[0]));
 		root = structure.rootNode();
@@ -87,31 +87,38 @@ namespace mdsearch { namespace tests {
 		EXPECT_EQ(initialBoundary, shrinkSplit->outerBox);
 		ASSERT_EQ(SplayQuadtree::FILLED_LEAF_NODE, shrinkSplit->leftChild->type);
 		leaf = dynamic_cast<SplayQuadtree::LeafNode*>(shrinkSplit->leftChild);
-		EXPECT_TRUE(leaf->outerBox.contains(leaf->point));
 		EXPECT_FALSE(leaf->containsInnerBox);
 		EXPECT_EQ(testPoints[0], leaf->point); // existing contents should be in left child
+		EXPECT_TRUE(leaf->outerBox.contains(testPoints[0]));
+		EXPECT_FALSE(leaf->outerBox.contains(testPoints[1]));
 		ASSERT_EQ(SplayQuadtree::FILLED_LEAF_NODE, shrinkSplit->rightChild->type);
 		leaf = dynamic_cast<SplayQuadtree::LeafNode*>(shrinkSplit->rightChild);
 		EXPECT_TRUE(leaf->outerBox.contains(leaf->point));
 		EXPECT_FALSE(leaf->containsInnerBox);
 		EXPECT_EQ(testPoints[1], leaf->point); //  new point should be in right child
+		EXPECT_TRUE(leaf->outerBox.contains(testPoints[1]));
+		EXPECT_FALSE(leaf->outerBox.contains(testPoints[0]));
 		ASSERT_EQ(SplayQuadtree::FILLED_LEAF_NODE, shrinkSplit->outerChild->type);
 		leaf = dynamic_cast<SplayQuadtree::LeafNode*>(shrinkSplit->outerChild);
 		EXPECT_EQ(initialBoundary, leaf->outerBox);
 		EXPECT_TRUE(leaf->containsInnerBox);
-		EXPECT_EQ(testRegions[0], leaf->innerBox);
+		EXPECT_TRUE(leaf->outerBox.contains(leaf->innerBox));
+		EXPECT_TRUE(leaf->innerBox.contains(shrinkSplit->leftChild->outerBox));
+		EXPECT_TRUE(leaf->innerBox.contains(shrinkSplit->rightChild->outerBox));
 
 		// Test inserting point where it is contained in outer child (w/ inner box) of root
 		ASSERT_TRUE(structure.insert(testPoints[2]));
-		// Ensuring outer chgild is now
-		shrinkSplit = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(
-			dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(root)->outerChild);
+		// Ensuring outer child is now a shrink-split node
+		root = structure.rootNode();
+		ASSERT_EQ(SplayQuadtree::SHRINKSPLIT_NODE, root->type);
+		shrinkSplit = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(root);
+		ASSERT_EQ(SplayQuadtree::SHRINKSPLIT_NODE, shrinkSplit->outerChild->type);
+		shrinkSplit = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(shrinkSplit->outerChild);
 		EXPECT_EQ(initialBoundary, shrinkSplit->outerBox);
 		ASSERT_EQ(SplayQuadtree::FILLED_LEAF_NODE, shrinkSplit->leftChild->type);
 		leaf = dynamic_cast<SplayQuadtree::LeafNode*>(shrinkSplit->leftChild);
 		EXPECT_TRUE(leaf->containsInnerBox);
 		EXPECT_TRUE(leaf->outerBox.contains(leaf->innerBox));
-		EXPECT_EQ(testRegions[0], leaf->innerBox); // existing contents should be in left child
 		ASSERT_EQ(SplayQuadtree::FILLED_LEAF_NODE, shrinkSplit->rightChild->type);
 		leaf = dynamic_cast<SplayQuadtree::LeafNode*>(shrinkSplit->rightChild);
 		EXPECT_FALSE(leaf->containsInnerBox);
@@ -121,12 +128,21 @@ namespace mdsearch { namespace tests {
 		leaf = dynamic_cast<SplayQuadtree::LeafNode*>(shrinkSplit->outerChild);
 		EXPECT_EQ(initialBoundary, leaf->outerBox);
 		EXPECT_TRUE(leaf->containsInnerBox);
-		EXPECT_EQ(testRegions[1], leaf->innerBox);
+		EXPECT_TRUE(leaf->innerBox.contains(shrinkSplit->leftChild->outerBox));
+		EXPECT_TRUE(leaf->innerBox.contains(shrinkSplit->rightChild->outerBox));
 
 		// Test inserting point where it is contained in left child of root
 		ASSERT_TRUE(structure.insert(testPoints[3]));
 		// Test inserting point where it is contained in right child of root
 		ASSERT_TRUE(structure.insert(testPoints[4]));
+		// Ensure that all three children of the root node are shrink-split nodes
+		root = structure.rootNode();
+		ASSERT_EQ(SplayQuadtree::SHRINKSPLIT_NODE, root->type);
+		shrinkSplit = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(root);
+		EXPECT_EQ(SplayQuadtree::SHRINKSPLIT_NODE, shrinkSplit->leftChild->type);
+		EXPECT_EQ(SplayQuadtree::SHRINKSPLIT_NODE, shrinkSplit->rightChild->type);
+		EXPECT_EQ(SplayQuadtree::SHRINKSPLIT_NODE, shrinkSplit->outerChild->type);
+
 		// Test inserting point out of whole structure's boundaries
 		ASSERT_FALSE(structure.insert(testPoints[5]));
 	}
