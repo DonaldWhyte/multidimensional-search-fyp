@@ -155,7 +155,6 @@ namespace mdsearch
 			minQuadtreeBox = Region::minimumBoundingBox(leaf->innerBox, p);
 		else
 			minQuadtreeBox = Region::minimumBoundingBox(leaf->point, p);
-		//expandToQuadtreeBox(leaf->outerBox, minQuadtreeBox);
 
 		// Find longest side of minimum quadtree box and use it to split region	
 		unsigned int longestSide = minQuadtreeBox.findLongestDimension();
@@ -186,25 +185,6 @@ namespace mdsearch
 		outerChild->parent = newNode;
 
 		return newNode;
-	}	
-
-	void SplayQuadtree::expandToQuadtreeBox(const Region& parentCell, Region& boxToExpand)
-	{
-		static const Real BOX_GAP_THRESHOLD = 0.5; // to ensure boxes w/ aspect ratio of 1 or 2
-
-		// Find length of longest side of box to expand
-		Real longestLength = parentCell.longestLength();
-
-		for (unsigned int d = 0; (d < numDimensions); d++)
-		{
-			// Gaps between tight bound box and parent cell box
-			Real gapHi = parentCell[d].max - boxToExpand[d].max;
-			Real gapLow = boxToExpand[d].min - parentCell[d].min;
-			if (gapHi < longestLength * BOX_GAP_THRESHOLD) // big enough gap to shrink?
-				boxToExpand[d].max = parentCell[d].max; // no - expand
-			if (gapLow < longestLength * BOX_GAP_THRESHOLD)
-				boxToExpand[d].min = parentCell[d].min;
-		}
 	}
 
 	std::string SplayQuadtree::toString() const

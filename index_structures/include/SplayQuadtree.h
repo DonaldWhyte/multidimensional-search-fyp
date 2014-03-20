@@ -96,10 +96,12 @@ namespace mdsearch
 		std::string toString() const;
 
 	private:
-		/* TODO: comment */
+		/* Find leaf node that contains the given point.
+		 * Returns NULL if the point is out the boundary of the structure. */
 		LeafNode* findContainingNode(const Point& p);
-		ShrinkSplitNode* performShrinkSplit(LeafNode* leaf, const Point& p);;
-		void expandToQuadtreeBox(const Region& parentCell, Region& boxToExpand);
+		/* Perform a shrink-split operation on a leaf node, so the new
+		 * point 'p' can be stored. */
+		ShrinkSplitNode* performShrinkSplit(LeafNode* leaf, const Point& p);
 
 		/* Recursively generates a nested text representation of a tree node. */
 		std::string nodeToString(Node* node, int level = 0) const;
