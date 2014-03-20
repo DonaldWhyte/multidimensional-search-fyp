@@ -97,6 +97,8 @@ namespace mdsearch
 		/* TODO: comment */
 		LeafNode* findContainingNode(const Point& p);
 		ShrinkSplitNode* performShrinkSplit(LeafNode* leaf, const Point& p);
+		Real computeSplitPoint(LeafNode* leaf, const Point& newPoint,
+			const Region& minQuadtreeBox, unsigned int splitDimension);
 
 		Region boundary; // use to initialise root node
 		Node* root;

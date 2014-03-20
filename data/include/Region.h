@@ -108,6 +108,20 @@ namespace mdsearch
 			return true;
 		}
 
+		/* Return true if given region is contained within this one. */
+		inline bool contains(const Region& r) const
+		{
+			for (int i = 0; (i < nDimensions); i++)
+			{
+				if (!(r[i].min >= intervals[i].min && r[i].min <= intervals[i].max)
+					|| !(r[i].max >= intervals[i].min && r[i].max <= intervals[i].max))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
 		// Subdivides the region into a collection of sub-regions by splitting
 		// the original region in half along each dimension. This returns
 		// 2^(numDimensions) sub-regions.
