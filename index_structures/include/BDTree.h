@@ -38,6 +38,10 @@ namespace mdsearch
 			/* Return true if the given node's boundary CONTAINS the given point.
 			 * NOTE: This does not mean that the node STORES the point p. */
 			bool contains(const Point& p);
+			/* Perform a Splay quadtree promote(x) operation on the given node.
+			 * Return true if the node was successfully promoted and false
+			 * if it wasn't (due to it already being the root). */
+			bool promote(Node* node);
 
 			NodeType type;
 			Node* parent; // NULL if node is root
@@ -72,10 +76,6 @@ namespace mdsearch
 		 * of the left node's shrunk region and the original node's region
 		 * (this is known as the outer box). */
 		void shrink(Node* node, const Point& newPoint);
-		/* Perform a Splay quadtree promote(x) operation on the given node.
-		 * Return true if the node was successfully promoted and false
-		 * if it wasn't (due to it already being the root). */
-		bool promote(Node* node);
 		/* Compute minimum boundary that surrounds the existing contents of
 		 * BD-tree node and a new point. */
 		Region minimumBoundingBox(const Point& existingContents, const Point& newPoint);

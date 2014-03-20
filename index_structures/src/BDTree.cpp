@@ -35,6 +35,56 @@ namespace mdsearch
 		}
 	}
 
+	bool BDTree::Node::promote(BDTree::Node* node)
+	{
+		// If root or a non-shrink node, no promotion can occur
+		if (!node->parent || node->type != SHRINK_NODE)
+			return false;
+
+		// Get the node's parent PSEUDO-NODE (another shrink node)
+		Node* pseudoNodeParent = node->parent;
+		if (pseudoNodeParent->type == SHRINK_NODE) // outer child (rightChild in code)
+		{
+			// Outer promotion
+			Node* temp = node->leftChild;
+			node->leftChild = pseudoNodeParent;
+			pseudoNodeParent->rightChild = temp;
+		}
+		else // left OR right child of split (parent is SPLIT_NODE type)
+		{
+			// Actual pseudo-node parent is the split node's parent (a shrink node)
+			Node* splitNode = pseudoNodeParent;
+			pseudoNodeParent = pseudoNodeParent->parent;
+			if (splitNode->leftChild == node) // left child of split
+			{
+				// Left promotion
+				Node* temp = node->rightChild;
+				node->rightChild = pseudoNodeParent;
+				splitNode->leftChild = temp;
+			}
+			else // right child of split (NOTE: msut be either of these two cases! so no check for right!)
+			{
+				// Swap this node with its left sibling, but ONLY if left sibling has an inner box
+				if (true) // TODO: perform left sibling box check
+				{
+					Node* temp = splitNode->leftChild;
+					splitNode->leftChild = node;
+					splitNode->rightChild = temp;
+					// Now perform a left-promotion
+					temp = node->rightChild;
+					node->rightChild = pseudoNodeParent;
+					splitNode->leftChild = temp;
+				}
+				else
+				{
+					return false; // invalid promotion
+				}
+			}
+		}
+
+		return true;
+	}
+
 	BDTree::BDTree(unsigned int numDimensions, const Region& boundary) :
 		IndexStructure(numDimensions), root(NULL), boundary(boundary)
 	{
@@ -248,11 +298,6 @@ namespace mdsearch
 		node->rightChild = outerNode;
 		// Be sure to clear the stored point from the (now) shrink node
 		node->point = Point(0);
-	}
-
-	bool BDTree::promote(BDTree::Node* node)
-	{
-		// TODO
 	}
 
 	Region BDTree::minimumBoundingBox(const Point& existingContents, const Point& newPoint)

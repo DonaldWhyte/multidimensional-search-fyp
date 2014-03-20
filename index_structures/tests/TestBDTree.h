@@ -70,7 +70,7 @@ namespace mdsearch { namespace tests {
 		ASSERT_TRUE(structure.pointExists(testPoints[0]));
 	}
 
-	TEST_F(BDTreeTests, Removal)
+	/*TEST_F(BDTreeTests, Removal)
 	{
 		BDTree structure(NUM_BDTREE_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
@@ -102,7 +102,7 @@ namespace mdsearch { namespace tests {
 		BDTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		tester.testUpdates(&structure);
-	}
+	}*/
 
 	TEST_F(BDTreeTests, PointQueries)
 	{
@@ -117,6 +117,31 @@ namespace mdsearch { namespace tests {
 		IndexStructureTester tester;
 		tester.testRegionQueries(&structure);
 	}*/
+
+	TEST_F(BDTreeTests, Promotion)
+	{
+		// Construct some nodes for testing
+		// TODO
+		BDTree::Node[] nodes = {
+			BDTree::Node(BDTree::SHRINK_NODE, NULL, Region(0)),
+			BDTree::Node(BDTree::SPLIT_NODE, NULL, Region(0)),
+			BDTree::Node(BDTree::OUTER_NODE, NULL, Region(0)),
+			BDTree::Node(BDTree::SHRINK_NODE, NULL, Region(0)),
+			BDTree::Node(BDTree::LEAF_BOX_NODE, NULL, Region(0)),
+			BDTree::Node(BDTree::SPLIT_NODE, NULL, Region(0)),
+			BDTree::Node(BDTree::LEAF_BOX_NODE, NULL, Region(0)),
+			BDTree::Node(BDTree::LEAF_POINT_NODE, NULL, Region(0)),
+		};
+
+		// Left child
+		// TODO
+
+		// Outer child
+		// TODO
+
+		// Right child
+		// TODO
+	}
 
 } }
 
