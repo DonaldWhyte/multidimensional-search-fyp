@@ -22,7 +22,22 @@ namespace mdsearch { namespace tests {
 
 	};
 
-
+	TEST_F(SplayQuadtreeTests, Construction)
+	{
+		SplayQuadtree structure(NUM_SPLAYQUADTREE_DIMENSIONS, initialBoundary);
+		EXPECT_EQ(SplayQuadtree::EMPTY_NODE, structure.rootNode()->type);
+		EXPECT_EQ(initialBoundary, structure.rootNode()->outerBox);
+		// Test clearing empty structure
+		structure.clear();
+		EXPECT_EQ(SplayQuadtree::EMPTY_NODE, structure.rootNode()->type);
+		EXPECT_EQ(initialBoundary, structure.rootNode()->outerBox);
+		// Testing clearing filled structure
+		ASSERT_TRUE( structure.insert(Point(NUM_SPLAYQUADTREE_DIMENSIONS, 1)) );
+		EXPECT_FALSE( structure.rootNode()->type == SplayQuadtree::EMPTY_NODE );
+		structure.clear();
+		EXPECT_EQ(SplayQuadtree::EMPTY_NODE, structure.rootNode()->type);
+		EXPECT_EQ(initialBoundary, structure.rootNode()->outerBox);			
+	}
 
 } }
 
