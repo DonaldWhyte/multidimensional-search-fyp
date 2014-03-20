@@ -14,8 +14,8 @@ namespace mdsearch
 	public:
 		enum NodeType
 		{
-			EMPTY_NODE = 0,
-			LEAF_NODE,
+			EMPTY_LEAF_NODE = 0,
+			FILLED_LEAF_NODE,
 			SHRINKSPLIT_NODE
 		};
 
@@ -30,6 +30,7 @@ namespace mdsearch
 				parent(parent), type(type), outerBox(outerBox)
 			{
 			}
+			virtual ~Node() { } // so class counts as polymorphic type
 		};
 
 		struct ShrinkSplitNode : public Node
@@ -38,9 +39,17 @@ namespace mdsearch
 			Node* rightChild; // right split of inner box
 			Node* outerChild; // child which initially contains inner box
 
-			ShrinkSplitNode(NodeType type, const Region& outerBox, Node* parent = NULL) :
-				Node(type, outerBox, parent)
+			ShrinkSplitNode(const Region& outerBox, Node* leftChild,
+				Node* rightChild, Node* outerChild, Node* parent = NULL) :
+				Node(SHRINKSPLIT_NODE, outerBox, parent), leftChild(leftChild),
+				rightChild(rightChild), outerChild(outerChild)
 			{
+			}
+			virtual ~ShrinkSplitNode()
+			{
+				delete leftChild;
+				delete rightChild;
+				delete outerChild;
 			}
 		};
 
@@ -52,13 +61,21 @@ namespace mdsearch
 			Region innerBox;
 			Point point;
 
-			LeafNode(NodeType type, const Region& outerBox, const Region& innerBox, Node* parent) :
-				Node(type, outerBox, parent), containsInnerBox(true), innerBox(innerBox), point(0)
+			LeafNode(const Region& outerBox, Node* parent = NULL) :
+				Node(EMPTY_LEAF_NODE, outerBox, parent), containsInnerBox(false),
+				innerBox(0), point(0)
 			{
 			}
 
-			LeafNode(NodeType type, const Region& outerBox, const Point& point, Node* parent) :
-				Node(type, outerBox, parent), containsInnerBox(false), innerBox(0), point(point)
+			LeafNode(const Region& outerBox, const Region& innerBox, Node* parent) :
+				Node(FILLED_LEAF_NODE, outerBox, parent), containsInnerBox(true),
+				innerBox(innerBox), point(0)
+			{
+			}
+
+			LeafNode(const Region& outerBox, const Point& point, Node* parent) :
+				Node(FILLED_LEAF_NODE, outerBox, parent), containsInnerBox(false),
+				innerBox(0), point(point)
 			{
 			}
 		};
@@ -77,6 +94,10 @@ namespace mdsearch
 		Node* rootNode();
 
 	private:
+		/* TODO: comment */
+		LeafNode* findContainingNode(const Point& p);
+		ShrinkSplitNode* performShrinkSplit(LeafNode* leaf, const Point& p);
+
 		Region boundary; // use to initialise root node
 		Node* root;
 

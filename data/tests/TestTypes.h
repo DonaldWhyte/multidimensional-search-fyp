@@ -234,6 +234,105 @@ namespace mdsearch { namespace tests
 		EXPECT_EQ(nonUniformSubRegions, nonUniformRegion.subdivide());
 	}
 
+	TEST_F(RegionTests, MinimumBoundingBox)
+	{
+		Real pointValues[][2] = { { 2, 2 }, { 8, -4 } };
+		Point points[] = { Point(2, pointValues[0]), Point(2, pointValues[1]) };
+		Interval regionIntervals[][2] = {
+			{ Interval(2, 2), Interval(2, 2) },
+			{ Interval(1, 3), Interval(1, 3) },
+			{ Interval(4, 5), Interval(4, 6) },
+			{ Interval(-10, -5), Interval(-15, -2.5) }
+		};
+		Region regions[] = {
+			Region(2, regionIntervals[0]),
+			Region(2, regionIntervals[1]),
+			Region(2, regionIntervals[2]),
+			Region(2, regionIntervals[3])
+		};
+		Interval expectedRegionIntervals[][2] = {
+			{ Interval(2, 8), Interval(-4, 2) },
+			{ Interval(2, 5), Interval(2, 6) },
+			{ Interval(-10, 2), Interval(-15, 2) }
+		};
+		Region expectedRegions[] = {
+			Region(2, expectedRegionIntervals[0]),
+			Region(2, expectedRegionIntervals[1]),
+			Region(2, expectedRegionIntervals[2])
+		};
+
+		// Test with zero-sized region and point in same place
+		Region minimum = Region::minimumBoundingBox(regions[0], points[0]);
+		EXPECT_EQ(regions[0], minimum);
+		// Test with zero-sized region and point
+		minimum = Region::minimumBoundingBox(regions[0], points[1]);
+		EXPECT_EQ(expectedRegions[0], minimum);
+		// Test with point in region
+		minimum = Region::minimumBoundingBox(regions[1], points[0]);
+		EXPECT_EQ(regions[1], minimum);
+		// Test with disjoint region and point
+		minimum = Region::minimumBoundingBox(regions[2], points[0]);
+		EXPECT_EQ(expectedRegions[1], minimum);
+		minimum = Region::minimumBoundingBox(regions[3], points[0]);
+		EXPECT_EQ(expectedRegions[2], minimum);
+
+		// Test with two points in same place
+		minimum = Region::minimumBoundingBox(points[0], points[0]);
+		EXPECT_EQ(regions[0], minimum);
+		// Test with two points in different place
+		minimum = Region::minimumBoundingBox(points[0], points[1]);
+		EXPECT_EQ(expectedRegions[0], minimum);
+	}
+
+	TEST_F(RegionTests, Split)
+	{
+		Interval expectedRegionIntervals[][2] = {
+			{ Interval(1, 10), Interval(1, 1) },
+			{ Interval(1, 10), Interval(1, 10) },
+
+			{ Interval(1, 10), Interval(1, 10) },
+			{ Interval(1, 10), Interval(10, 10) },
+
+			{ Interval(1, 10), Interval(1, 5.5) },
+			{ Interval(1, 10), Interval(5.5, 10) },
+
+			{ Interval(1, 10), Interval(1, 9) },
+			{ Interval(1, 10), Interval(9, 10) }
+		};
+		Region expectedRegions[] = {
+			Region(2, expectedRegionIntervals[0]),
+			Region(2, expectedRegionIntervals[1]),
+			Region(2, expectedRegionIntervals[2]),
+			Region(2, expectedRegionIntervals[3]),
+			Region(2, expectedRegionIntervals[4]),
+			Region(2, expectedRegionIntervals[5]),
+			Region(2, expectedRegionIntervals[6]),
+			Region(2, expectedRegionIntervals[7])
+		};
+
+		Region originalRegion = Region(2, Interval(1, 10));
+		Region lowRegion, highRegion;
+		// Test splitting with pivot values outside region
+		EXPECT_FALSE(originalRegion.split(1, 0.9, lowRegion, highRegion));
+		EXPECT_FALSE(originalRegion.split(1, 10.1, lowRegion, highRegion));
+		// Test splitting on lowest value
+		EXPECT_TRUE(originalRegion.split(1, 1, lowRegion, highRegion));
+		EXPECT_EQ(expectedRegions[0], lowRegion);
+		EXPECT_EQ(expectedRegions[1], highRegion);
+		// Test splitting on highest value
+		EXPECT_TRUE(originalRegion.split(1, 10, lowRegion, highRegion));
+		EXPECT_EQ(expectedRegions[2], lowRegion);
+		EXPECT_EQ(expectedRegions[3], highRegion);
+		// Test splitting on middle value
+		EXPECT_TRUE(originalRegion.split(1, 5.5, lowRegion, highRegion));
+		EXPECT_EQ(expectedRegions[4], lowRegion);
+		EXPECT_EQ(expectedRegions[5], highRegion);
+		// Test splitting on another value
+		EXPECT_TRUE(originalRegion.split(1, 9, lowRegion, highRegion));
+		EXPECT_EQ(expectedRegions[6], lowRegion);
+		EXPECT_EQ(expectedRegions[7], highRegion);
+	}
+
 } }
 
 #endif
