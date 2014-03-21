@@ -96,9 +96,12 @@ namespace mdsearch
 		std::string toString() const;
 
 	private:
-		/* Find leaf node that contains the given point.
+		/* Find leaf node with a region that contains the given point.
 		 * Returns NULL if the point is out the boundary of the structure. */
 		LeafNode* findContainingNode(const Point& p);
+		/* Find leaf node that STORES the given point. If the point is not
+		 * being stored in the structure, then NULL will be returned. */
+		LeafNode* findNodeStoredIn(const Point& p);
 		/* Perform a shrink-split operation on a leaf node, so the new
 		 * point 'p' can be stored. */
 		ShrinkSplitNode* performShrinkSplit(LeafNode* leaf, const Point& p);

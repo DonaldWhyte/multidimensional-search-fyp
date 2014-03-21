@@ -333,6 +333,20 @@ namespace mdsearch { namespace tests
 		EXPECT_EQ(expectedRegions[7], highRegion);
 	}
 
+	TEST_F(RegionTests, ContainsRegion)
+	{
+		// TODO
+		ASSERT_TRUE(false);
+	}
+
+	TEST_F(RegionTests, LongestDimension)
+	{
+		// TODO: longestDimension + longestLength
+		ASSERT_TRUE(false);		
+	}
+
+
+
 } }
 
 #endif

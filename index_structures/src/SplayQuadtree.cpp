@@ -85,15 +85,7 @@ namespace mdsearch
 
 	bool SplayQuadtree::pointExists(const Point& p)
 	{
-		LeafNode* leaf = findContainingNode(p);
-		if (leaf && !leaf->containsInnerBox && leaf->point == p)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return (findNodeStoredIn(p) != NULL);
 	}
 
 	PointList SplayQuadtree::pointsInRegion(const Region& region)
@@ -144,6 +136,15 @@ namespace mdsearch
 				return NULL; // not contained in structure at all!
 			}
 		}	
+	}
+
+	SplayQuadtree::LeafNode* SplayQuadtree::findNodeStoredIn(const Point& p)
+	{
+		LeafNode* leaf = findContainingNode(p);
+		if (leaf && !leaf->containsInnerBox && leaf->point == p)
+			return leaf;
+		else
+			return NULL;
 	}
 
 	SplayQuadtree::ShrinkSplitNode* SplayQuadtree::performShrinkSplit(
