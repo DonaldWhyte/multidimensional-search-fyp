@@ -48,18 +48,23 @@ namespace mdsearch
 				{
 					// Replace existing leaf with new shrink-split node
 					ShrinkSplitNode* parent = dynamic_cast<ShrinkSplitNode*>(leaf->parent);
-					if (parent->leftChild == leaf)
+					NodeRelation rel = relation(parent, leaf);
+					switch (rel)
 					{
+					case LEFT_CHILD_RELATION:
 						parent->leftChild = newNode;
-					}
-					else if (parent->rightChild == leaf)
+						break;
+					case RIGHT_CHILD_RELATION:
 						parent->rightChild = newNode;
-					else if (parent->outerChild == leaf)
+						break;
+					case OUTER_CHILD_RELATION:
 						parent->outerChild = newNode;
+						break;
 					// leaf is not actually child of its assigned parent -- sohuld never happen
 					// Return false if so, as the tree structure is invalid
-					else
+					default:
 						return false;
+					}
 					delete leaf; // free memory used for old leaf
 				}
 				else // if node to replace is the root
@@ -108,7 +113,9 @@ namespace mdsearch
 				return false;
 			ShrinkSplitNode* parent = dynamic_cast<ShrinkSplitNode*>(node->parent);
 			SplayQuadtree::Node* grandparent = parent->parent;
-			if (node == parent->outerChild)
+
+			NodeRelation rel = relation(parent, nodeToPromote);
+			if (rel == OUTER_CHILD_RELATION)
 			{
 				// Perform outer node promotion
 				Node* tmp = nodeToPromote->leftChild;
@@ -122,7 +129,7 @@ namespace mdsearch
 				// If node is the right child, then swap it with the left child.
 				// ONLY IF THE LEFT CHILD DOE SNOT HAVE AN INNER BOX!
 				// If it doesn't, then the 
-				if (node == parent->rightChild)
+				if (rel == RIGHT_CHILD_RELATION)
 				{
 					Node* tmp = parent->leftChild;
 					if (tmp->type == FILLED_LEAF_NODE) // check left child doesn't have an inner box
@@ -150,7 +157,7 @@ namespace mdsearch
 		return root;
 	}
 
-	SplayQuadtree::LeafNode* SplayQuadtree::findContainingNode(const Point& p)
+	SplayQuadtree::LeafNode* SplayQuadtree::findContainingNode(const Point& p) const
 	{
 		Node* node = root;
 		while (true)
@@ -190,7 +197,7 @@ namespace mdsearch
 		}	
 	}
 
-	SplayQuadtree::LeafNode* SplayQuadtree::findNodeStoredIn(const Point& p)
+	SplayQuadtree::LeafNode* SplayQuadtree::findNodeStoredIn(const Point& p) const
 	{
 		LeafNode* leaf = findContainingNode(p);
 		if (leaf && !leaf->containsInnerBox && leaf->point == p)
@@ -239,6 +246,20 @@ namespace mdsearch
 
 		return newNode;
 	}
+
+	SplayQuadtree::NodeRelation SplayQuadtree::relation(
+		SplayQuadtree::ShrinkSplitNode* parent,
+		SplayQuadtree::Node* child) const
+	{
+		if (parent->leftChild == child)
+			return LEFT_CHILD_RELATION;
+		else if (parent->rightChild == child)
+			return RIGHT_CHILD_RELATION;
+		else if (parent->outerChild == child)
+			return OUTER_CHILD_RELATION;
+		else
+			return NO_RELATION;
+	}	
 
 	std::string SplayQuadtree::toString() const
 	{

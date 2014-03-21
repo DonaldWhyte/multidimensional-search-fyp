@@ -19,6 +19,14 @@ namespace mdsearch
 			SHRINKSPLIT_NODE
 		};
 
+		enum NodeRelation
+		{
+			NO_RELATION = 0,
+			LEFT_CHILD_RELATION,
+			RIGHT_CHILD_RELATION,
+			OUTER_CHILD_RELATION,
+		};
+
 		struct Node
 		{
 			Node* parent;
@@ -102,13 +110,15 @@ namespace mdsearch
 	private:
 		/* Find leaf node with a region that contains the given point.
 		 * Returns NULL if the point is out the boundary of the structure. */
-		LeafNode* findContainingNode(const Point& p);
+		LeafNode* findContainingNode(const Point& p) const;
 		/* Find leaf node that STORES the given point. If the point is not
 		 * being stored in the structure, then NULL will be returned. */
-		LeafNode* findNodeStoredIn(const Point& p);
+		LeafNode* findNodeStoredIn(const Point& p) const;
 		/* Perform a shrink-split operation on a leaf node, so the new
 		 * point 'p' can be stored. */
 		ShrinkSplitNode* performShrinkSplit(LeafNode* leaf, const Point& p);
+		/* Return relation between a specified parent node and a potential child. */
+		NodeRelation relation(ShrinkSplitNode* parent, Node* child) const;
 
 		/* Recursively generates a nested text representation of a tree node. */
 		std::string nodeToString(Node* node, int level = 0) const;
