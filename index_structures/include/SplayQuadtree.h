@@ -90,8 +90,12 @@ namespace mdsearch
 		bool pointExists(const Point& p);
 		PointList pointsInRegion(const Region& region);
 
+		/* NOTE: Only public so it can be tesed thoroughly in unit tests. */
+		bool promote(SplayQuadtree::Node* node);
+
 		/* Return root node of the splay quadtree. */
 		Node* rootNode();
+
 		/* Generate textual string representation of Splay Quadtree node hierarhcy. */
 		std::string toString() const;
 

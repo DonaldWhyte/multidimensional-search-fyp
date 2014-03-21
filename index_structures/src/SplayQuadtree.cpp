@@ -93,6 +93,58 @@ namespace mdsearch
 		return PointList();
 	}
 
+	bool SplayQuadtree::promote(SplayQuadtree::Node* node)
+	{
+		// Cannot promote if the given node is a leaf or the root
+		if (node->type != SHRINKSPLIT_NODE || node->parent == NULL)
+		{
+			return false;
+		}
+		else
+		{
+			// Perform necessary casts
+			ShrinkSplitNode* nodeToPromote = dynamic_cast<ShrinkSplitNode*>(node);
+			if (node->parent->type != SHRINKSPLIT_NODE)
+				return false;
+			ShrinkSplitNode* parent = dynamic_cast<ShrinkSplitNode*>(node->parent);
+			SplayQuadtree::Node* grandparent = parent->parent;
+			if (node == parent->outerChild)
+			{
+				// Perform outer node promotion
+				Node* tmp = nodeToPromote->leftChild;
+				nodeToPromote->leftChild = parent;
+				nodeToPromote->parent = grandparent;
+				parent->outerChild = tmp;
+				parent->parent = node;
+			}
+			else // left or right children
+			{
+				// If node is the right child, then swap it with the left child.
+				// ONLY IF THE LEFT CHILD DOE SNOT HAVE AN INNER BOX!
+				// If it doesn't, then the 
+				if (node == parent->rightChild)
+				{
+					Node* tmp = parent->leftChild;
+					if (tmp->type == FILLED_LEAF_NODE) // check left child doesn't have an inner box
+					{
+						LeafNode* leaf = dynamic_cast<LeafNode*>(tmp);
+						if (leaf->containsInnerBox)
+							return false;
+					}
+					parent->leftChild = node;
+					parent->rightChild = tmp;
+				}
+				// Perform a left child promotion
+				Node* tmp = nodeToPromote->outerChild;
+				nodeToPromote->outerChild = parent;
+				nodeToPromote->parent = grandparent;
+				parent->leftChild = tmp;
+				parent->parent = node;
+			}
+			return true;
+		}
+	}
+
 	SplayQuadtree::Node* SplayQuadtree::rootNode()
 	{
 		return root;
@@ -179,7 +231,7 @@ namespace mdsearch
 		LeafNode* outerChild = new LeafNode(leaf->outerBox, minQuadtreeBox, NULL); // outer child always new inner box node
 		// Construct new non-leaf node
 		ShrinkSplitNode* newNode = new ShrinkSplitNode(
-			leaf->outerBox, leftChild, rightChild, outerChild
+			leaf->outerBox, leftChild, rightChild, outerChild, leaf->parent
 		);
 		leftChild->parent = newNode;
 		rightChild->parent = newNode;

@@ -154,6 +154,83 @@ namespace mdsearch { namespace tests {
 		tester.testPointQueries(&structure);
 	}
 
+	TEST_F(SplayQuadtreeTests, Promotion)
+	{
+		SplayQuadtree structure(NUM_SPLAYQUADTREE_DIMENSIONS, initialBoundary);
+		IndexStructureTester tester;
+
+		SplayQuadtree::Node* root = NULL;
+		SplayQuadtree::ShrinkSplitNode* shrinkSplit = NULL;
+		SplayQuadtree::LeafNode* leaf = NULL;
+
+		// Test root node
+		structure.clear();
+		structure.loadPoints(tester.getTestPoints());
+		root = structure.rootNode();
+		ASSERT_FALSE( structure.promote(root) ); // root node cannot be promoted any more
+
+		// Test leaf node
+		ASSERT_EQ(SplayQuadtree::SHRINKSPLIT_NODE, root->type);
+		shrinkSplit = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(root);
+		ASSERT_FALSE( structure.promote(shrinkSplit->leftChild) ); // leaves cannot be promoted
+
+		// Test promoting right child (where left sibling DOES NOT HAVE AN INNER BOX)
+		// NOTE: Equivalent as left node promotion, just with a swap
+		SplayQuadtree::Node* oldParentLeftChild = shrinkSplit->leftChild;
+		SplayQuadtree::ShrinkSplitNode* oldParentOuterChild = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(shrinkSplit->outerChild);
+		SplayQuadtree::Node* oldGrandparent = shrinkSplit->parent;
+		SplayQuadtree::ShrinkSplitNode* oldRightChild = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(shrinkSplit->rightChild);
+		SplayQuadtree::Node* oldRightChildChildren[] = {
+			oldRightChild->leftChild, oldRightChild->rightChild, oldRightChild->outerChild
+		};
+		ASSERT_TRUE(structure.promote(shrinkSplit->rightChild));
+		EXPECT_EQ(oldGrandparent, oldRightChild->parent); // promoted node's parent is its old grandparent
+		EXPECT_EQ(shrinkSplit, oldRightChild->outerChild);
+		EXPECT_EQ(oldRightChildChildren[0], oldRightChild->leftChild); // left and right children of promoted node should stay the same
+		EXPECT_EQ(oldRightChildChildren[1], oldRightChild->rightChild);
+		EXPECT_EQ(oldRightChild, shrinkSplit->parent);
+		EXPECT_EQ(oldRightChildChildren[2], shrinkSplit->leftChild);
+		EXPECT_EQ(oldParentLeftChild, shrinkSplit->rightChild); // old left is now right
+		EXPECT_EQ(oldParentOuterChild, shrinkSplit->outerChild); // outer child remains same
+
+		// Test promoting right child (where left sibling DOES HAVE AN INNER BOX)
+		// This is not a valid promotion, so false should be returned
+		structure.clear();
+		structure.loadPoints(tester.getTestPoints());
+		root = structure.rootNode();
+		ASSERT_EQ(SplayQuadtree::SHRINKSPLIT_NODE, root->type);
+		shrinkSplit = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(root);
+		ASSERT_EQ(SplayQuadtree::FILLED_LEAF_NODE, shrinkSplit->leftChild->type);
+		leaf = dynamic_cast<SplayQuadtree::LeafNode*>(shrinkSplit->leftChild);
+		leaf->containsInnerBox = true; // make it seem like the left child has an inner box
+		ASSERT_FALSE(structure.promote(shrinkSplit->rightChild));
+
+		// Test promoting outer child
+		structure.clear();
+		structure.loadPoints(tester.getTestPoints());
+		root = structure.rootNode();
+		ASSERT_EQ(SplayQuadtree::SHRINKSPLIT_NODE, root->type);
+		shrinkSplit = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(root);
+
+		oldGrandparent = shrinkSplit->parent;
+		oldParentLeftChild = shrinkSplit->leftChild;
+		SplayQuadtree::Node* oldParentRightChild = shrinkSplit->rightChild;
+		oldParentOuterChild = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(shrinkSplit->outerChild);
+		SplayQuadtree::Node* oldPromotedLeftChild = oldParentOuterChild->leftChild;
+		SplayQuadtree::Node* oldPromotedRightChild = oldParentOuterChild->rightChild;
+		SplayQuadtree::Node* oldPromotedOuterChild = oldParentOuterChild->outerChild;
+
+		ASSERT_TRUE(structure.promote(shrinkSplit->outerChild));
+		EXPECT_EQ(oldGrandparent, oldParentOuterChild->parent); // promoted node's parent is its old grandparent
+		EXPECT_EQ(shrinkSplit, oldParentOuterChild->leftChild); // left child of promoted becomes its old parent
+		EXPECT_EQ(oldPromotedRightChild, oldParentOuterChild->rightChild); // right and outer children of promoted node should stay the same
+		EXPECT_EQ(oldPromotedOuterChild, oldParentOuterChild->outerChild);
+		EXPECT_EQ(oldParentOuterChild, shrinkSplit->parent);
+		EXPECT_EQ(oldParentLeftChild, shrinkSplit->leftChild); // left and right children same
+		EXPECT_EQ(oldParentRightChild, shrinkSplit->rightChild);
+		EXPECT_EQ(oldPromotedLeftChild, shrinkSplit->outerChild); // left child of promoted becomes outer node
+	}
+
 } }
 
 #endif
