@@ -35,7 +35,9 @@ void writeResultsToFile(const std::string& filename,
 	file << "===OPERATION LISTS===\n";
 	for (unsigned int i = 0; (i < testOperationLists.size()); i++)
 	{
-		file << "Test Operation List (" << i << "):\n\tNumber of Operations: " << testOperationLists[i].size() << "\n";
+		file << "Test Operation List (" << i << "):\n";
+		file << "\tFilename: " << args.testOperationFilenames()[i] << "\n";
+		file << "\tNumber of Operations: " << testOperationLists[i].size() << "\n";
 	}
 	file << "\n";
 	// Write timing report
