@@ -36,7 +36,12 @@ add_executable ( data_tests
 include_directories ("tests")
 # Ensure google-test library is linked and include files are in search path
 target_link_libraries ( data_tests data ${LIBS} )
-include_directories ({DEPENDENCIES})
+include_directories (${DEPENDENCIES})
+
+# Executable for running core data gennerator, which is used to generated
+# a varied set of test datasets for evaluating structures
+add_executable(data_generator "src/EvaluationDataGenerator.cpp")
+target_link_libraries( data_generator data)
 
 # Copy additional test files to build directory
 file( COPY tests/test_files DESTINATION ${BUILD_DIR} )

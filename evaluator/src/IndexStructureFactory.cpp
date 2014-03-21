@@ -60,19 +60,20 @@ namespace mdsearch
 		{
 			Region boundary = parseBoundary(numDimensions, args);
 			// Parse optional "MAX EMPTY ELEMENTS ALLOWED" argument
-			int maxEmptyElements = -1;
+			int maxEmptyElements = -2;
 			if (args.size() >= requiredArgCount + 1)
 			{
 				const std::string& emptyElementArg = args[requiredArgCount];
 				maxEmptyElements = boost::lexical_cast<int>(emptyElementArg);
-				// If negative maximum given, return NULL as it's invalid!
-				if (maxEmptyElements < 0)
+				// If negative maximum given (other than -1), return NULL
+				// as it's invalid!
+				if (maxEmptyElements < -2)
 					return NULL;
 			}
-			if (maxEmptyElements != -1)
+			if (maxEmptyElements != -2) // if a value was given, we don't use the default
 				return new PyramidTree(numDimensions, boundary, maxEmptyElements);
 			else
-				return new PyramidTree(numDimensions, boundary);
+				return new PyramidTree(numDimensions, boundary); // use default
 		}	
 		catch (const boost::bad_lexical_cast& ex)
 		{

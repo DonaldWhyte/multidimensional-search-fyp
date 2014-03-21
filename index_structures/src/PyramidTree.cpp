@@ -5,7 +5,7 @@ namespace mdsearch
 {
 
 	PyramidTree::PyramidTree(unsigned int nDimensions, const Region& treeBoundary,
-		unsigned int maxEmptyElements) :
+		int maxEmptyElements) :
 		IndexStructure(nDimensions),
 		maxEmptyElements(maxEmptyElements), boundary(treeBoundary), 
 		bucketInterval(1), medianPoint(nDimensions)
@@ -85,7 +85,8 @@ namespace mdsearch
 				indices.erase(pointIndex);
 				// If the amount of empty elements of the point array is
 				// higher than a certain threshold, DEFRAGMENT the structure
-				if (emptyElementIndices.size() >= maxEmptyElements)
+				if (maxEmptyElements != -1 && // NOTE: -1 means the list should NOT be defragmented
+					emptyElementIndices.size() >= maxEmptyElements)
 				{
 					defragment();
 				}

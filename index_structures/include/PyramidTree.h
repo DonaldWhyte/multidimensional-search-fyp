@@ -22,7 +22,7 @@ namespace mdsearch
 
 	public:
 		PyramidTree(unsigned int numDimensions, const Region& boundary,
-			unsigned int maxEmptyElements = DEFAULT_MAX_EMPTY_ELEMENTS);
+			int maxEmptyElements = DEFAULT_MAX_EMPTY_ELEMENTS);
 
 		/* Clear all points currently stored in the structure. */
 		virtual void clear();
@@ -57,8 +57,8 @@ namespace mdsearch
 	private:
 		static const unsigned int MAX_BUCKET_NUMBER = 300000;
 		/* Maximum amount of empty elements in the point array before
-		 * it is defragmented (to ensure contingious memory). */
-		static const unsigned int DEFAULT_MAX_EMPTY_ELEMENTS = 100;
+		 * it is defragmented (to ensure contiguous memory). */
+		static const unsigned int DEFAULT_MAX_EMPTY_ELEMENTS = -1;
 
 		void insertToStructure(const Point& point, bool searchKeyExists);
 		int getPointIndex(const Point& point);
@@ -86,7 +86,8 @@ namespace mdsearch
 		// being used
 		IndexList emptyElementIndices;
 		// Maximum amount of empty elements allowed before the list is defragmented
-		unsigned int maxEmptyElements;
+		// A value of -1 means the point list will NEVER be defragmented
+		int maxEmptyElements;
 
 		// Entire region of space the Pyramid tree covers
 		// (points outside this region are ignored)
