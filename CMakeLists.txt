@@ -21,7 +21,7 @@ set( LIBS
 set(Boost_USE_STATIC_LIBS ON) 
 set(Boost_USE_MULTITHREADED ON)  
 set(Boost_USE_STATIC_RUNTIME OFF) 
-find_package(Boost 1.46.0 COMPONENTS program_options REQUIRED)
+find_package(Boost 1.41.0 COMPONENTS program_options REQUIRED)
 # NOTE: Variables BOOST_INCLUDE_DIRS and Boost_LIBRARIES contain
 # a list of Boost's include directories and static libraries.
 include_directories(${Boost_INCLUDE_DIRS})
