@@ -26,7 +26,6 @@ static const Interval UNIFORM_CLUSTER_INTERVALS[] = { // first elem 'min', secon
 static const unsigned int NUM_CLUSTERS = 2;
 static const unsigned int NUM_POINTS_PER_CLUSTER = NUM_POINTS_PER_DATASET / NUM_CLUSTERS;
 
-static const std::string UNIFORM_DATASET_PREFIX = "uniform";
 static const std::string RANDOM_UNIFORM_DATASET_PREFIX = "randuniform";
 static const std::string SKEWED_DATASET_PREFIX = "skewed";
 static const std::string CLUSTERED_DATASET_PREFIX = "clustered";
@@ -43,31 +42,6 @@ std::string datasetFilename(const std::string& prefix, unsigned int numDimension
 
 int main(int argc, char* argv[])
 {
-	// Generate uniform datasets
-	/*std::cout << "Generating uniform datasets..." << std::endl;
-	UniformDatasetGenerator uniformGenerator;
-	for (unsigned int i = 0; (i < NUM_DIMENSIONALITIES); i++)
-	{
-		unsigned int d = DIMENSIONS[i];
-		std::string filename = datasetFilename(UNIFORM_DATASET_PREFIX, d);
-		std::cout << "\tGenerating " << d << "D dataset..." << std::endl;
-
-		double n = NUM_POINTS_PER_DATASET;
-		for (unsigned int j = 0; (j < d); j++)
-			n /= d;
-		int pointsPerDimensions = static_cast<int>(n);
-		if (pointsPerDimensions < 1)
-			continue;
-		std::cout << pointsPerDimensions << std::endl;
-
-		PointList dataset = uniformGenerator.generate(d,
-			MIN_VALUE, MAX_VALUE, pointsPerDimensions);
-		writePointsToFile(filename, d, dataset);
-		dataset.clear();
-
-		std::cout << "\tGenerated " << d << "D dataset" << std::endl;
-	}*/
-
 	// Generate skewed datasets
 	std::cout << "Generating skewed datasets..." << std::endl;
 	SkewedDatasetGenerator skewedGenerator;
