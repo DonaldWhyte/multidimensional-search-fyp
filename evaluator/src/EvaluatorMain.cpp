@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "CommandLineArguments.h"
 #include "IndexStructureFactory.h"
 #include "DatasetFileLoader.h"
@@ -6,6 +7,42 @@
 #include "Evaluator.h"
 
 using namespace mdsearch;
+
+void writeResultsToFile(const std::string& filename,
+	const OperationListTimings& timings,
+	const CommandLineArguments& args,
+	const std::vector<TestOperationList>& testOperationLists)
+{
+	std::ofstream file(filename.c_str());
+	// Write structures used
+	file << "===STRUCTURES===\n";
+	const std::vector<CommandLineArguments::IndexStructureSpecification> structureSpecs = args.indexStructures();
+	for (unsigned int i = 0; (i < structureSpecs.size()); i++)
+	{
+		const CommandLineArguments::IndexStructureSpecification& spec = structureSpecs[i];
+		file << "Structure (" << i << "):\n\tType: " << spec.type << "\n\tDimensionality: " << spec.numDimensions << "\n\t";
+		file << "Arguments: ";
+		if (spec.arguments.size() > 0)
+		{
+			for (unsigned int j = 0; (j < spec.arguments.size() -1); j++)
+				file << spec.arguments[j] << " ";
+			file << spec.arguments[spec.arguments.size() -1];
+		}
+		file << "\n";
+	}
+	file << "\n";
+	// Write test operation list information
+	file << "===OPERATION LISTS===\n";
+	for (unsigned int i = 0; (i < testOperationLists.size()); i++)
+	{
+		file << "Test Operation List (" << i << "):\n\tNumber of Operations: " << testOperationLists[i].size() << "\n";
+	}
+	file << "\n";
+	// Write timing report
+	file << "===TIMINGS===\n";
+	file << generateTimingReport(timings);
+	file.close();
+}
 
 int main(int argc, char* argv[])
 {
@@ -76,6 +113,11 @@ int main(int argc, char* argv[])
 	// Run evaluation on loaded datasets and operation lists
 	OperationListTimings timings = evaluator.timePerformance(testOperationLists);
 	std::cout << generateTimingReport(timings) << std::endl;
+	// Write timing results to file if an output filename was given
+	if (!args.resultFilename().empty())
+	{
+		writeResultsToFile(args.resultFilename(), timings, args, testOperationLists);
+	}
 
 	return 0;
 }
