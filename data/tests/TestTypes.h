@@ -108,14 +108,14 @@ namespace mdsearch { namespace tests
 			Interval(30, 41), Interval(0.535, 0.8)
 		};
 		Region longestTestRegion(5, longestTestRegionIntervals);
-		EXPECT_EQ(-1, Region(0).findLongestDimension());
-		EXPECT_EQ(0, oneA.findLongestDimension());
-		EXPECT_EQ(0, oneB.findLongestDimension());
-		EXPECT_EQ(0, twoA.findLongestDimension());
-		EXPECT_EQ(0, twoB.findLongestDimension());
-		EXPECT_EQ(0, twoC.findLongestDimension());
-		EXPECT_EQ(0, twoD.findLongestDimension());
-		EXPECT_EQ(3, longestTestRegion.findLongestDimension());
+		EXPECT_EQ(-1, Region(0).longestDimension());
+		EXPECT_EQ(0, oneA.longestDimension());
+		EXPECT_EQ(0, oneB.longestDimension());
+		EXPECT_EQ(0, twoA.longestDimension());
+		EXPECT_EQ(0, twoB.longestDimension());
+		EXPECT_EQ(0, twoC.longestDimension());
+		EXPECT_EQ(0, twoD.longestDimension());
+		EXPECT_EQ(3, longestTestRegion.longestDimension());
 	}	
 
 	TEST_F(RegionTests, Subdivison)
@@ -335,14 +335,50 @@ namespace mdsearch { namespace tests
 
 	TEST_F(RegionTests, ContainsRegion)
 	{
-		// TODO
-		ASSERT_TRUE(false);
+		Interval testRegionIntervals[][2] = {
+			{ Interval(1, 1), Interval(1, 1) },
+			{ Interval(2, 2), Interval(2, 2) },
+			{ Interval(1, 10), Interval(1, 10) },
+			{ Interval(2, 6), Interval(2, 6) },
+			{ Interval(4, 7), Interval(4, 7) },
+			{ Interval(7, 8), Interval(7, 8) }
+		};
+		RegionList testRegions;
+		for (unsigned int i = 0; (i < 6); i++)
+			testRegions.push_back(Region(2, testRegionIntervals[i]));
+
+		// Test two zero-sized regions in same place
+		EXPECT_TRUE(testRegions[0].contains(testRegions[0]));
+		// Test two different zero-sized regions
+		EXPECT_FALSE(testRegions[0].contains(testRegions[1]));
+		// Test identical regions
+		EXPECT_TRUE(testRegions[2].contains(testRegions[2]));
+		// Test one region nested in the other
+		EXPECT_TRUE(testRegions[2].contains(testRegions[3]));
+		// Test region TOO BIG to be in other region, but intersects with all of it (should fail)
+		EXPECT_FALSE(testRegions[3].contains(testRegions[2]));
+		// Test overlapping regions
+		EXPECT_FALSE(testRegions[3].contains(testRegions[4]));
+		// Test disjoint regions
+		EXPECT_FALSE(testRegions[3].contains(testRegions[5]));
 	}
 
 	TEST_F(RegionTests, LongestDimension)
 	{
-		// TODO: longestDimension + longestLength
-		ASSERT_TRUE(false);		
+		Region oneD(1, Interval(4, 8));
+		Region twoDUniform(2, Interval(4, 8));
+		Interval intervals[2] = { Interval(1, 5), Interval(-4, 7) };
+		Region twoD(2, intervals);
+
+		// Test 1D region
+		EXPECT_EQ(0, oneD.longestDimension());
+		EXPECT_EQ(4, oneD.longestLength());
+		// Test 2D uniform region
+		EXPECT_EQ(0, twoDUniform.longestDimension());
+		EXPECT_EQ(4, twoDUniform.longestLength());
+		// Test 2D non-uniform region
+		EXPECT_EQ(1, twoD.longestDimension());
+		EXPECT_EQ(11, twoD.longestLength());
 	}
 
 

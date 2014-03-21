@@ -324,7 +324,7 @@ namespace mdsearch
 		expandToQuadtreeBox(leaf->outerBox, minQuadtreeBox);
 
 		// Find longest side of minimum quadtree box and use it to split region	
-		unsigned int longestSide = minQuadtreeBox.findLongestDimension();
+		unsigned int longestSide = minQuadtreeBox.longestDimension();
 		// Compute value of longest side to split at (midpoint of longest side
 		Real splitPoint = minQuadtreeBox[longestSide].min +
 			((minQuadtreeBox[longestSide].max - minQuadtreeBox[longestSide].min) / 2.0f);

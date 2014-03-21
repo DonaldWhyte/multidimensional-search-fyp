@@ -176,7 +176,7 @@ namespace mdsearch
 		}
 
 		/* Return index of the region's longest dimension (side). */
-		inline int findLongestDimension() const
+		inline int longestDimension() const
 		{
 			Real maxLength = -1; // guaranteed to be lower than any dimension
 			int maxLengthIndex = -1;
