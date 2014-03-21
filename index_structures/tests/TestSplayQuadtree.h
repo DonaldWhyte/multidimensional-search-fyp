@@ -231,6 +231,116 @@ namespace mdsearch { namespace tests {
 		EXPECT_EQ(oldPromotedLeftChild, shrinkSplit->outerChild); // left child of promoted becomes outer node
 	}
 
+	TEST_F(SplayQuadtreeTests, BasicSplay)
+	{
+		SplayQuadtree structure(NUM_SPLAYQUADTREE_DIMENSIONS, initialBoundary);
+		IndexStructureTester tester;
+
+		SplayQuadtree::Node* root = NULL;
+		SplayQuadtree::ShrinkSplitNode* shrinkSplit = NULL;
+		SplayQuadtree::ShrinkSplitNode* nodeToSplay = NULL;
+		SplayQuadtree::LeafNode* leaf = NULL;
+
+		// Test root node
+		structure.clear();
+		structure.loadPoints(tester.getTestPoints());		
+		shrinkSplit = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(structure.rootNode());
+		ASSERT_TRUE(structure.basicSplay(shrinkSplit));
+
+		// Test zig (w/ right child chosen) -- EQUIVALENT TO A RIGHT CHILD PROMOTE
+		structure.clear();
+		structure.loadPoints(tester.getTestPoints());
+		shrinkSplit = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(structure.rootNode());
+		nodeToSplay = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(shrinkSplit->rightChild);
+		SplayQuadtree::ShrinkSplitNode* oldParent = shrinkSplit;
+		SplayQuadtree::Node* oldParentChildren[] = {
+			oldParent->leftChild, oldParent->rightChild, oldParent->outerChild
+		};
+		SplayQuadtree::Node* nodeToSplayOldChildren[] = {
+			nodeToSplay->leftChild, nodeToSplay->rightChild, nodeToSplay->outerChild
+		};
+
+		ASSERT_TRUE(structure.basicSplay(nodeToSplay));
+		ASSERT_EQ(NULL, nodeToSplay->parent);
+		ASSERT_EQ(nodeToSplayOldChildren[0], nodeToSplay->leftChild);
+		ASSERT_EQ(nodeToSplayOldChildren[1], nodeToSplay->rightChild);
+		ASSERT_EQ(oldParent, nodeToSplay->outerChild);
+		ASSERT_EQ(nodeToSplay, oldParent->parent);
+		ASSERT_EQ(nodeToSplayOldChildren[2], oldParent->leftChild);
+		ASSERT_EQ(oldParentChildren[0], oldParent->rightChild);
+		ASSERT_EQ(oldParentChildren[2], oldParent->outerChild);
+
+		// Test zig-zag (OL)
+		structure.clear();
+		structure.loadPoints(tester.getTestPoints());
+		// Insert points to make LO situation
+		Real values[][3] = { { 7, 5, 5 }, { 9, 6, 6 } };
+		ASSERT_TRUE( structure.insert(Point(3, values[0])) );
+		ASSERT_TRUE( structure.insert(Point(3, values[1])) );
+		// Get node to splay
+		shrinkSplit = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(structure.rootNode());
+		SplayQuadtree::ShrinkSplitNode* parent = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(shrinkSplit->leftChild);
+		nodeToSplay = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(parent->outerChild);
+		nodeToSplayOldChildren[0] = nodeToSplay->leftChild;
+		nodeToSplayOldChildren[1] = nodeToSplay->rightChild;
+		nodeToSplayOldChildren[2] = nodeToSplay->outerChild;
+		oldParentChildren[0] = parent->leftChild;
+		oldParentChildren[1] = parent->rightChild;
+		oldParentChildren[2] = parent->outerChild;
+		SplayQuadtree::Node* oldGrandparentChildren[] = {
+			shrinkSplit->leftChild, shrinkSplit->rightChild, shrinkSplit->outerChild
+		};
+
+		ASSERT_TRUE(structure.basicSplay(nodeToSplay));
+		ASSERT_EQ(NULL, nodeToSplay->parent);
+		ASSERT_EQ(parent, nodeToSplay->leftChild);
+		ASSERT_EQ(nodeToSplayOldChildren[1], nodeToSplay->rightChild);
+		ASSERT_EQ(shrinkSplit, nodeToSplay->outerChild);
+		ASSERT_EQ(nodeToSplay, parent->parent);
+		ASSERT_EQ(oldParentChildren[0], parent->leftChild);
+		ASSERT_EQ(oldParentChildren[1], parent->rightChild);
+		ASSERT_EQ(nodeToSplayOldChildren[0], parent->outerChild);
+		ASSERT_EQ(nodeToSplay, shrinkSplit->parent);
+		ASSERT_EQ(nodeToSplayOldChildren[2], shrinkSplit->leftChild);
+		ASSERT_EQ(oldGrandparentChildren[1], shrinkSplit->rightChild);
+		ASSERT_EQ(oldGrandparentChildren[2], shrinkSplit->outerChild);
+
+		// Test zig-zig (OO)
+		structure.clear();
+		structure.loadPoints(tester.getTestPoints());
+		shrinkSplit = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(structure.rootNode());
+		parent = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(shrinkSplit->outerChild);
+		nodeToSplay = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(parent->outerChild);
+		nodeToSplayOldChildren[0] = nodeToSplay->leftChild;
+		nodeToSplayOldChildren[1] = nodeToSplay->rightChild;
+		nodeToSplayOldChildren[2] = nodeToSplay->outerChild;
+		oldParentChildren[0] = parent->leftChild;
+		oldParentChildren[1] = parent->rightChild;
+		oldParentChildren[2] = parent->outerChild;
+		oldGrandparentChildren[0] = shrinkSplit->leftChild;
+		oldGrandparentChildren[1] = shrinkSplit->rightChild;
+		oldGrandparentChildren[2] = shrinkSplit->outerChild;
+
+		ASSERT_TRUE(structure.basicSplay(nodeToSplay));
+		ASSERT_EQ(NULL, nodeToSplay->parent);
+		ASSERT_EQ(parent, nodeToSplay->leftChild);
+		ASSERT_EQ(nodeToSplayOldChildren[1], nodeToSplay->rightChild);
+		ASSERT_EQ(nodeToSplayOldChildren[2], nodeToSplay->outerChild);
+		ASSERT_EQ(nodeToSplay, parent->parent);
+		ASSERT_EQ(shrinkSplit, parent->leftChild);
+		ASSERT_EQ(oldParentChildren[1], parent->rightChild);
+		ASSERT_EQ(nodeToSplayOldChildren[0], parent->outerChild);
+		ASSERT_EQ(parent, shrinkSplit->parent);
+		ASSERT_EQ(oldGrandparentChildren[0], shrinkSplit->leftChild);
+		ASSERT_EQ(oldGrandparentChildren[1], shrinkSplit->rightChild);
+		ASSERT_EQ(oldParentChildren[0], shrinkSplit->outerChild);
+	}
+
+	TEST_F(SplayQuadtreeTests, Splay)
+	{
+		ASSERT_TRUE(false);
+	}
+
 } }
 
 #endif

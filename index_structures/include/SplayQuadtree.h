@@ -98,8 +98,22 @@ namespace mdsearch
 		bool pointExists(const Point& p);
 		PointList pointsInRegion(const Region& region);
 
-		/* NOTE: Only public so it can be tesed thoroughly in unit tests. */
-		bool promote(SplayQuadtree::Node* node);
+		/* NOTE: These thre methods are only public so they can be tesed thoroughly in unit tests. */
+
+		/* Swaps given node with its parent, re-ordering the children to
+		 * maintain the structure's invariants.
+		 * Returns false if the given node cannot be promoted and true if
+		 * the promotion was succesful. */
+		bool promote(Node* node);
+		/* Perform basic splaying operation to push given node up the tree
+		 * and towards the route.
+		 * Returns false if the given node cannot be splayed and true if
+		 * the operation was succesful. */
+		bool basicSplay(ShrinkSplitNode* node);
+		/* Perform full splay and push node to the root of the tree.
+		 * Returns true if the full splay was successful and false if it was not. */
+		bool splay(ShrinkSplitNode* node);
+
 
 		/* Return root node of the splay quadtree. */
 		Node* rootNode();

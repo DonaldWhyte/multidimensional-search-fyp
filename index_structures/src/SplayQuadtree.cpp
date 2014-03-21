@@ -152,6 +152,52 @@ namespace mdsearch
 		}
 	}
 
+	bool SplayQuadtree::basicSplay(SplayQuadtree::ShrinkSplitNode* node)
+	{
+		if (!node->parent)
+		{
+			return true;
+		}
+		else
+		{
+			if (node->parent->type != SHRINKSPLIT_NODE)
+				return false;
+			ShrinkSplitNode* parent = dynamic_cast<ShrinkSplitNode*>(node->parent);
+			// If parent is the root
+			if (!parent->parent) // Zig
+			{
+				return promote(node);
+			}
+			else
+			{
+				if (parent->parent->type != SHRINKSPLIT_NODE)
+					return false;
+				ShrinkSplitNode* grandparent = dynamic_cast<ShrinkSplitNode*>(parent->parent);				
+				NodeRelation relP = relation(parent, node);	
+				NodeRelation relG = relation(grandparent, parent); // first char
+				if ((relG == LEFT_CHILD_RELATION && relP == OUTER_CHILD_RELATION) ||
+					(relG == LEFT_CHILD_RELATION && relP == OUTER_CHILD_RELATION) ||
+					(relG == LEFT_CHILD_RELATION && relP == OUTER_CHILD_RELATION)) // Zig-Zag
+				{
+					promote(node);
+					return promote(node); // TODO: return first promote or do if() with it??
+				}
+				else // Zig-Zig
+				{
+					promote(parent);
+					return promote(node);
+				}
+			}
+
+			return true;
+		}
+	}
+
+	bool SplayQuadtree::splay(SplayQuadtree::ShrinkSplitNode* node)
+	{
+		return false;
+	}
+
 	SplayQuadtree::Node* SplayQuadtree::rootNode()
 	{
 		return root;
