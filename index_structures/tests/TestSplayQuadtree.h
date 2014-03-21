@@ -166,13 +166,8 @@ namespace mdsearch { namespace tests {
 		// Test root node
 		structure.clear();
 		structure.loadPoints(tester.getTestPoints());
-		root = structure.rootNode();
-		ASSERT_FALSE( structure.promote(root) ); // root node cannot be promoted any more
-
-		// Test leaf node
-		ASSERT_EQ(SplayQuadtree::SHRINKSPLIT_NODE, root->type);
-		shrinkSplit = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(root);
-		ASSERT_FALSE( structure.promote(shrinkSplit->leftChild) ); // leaves cannot be promoted
+		shrinkSplit = dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(structure.rootNode());
+		ASSERT_FALSE( structure.promote(shrinkSplit) ); // root node cannot be promoted any more
 
 		// Test promoting right child (where left sibling DOES NOT HAVE AN INNER BOX)
 		// NOTE: Equivalent as left node promotion, just with a swap
@@ -183,7 +178,7 @@ namespace mdsearch { namespace tests {
 		SplayQuadtree::Node* oldRightChildChildren[] = {
 			oldRightChild->leftChild, oldRightChild->rightChild, oldRightChild->outerChild
 		};
-		ASSERT_TRUE(structure.promote(shrinkSplit->rightChild));
+		ASSERT_TRUE( structure.promote(oldRightChild) );
 		EXPECT_EQ(oldGrandparent, oldRightChild->parent); // promoted node's parent is its old grandparent
 		EXPECT_EQ(shrinkSplit, oldRightChild->outerChild);
 		EXPECT_EQ(oldRightChildChildren[0], oldRightChild->leftChild); // left and right children of promoted node should stay the same
@@ -203,7 +198,7 @@ namespace mdsearch { namespace tests {
 		ASSERT_EQ(SplayQuadtree::FILLED_LEAF_NODE, shrinkSplit->leftChild->type);
 		leaf = dynamic_cast<SplayQuadtree::LeafNode*>(shrinkSplit->leftChild);
 		leaf->containsInnerBox = true; // make it seem like the left child has an inner box
-		ASSERT_FALSE(structure.promote(shrinkSplit->rightChild));
+		ASSERT_FALSE( structure.promote(dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(shrinkSplit->rightChild)) );
 
 		// Test promoting outer child
 		structure.clear();
@@ -220,7 +215,7 @@ namespace mdsearch { namespace tests {
 		SplayQuadtree::Node* oldPromotedRightChild = oldParentOuterChild->rightChild;
 		SplayQuadtree::Node* oldPromotedOuterChild = oldParentOuterChild->outerChild;
 
-		ASSERT_TRUE(structure.promote(shrinkSplit->outerChild));
+		ASSERT_TRUE(structure.promote( dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(shrinkSplit->outerChild)) );
 		EXPECT_EQ(oldGrandparent, oldParentOuterChild->parent); // promoted node's parent is its old grandparent
 		EXPECT_EQ(shrinkSplit, oldParentOuterChild->leftChild); // left child of promoted becomes its old parent
 		EXPECT_EQ(oldPromotedRightChild, oldParentOuterChild->rightChild); // right and outer children of promoted node should stay the same
@@ -338,7 +333,40 @@ namespace mdsearch { namespace tests {
 
 	TEST_F(SplayQuadtreeTests, Splay)
 	{
-		ASSERT_TRUE(false);
+		SplayQuadtree structure(NUM_SPLAYQUADTREE_DIMENSIONS, initialBoundary);
+		IndexStructureTester tester;
+		const PointList& testPoints = tester.getTestPoints();
+		structure.loadPoints(testPoints);
+
+		for (unsigned int i = 0; (i < testPoints.size()); i++)
+		{
+			SplayQuadtree::Node* node = structure.findNodeStoredIn(testPoints[i]);	
+			if (node == NULL)
+			{
+				node = structure.findContainingNode(testPoints[i]);
+				std::cout << testPoints[i] << " ";
+				if (node)
+					std::cout << node->outerBox << std::endl;
+				else
+					std::cout << "NULL" << std::endl;
+				std::cout << std::endl;
+				std::cout << structure.toString() << std::endl;
+				ASSERT_FALSE(true);
+			}
+
+			ASSERT_EQ(SplayQuadtree::SHRINKSPLIT_NODE, node->parent->type);
+			SplayQuadtree::ShrinkSplitNode* nonLeaf =
+				dynamic_cast<SplayQuadtree::ShrinkSplitNode*>(node->parent);
+			// Splay parent of leaf node and ensure it's now the root
+			ASSERT_TRUE(structure.splay(nonLeaf));
+			ASSERT_EQ(NULL, nonLeaf->parent);
+			ASSERT_EQ(structure.rootNode(), nonLeaf);
+			// Ensure all points can still be retrieved
+			/*for (unsigned int j = 0; (j < testPoints.size()); j++)
+			{
+				structure.pointExists(testPoints[j]);
+			}*/
+		}
 	}
 
 } }

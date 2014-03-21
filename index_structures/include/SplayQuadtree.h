@@ -27,6 +27,19 @@ namespace mdsearch
 			OUTER_CHILD_RELATION,
 		};
 
+		/* TODO: comment on */
+		struct TwoDeepRelation
+		{
+			NodeRelation grandparentToParent;
+			NodeRelation parentToNode;
+
+			TwoDeepRelation(NodeRelation grandparentToParent, NodeRelation parentToNode)
+				: grandparentToParent(grandparentToParent), parentToNode(parentToNode)
+			{
+
+			}
+		};
+
 		struct Node
 		{
 			Node* parent;
@@ -98,13 +111,13 @@ namespace mdsearch
 		bool pointExists(const Point& p);
 		PointList pointsInRegion(const Region& region);
 
-		/* NOTE: These thre methods are only public so they can be tesed thoroughly in unit tests. */
+		/* NOTE: These four methods are only public so they can be tesed thoroughly in unit tests. */
 
 		/* Swaps given node with its parent, re-ordering the children to
 		 * maintain the structure's invariants.
 		 * Returns false if the given node cannot be promoted and true if
 		 * the promotion was succesful. */
-		bool promote(Node* node);
+		bool promote(ShrinkSplitNode* nodeToPromote);
 		/* Perform basic splaying operation to push given node up the tree
 		 * and towards the route.
 		 * Returns false if the given node cannot be splayed and true if
@@ -114,6 +127,13 @@ namespace mdsearch
 		 * Returns true if the full splay was successful and false if it was not. */
 		bool splay(ShrinkSplitNode* node);
 
+		/* Find leaf node with a region that contains the given point.
+		 * Returns NULL if the point is out the boundary of the structure. */
+		LeafNode* findContainingNode(const Point& p) const;		
+		/* Find leaf node that STORES the given point. If the point is not
+		 * being stored in the structure, then NULL will be returned. */
+		LeafNode* findNodeStoredIn(const Point& p) const;		
+
 
 		/* Return root node of the splay quadtree. */
 		Node* rootNode();
@@ -122,17 +142,19 @@ namespace mdsearch
 		std::string toString() const;
 
 	private:
-		/* Find leaf node with a region that contains the given point.
-		 * Returns NULL if the point is out the boundary of the structure. */
-		LeafNode* findContainingNode(const Point& p) const;
-		/* Find leaf node that STORES the given point. If the point is not
-		 * being stored in the structure, then NULL will be returned. */
-		LeafNode* findNodeStoredIn(const Point& p) const;
+
 		/* Perform a shrink-split operation on a leaf node, so the new
 		 * point 'p' can be stored. */
 		ShrinkSplitNode* performShrinkSplit(LeafNode* leaf, const Point& p);
 		/* Return relation between a specified parent node and a potential child. */
 		NodeRelation relation(ShrinkSplitNode* parent, Node* child) const;
+		/* Return deep relation between a node, its parent and the parent's grandparent.
+		 * Equivalent to str(x) in Splay Quadtree paper. */
+		TwoDeepRelation twoDeepRelation(ShrinkSplitNode* node) const;
+		/* Return true if given two-deep relation is not allowed in Phase-1 of splaying. */
+		bool disallowedInPhase1(TwoDeepRelation rel) const;
+
+		void expandToQuadtreeBox(const Region& parentCell, Region& boxToExpand);
 
 		/* Recursively generates a nested text representation of a tree node. */
 		std::string nodeToString(Node* node, int level = 0) const;

@@ -98,58 +98,49 @@ namespace mdsearch
 		return PointList();
 	}
 
-	bool SplayQuadtree::promote(SplayQuadtree::Node* node)
+	bool SplayQuadtree::promote(SplayQuadtree::ShrinkSplitNode* nodeToPromote)
 	{
-		// Cannot promote if the given node is a leaf or the root
-		if (node->type != SHRINKSPLIT_NODE || node->parent == NULL)
-		{
+		// If root node or parent is not non-leaf (although it SHOULD be)
+		if (!nodeToPromote->parent || nodeToPromote->parent->type != SHRINKSPLIT_NODE)
 			return false;
-		}
-		else
-		{
-			// Perform necessary casts
-			ShrinkSplitNode* nodeToPromote = dynamic_cast<ShrinkSplitNode*>(node);
-			if (node->parent->type != SHRINKSPLIT_NODE)
-				return false;
-			ShrinkSplitNode* parent = dynamic_cast<ShrinkSplitNode*>(node->parent);
-			SplayQuadtree::Node* grandparent = parent->parent;
+		ShrinkSplitNode* parent = dynamic_cast<ShrinkSplitNode*>(nodeToPromote->parent);
+		SplayQuadtree::Node* grandparent = parent->parent; // NULL is acceptable in this case
 
-			NodeRelation rel = relation(parent, nodeToPromote);
-			if (rel == OUTER_CHILD_RELATION)
-			{
-				// Perform outer node promotion
-				Node* tmp = nodeToPromote->leftChild;
-				nodeToPromote->leftChild = parent;
-				nodeToPromote->parent = grandparent;
-				parent->outerChild = tmp;
-				parent->parent = node;
-			}
-			else // left or right children
-			{
-				// If node is the right child, then swap it with the left child.
-				// ONLY IF THE LEFT CHILD DOE SNOT HAVE AN INNER BOX!
-				// If it doesn't, then the 
-				if (rel == RIGHT_CHILD_RELATION)
-				{
-					Node* tmp = parent->leftChild;
-					if (tmp->type == FILLED_LEAF_NODE) // check left child doesn't have an inner box
-					{
-						LeafNode* leaf = dynamic_cast<LeafNode*>(tmp);
-						if (leaf->containsInnerBox)
-							return false;
-					}
-					parent->leftChild = node;
-					parent->rightChild = tmp;
-				}
-				// Perform a left child promotion
-				Node* tmp = nodeToPromote->outerChild;
-				nodeToPromote->outerChild = parent;
-				nodeToPromote->parent = grandparent;
-				parent->leftChild = tmp;
-				parent->parent = node;
-			}
-			return true;
+		NodeRelation rel = relation(parent, nodeToPromote);
+		if (rel == OUTER_CHILD_RELATION)
+		{
+			// Perform outer node promotion
+			Node* tmp = nodeToPromote->leftChild;
+			nodeToPromote->leftChild = parent;
+			nodeToPromote->parent = grandparent;
+			parent->outerChild = tmp;
+			parent->parent = nodeToPromote;
 		}
+		else // left or right children
+		{
+			// If node is the right child, then swap it with the left child.
+			// ONLY IF THE LEFT CHILD DOE SNOT HAVE AN INNER BOX!
+			// If it doesn't, then the 
+			if (rel == RIGHT_CHILD_RELATION)
+			{
+				Node* tmp = parent->leftChild;
+				if (tmp->type == FILLED_LEAF_NODE) // check left child doesn't have an inner box
+				{
+					LeafNode* leaf = dynamic_cast<LeafNode*>(tmp);
+					if (leaf->containsInnerBox)
+						return false;
+				}
+				parent->leftChild = nodeToPromote;
+				parent->rightChild = tmp;
+			}
+			// Perform a left child promotion
+			Node* tmp = nodeToPromote->outerChild;
+			nodeToPromote->outerChild = parent;
+			nodeToPromote->parent = grandparent;
+			parent->leftChild = tmp;
+			parent->parent = nodeToPromote;
+		}
+		return true;
 	}
 
 	bool SplayQuadtree::basicSplay(SplayQuadtree::ShrinkSplitNode* node)
@@ -193,9 +184,79 @@ namespace mdsearch
 		}
 	}
 
-	bool SplayQuadtree::splay(SplayQuadtree::ShrinkSplitNode* node)
+	bool SplayQuadtree::splay(ShrinkSplitNode* node)
 	{
-		return false;
+		// --------PHASE 1----------
+		std::cout << "PHASE 1" << std::endl;
+		ShrinkSplitNode* currentNode = node;
+		while (currentNode->parent)
+		{
+			TwoDeepRelation rel = twoDeepRelation(currentNode);
+			while (disallowedInPhase1(rel)) // loop until two-deep relation is allowed
+			{
+				if ((rel.grandparentToParent == LEFT_CHILD_RELATION && rel.parentToNode == LEFT_CHILD_RELATION) ||
+					(rel.grandparentToParent == OUTER_CHILD_RELATION && rel.parentToNode == OUTER_CHILD_RELATION))
+				{
+					ShrinkSplitNode* parent = dynamic_cast<ShrinkSplitNode*>(currentNode->parent);
+					promote(parent);
+					promote(currentNode);
+				}
+				else
+				{
+					promote(currentNode);
+					promote(currentNode);
+				}
+				// Compute new new two-deep relation
+				rel = twoDeepRelation(currentNode);
+			}
+			// If current node is root or its parent is the roots
+			if (!currentNode->parent || !currentNode->parent->parent)
+			{
+				break;
+			}
+			else
+			{
+				ShrinkSplitNode* parent = dynamic_cast<ShrinkSplitNode*>(currentNode->parent);
+				if (relation(parent, currentNode) == RIGHT_CHILD_RELATION)
+				{
+					currentNode = parent;
+				}
+				else
+				{
+					ShrinkSplitNode* grandparent = dynamic_cast<ShrinkSplitNode*>(parent->parent);
+					currentNode = grandparent;
+				}
+			}
+		}
+
+		// --------PHASE 2----------
+		std::cout << "PHASE 2" << std::endl;
+		currentNode = node;
+		while (currentNode->parent)
+		{
+			ShrinkSplitNode* parent = dynamic_cast<ShrinkSplitNode*>(currentNode->parent);
+			TwoDeepRelation rel = twoDeepRelation(currentNode);
+			// If str(x) == OR, perform a zig-zig
+			if (rel.grandparentToParent == OUTER_CHILD_RELATION && rel.parentToNode == RIGHT_CHILD_RELATION)
+			{
+				promote(parent);
+				promote(currentNode);
+			}
+			// Otherwise, just move up to the parent without making any changes
+			else
+			{
+				currentNode = parent;
+			}
+		}
+
+		// --------PHASE 3----------
+		std::cout << "PHASE 3" << std::endl;
+		while (node->parent) // repeatedly splay node until it is the root
+		{
+			basicSplay(node);
+		}
+		root = node; // make sure to assign root!
+		return true;
 	}
 
 	SplayQuadtree::Node* SplayQuadtree::rootNode()
@@ -212,7 +273,6 @@ namespace mdsearch
 			{
 				if (node->type == SHRINKSPLIT_NODE)
 				{
-
 					ShrinkSplitNode* nonLeaf = dynamic_cast<ShrinkSplitNode*>(node);
 					if (nonLeaf->leftChild && nonLeaf->leftChild->outerBox.contains(p))
 					{
@@ -238,9 +298,9 @@ namespace mdsearch
 			}
 			else
 			{
-				return NULL; // not contained in structure at all!
+				return NULL;
 			}
-		}	
+		}
 	}
 
 	SplayQuadtree::LeafNode* SplayQuadtree::findNodeStoredIn(const Point& p) const
@@ -261,6 +321,7 @@ namespace mdsearch
 			minQuadtreeBox = Region::minimumBoundingBox(leaf->innerBox, p);
 		else
 			minQuadtreeBox = Region::minimumBoundingBox(leaf->point, p);
+		expandToQuadtreeBox(leaf->outerBox, minQuadtreeBox);
 
 		// Find longest side of minimum quadtree box and use it to split region	
 		unsigned int longestSide = minQuadtreeBox.findLongestDimension();
@@ -306,6 +367,48 @@ namespace mdsearch
 		else
 			return NO_RELATION;
 	}	
+
+	SplayQuadtree::TwoDeepRelation SplayQuadtree::twoDeepRelation(
+		SplayQuadtree::ShrinkSplitNode* node) const
+	{
+		if (!node->parent || node->parent->type != SHRINKSPLIT_NODE) // SHOULDN'T HAPPEN
+			return TwoDeepRelation(NO_RELATION, NO_RELATION);
+		ShrinkSplitNode* parent = dynamic_cast<ShrinkSplitNode*>(node->parent);
+
+		if (!parent->parent || parent->parent->type != SHRINKSPLIT_NODE) // SHOULDN'T HAPPEN
+			return TwoDeepRelation(NO_RELATION, relation(parent, node));
+		ShrinkSplitNode* grandparent = dynamic_cast<ShrinkSplitNode*>(parent->parent);
+
+		return TwoDeepRelation(relation(grandparent, parent), relation(parent, node));
+	}
+
+	bool SplayQuadtree::disallowedInPhase1(SplayQuadtree::TwoDeepRelation rel) const
+	{
+		return ((rel.grandparentToParent == LEFT_CHILD_RELATION && rel.parentToNode == LEFT_CHILD_RELATION) ||
+			(rel.grandparentToParent == OUTER_CHILD_RELATION && rel.parentToNode == OUTER_CHILD_RELATION) ||
+			(rel.grandparentToParent == LEFT_CHILD_RELATION && rel.parentToNode == OUTER_CHILD_RELATION) ||
+			(rel.grandparentToParent == OUTER_CHILD_RELATION && rel.parentToNode == LEFT_CHILD_RELATION)
+		);
+	}
+
+	void SplayQuadtree::expandToQuadtreeBox(const Region& parentCell, Region& boxToExpand)
+	{
+		static const Real BOX_GAP_THRESHOLD = 0.5; // to ensure boxes w/ aspect ratio of 1 or 2
+
+		// Find length of longest side of box to expand
+		Real longestLength = parentCell.longestLength();
+
+		for (unsigned int d = 0; (d < numDimensions); d++)
+		{
+			// Gaps between tight bound box and parent cell box
+			Real gapHi = parentCell[d].max - boxToExpand[d].max;
+			Real gapLow = boxToExpand[d].min - parentCell[d].min;
+			if (gapHi < longestLength * BOX_GAP_THRESHOLD) // big enough gap to shrink?
+				boxToExpand[d].max = parentCell[d].max; // no - expand
+			if (gapLow < longestLength * BOX_GAP_THRESHOLD)
+				boxToExpand[d].min = parentCell[d].min;
+		}
+	}
 
 	std::string SplayQuadtree::toString() const
 	{
