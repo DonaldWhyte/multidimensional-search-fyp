@@ -50,9 +50,15 @@ namespace mdsearch
 					structures[s]->clear();
 					// Pre-load specified points
 					if (dataToPreload.size() > 0)
+					{
+						if (verbose)
+							std::cout << "\t\tPre-loading " << dataToPreload.size() << " points into structure for run " << (i + 1) << std::endl;
 						structures[s]->loadPoints(dataToPreload);
+					}
 					// Run test operations on structure and add time elapsed
 					// to the total sum
+					if (verbose)
+						std::cout << "\t\tExecuting test run..." << (i + 1) << std::endl;
 					sumOfTimes += runOperations(structures[s],
 						testOperationLists[t],
 						generateCPUProfilerFilename(t, s),

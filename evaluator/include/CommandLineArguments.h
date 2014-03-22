@@ -37,7 +37,7 @@ namespace mdsearch
 		unsigned int testRunsToPerform() const;
 		/* Accessors for parsed command line data. */
 		const std::vector<IndexStructureSpecification>& indexStructures() const;
-		const StringList& datasetFilenames() const;
+		const std::string& datasetToPreloadFilename() const;
 		const StringList& testOperationFilenames() const;
 		const std::string& resultFilename() const;
 
@@ -52,7 +52,7 @@ namespace mdsearch
 		unsigned int runs;
 
 		std::vector<IndexStructureSpecification> specifiedIndexStructures;
-		StringList datasets;
+		std::string preloadedDatasetFilename;
 		StringList testOperations;
 		std::string outputFilename;
 

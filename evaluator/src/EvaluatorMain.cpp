@@ -11,7 +11,8 @@ using namespace mdsearch;
 void writeResultsToFile(const std::string& filename,
 	const OperationListTimings& timings,
 	const CommandLineArguments& args,
-	const std::vector<TestOperationList>& testOperationLists)
+	const std::vector<TestOperationList>& testOperationLists,
+	const PointList& datasetToPreload)
 {
 	std::ofstream file(filename.c_str());
 	// Write structures used
@@ -30,6 +31,10 @@ void writeResultsToFile(const std::string& filename,
 		}
 		file << "\n";
 	}
+	file << "\n";
+	// Information about pre-loaded data
+	file << "===PRE-LOADED DATASET===\n";
+	file << "Points Pre-Loaded for Each Test: " << datasetToPreload.size() << "\n";
 	file << "\n";
 	// Write test operation list information
 	file << "===OPERATION LISTS===\n";
@@ -84,17 +89,13 @@ int main(int argc, char* argv[])
 		structures.push_back(structure);
 	}
 
-	// Load specified datasets
+	// Load dataset that will be pre-loaded into structure for each test
 	if (args.isVerbose())
-		std::cout << "Loading datasets" << std::endl;	
-	std::vector<PointList> datasets;
-
+		std::cout << "Loading dataset to pre-load into structures" << std::endl;	
 	DatasetFileLoader datasetLoader;
-	const StringList& datasetFilenames = args.datasetFilenames();
-	for (unsigned int i = 0; (i < datasetFilenames.size()); i++)
-	{
-		datasets.push_back( datasetLoader.load(datasetFilenames[i]) );
-	}
+	PointList datasetToPreload = datasetLoader.load(
+		args.datasetToPreloadFilename()
+	);
 
 	// Load specified test operations
 	std::vector<TestOperationList> testOperationLists;
@@ -113,12 +114,14 @@ int main(int argc, char* argv[])
 	Evaluator evaluator(structures, args.testRunsToPerform(),
 		args.profileCPU(), args.profileHeap(), args.isVerbose());
 	// Run evaluation on loaded datasets and operation lists
-	OperationListTimings timings = evaluator.timePerformance(testOperationLists);
+	OperationListTimings timings = evaluator.timePerformance(
+		testOperationLists, datasetToPreload);
 	std::cout << generateTimingReport(timings) << std::endl;
 	// Write timing results to file if an output filename was given
 	if (!args.resultFilename().empty())
 	{
-		writeResultsToFile(args.resultFilename(), timings, args, testOperationLists);
+		writeResultsToFile(args.resultFilename(), timings,
+			args, testOperationLists, datasetToPreload);
 	}
 
 	return 0;

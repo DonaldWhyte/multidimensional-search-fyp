@@ -29,7 +29,7 @@ namespace mdsearch
 				("heap", "heap is profiled if this flag is set")
 				("runs,r", po::value<unsigned int>(), "number of runs to perform of test operations to get AVERAGE time")
 				("index_structures,s", po::value<std::vector<std::string> >(), "index structure to evaluate")
-				("datasets,d", po::value<std::vector<std::string> >(), "dataset to use for evaluation")
+				("preloaded_dataset,p", po::value<std::string>(), "dataset of points which are pre-loaded into structure before running timed tests")
 				("test_operations,t", po::value<std::vector<std::string> >(), "list of test operations to perform");
 			// Parse given command line arguments
 			po::variables_map parsedArgs;
@@ -99,11 +99,12 @@ namespace mdsearch
 					specifiedIndexStructures.push_back(spec);
 				}
 			}
-			// Get all specified test datasets and operations
-			if (parsedArgs.count("datasets"))
-				datasets = parsedArgs["datasets"].as<std::vector<std::string> >();
+			// Check if a dataset to preloaded has been specified
+			if (parsedArgs.count("preloaded_dataset"))
+				preloadedDatasetFilename = parsedArgs["preloaded_dataset"].as<std::string>();
+			// Get all specified test operation lists
 			if (parsedArgs.count("test_operations"))
-				testOperations = parsedArgs["test_operations"].as<std::vector<std::string> >();
+				testOperations = parsedArgs["test_operations"].as<StringList>();
 		}
 		catch(po::error& error)
 		{
@@ -141,9 +142,9 @@ namespace mdsearch
 		return specifiedIndexStructures;
 	}
 
-	const StringList& CommandLineArguments::datasetFilenames() const
+	const std::string& CommandLineArguments::datasetToPreloadFilename() const
 	{
-		return datasets;
+		return preloadedDatasetFilename;
 	}
 
 	const StringList& CommandLineArguments::testOperationFilenames() const

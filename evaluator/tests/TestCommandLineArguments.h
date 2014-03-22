@@ -93,27 +93,20 @@ namespace mdsearch { namespace tests
 		EXPECT_EQ(0, structures[1].arguments.size());
 	}
 
-	TEST_F(CommandLineArgumentsTests, Datasets)
+	TEST_F(CommandLineArgumentsTests, PreloadedDataset)
 	{
 		char* testArgs1[] = { "./evaluator", "--output=filename" };
-		char* testArgs2[] = { "./evaluator", "--output=filename", "--dataset=astro.dat" };
-		char* testArgs3[] = { "./evaluator", "--output=filename", "--dataset=astro.dat", "-dclustered100.dat" };
+		char* testArgs2[] = { "./evaluator", "--output=filename", "--preloaded_dataset=astro.dat" };
+		char* testArgs3[] = { "./evaluator", "--output=filename", "-pastro.dat" };
 
-		// Test no datasets
+		// Test no preloaded dataset
 		CommandLineArguments parsedArgs(2, testArgs1);
-		StringList datasets = parsedArgs.datasetFilenames();
-		ASSERT_EQ(0, datasets.size());
-		// Test one dataset
+		EXPECT_EQ("", parsedArgs.datasetToPreloadFilename());
+		// Test one dataset with long and short option
 		parsedArgs = CommandLineArguments(3, testArgs2);
-		datasets = parsedArgs.datasetFilenames();
-		ASSERT_EQ(1, datasets.size());
-		EXPECT_EQ("astro.dat", datasets[0]);
-		// Test multiple datasets
-		parsedArgs = CommandLineArguments(4, testArgs3);
-		datasets = parsedArgs.datasetFilenames();
-		ASSERT_EQ(2, datasets.size());
-		EXPECT_EQ("astro.dat", datasets[0]);
-		EXPECT_EQ("clustered100.dat", datasets[1]);
+		EXPECT_EQ("astro.dat", parsedArgs.datasetToPreloadFilename());
+		parsedArgs = CommandLineArguments(3, testArgs3);
+		EXPECT_EQ("astro.dat", parsedArgs.datasetToPreloadFilename());
 	}
 
 	TEST_F(CommandLineArgumentsTests, TestOperations)
