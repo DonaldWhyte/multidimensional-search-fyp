@@ -10,6 +10,7 @@ DATASET_TEST_OP_INDICES = {
 	"skewed" : 1,
 	"clustered" : 2
 }
+OUTPUT_STRUCTURE_TIMING_FILENAME_FORMAT = "{}_{}_{}.times"
 
 def getInsertFilesToProcess(resultsDirectory):
 	filesToProcess = []
@@ -43,7 +44,6 @@ def getStructureTimings(timingFiles, structureNames, testOpListIndex = 0):
 		with open(filePath, "r") as f:
 			# Scan through file until required test operation list index is found
 			testOpListToRead = "Test Operations ({}):".format(testOpListIndex)
-			print testOpListToRead
 			line = ""
 			while line != testOpListToRead:
 				line = f.readline()[:-1] # [:-1] there to remove trailing newline
@@ -64,17 +64,18 @@ def getStructureTimings(timingFiles, structureNames, testOpListIndex = 0):
 def writeTimings(filename, timings):
 	with open(filename, "w") as f:
 		# Iterate through each structure
-		for dimensionality, timingValue in timings.items():
+		for dimensionality, timingValue in timings:
 			f.write("{} {}\n".format(dimensionality, timingValue))
 
 if __name__ == "__main__":
 	# Parse command line arguments
-	if len(sys.argv) < 4:
-		sys.exit("Usage: python {} <directory> <operation> <dataset> [<structure1Name> <structure2Name> ... <structureNName>]".format(sys.argv[0]))
-	resultsDirectory = sys.argv[1]
-	operation = sys.argv[2]
-	dataset = sys.argv[3]
-	structureNames = sys.argv[4:]
+	if len(sys.argv) < 5:
+		sys.exit("Usage: python {} <outputDirectory> <timingsDirectory> <operation> <dataset> [<structure1Name> <structure2Name> ... <structureNName>]".format(sys.argv[0]))
+	outputDirectory = sys.argv[1]
+	resultsDirectory = sys.argv[2]
+	operation = sys.argv[3]
+	dataset = sys.argv[4]
+	structureNames = sys.argv[5:]
 
 	# If operation is insert, USE A SPECIALISED PROCESSOR 
 	if operation == "insert":
@@ -91,7 +92,6 @@ if __name__ == "__main__":
 		)
 		
 	for structureName, timings in structureTimings.items():
-		print structureName
-		for dimensionality, timingValue in timings:
-			print "\t", dimensionality, timingValue
-		#writeTimings(filename, timings)
+		filename = OUTPUT_STRUCTURE_TIMING_FILENAME_FORMAT.format(structureName, operation, dataset)
+		outputPath = os.path.join(outputDirectory, filename)
+		writeTimings(outputPath, timings)
