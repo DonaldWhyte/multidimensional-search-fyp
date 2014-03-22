@@ -25,7 +25,8 @@ namespace mdsearch
 	public:
 		/* Construct an evaluator specifically for the given structures. */
 		Evaluator(const std::vector<IndexStructure*>& structures,
-			unsigned int numTestRuns, bool profileHeap = false, bool verbose = false);
+			unsigned int numTestRuns, bool profileCPU = false,
+			bool profileHeap = false, bool verbose = false);
 
 		/* Given a list of datasets and test operations, run each index
 		 * structure on EACH OPERATION LIST!
@@ -34,9 +35,14 @@ namespace mdsearch
 		 * structures returned. A vector of size d is return, which
 		 * contains t lists that contain s timing values (milliseconds)
 		 * a structure took to perform the respective operations on a dataset.
+		 *
+		 * If there are points that should be pre-loaded into each structure,
+		 * BEFORE timing the operations on it, then this can be passed in
+		 * as the 'dataToPreload' argument.
 		 */
 		 OperationListTimings timePerformance(
-			const std::vector<TestOperationList>& testOperationLists) const;
+			const std::vector<TestOperationList>& testOperationLists,
+			const PointList& dataToPreload = PointList()) const;
 
 		/* Accessors */
 		bool isVerbose() const;
@@ -55,7 +61,8 @@ namespace mdsearch
 		std::string generateHeapProfilerFilename(unsigned int testOpListIndex, unsigned int structureIndex) const;
 
 		std::vector<IndexStructure*> structures;
-		bool profileHeap; // if true, the heap is profiled for each test operation ruin
+		bool profileCPU; // if true, the CPU is profiled for each test operation ruin
+		bool profileHeap; // if true, the heap is profiled for each test operation run
 		bool verbose; // if true, progress log is outputted as test operations are being executed
 		// Number of test runs to perform for each operation list 
 		// Average time of all runs is used for the outputted time

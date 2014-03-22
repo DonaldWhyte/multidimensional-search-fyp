@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 
 	// Create evaluator object and fill it with loaded structures
 	Evaluator evaluator(structures, args.testRunsToPerform(),
-		args.profileHeap(), args.isVerbose());
+		args.profileCPU(), args.profileHeap(), args.isVerbose());
 	// Run evaluation on loaded datasets and operation lists
 	OperationListTimings timings = evaluator.timePerformance(testOperationLists);
 	std::cout << generateTimingReport(timings) << std::endl;

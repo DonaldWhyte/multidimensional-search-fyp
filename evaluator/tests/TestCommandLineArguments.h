@@ -177,6 +177,17 @@ namespace mdsearch { namespace tests
 		EXPECT_EQ(8, parsedArgs.testRunsToPerform());
 	}
 
+	TEST_F(CommandLineArgumentsTests, ProfileCPU)
+	{
+		char* testArgs1[] = { "./evaluator" };
+		char* testArgs2[] = { "./evaluator", "--cpu" };
+
+		CommandLineArguments parsedArgs(1, testArgs1);
+		ASSERT_FALSE(parsedArgs.profileCPU());
+		parsedArgs = CommandLineArguments(2, testArgs2);
+		ASSERT_TRUE(parsedArgs.profileCPU());
+	}	
+
 } }
 
 #endif

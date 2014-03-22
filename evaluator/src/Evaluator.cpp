@@ -9,14 +9,15 @@ namespace mdsearch
 {
 
 	Evaluator::Evaluator(const std::vector<IndexStructure*>& structures,
-		unsigned int numTestRuns, bool profileHeap, bool verbose)
+		unsigned int numTestRuns, bool profileCPU, bool profileHeap, bool verbose)
 		: structures(structures), numTestRuns(numTestRuns),
-		profileHeap(profileHeap), verbose(verbose)
+		profileCPU(profileCPU), profileHeap(profileHeap), verbose(verbose)
 	{
 	}
 
 	OperationListTimings Evaluator::timePerformance(
-		const std::vector<TestOperationList>& testOperationLists) const
+		const std::vector<TestOperationList>& testOperationLists,
+		const PointList& dataToPreload) const
 	{
 		// NOTE: reserve() calls are done to minimise the amount of dynamic allocations as possible
 
@@ -47,6 +48,9 @@ namespace mdsearch
 				{
 					// Ensure structure is completely empty
 					structures[s]->clear();
+					// Pre-load specified points
+					if (dataToPreload.size() > 0)
+						structures[s]->loadPoints(dataToPreload);
 					// Run test operations on structure and add time elapsed
 					// to the total sum
 					sumOfTimes += runOperations(structures[s],
@@ -89,7 +93,10 @@ namespace mdsearch
 		{
 			HeapProfilerStart(heapProfilerOutputFilename.c_str());
 		}
-		ProfilerStart(cpuProfilerOutputFilename.c_str());
+		if (profileCPU)
+		{
+			ProfilerStart(cpuProfilerOutputFilename.c_str());
+		}
 		// Keep track of the time the performance test starts
 		boost::timer timer;
 		timer.restart();
@@ -118,7 +125,10 @@ namespace mdsearch
 		// Store time elapsed during execution of the operations
 		Timing elapsed = timer.elapsed();
 		// Stop profilers
-		ProfilerStop();
+		if (profileCPU)
+		{
+			ProfilerStop();
+		}
 		// NOTE: You have to call HeadProfilerDump() to produce the heap
 		// profiling output. HeapProfilerStop() will not produce it for you
 		// like ProfilerStop() does for PCU profiling.

@@ -29,6 +29,8 @@ namespace mdsearch
 		bool isValid() const;
 		/* If true is returned, verbose output is expected when evaluator is running. */
 		bool isVerbose() const;
+		/* If true, then the CPU will be profiled for per-function timings and call graph generation. */
+		bool profileCPU() const;
 		/* If true, then the heap will be profiled for heap memory allocation. */
 		bool profileHeap() const;
 		/* Number of runs to perform of each test operation set (to compute average time). */
@@ -45,6 +47,7 @@ namespace mdsearch
 		// are either missing or invalid
 		bool validArguments;
 		bool verbose;
+		bool profileCPUFlag;
 		bool profileHeapFlag;
 		unsigned int runs;
 
