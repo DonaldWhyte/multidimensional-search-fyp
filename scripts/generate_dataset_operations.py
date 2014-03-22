@@ -3,6 +3,7 @@ import time
 import random
 import math
 from generate_random_operations import *
+from generate_random_dataset import generatePoint
 
 def getOperationMaximums(args):
 	maximums = [ -1, -1, -1, -1 ]
@@ -42,6 +43,12 @@ def generateDatasetOperationWithType(numDimensions, opType, dataset):
 		
 	return (opType, point)	
 
+def printSingleOperationTypeList(opType, numDimensions, dataset):
+	print("{} {}".format(numDimensions, len(dataset)))
+	for p in dataset:
+		op = (opType, list(p))
+		print(operationToStr(op))
+
 
 if __name__ == "__main__":
 	# Seed random number generator
@@ -49,13 +56,13 @@ if __name__ == "__main__":
 
 	# Parse command line arguments	
 	if len(sys.argv) < 3:
-		sys.exit("Usage: {} <datasetFilename> [all|random|equal] {{<numOperations> <insertProbability> <deleteProbability> <updateProbability> <pqueryProbability> <maxInsert> <maxDelete> <maxUpdate> <maxPQuery>}}".format(sys.argv[0]))
+		sys.exit("Usage: {} <datasetFilename> [all|random|equal|insert|delete|update|pquery] {{<numOperations> <insertProbability> <deleteProbability> <updateProbability> <pqueryProbability> <maxInsert> <maxDelete> <maxUpdate> <maxPQuery>}}".format(sys.argv[0]))
 	datasetFilename = sys.argv[1]
 	listType = sys.argv[2]
-	if not listType in [ "all", "random", "equal" ]:
+	if not listType in [ "all", "random", "equal", "insert", "delete", "update", "pquery" ]:
 		sys.exit("Invalid list type '{}' given".format(listType))
 	numOperations = 0
-	if listType != "all":
+	if listType in ["random", "equal"]:
 		if len(sys.argv) < 4:
 			sys.exit("The number of operations to generate must be given if 'all' mode is node used")
 		else:
@@ -110,3 +117,18 @@ if __name__ == "__main__":
 		# Output all opewrations
 		for op in operations:
 			print(operationToStr(op))
+	# Generate olists which have a single type of operation, each operation being for a single point in the dataset
+	elif listType == "insert":
+		printSingleOperationTypeList("I", numDimensions, dataset)
+	elif listType == "delete":
+		printSingleOperationTypeList("D", numDimensions, dataset)
+	elif listType == "update":
+		print("{} {}".format(numDimensions, len(dataset)))
+		for p in dataset:
+			updateArgs = list(p)
+			# Generate random point to update the given point with
+			updateArgs += generatePoint(numDimensions)
+			op = ("U", updateArgs)
+			print(operationToStr(op))
+	elif listType == "pquery":
+		printSingleOperationTypeList("P", numDimensions, dataset)
