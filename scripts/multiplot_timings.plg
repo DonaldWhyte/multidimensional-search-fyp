@@ -1,5 +1,6 @@
 set xlabel "Number of Dimensions"
 set ylabel "Execution Time (seconds)"
+set xrange[1:200]
 
 set terminal postscript
 set output (inputDirectory."all_".operation."_".dataset.".ps")
