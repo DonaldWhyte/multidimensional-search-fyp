@@ -1,0 +1,12 @@
+set xlabel "Number of Dimensions"
+set ylabel "Execution Time (seconds)"
+
+set terminal postscript
+set output (inputDirectory."all_".operation."_".dataset.".ps")
+
+filename0 = sprintf("%s%s_%s_%s.times", inputDirectory, "sequentialscan", operation, dataset)
+filename1 = sprintf("%s%s_%s_%s.times", inputDirectory, "octree", operation, dataset)
+filename2 = sprintf("%s%s_%s_%s.times", inputDirectory, "pyramidtree", operation, dataset)
+filename3 = sprintf("%s%s_%s_%s.times", inputDirectory, "pyramidtreenodefrag", operation, dataset)
+
+plot filename0 using 1:2 with lines title "Sequential Scan" lc rgb "red", filename1 using 1:2 with lines title "Octree" lc rgb "blue", filename2 using 1:2 with lines title "Pyramid Tree" lc rgb "green", filename3 using 1:2 with lines title "Pyramid Tree (No Defrag)" lc rgb "purple" 

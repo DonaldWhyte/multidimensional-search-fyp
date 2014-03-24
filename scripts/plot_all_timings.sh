@@ -6,46 +6,22 @@ if [ -z "$1" ] ; then
 fi
 
 function plotTiming {
+	# Arguments: <resultsDirectory> <timingBaseFilename>
 	gnuplot -e "outputFilename='$1/$2.ps'" -e "inputFilename='$1/$2.times'" -e "plotTitle='$2" plot_timing.plg
 }
 
-# TODO: plot all four structures in one graph!!! one graph for each operation-dataset pair
+function plotMultipleTimings {
+	# Arguments: <resultsDirectory> <operationType> <dataset>
+	gnuplot -e "inputDirectory='$1/'" -e "operation='$2'" -e "dataset='$3'" multiplot_timings.plg
+}
 
-plotTiming "$1" "sequentialscan_insert_randuniform"
-plotTiming "$1" "sequentialscan_insert_skewed"
-plotTiming "$1" "sequentialscan_insert_clustered"
-plotTiming "$1" "octree_insert_randuniform"
-plotTiming "$1" "octree_insert_skewed"
-plotTiming "$1" "octree_insert_clustered"
-plotTiming "$1" "pyramidtreenodefrag_insert_randuniform"
-plotTiming "$1" "pyramidtreenodefrag_insert_skewed"
-plotTiming "$1" "pyramidtreenodefrag_insert_clustered"
-plotTiming "$1" "pyramidtree_insert_randuniform"
-plotTiming "$1" "pyramidtree_insert_skewed"
-plotTiming "$1" "pyramidtree_insert_clustered"
-
-plotTiming "$1" "sequentialscan_delete_randuniform"
-plotTiming "$1" "sequentialscan_delete_skewed"
-plotTiming "$1" "sequentialscan_delete_clustered"
-plotTiming "$1" "octree_delete_randuniform"
-plotTiming "$1" "octree_delete_skewed"
-plotTiming "$1" "octree_delete_clustered"
-plotTiming "$1" "pyramidtreenodefrag_delete_randuniform"
-plotTiming "$1" "pyramidtreenodefrag_delete_skewed"
-plotTiming "$1" "pyramidtreenodefrag_delete_clustered"
-plotTiming "$1" "pyramidtree_delete_randuniform"
-plotTiming "$1" "pyramidtree_delete_skewed"
-plotTiming "$1" "pyramidtree_delete_clustered"
-
-plotTiming "$1" "sequentialscan_pquery_randuniform"
-plotTiming "$1" "sequentialscan_pquery_skewed"
-plotTiming "$1" "sequentialscan_pquery_clustered"
-plotTiming "$1" "octree_pquery_randuniform"
-plotTiming "$1" "octree_pquery_skewed"
-plotTiming "$1" "octree_pquery_clustered"
-plotTiming "$1" "pyramidtreenodefrag_pquery_randuniform"
-plotTiming "$1" "pyramidtreenodefrag_pquery_skewed"
-plotTiming "$1" "pyramidtreenodefrag_pquery_clustered"
-plotTiming "$1" "pyramidtree_pquery_randuniform"
-plotTiming "$1" "pyramidtree_pquery_skewed"
-plotTiming "$1" "pyramidtree_pquery_clustered"
+# Plotting all four structures in one graph, for each operation-dataset pair
+plotMultipleTimings "$1" "insert" "randuniform"
+plotMultipleTimings "$1" "insert" "skewed"
+plotMultipleTimings "$1" "insert" "clustered"
+plotMultipleTimings "$1" "delete" "randuniform"
+plotMultipleTimings "$1" "delete" "skewed"
+plotMultipleTimings "$1" "delete" "clustered"
+plotMultipleTimings "$1" "pquery" "randuniform"
+plotMultipleTimings "$1" "pquery" "skewed"
+plotMultipleTimings "$1" "pquery" "clustered"
