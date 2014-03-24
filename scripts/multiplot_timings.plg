@@ -2,8 +2,10 @@ set xlabel "Number of Dimensions"
 set ylabel "Execution Time (seconds)"
 set xrange[1:200]
 
-set terminal postscript
-set output (inputDirectory."all_".operation."_".dataset.".ps")
+# How to export to PDF files with line styles found from:
+# http://theletterpsi.blogspot.co.uk/2010/11/setting-dashed-line-style-on-pdf.html
+set terminal pdf monochrome dashed
+set output (inputDirectory."all_".operation."_".dataset.".pdf")
 
 filename0 = sprintf("%s%s_%s_%s.times", inputDirectory, "sequentialscan", operation, dataset)
 filename1 = sprintf("%s%s_%s_%s.times", inputDirectory, "octree", operation, dataset)
