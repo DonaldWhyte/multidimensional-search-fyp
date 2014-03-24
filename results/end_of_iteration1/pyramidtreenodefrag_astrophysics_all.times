@@ -1,0 +1,17 @@
+===STRUCTURES===
+Structure (0):
+	Type: pyramid_tree
+	Dimensionality: 10
+	Arguments: 0 50000
+
+===PRE-LOADED DATASET===
+Points Pre-Loaded for Each Test: 0
+
+===OPERATION LISTS===
+Test Operation List (0):
+	Filename: ../test_data/operation_lists/multifield.0099_75x31x31.ops
+	Number of Operations: 216225
+
+===TIMINGS===
+Test Operations (0):
+		Structure (0): 64.72 seconds

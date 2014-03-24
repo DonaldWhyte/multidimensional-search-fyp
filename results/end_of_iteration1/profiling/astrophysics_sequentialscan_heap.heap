@@ -1,0 +1,58 @@
+heap profile:      1:  2097152 [105726: 12682333] @ heapprofile
+     1:  2097152 [    17:  4194272] @ 0x00482912 0x00482661 0x004823e3 0x00482140 0x00482d2c 0x0047d6d0 0x0047d43f 0x00463c40 0x7ffd2a77876d
+     0:        0 [    17:      680] @ 0x00468960 0x0046845d 0x00467cb5 0x0046755f 0x00466f85 0x0048228d 0x00482411 0x00482140 0x00482d2c 0x0047d6d0 0x0047d43f 0x00463c40 0x7ffd2a77876d
+     0:        0 [     1:       24] @ 0x7ffd2b5a19be 0x7ffd2b5a0782 0x7ffd2b5a08b7 0x7ffd2b5a0ce5 0x0047d645 0x0047d43f 0x00463c40 0x7ffd2a77876d
+     0:        0 [ 65535:  2621400] @ 0x00468960 0x0046845d 0x00467cb5 0x0046755f 0x00466f85 0x004829fb 0x00482a5b 0x0048293f 0x004826ad 0x0048287b 0x0048244d 0x00482140 0x00482d2c 0x0047d6d0 0x0047d43f 0x00463c40 0x7ffd2a77876d
+     0:        0 [     1:       21] @ 0x7ffd2a7dfd82
+     0:        0 [ 40152:  1606080] @ 0x00468960 0x0046845d 0x00467cb5 0x0046755f 0x00466f85 0x0048228d 0x00482108 0x00482d2c 0x0047d6d0 0x0047d43f 0x00463c40 0x7ffd2a77876d
+     0:        0 [     1:       16] @ 0x7ffd2b5a1952 0x7ffd2b5a0782 0x7ffd2b5a08b7 0x7ffd2b5a0ce5 0x0047d645 0x0047d43f 0x00463c40 0x7ffd2a77876d
+     0:        0 [     1:  2097152] @ 0x7ffd2b5a21a6 0x7ffd2b5a0888 0x7ffd2b5a0ce5 0x0047d645 0x0047d43f 0x00463c40 0x7ffd2a77876d
+     0:        0 [     1:  2162688] @ 0x7ffd2b5a2199 0x7ffd2b5a0888 0x7ffd2b5a0ce5 0x0047d645 0x0047d43f 0x00463c40 0x7ffd2a77876d
+
+MAPPED_LIBRARIES:
+00400000-004d3000 r-xp 00000000 00:00 4859        /home/dwhyte/multidimensional-search/build/evaluator
+006d2000-006d3000 r--p 000d2000 00:00 4859        /home/dwhyte/multidimensional-search/build/evaluator
+006d3000-006d4000 rw-p 000d3000 00:00 4859        /home/dwhyte/multidimensional-search/build/evaluator
+01840000-065f4000 rw-p 00000000 00:00 0           [heap]
+7ffd2a1ea000-7ffd2a53a000 rw-p 00000000 00:00 0           
+7ffd2a53a000-7ffd2a552000 r-xp 00000000 00:00 178345      /lib/x86_64-linux-gnu/libpthread-2.15.so
+7ffd2a552000-7ffd2a751000 ---p 00018000 00:00 178345      /lib/x86_64-linux-gnu/libpthread-2.15.so
+7ffd2a751000-7ffd2a752000 r--p 00017000 00:00 178345      /lib/x86_64-linux-gnu/libpthread-2.15.so
+7ffd2a752000-7ffd2a753000 rw-p 00018000 00:00 178345      /lib/x86_64-linux-gnu/libpthread-2.15.so
+7ffd2a753000-7ffd2a757000 rw-p 00000000 00:00 0           
+7ffd2a757000-7ffd2a90c000 r-xp 00000000 00:00 178336      /lib/x86_64-linux-gnu/libc-2.15.so
+7ffd2a90c000-7ffd2ab0c000 ---p 001b5000 00:00 178336      /lib/x86_64-linux-gnu/libc-2.15.so
+7ffd2ab0c000-7ffd2ab10000 r--p 001b5000 00:00 178336      /lib/x86_64-linux-gnu/libc-2.15.so
+7ffd2ab10000-7ffd2ab12000 rw-p 001b9000 00:00 178336      /lib/x86_64-linux-gnu/libc-2.15.so
+7ffd2ab12000-7ffd2ab17000 rw-p 00000000 00:00 0           
+7ffd2ab17000-7ffd2ab2c000 r-xp 00000000 00:00 136401      /lib/x86_64-linux-gnu/libgcc_s.so.1
+7ffd2ab2c000-7ffd2ad2b000 ---p 00015000 00:00 136401      /lib/x86_64-linux-gnu/libgcc_s.so.1
+7ffd2ad2b000-7ffd2ad2c000 r--p 00014000 00:00 136401      /lib/x86_64-linux-gnu/libgcc_s.so.1
+7ffd2ad2c000-7ffd2ad2d000 rw-p 00015000 00:00 136401      /lib/x86_64-linux-gnu/libgcc_s.so.1
+7ffd2ad2d000-7ffd2ae28000 r-xp 00000000 00:00 178347      /lib/x86_64-linux-gnu/libm-2.15.so
+7ffd2ae28000-7ffd2b027000 ---p 000fb000 00:00 178347      /lib/x86_64-linux-gnu/libm-2.15.so
+7ffd2b027000-7ffd2b028000 r--p 000fa000 00:00 178347      /lib/x86_64-linux-gnu/libm-2.15.so
+7ffd2b028000-7ffd2b029000 rw-p 000fb000 00:00 178347      /lib/x86_64-linux-gnu/libm-2.15.so
+7ffd2b029000-7ffd2b10b000 r-xp 00000000 00:00 274779      /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.16
+7ffd2b10b000-7ffd2b30a000 ---p 000e2000 00:00 274779      /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.16
+7ffd2b30a000-7ffd2b312000 r--p 000e1000 00:00 274779      /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.16
+7ffd2b312000-7ffd2b314000 rw-p 000e9000 00:00 274779      /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.16
+7ffd2b314000-7ffd2b329000 rw-p 00000000 00:00 0           
+7ffd2b329000-7ffd2b371000 r-xp 00000000 00:00 328960      /usr/local/lib/libtcmalloc.so.4.1.2
+7ffd2b371000-7ffd2b571000 ---p 00048000 00:00 328960      /usr/local/lib/libtcmalloc.so.4.1.2
+7ffd2b571000-7ffd2b572000 r--p 00048000 00:00 328960      /usr/local/lib/libtcmalloc.so.4.1.2
+7ffd2b572000-7ffd2b573000 rw-p 00049000 00:00 328960      /usr/local/lib/libtcmalloc.so.4.1.2
+7ffd2b573000-7ffd2b59b000 rw-p 00000000 00:00 0           
+7ffd2b59b000-7ffd2b5a9000 r-xp 00000000 00:00 328995      /usr/local/lib/libprofiler.so.0.3.2
+7ffd2b5a9000-7ffd2b7a8000 ---p 0000e000 00:00 328995      /usr/local/lib/libprofiler.so.0.3.2
+7ffd2b7a8000-7ffd2b7a9000 r--p 0000d000 00:00 328995      /usr/local/lib/libprofiler.so.0.3.2
+7ffd2b7a9000-7ffd2b7aa000 rw-p 0000e000 00:00 328995      /usr/local/lib/libprofiler.so.0.3.2
+7ffd2b7aa000-7ffd2b7ae000 rw-p 00000000 00:00 0           
+7ffd2b7ae000-7ffd2b7d0000 r-xp 00000000 00:00 178348      /lib/x86_64-linux-gnu/ld-2.15.so
+7ffd2b7d5000-7ffd2b9bb000 rw-p 00000000 00:00 0           
+7ffd2b9be000-7ffd2b9d0000 rw-p 00000000 00:00 0           
+7ffd2b9d0000-7ffd2b9d1000 r--p 00022000 00:00 178348      /lib/x86_64-linux-gnu/ld-2.15.so
+7ffd2b9d1000-7ffd2b9d3000 rw-p 00023000 00:00 178348      /lib/x86_64-linux-gnu/ld-2.15.so
+7fff03635000-7fff03656000 rw-p 00000000 00:00 0           [stack]
+7fff03698000-7fff0369a000 r-xp 00000000 00:00 0           [vdso]
+ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0           [vsyscall]

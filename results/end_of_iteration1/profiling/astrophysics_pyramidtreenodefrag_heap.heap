@@ -1,0 +1,66 @@
+heap profile:  40181:  4490668 [105807: 14255725] @ heapprofile
+     1:  2097152 [    17:  4194272] @ 0x00482912 0x00482661 0x004823e3 0x00482140 0x00488698 0x0048836e 0x0047d6d0 0x0047d43f 0x00463c40 0x7febce02c76d
+ 32768:  1310720 [ 65535:  2621400] @ 0x00468960 0x0046845d 0x00467cb5 0x0046755f 0x00466f85 0x004829fb 0x00482a5b 0x0048293f 0x004826ad 0x0048287b 0x0048244d 0x00482140 0x00488698 0x0048836e 0x0047d6d0 0x0047d43f 0x00463c40 0x7febce02c76d
+  7400:   296000 [ 40152:  1606080] @ 0x00468960 0x0046845d 0x00467cb5 0x0046755f 0x00466f85 0x0048228d 0x00482108 0x00488698 0x0048836e 0x0047d6d0 0x0047d43f 0x00463c40 0x7febce02c76d
+     3:   262208 [    34:   524392] @ 0x0048c9f6 0x0048b81b 0x0048a7bf 0x0048983c 0x00488770 0x0048836e 0x0047d6d0 0x0047d43f 0x00463c40 0x7febce02c76d
+     1:   262144 [    17:   524284] @ 0x0048c9f6 0x0048b81b 0x0048a7bf 0x0048983c 0x00488508 0x0047d6ff 0x0047d43f 0x00463c40 0x7febce02c76d
+     1:   262144 [    17:   524284] @ 0x00468960 0x0046845d 0x00480841 0x0048062a 0x004886cc 0x0048836e 0x0047d6d0 0x0047d43f 0x00463c40 0x7febce02c76d
+     3:      120 [     3:      120] @ 0x0048dc88 0x0048cd30 0x0048be63 0x0048ac26 0x00489a6f 0x004887c6 0x0048836e 0x0047d6d0 0x0047d43f 0x00463c40 0x7febce02c76d
+     1:       96 [     1:       96] @ 0x0048e150 0x0048d951 0x0048c75f 0x0048cf19 0x0048bf94 0x0048ab87 0x00489a6f 0x004887c6 0x0048836e 0x0047d6d0 0x0047d43f 0x00463c40 0x7febce02c76d
+     1:       40 [     1:       40] @ 0x0048dc88 0x0048cd30 0x0048be63 0x0048ab6f 0x00489a6f 0x004887c6 0x0048836e 0x0047d6d0 0x0047d43f 0x00463c40 0x7febce02c76d
+     1:       40 [    17:      680] @ 0x00468960 0x0046845d 0x00467cb5 0x0046755f 0x00466f85 0x0048228d 0x00482411 0x00482140 0x00488698 0x0048836e 0x0047d6d0 0x0047d43f 0x00463c40 0x7febce02c76d
+     1:        4 [     4:       16] @ 0x0048c9f6 0x0048b81b 0x0048a2f4 0x0048941b 0x004887d5 0x0048836e 0x0047d6d0 0x0047d43f 0x00463c40 0x7febce02c76d
+     0:        0 [     1:       16] @ 0x7febcee55952 0x7febcee54782 0x7febcee548b7 0x7febcee54ce5 0x0047d645 0x0047d43f 0x00463c40 0x7febce02c76d
+     0:        0 [     1:  2097152] @ 0x7febcee561a6 0x7febcee54888 0x7febcee54ce5 0x0047d645 0x0047d43f 0x00463c40 0x7febce02c76d
+     0:        0 [     1:       24] @ 0x7febcee559be 0x7febcee54782 0x7febcee548b7 0x7febcee54ce5 0x0047d645 0x0047d43f 0x00463c40 0x7febce02c76d
+     0:        0 [     1:  2162688] @ 0x7febcee56199 0x7febcee54888 0x7febcee54ce5 0x0047d645 0x0047d43f 0x00463c40 0x7febce02c76d
+     0:        0 [     4:      160] @ 0x0048c9f6 0x0048b81b 0x0048aa70 0x004899a9 0x00488792 0x0048836e 0x0047d6d0 0x0047d43f 0x00463c40 0x7febce02c76d
+     0:        0 [     1:       21] @ 0x7febce093d82
+
+MAPPED_LIBRARIES:
+00400000-004d3000 r-xp 00000000 00:00 4859        /home/dwhyte/multidimensional-search/build/evaluator
+006d2000-006d3000 r--p 000d2000 00:00 4859        /home/dwhyte/multidimensional-search/build/evaluator
+006d3000-006d4000 rw-p 000d3000 00:00 4859        /home/dwhyte/multidimensional-search/build/evaluator
+01bfb000-069b0000 rw-p 00000000 00:00 0           [heap]
+7febcda8e000-7febcddee000 rw-p 00000000 00:00 0           
+7febcddee000-7febcde06000 r-xp 00000000 00:00 178345      /lib/x86_64-linux-gnu/libpthread-2.15.so
+7febcde06000-7febce005000 ---p 00018000 00:00 178345      /lib/x86_64-linux-gnu/libpthread-2.15.so
+7febce005000-7febce006000 r--p 00017000 00:00 178345      /lib/x86_64-linux-gnu/libpthread-2.15.so
+7febce006000-7febce007000 rw-p 00018000 00:00 178345      /lib/x86_64-linux-gnu/libpthread-2.15.so
+7febce007000-7febce00b000 rw-p 00000000 00:00 0           
+7febce00b000-7febce1c0000 r-xp 00000000 00:00 178336      /lib/x86_64-linux-gnu/libc-2.15.so
+7febce1c0000-7febce3c0000 ---p 001b5000 00:00 178336      /lib/x86_64-linux-gnu/libc-2.15.so
+7febce3c0000-7febce3c4000 r--p 001b5000 00:00 178336      /lib/x86_64-linux-gnu/libc-2.15.so
+7febce3c4000-7febce3c6000 rw-p 001b9000 00:00 178336      /lib/x86_64-linux-gnu/libc-2.15.so
+7febce3c6000-7febce3cb000 rw-p 00000000 00:00 0           
+7febce3cb000-7febce3e0000 r-xp 00000000 00:00 136401      /lib/x86_64-linux-gnu/libgcc_s.so.1
+7febce3e0000-7febce5df000 ---p 00015000 00:00 136401      /lib/x86_64-linux-gnu/libgcc_s.so.1
+7febce5df000-7febce5e0000 r--p 00014000 00:00 136401      /lib/x86_64-linux-gnu/libgcc_s.so.1
+7febce5e0000-7febce5e1000 rw-p 00015000 00:00 136401      /lib/x86_64-linux-gnu/libgcc_s.so.1
+7febce5e1000-7febce6dc000 r-xp 00000000 00:00 178347      /lib/x86_64-linux-gnu/libm-2.15.so
+7febce6dc000-7febce8db000 ---p 000fb000 00:00 178347      /lib/x86_64-linux-gnu/libm-2.15.so
+7febce8db000-7febce8dc000 r--p 000fa000 00:00 178347      /lib/x86_64-linux-gnu/libm-2.15.so
+7febce8dc000-7febce8dd000 rw-p 000fb000 00:00 178347      /lib/x86_64-linux-gnu/libm-2.15.so
+7febce8dd000-7febce9bf000 r-xp 00000000 00:00 274779      /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.16
+7febce9bf000-7febcebbe000 ---p 000e2000 00:00 274779      /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.16
+7febcebbe000-7febcebc6000 r--p 000e1000 00:00 274779      /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.16
+7febcebc6000-7febcebc8000 rw-p 000e9000 00:00 274779      /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.16
+7febcebc8000-7febcebdd000 rw-p 00000000 00:00 0           
+7febcebdd000-7febcec25000 r-xp 00000000 00:00 328960      /usr/local/lib/libtcmalloc.so.4.1.2
+7febcec25000-7febcee25000 ---p 00048000 00:00 328960      /usr/local/lib/libtcmalloc.so.4.1.2
+7febcee25000-7febcee26000 r--p 00048000 00:00 328960      /usr/local/lib/libtcmalloc.so.4.1.2
+7febcee26000-7febcee27000 rw-p 00049000 00:00 328960      /usr/local/lib/libtcmalloc.so.4.1.2
+7febcee27000-7febcee4f000 rw-p 00000000 00:00 0           
+7febcee4f000-7febcee5d000 r-xp 00000000 00:00 328995      /usr/local/lib/libprofiler.so.0.3.2
+7febcee5d000-7febcf05c000 ---p 0000e000 00:00 328995      /usr/local/lib/libprofiler.so.0.3.2
+7febcf05c000-7febcf05d000 r--p 0000d000 00:00 328995      /usr/local/lib/libprofiler.so.0.3.2
+7febcf05d000-7febcf05e000 rw-p 0000e000 00:00 328995      /usr/local/lib/libprofiler.so.0.3.2
+7febcf05e000-7febcf062000 rw-p 00000000 00:00 0           
+7febcf062000-7febcf084000 r-xp 00000000 00:00 178348      /lib/x86_64-linux-gnu/ld-2.15.so
+7febcf089000-7febcf26f000 rw-p 00000000 00:00 0           
+7febcf272000-7febcf284000 rw-p 00000000 00:00 0           
+7febcf284000-7febcf285000 r--p 00022000 00:00 178348      /lib/x86_64-linux-gnu/ld-2.15.so
+7febcf285000-7febcf287000 rw-p 00023000 00:00 178348      /lib/x86_64-linux-gnu/ld-2.15.so
+7fff6fe5e000-7fff6fe7f000 rw-p 00000000 00:00 0           [stack]
+7fff6ff65000-7fff6ff67000 r-xp 00000000 00:00 0           [vdso]
+ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0           [vsyscall]
