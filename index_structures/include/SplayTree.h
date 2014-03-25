@@ -78,18 +78,19 @@ namespace mdsearch
 			{
 				// Splay found node to the root of the tree
 				splay(node);
-				// TODO: comment
+				// Swap node with its right child
 				if (!node->leftChild)
 				{
 					replace(node, node->rightChild);
 				}
+				// ..or its left child if it doesn't have a right child
 				else if (!node->rightChild)
 				{
 					replace(node, node->leftChild);
 				}
+				// TODO: COMMENTS
 				else
 				{
-					// TODO: comments
 					Node* subtree = minimumSubtree(node->rightChild);
 					if (subtree->parent != node)
 					{
@@ -137,14 +138,54 @@ namespace mdsearch
 				return 0;
 		}
 
+		/* Move given node to the top of the tree. */
 		void splay(Node* nodeToSplay)
 		{
-			// TODO
+			// Keep performing tree rotations until desired node is the root
+			while (nodeToSplay->parent)
+			{
+				if (!nodeToSplay->parent->parent) // ZIG
+				{
+					if (nodeToSplay->parent->leftChild == nodeToSplay)
+						rightRotate(nodeToSplay->parent);
+					else
+						leftRotate(nodeToSplay->parent);
+				}
+				// ZIG-ZIG (LEFT CHILDREN)
+				else if (nodeToSplay->parent->leftChild == nodeToSplay && nodeToSplay->parent->parent->leftChild == nodeToSplay->parent)
+				{
+					rightRotate(nodeToSplay->parent->parent);
+					rightRotate(nodeToSplay->parent);
+				}
+				// ZIG-ZIG (RIGHT CHILDREN)
+				else if (nodeToSplay->parent->rightChild == nodeToSplay && nodeToSplay->parent->parent->rightChild == nodeToSplay->parent)
+				{
+					leftRotate(nodeToSplay->parent->parent);
+					leftRotate(nodeToSplay->parent);
+				}
+				// ZIG-ZAG (RIGHT-LEFT CHILDREN)
+				else if (nodeToSplay->parent->leftChild == nodeToSplay && nodeToSplay->parent->parent->rightChild == nodeToSplay->parent)
+				{
+					rightRotate(nodeToSplay->parent);
+					leftRotate(nodeToSplay->parent);
+				}
+				// ZIG-ZAG (LEFT-RIGHT CHILDREN)
+				else
+				{
+					leftRotate(nodeToSplay->parent);
+					rightRotate(nodeToSplay->parent);
+				}
+			}
 		}
 
 		Node* rootNode()
 		{
 			return root;
+		}
+
+		std::string toString() const
+		{
+			return nodeToString(root);
 		}
 
 	private:
@@ -155,7 +196,9 @@ namespace mdsearch
 			while (currentNode)
 			{
 				parent = currentNode;
-				if(compare(currentNode->key, key))
+				if (currentNode->key == key) // if we've reached the node with the given key
+					return currentNode;
+				else if (compare(currentNode->key, key)) // current node's key is LESS THAN desired key
 					currentNode = currentNode->rightChild;
 				else
 					currentNode = currentNode->leftChild;
@@ -202,12 +245,59 @@ namespace mdsearch
 
 		void leftRotate(Node* node)
 		{
-			// TODO
+			Node* other = node->rightChild;
+			node->rightChild = other->leftChild;
+			if (other->leftChild)
+				other->leftChild->parent = node;
+
+			other->parent = node->parent;
+			if (!node->parent) // if original node was root
+				root = other;
+			else if (node == node->parent->leftChild) // original node is left child
+				node->parent->leftChild = other;
+			else // if it's right child
+				node->parent->rightChild = other;
+
+			other->leftChild = node;
+			node->parent = other;
 		}
 
 		void rightRotate(Node* node)
 		{
-			// TODO
+			Node* other = node->leftChild;
+			node->leftChild = other->rightChild;
+			if (other->rightChild)
+				other->rightChild->parent = node;
+
+			other->parent = node->parent;
+			if (!node->parent)
+				root = other;
+			else if (node == node->parent->leftChild)
+				node->parent->leftChild = other;
+			else
+				node->parent->rightChild = other;
+
+			other->rightChild = node;
+			node->parent = other;
+		}
+
+		std::string nodeToString(Node* node, unsigned int level = 0) const
+		{
+			std::stringstream ss;
+			for (unsigned int i = 0; (i < level); i++)
+				ss << "\t";			
+			if (!node)
+			{
+				ss << "()\n";
+			}
+			else
+			{
+				ss << "(Key: " << node->key << ", Value: " << node->value << ")\n";
+				ss << nodeToString(node->leftChild, level + 1);
+				ss << nodeToString(node->rightChild, level + 1);
+			}
+
+			return ss.str();
 		}
 
 		Node* root;
