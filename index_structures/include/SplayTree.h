@@ -88,22 +88,26 @@ namespace mdsearch
 				{
 					replace(node, node->leftChild);
 				}
-				// TODO: COMMENTS
+				// If node has two children, we need to push the node down to
+				// the bottom of the tree before removing it
 				else
 				{
-					Node* subtree = minimumSubtree(node->rightChild);
-					if (subtree->parent != node)
+					Node* minNode = minimumNodeInSubtree(node->rightChild);
+					if (minNode->parent != node)
 					{
-						replace(subtree, subtree->right);
-						subtree->rightChild = node->rightChild;
-						subtree->rightChild->parent = subtree;
+						replace(minNode, minNode->rightChild);
+						minNode->rightChild = node->rightChild;
+						minNode->rightChild->parent = minNode;
 					}
-					replace(node, subtree);
-					subtree->leftChild = node->leftChild;
-					subtree->leftChild->parent = subtree;
+					replace(node, minNode);
+					minNode->leftChild = node->leftChild;
+					minNode->leftChild->parent = minNode;
 				}
 
 				// Finally, delete the node and return true to indicate success
+				// Ensure node to delete's children are NULL, because it's a leaf
+				// and we don't want to delete any other nodes
+				node->leftChild = node->rightChild = 0;
 				delete node;
 				return true;
 			}
@@ -229,19 +233,14 @@ namespace mdsearch
 				y->parent = x->parent;
 		}
  
-		Node* minimumSubtree(Node* node)
+ 		/* Return node which has the smallest key in the subtre
+ 		 * rooted at the given node. */
+		Node* minimumNodeInSubtree(Node* node)
 		{
 			while(node->leftChild)
 				node = node->leftChild;
 			return node;
 		}
-
-		Node* maximumSubtree(Node* node)
-		{
-			while(node->rightChild)
-				node = node->rightChild;
-			return node;
-		}		
 
 		void leftRotate(Node* node)
 		{

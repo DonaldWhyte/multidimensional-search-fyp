@@ -86,19 +86,7 @@ namespace mdsearch { namespace tests
 		EXPECT_EQ(NULL, root);
 	}
 
-	TEST_F(SplayTreeTests, Remove)
-	{
-		TestSplayTreeType tree;
-		// Insert 
-	}
-
-	TEST_F(SplayTreeTests, Update)
-	{
-		TestSplayTreeType tree;
-		// TODO
-	}
-
-	TEST_F(SplayTreeTests, Exists)
+	TEST_F(SplayTreeTests, RemoveAndGetValue)
 	{
 		TestSplayTreeType tree;
 		// Ensure points cannot be retrieved
@@ -115,10 +103,31 @@ namespace mdsearch { namespace tests
 			for (unsigned int j = 0; (j <= i); j++)
 			{
 				float* storedValue = tree.getValue(SPLAYTREE_TEST_KEYS[j]);
-				ASSERT_FALSE(storedValue == NULL);			
+				ASSERT_FALSE(storedValue == NULL);
 				ASSERT_EQ(SPLAYTREE_TEST_VALUES[j], *storedValue);
 			}
 		}
+		// Remove each of the 10 key-value pairs, ensuring that it cannot be
+		// retrieved after removal (but the remaining pairs can be retrieved!)
+		for (unsigned int i = 0; (i < SPLAYTREE_NUM_TEST_PAIRS); i++)
+		{
+			ASSERT_TRUE( tree.remove(SPLAYTREE_TEST_KEYS[i]) );
+			for (unsigned int j = 0; (j <= i); j++) // ensuring keys are deleted...
+			{
+				ASSERT_EQ(NULL, tree.getValue(SPLAYTREE_TEST_KEYS[j]));
+			}
+			for (unsigned int j = i + 1; (j < SPLAYTREE_NUM_TEST_PAIRS); j++) //...but that the others can still be found
+			{
+				float* storedValue = tree.getValue(SPLAYTREE_TEST_KEYS[j]);
+				ASSERT_FALSE(storedValue == NULL);			
+				ASSERT_EQ(SPLAYTREE_TEST_VALUES[j], *storedValue);
+			}
+		}		
+	}
+
+	TEST_F(SplayTreeTests, Update)
+	{
+		TestSplayTreeType tree;
 	}
 
 } }
