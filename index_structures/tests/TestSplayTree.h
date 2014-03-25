@@ -128,6 +128,26 @@ namespace mdsearch { namespace tests
 	TEST_F(SplayTreeTests, Update)
 	{
 		TestSplayTreeType tree;
+		// Load test points in
+		for (unsigned int i = 0; (i < SPLAYTREE_NUM_TEST_PAIRS); i++)
+		{
+			ASSERT_TRUE( tree.insert(SPLAYTREE_TEST_KEYS[i], SPLAYTREE_TEST_VALUES[i]) );
+		}
+
+		// Test with key that is not in tree
+		ASSERT_FALSE(tree.update(5000, 3052, 88.0f));
+		// Test with existing key, where the NEW key is already in the structure
+		ASSERT_TRUE(tree.getValue(1)); ASSERT_EQ(1.0f, *tree.getValue(1));
+		ASSERT_TRUE(tree.getValue(-4)); ASSERT_EQ(4.0f, *tree.getValue(-4));
+		ASSERT_TRUE(tree.update(1, -4, 22.0f));
+		ASSERT_EQ(NULL, tree.getValue(1));
+		ASSERT_TRUE(tree.getValue(-4)); ASSERT_EQ(22.0f, *tree.getValue(-4));
+		// Test with existing key, where the NEW key is NOT in the structure
+		ASSERT_TRUE(tree.getValue(8)); ASSERT_EQ(7.0f, *tree.getValue(8));
+		ASSERT_EQ(NULL, tree.getValue(3052));
+		ASSERT_TRUE(tree.update(8, 3052, 88.0f));
+		ASSERT_EQ(NULL, tree.getValue(8));
+		ASSERT_TRUE(tree.getValue(3052)); ASSERT_EQ(88.0f, *tree.getValue(3052));
 	}
 
 } }

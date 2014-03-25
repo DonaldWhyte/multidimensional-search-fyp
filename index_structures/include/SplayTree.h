@@ -121,6 +121,9 @@ namespace mdsearch
 		{
 			if (remove(oldKey))
 			{
+				// Ensure NEW KEY does not already exist so its value can be
+				// updated with the new value given
+				remove(newKey);
 				insert(newKey, newValue);
 				return true;
 			}
