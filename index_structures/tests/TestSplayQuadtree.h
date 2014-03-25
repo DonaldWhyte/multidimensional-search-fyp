@@ -147,7 +147,7 @@ namespace mdsearch { namespace tests {
 		ASSERT_FALSE(structure.insert(testPoints[5]));
 	}
 
-	TEST_F(SplayQuadtreeTests, PointQueries)
+	/*TEST_F(SplayQuadtreeTests, PointQueries)
 	{
 		SplayQuadtree structure(NUM_SPLAYQUADTREE_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
@@ -362,12 +362,12 @@ namespace mdsearch { namespace tests {
 			ASSERT_EQ(NULL, nonLeaf->parent);
 			ASSERT_EQ(structure.rootNode(), nonLeaf);
 			// Ensure all points can still be retrieved
-			/*for (unsigned int j = 0; (j < testPoints.size()); j++)
+			for (unsigned int j = 0; (j < testPoints.size()); j++)
 			{
 				structure.pointExists(testPoints[j]);
-			}*/
+			}
 		}
-	}
+	}*/
 
 } }
 

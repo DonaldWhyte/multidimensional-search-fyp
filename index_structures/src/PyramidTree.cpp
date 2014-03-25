@@ -45,6 +45,8 @@ namespace mdsearch
 
 	bool PyramidTree::insert(const Point& point)
 	{
+		// TODO: add boundary check w/ point here???
+		
 		int pointIndex = getPointIndex(point);
 		if (pointIndex >= 0) // if point already exists in structure
 		{
