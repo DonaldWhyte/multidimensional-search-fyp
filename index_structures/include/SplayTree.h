@@ -2,6 +2,7 @@
 #define MDSEARCH_SPLAYTREE_H
 
 #include <functional>
+#include <sstream>
 
 namespace mdsearch
 {

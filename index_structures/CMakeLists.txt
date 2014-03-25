@@ -5,6 +5,7 @@ add_library( index_structures
 	"src/Octree.cpp"
 	"src/PyramidTree.cpp"
 	"src/SplayQuadtree.cpp"
+	"src/SplayPyramidTree.cpp"
 	# Header files
 	"include/IndexStructure.h"
 	"include/SequentialScan.h"
@@ -12,6 +13,7 @@ add_library( index_structures
 	"include/PyramidTree.h"
 	"include/SplayQuadtree.h"
 	"include/SplayTree.h"
+	"include/SplayPyramidTree.h"
 )
 # Ensure include directory is in search path
 include_directories ("include")
