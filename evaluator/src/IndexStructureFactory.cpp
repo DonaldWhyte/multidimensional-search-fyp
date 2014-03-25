@@ -3,6 +3,8 @@
 #include "SequentialScan.h"
 #include "Octree.h"
 #include "PyramidTree.h"
+#include "SplayPyramidTree.h"
+
 #include <boost/lexical_cast.hpp>
 
 namespace mdsearch
@@ -81,6 +83,24 @@ namespace mdsearch
 		}
 	}
 
+	IndexStructure* generateSplayPyramidTree(unsigned int numDimensions,
+		const std::vector<std::string>& args)
+	{
+		// Check there are enough arguments to construct n-dimensional boundary
+		if (args.size() < 2) // min + max args for every dimension
+			return NULL;
+
+		try
+		{
+			Region boundary = parseBoundary(numDimensions, args);
+			return new SplayPyramidTree(numDimensions, boundary);
+		}	
+		catch (const boost::bad_lexical_cast& ex)
+		{
+			return NULL;
+		}		
+	}	
+
 
 
 
@@ -90,6 +110,7 @@ namespace mdsearch
 		addGenerator("sequential_scan", generateSequentialScan);
 		addGenerator("octree", generateOctree);
 		addGenerator("pyramid_tree", generatePyramidTree);
+		addGenerator("splay_pyramid_tree", generateSplayPyramidTree);
 	}
 
 	void IndexStructureFactory::addGenerator(const std::string& structureType,
