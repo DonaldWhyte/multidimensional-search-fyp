@@ -22,7 +22,7 @@ A variety of measurements have been used to evaluate the performance of index st
 
 One assumption being made about the target data is that it is dynamic, meaning points may be inserted or deleted at any time. For query performance, the evaluation will focus on the performance of point queries. Therefore, index structures will be evaluated using the performance of their \textbf{insert}, \textbf{delete} and \textbf{point query} operations.
 
-\section{Amortisation of Tests}
+\section{Measuing Operation Performance}
 
 TODO: explain what amortmisation is
 
@@ -34,9 +34,11 @@ This project will use this concept for evaluation by measuring the \textit{avera
 	\item \textbf{Query Points} -- query each point in the dataset, which should not be in the structure
 	\item \textbf{Delete Points} -- delete each point in the dataset from the structure until it is empty
 \end{enumerate}
-Using this process allows the \textbf{average} performance of large numbers of \texttt{insert}, \texttt{delete} and point query operations to be computed. 
+Using this process allows the average performance of large numbers of \texttt{insert}, \texttt{delete} and point query operations to be computed. 
 
 By interleaving \texttt{insert} and \texttt{delete} operations with a number of point queries, more insight can be gained into how well the implementations perform in real applications that use dynamic data structures, where the pattern of operations is less straightforward. The performance of the implementations on interleaved operations may be different from the test process described previously due to cache coherency. The contents of the cache may change frequently due to different operations being performed consecutively, potentially causing a greater number of cache misses.
+
+TODO: formally defined an operation test
 
 TODO: mention trace of Joint Contour Net behaviour that will be used to see how the index structures perform with a real application -- AND TO SEE HOW INTERLEAVED OPERATIONS 
 
@@ -51,6 +53,8 @@ The real dataset being used for the evaluation is the result of an \textbf{astro
 The astrophysics was chosen because it is large (almost 37 million points) and has a high number of dimensions (10). The core focus of the project is high-dimensional data, so this data will provide a true test of how well the implementations perform with real instances of such data. Various resolutions of the dataset may be used for testing to reduce the amount of data being tested at any one point. Datasets with smaller resolutions will be constructed by \textbf{uniformly sampling} the points of the original simulation's mesh.
 
 TODO: how the astrophysics dataset was uniformly sampled
+
+TODO: table listing all the different datasets and OPERATION LISTS that were used for tests
 
 \section{Baselines}
 

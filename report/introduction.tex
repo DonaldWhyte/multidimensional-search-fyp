@@ -56,6 +56,7 @@ Throughout the project, some assumptions have been made. These are used to narro
 	\item Datasets have a ``high" number of dimensions ($\geq 10$), meaning the performance of the index structures will be measured using data with at least 10 dimensions. However, data using a smaller number of dimensions may be used for the purposes of understanding how the implementations behave with respect to dimensionality.
 	\item Datasets will be able to fit into the main memory (i.e. RAM) of the machine used for evaluation. That is, none of the data is paged to secondary memory and page accesses causing reduced performance does not need to be considered.
 	\item Datasets are dynamic, meaning points may be inserted, deleted or updated at any time.
+	\item Structures only store \textit{unique} points, meaning a structure cannot store two points with identical coordinates
 \end{enumerate}
 Furthermore, the project is focused on the \textit{geometric} applications of multi-dimensional search and not databases. This is the primary reason assumption (2) has been made.
 
