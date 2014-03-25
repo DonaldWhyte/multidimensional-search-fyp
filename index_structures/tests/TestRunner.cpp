@@ -6,6 +6,7 @@
 #include "TestOctree.h"
 #include "TestPyramidTree.h"
 #include "TestSplayQuadtree.h"
+#include "TestSplayTree.h"
 
 int main(int argc, char* argv[])
 {

@@ -24,9 +24,12 @@ build
 # Compile Python scripts
 *.pyc
 
-# File containing large test data
+# Directory containing large test data
 test_data
 test_data/*
+# Directories containing intermittent results
+scripts/results
+scripts/results/*
 
 
 # Stuff for LaTeX documents
