@@ -5,7 +5,6 @@ add_library( index_structures
 	"src/Octree.cpp"
 	"src/PyramidTree.cpp"
 	"src/SplayQuadtree.cpp"
-	"src/SplayTree.cpp"
 	# Header files
 	"include/IndexStructure.h"
 	"include/SequentialScan.h"
