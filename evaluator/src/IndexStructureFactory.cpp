@@ -50,7 +50,25 @@ namespace mdsearch
 		{
 			return NULL;
 		}		
-	}	
+	}
+
+	IndexStructure* generatePyramidTree(unsigned int numDimensions,
+		const std::vector<std::string>& args)
+	{
+		// Check there are enough arguments to construct n-dimensional boundary
+		if (args.size() < 2) // min + max args for every dimension
+			return NULL;
+
+		try
+		{
+			Region boundary = parseBoundary(numDimensions, args);
+			return new PyramidTree(numDimensions, boundary);
+		}	
+		catch (const boost::bad_lexical_cast& ex)
+		{
+			return NULL;
+		}		
+	}		
 
 	IndexStructure* generateIndexPyramidTree(unsigned int numDimensions,
 		const std::vector<std::string>& args)
@@ -118,6 +136,7 @@ namespace mdsearch
 		// Add generators defined in this source file
 		addGenerator("sequential_scan", generateSequentialScan);
 		addGenerator("octree", generateOctree);
+		addGenerator("pyramid_tree", generateIndexPyramidTree);
 		addGenerator("index_pyramid_tree", generateIndexPyramidTree);
 		addGenerator("splay_pyramid_tree", generateSplayPyramidTree);
 	}
