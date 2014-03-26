@@ -1,5 +1,5 @@
-#ifndef MDSEARCH_PYRAMIDTREE_H
-#define MDSEARCH_PYRAMIDTREE_H
+#ifndef MDSEARCH_INDEXPYRAMIDTREE_H
+#define MDSEARCH_INDEXPYRAMIDTREE_H
 
 #include <vector>
 #include <boost/unordered_map.hpp>
@@ -17,7 +17,7 @@ namespace mdsearch
 		}
 	};
 
-	class PyramidTree : public IndexStructure
+	class IndexPyramidTree : public IndexStructure
 	{
 
 	public:
@@ -27,7 +27,7 @@ namespace mdsearch
 			CLEANUP_PROC_REBUILD
 		};
 
-		PyramidTree(unsigned int numDimensions, const Region& boundary,
+		IndexPyramidTree(unsigned int numDimensions, const Region& boundary,
 			int maxEmptyElements = DEFAULT_MAX_EMPTY_ELEMENTS,
 			CleanupProcedure cleanupProcedure = CLEANUP_PROC_DEFRAGMENT);
 

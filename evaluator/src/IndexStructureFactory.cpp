@@ -3,6 +3,7 @@
 #include "SequentialScan.h"
 #include "Octree.h"
 #include "PyramidTree.h"
+#include "IndexPyramidTree.h"
 #include "SplayPyramidTree.h"
 
 #include <boost/lexical_cast.hpp>
@@ -51,7 +52,7 @@ namespace mdsearch
 		}		
 	}	
 
-	IndexStructure* generatePyramidTree(unsigned int numDimensions,
+	IndexStructure* generateIndexPyramidTree(unsigned int numDimensions,
 		const std::vector<std::string>& args)
 	{
 		unsigned int requiredArgCount = 2;
@@ -73,17 +74,17 @@ namespace mdsearch
 					return NULL;
 			}
 			// Parse optional 'CLEANUP PROCEDURE' ARGUMENT
-			PyramidTree::CleanupProcedure cleanupProc = PyramidTree::CLEANUP_PROC_DEFRAGMENT; // default is defragmentation
+			IndexPyramidTree::CleanupProcedure cleanupProc = IndexPyramidTree::CLEANUP_PROC_DEFRAGMENT; // default is defragmentation
 			if (args.size() >= requiredArgCount + 2)
 			{
 				const std::string& procStr = args[requiredArgCount];
 				if (procStr == "defragment")
-					cleanupProc = PyramidTree::CLEANUP_PROC_DEFRAGMENT;
+					cleanupProc = IndexPyramidTree::CLEANUP_PROC_DEFRAGMENT;
 				else if (procStr == "rebuild")
-					cleanupProc = PyramidTree::CLEANUP_PROC_REBUILD;
+					cleanupProc = IndexPyramidTree::CLEANUP_PROC_REBUILD;
 			}
 
-			return new PyramidTree(numDimensions, boundary, maxEmptyElements, cleanupProc);
+			return new IndexPyramidTree(numDimensions, boundary, maxEmptyElements, cleanupProc);
 		}	
 		catch (const boost::bad_lexical_cast& ex)
 		{
@@ -117,7 +118,7 @@ namespace mdsearch
 		// Add generators defined in this source file
 		addGenerator("sequential_scan", generateSequentialScan);
 		addGenerator("octree", generateOctree);
-		addGenerator("pyramid_tree", generatePyramidTree);
+		addGenerator("index_pyramid_tree", generateIndexPyramidTree);
 		addGenerator("splay_pyramid_tree", generateSplayPyramidTree);
 	}
 

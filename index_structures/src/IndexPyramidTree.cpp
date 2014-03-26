@@ -1,10 +1,10 @@
-#include "PyramidTree.h"
+#include "IndexPyramidTree.h"
 #include "Util.h"
 
 namespace mdsearch
 {
 
-	PyramidTree::PyramidTree(unsigned int nDimensions, const Region& treeBoundary,
+	IndexPyramidTree::IndexPyramidTree(unsigned int nDimensions, const Region& treeBoundary,
 		int maxEmptyElements, CleanupProcedure cleanupProcedure) :
 		IndexStructure(nDimensions),
 		maxEmptyElements(maxEmptyElements), cleanupProcedure(cleanupProcedure),
@@ -33,7 +33,7 @@ namespace mdsearch
 		}
 	}
 
-	void PyramidTree::clear()
+	void IndexPyramidTree::clear()
 	{
 		// NOTE: Using assigment not clear() to ensure memory is de-allocated
 		// (through destructors of containers)
@@ -43,7 +43,7 @@ namespace mdsearch
 		emptyElementIndices = IndexList();
 	}
 
-	bool PyramidTree::insert(const Point& point)
+	bool IndexPyramidTree::insert(const Point& point)
 	{
 		// TODO: add boundary check w/ point here???
 		
@@ -60,7 +60,7 @@ namespace mdsearch
 		}
 	}
 
-	bool PyramidTree::remove(const Point& point)
+	bool IndexPyramidTree::remove(const Point& point)
 	{
 		// Find bucket the point would belong to
 		int searchKey = hashPoint(point);
@@ -111,7 +111,7 @@ namespace mdsearch
 		}
 	}
 
-	bool PyramidTree::update(const Point& oldPoint, const Point& newPoint)
+	bool IndexPyramidTree::update(const Point& oldPoint, const Point& newPoint)
 	{
 		if (remove(oldPoint)) // if point was removed successfully (i.e. it existed)
 		{
@@ -124,33 +124,33 @@ namespace mdsearch
 		}
 	}
 
-	bool PyramidTree::pointExists(const Point& point)
+	bool IndexPyramidTree::pointExists(const Point& point)
 	{
 		return (getPointIndex(point) >= 0);
 	}
 
-	PointList PyramidTree::pointsInRegion(const Region& region)
+	PointList IndexPyramidTree::pointsInRegion(const Region& region)
 	{
 		// TODO
 		return PointList();
 	}
 
-	const PointList& PyramidTree::allPoints() const
+	const PointList& IndexPyramidTree::allPoints() const
 	{
 		return points;
 	}
 
-	const IndexList& PyramidTree::emptyIndices() const
+	const IndexList& IndexPyramidTree::emptyIndices() const
 	{
 		return emptyElementIndices;
 	}
 
-	const Region& PyramidTree::getBoundary() const
+	const Region& IndexPyramidTree::getBoundary() const
 	{
 		return boundary;
 	}
 
-	void PyramidTree::insertToStructure(const Point& point, bool searchKeyExists)
+	void IndexPyramidTree::insertToStructure(const Point& point, bool searchKeyExists)
 	{
 		// Add raw point adn the sum of all its elements to the vectors
 		points.push_back(point);
@@ -176,7 +176,7 @@ namespace mdsearch
 		}
 	}
 
-	int PyramidTree::getPointIndex(const Point& point)
+	int IndexPyramidTree::getPointIndex(const Point& point)
 	{
 		// First check if this point's bucket exists
 		int searchKey = hashPoint(point);
@@ -212,7 +212,7 @@ namespace mdsearch
 		}
 	}	
 
-	int PyramidTree::hashPoint(const Point& point)
+	int IndexPyramidTree::hashPoint(const Point& point)
 	{
 		int searchKey = 0 ;
 		int value[numDimensions];
@@ -245,7 +245,7 @@ namespace mdsearch
 		return (i > j);	
 	}
 
-	void PyramidTree::defragment()
+	void IndexPyramidTree::defragment()
 	{
 		// Sort indices list in DESCENDING ORDER
 		// Done so indices aren't changed by previously removed elements
@@ -264,7 +264,7 @@ namespace mdsearch
 		emptyElementIndices.clear();
 	}
 
-	void PyramidTree::updatePointIndices(unsigned int removedIndex)
+	void IndexPyramidTree::updatePointIndices(unsigned int removedIndex)
 	{
 		for (OneDMap::iterator entry = hashMap.begin(); (entry != hashMap.end()); entry++)
 		{
@@ -279,7 +279,7 @@ namespace mdsearch
 		}
 	}
 
-	void PyramidTree::rebuild()
+	void IndexPyramidTree::rebuild()
 	{
 		// Store old points to re-insert into structure
 		PointList oldPoints = points;

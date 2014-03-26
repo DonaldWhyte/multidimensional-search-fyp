@@ -4,6 +4,7 @@ add_library( index_structures
 	"src/SequentialScan.cpp"
 	"src/Octree.cpp"
 	"src/PyramidTree.cpp"
+	"src/IndexPyramidTree.cpp"
 	"src/SplayQuadtree.cpp"
 	"src/SplayPyramidTree.cpp"
 	# Header files
@@ -11,6 +12,7 @@ add_library( index_structures
 	"include/SequentialScan.h"
 	"include/Octree.h"
 	"include/PyramidTree.h"
+	"include/IndexPyramidTree.h"
 	"include/SplayQuadtree.h"
 	"include/SplayTree.h"
 	"include/SplayPyramidTree.h"
@@ -27,6 +29,7 @@ add_executable ( structure_tests
 	"tests/TestSequentialScan.h"
 	"tests/TestOctree.h"
 	"tests/TestPyramidTree.h"
+	"tests/TestIndexPyramidTree.h"
 	"tests/TestSplayQuadtree.h"
 	"tests/TestSplayTree.h"
 )

@@ -25,14 +25,14 @@ namespace mdsearch { namespace tests
 
 	TEST_F(SplayPyramidTreeTests, Construction)
 	{
-		PyramidTree structure(NUM_DIMENSIONS, initialBoundary);
+		SplayPyramidTree structure(NUM_DIMENSIONS, initialBoundary);
 		ASSERT_EQ(NUM_DIMENSIONS, structure.dimensionality());
 		ASSERT_EQ(initialBoundary, structure.getBoundary());
 	}
 
 	TEST_F(SplayPyramidTreeTests, Clear)
 	{
-		PyramidTree structure(NUM_DIMENSIONS, initialBoundary);
+		SplayPyramidTree structure(NUM_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();
 		structure.loadPoints(testPoints);
@@ -48,7 +48,7 @@ namespace mdsearch { namespace tests
 
 	TEST_F(SplayPyramidTreeTests, InsertionAndRemoval)
 	{
-		PyramidTree structure(NUM_DIMENSIONS, initialBoundary);
+		SplayPyramidTree structure(NUM_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();
 
@@ -76,14 +76,14 @@ namespace mdsearch { namespace tests
 
 	TEST_F(SplayPyramidTreeTests, Updating)
 	{
-		PyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
+		SplayPyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		tester.testUpdates(&structure);
 	}
 
 	TEST_F(SplayPyramidTreeTests, PointQueries)
 	{
-		PyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
+		SplayPyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		tester.testPointQueries(&structure);
 	}
@@ -92,7 +92,7 @@ namespace mdsearch { namespace tests
 	{
 		// TODO
 		/*
-		PyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
+		SplayPyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		tester.testRegionQueries(&structure);*/
 	}
