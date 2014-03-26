@@ -13,7 +13,7 @@ Trees are often used to order data items in a hierarchical fashion to accelerate
 
 A point query is equivalent to checking if a certain key is stored in the tree. In the best case, we get running time $O(\log_2 n)$ for the query, as the height of the tree is $\log_2 n$. However, this performance is not guaranteed. Skewed or sorted data may result in taller trees, where there are many nodes with only left or only right children. This makes the binary tree \textbf{unbalanced} (height greater than $\log_2 n$). Therefore, if balance is not guaranteed, the running time of a point query is $O(n)$ in the worst case (no better than a sequential search).
 
-Balanced search trees are trees which re-order the nodes to maintain balance (logarithmic height) when a node is inserted, updated or deleted, regardless of data skew. These operations cause dynamic index structure operations to become slower, but allow for faster queries. Examples of balanced search trees include red-black trees, AVL trees and Splay trees and treaps \cite{introduction-to-algorithms}.
+Balanced search trees are trees which re-order the nodes to maintain balance (logarithmic height) when a node is inserted, updated or deleted, regardless of data skew. These operations cause dynamic index structure operations to become slower, but allow for faster queries. Examples of balanced search trees include red-black trees, AVL trees, Splay trees and treaps \cite{introduction-to-algorithms}.
 
 \subsection{Recursive Partitioning of Data Space}
 \label{sec:recursive-partition-structures}
@@ -125,6 +125,7 @@ One method of reducing the effects of the curse of dimensionality is reducing th
 PCA struggles with dynamic data; if the data changes then the computed transformation will go out of sync and queries will be even less accurate. The transformation could be re-computed whenever a point is added, removed or changed but doing so takes a very long time, making dynamic operations really slow. Therefore, these dimension reducing techniques are mostly suitable to static datasets where full accuracy is not required.
 
 \subsubsection{Pyramid Tree}
+\label{sec:pyramid-tree}
 
 The Pyramid tree is specifically targeted towards high-dimensional data \cite{pyramid-tree}. They partition the data space into $2d$ pyramids and map $d$-dimensional data items to \textbf{one-dimensional space}, storing the mapped 1D points in a B${}^{+}$-tree. This one-dimensional representation is achieved by describing a data point in terms of \textit{which} pyramid it is contained in and \textit{where} in the specified pyramid it is. Queries are given as $d$-dimensional points which are reduced to one dimension before they're applied, reducing the effects of the curse of dimensionality. Even though data points are stored in a one-dimensional B${}^{+}$-tree, the original data is maintained since the original $d$-dimensional point is stored alongside its 1D representation. Hence, pyramid trees reduce the dimensionality of the data but retain all of the original information (unlike PCA).
 

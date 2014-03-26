@@ -22,25 +22,29 @@ A variety of measurements have been used to evaluate the performance of index st
 
 One assumption being made about the target data is that it is dynamic, meaning points may be inserted or deleted at any time. For query performance, the evaluation will focus on the performance of point queries. Therefore, index structures will be evaluated using the performance of their \textbf{insert}, \textbf{delete} and \textbf{point query} operations.
 
-A typical performance test will have the following steps:
+\section{Measuing Operation Performance}
+
+TODO: explain what amortmisation is
+
+TODO: state that it has been used for theoretical analysis of algorithms (amortised analysis), such as the splay quadtree, quadtreap and Splay tree (Robert Tarjan was first one to use such a thing, or one of the first???)
+
+This project will use this concept for evaluation by measuring the \textit{average} runtime of each operation, over many thousands of such operations. A typical performance test therefore has the following steps:
 \begin{enumerate}
-	\item Incrementally build structure by adding each point in test dataset one-by-one
-	\item Perform point queries with points in the structure and points that are not
-	\item Interleave \texttt{insert} and \texttt{delete} operations with a number of point queries
+	\item \textbf{Initial Build} -- incrementally build structure by adding each point in test dataset one-by-one
+	\item \textbf{Query Points} -- query each point in the dataset, which should not be in the structure
+	\item \textbf{Delete Points} -- delete each point in the dataset from the structure until it is empty
 \end{enumerate}
-Using this process allows the \textbf{average} performance of large numbers of \texttt{insert}, \texttt{delete} and point query operations to be computed. How well the implementations perform with a mixture of operations can also be determined. For example, the contents of the cache may change rapidly due to different operations being performed consecutively, highlighting if cache locality has an impact on the performance of those implementations.
+Using this process allows the average performance of large numbers of \texttt{insert}, \texttt{delete} and point query operations to be computed. 
 
-TODO: how points were chosen
+By interleaving \texttt{insert} and \texttt{delete} operations with a number of point queries, more insight can be gained into how well the implementations perform in real applications that use dynamic data structures, where the pattern of operations is less straightforward. The performance of the implementations on interleaved operations may be different from the test process described previously due to cache coherency. The contents of the cache may change frequently due to different operations being performed consecutively, potentially causing a greater number of cache misses.
 
-\section{Baseline}
+TODO: formally defined an operation test
 
-There is little use in measuring the performance of the implemented index structures for the purposes of evaluation if there is nothing to compare the results to. As such, two baseline index structure implementations will be developed -- \textbf{sequential scan} and the \textbf{PR quadtree} (see Section \ref{sec:recursive-partition-structures}). The reason for choosing sequential scan as a baseline is that it's the na\"{i}ve brute-force approach to performing search. The PR quadtree is the basis of many index structures, both old and new. Thus, the structure is well-known in the field and makes a suitable baseline.
-
-These baselines will be developed in C++ to match the technology used to develop the initially implemented index structure.
+TODO: mention trace of Joint Contour Net behaviour that will be used to see how the index structures perform with a real application -- AND TO SEE HOW INTERLEAVED OPERATIONS 
 
 \section{Data}
 
-Both synthetic, artificially generated data and a real dataset will be used for the evaluation. Three types of \textbf{synthetic} datasets will be generated -- uniform distributed, skewed and clustered. Multiple instances of these datasets will be used, with varying numbers of dimensions (e.g. 1, 2, 3, 5, 10, 50, 100). Using such datasets was inspired by Wang et al. and Berchtold et al., who used similar datasets to evaluate the performance of the PK-tree and pyramid tree respectively \cite{pk-tree, pyramid-tree}. The reason for testing the index structures with these datasets is that the variety of point distributions and number of dimensions should tease out which data the implementations struggle with and which they work well at.
+Both synthetic, artificially generated data and a real dataset will be used for the evaluation. Three types of \textbf{synthetic} datasets will be generated -- uniformly distributed, skewed and clustered. Multiple instances of these datasets will be used, with varying numbers of dimensions (e.g. 1, 2, 3, 5, 10, 50, 100). Using such datasets was inspired by Wang et al. and Berchtold et al., who used similar datasets to evaluate the performance of the PK-tree and pyramid tree respectively \cite{pk-tree, pyramid-tree}. The reason for testing the index structures with these datasets is that the variety of point distributions and number of dimensions should tease out which data the implementations struggle with and which they work well at.
 
 TODO: how synthetic data was generated
 
@@ -49,3 +53,11 @@ The real dataset being used for the evaluation is the result of an \textbf{astro
 The astrophysics was chosen because it is large (almost 37 million points) and has a high number of dimensions (10). The core focus of the project is high-dimensional data, so this data will provide a true test of how well the implementations perform with real instances of such data. Various resolutions of the dataset may be used for testing to reduce the amount of data being tested at any one point. Datasets with smaller resolutions will be constructed by \textbf{uniformly sampling} the points of the original simulation's mesh.
 
 TODO: how the astrophysics dataset was uniformly sampled
+
+TODO: table listing all the different datasets and OPERATION LISTS that were used for tests
+
+\section{Baselines}
+
+There is little use in measuring the performance of the implemented index structures for the purposes of evaluation if there is nothing to compare the results to. As such, two baseline index structure implementations will be developed -- \textbf{sequential scan} and the \textbf{PR octree} (see Section \ref{sec:recursive-partition-structures}). The reason for choosing sequential scan as a baseline is that it's the na\"{i}ve brute-force approach to performing search. The PR octree is the basis of many index structures, both old and new. Thus, the structure is well-known in the field and makes a suitable baseline.
+
+These baselines will be developed in C++ to match the technology used to develop the initially implemented index structure.
