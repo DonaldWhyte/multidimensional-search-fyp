@@ -62,7 +62,7 @@ namespace mdsearch
 		{
 			Region boundary = parseBoundary(numDimensions, args);
 			// Parse optional "MAX EMPTY ELEMENTS ALLOWED" argument
-			int maxEmptyElements = -2;
+			int maxEmptyElements = -1; // default is NO CLEANING UP EMPTY ELEMENTS
 			if (args.size() >= requiredArgCount + 1)
 			{
 				const std::string& emptyElementArg = args[requiredArgCount];
@@ -72,10 +72,18 @@ namespace mdsearch
 				if (maxEmptyElements < -2)
 					return NULL;
 			}
-			if (maxEmptyElements != -2) // if a value was given, we don't use the default
-				return new PyramidTree(numDimensions, boundary, maxEmptyElements);
-			else
-				return new PyramidTree(numDimensions, boundary); // use default
+			// Parse optional 'CLEANUP PROCEDURE' ARGUMENT
+			PyramidTree::CleanupProcedure cleanupProc = PyramidTree::CLEANUP_PROC_DEFRAGMENT; // default is defragmentation
+			if (args.size() >= requiredArgCount + 2)
+			{
+				const std::string& procStr = args[requiredArgCount];
+				if (procStr == "defragment")
+					cleanupProc = PyramidTree::CLEANUP_PROC_DEFRAGMENT;
+				else if (procStr == "rebuild")
+					cleanupProc = PyramidTree::CLEANUP_PROC_REBUILD;
+			}
+
+			return new PyramidTree(numDimensions, boundary, maxEmptyElements, cleanupProc);
 		}	
 		catch (const boost::bad_lexical_cast& ex)
 		{
