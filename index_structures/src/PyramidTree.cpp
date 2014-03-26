@@ -5,10 +5,10 @@ namespace mdsearch
 {
 
 	PyramidTree::PyramidTree(unsigned int nDimensions, const Region& treeBoundary,
-		int maxEmptyElements) :
+		int maxEmptyElements, CleanupProcedure cleanupProcedure) :
 		IndexStructure(nDimensions),
-		maxEmptyElements(maxEmptyElements), boundary(treeBoundary), 
-		bucketInterval(1), medianPoint(nDimensions)
+		maxEmptyElements(maxEmptyElements), cleanupProcedure(cleanupProcedure),
+		boundary(treeBoundary),  bucketInterval(1), medianPoint(nDimensions)
 	{
 		// Compute the interval between buckets 
 		bucketInterval = static_cast<Real>(
@@ -86,11 +86,14 @@ namespace mdsearch
 				// Remove index pointing to the point in the bucket
 				indices.erase(pointIndex);
 				// If the amount of empty elements of the point array is
-				// higher than a certain threshold, DEFRAGMENT the structure
-				if (maxEmptyElements != -1 && // NOTE: -1 means the list should NOT be defragmented
+				// higher than a certain threshold, clean up unused points
+				if (maxEmptyElements != -1 && // NOTE: -1 means the list should NOT be cleaned
 					emptyElementIndices.size() >= maxEmptyElements)
 				{
-					defragment();
+					if (cleanupProcedure == CLEANUP_PROC_REBUILD)
+						rebuild();
+					else
+						defragment();
 				}
 
 				return true;
@@ -274,6 +277,25 @@ namespace mdsearch
 				}
 			}
 		}
+	}
+
+	void PyramidTree::rebuild()
+	{
+		// Store old points to re-insert into structure
+		PointList oldPoints = points;
+		// Clear all data from structure
+		points.clear();
+		pointSums.clear();
+		hashMap.clear();
+		// Insert non-marked pooints into structure incrementally
+		for (unsigned int i = 0; (i < oldPoints.size()); i++)
+		{
+			// Only insert point if its old index has NOT been marked as empty
+			if (std::find(emptyElementIndices.begin(), emptyElementIndices.end(), i) == emptyElementIndices.end())
+				insert(oldPoints[i]);
+		}
+		// Now clear the marked elements list
+		emptyElementIndices.clear();
 	}
 
 }

@@ -18,6 +18,39 @@ namespace mdsearch { namespace tests
 			initialBoundary = Region(3, initialBoundaryIntervals);			
 		}
 
+		void testCleanupProcedure(PyramidTree& structure)
+		{
+			IndexStructureTester tester;
+			const PointList& testPoints = tester.getTestPoints();
+			// Insert some points into the structure
+			structure.insert(testPoints[0]);
+			structure.insert(testPoints[1]);
+			structure.insert(testPoints[2]);
+			structure.insert(testPoints[3]);
+			ASSERT_EQ(4, structure.allPoints().size());
+			ASSERT_TRUE(structure.pointExists(testPoints[0]));
+			ASSERT_TRUE(structure.pointExists(testPoints[1]));
+			ASSERT_TRUE(structure.pointExists(testPoints[2]));
+			ASSERT_TRUE(structure.pointExists(testPoints[3]));
+			// Remove one point and ensure nothing is deleted from point list
+			structure.remove(testPoints[0]);
+			ASSERT_EQ(4, structure.allPoints().size());
+			ASSERT_EQ(1, structure.emptyIndices().size());
+			ASSERT_EQ(0, structure.emptyIndices()[0]);
+			// Remove another point. Empty indices should now be empty and the two
+			// points should be removed (WITH THE ORIGINAL ORDER OF INSERTION INTACT!)
+			structure.remove(testPoints[2]);
+			ASSERT_EQ(2, structure.allPoints().size());
+			ASSERT_EQ(testPoints[1], structure.allPoints()[0]);
+			ASSERT_EQ(testPoints[3], structure.allPoints()[1]);
+			ASSERT_EQ(0, structure.emptyIndices().size());
+			// Test point queries work correctly after defragmentation
+			EXPECT_FALSE(structure.pointExists(testPoints[0]));
+			EXPECT_TRUE(structure.pointExists(testPoints[1]));
+			EXPECT_FALSE(structure.pointExists(testPoints[2]));
+			EXPECT_TRUE(structure.pointExists(testPoints[3]));	
+		}
+
 		static const unsigned int NUM_DIMENSIONS = 3;
 		Region initialBoundary;
 
@@ -131,36 +164,18 @@ namespace mdsearch { namespace tests
 	TEST_F(PyramidTreeTests, Defragment)
 	{
 		// Make max empty elements 2 for testing purposes
-		PyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary, 2);
-		IndexStructureTester tester;
-		const PointList& testPoints = tester.getTestPoints();
-		// Insert some points into the structure
-		structure.insert(testPoints[0]);
-		structure.insert(testPoints[1]);
-		structure.insert(testPoints[2]);
-		structure.insert(testPoints[3]);
-		ASSERT_EQ(4, structure.allPoints().size());
-		ASSERT_TRUE(structure.pointExists(testPoints[0]));
-		ASSERT_TRUE(structure.pointExists(testPoints[1]));
-		ASSERT_TRUE(structure.pointExists(testPoints[2]));
-		ASSERT_TRUE(structure.pointExists(testPoints[3]));		
-		// Remove one point and ensure nothing is deleted from point list
-		structure.remove(testPoints[0]);
-		ASSERT_EQ(4, structure.allPoints().size());
-		ASSERT_EQ(1, structure.emptyIndices().size());
-		ASSERT_EQ(0, structure.emptyIndices()[0]);
-		// Remove another point. Empty indices should now be empty and the two
-		// points should be removed (WITH THE ORIGINAL ORDER OF INSERTION INTACT!)
-		structure.remove(testPoints[2]);
-		ASSERT_EQ(2, structure.allPoints().size());
-		ASSERT_EQ(testPoints[1], structure.allPoints()[0]);
-		ASSERT_EQ(testPoints[3], structure.allPoints()[1]);
-		ASSERT_EQ(0, structure.emptyIndices().size());
-		// Test point queries work correctly after defragmentation
-		EXPECT_FALSE(structure.pointExists(testPoints[0]));
-		EXPECT_TRUE(structure.pointExists(testPoints[1]));
-		EXPECT_FALSE(structure.pointExists(testPoints[2]));
-		EXPECT_TRUE(structure.pointExists(testPoints[3]));
+		PyramidTree defragStructure(IndexStructureTester::NUM_TEST_DIMENSIONS,
+			initialBoundary, 2, PyramidTree::CLEANUP_PROC_DEFRAGMENT);
+		testCleanupProcedure(defragStructure);
+		
+	}
+
+	TEST_F(PyramidTreeTests, Rebuild)
+	{
+		// Make max empty elements 2 for testing purposes
+		PyramidTree rebuildStructure(IndexStructureTester::NUM_TEST_DIMENSIONS,
+			initialBoundary, 2, PyramidTree::CLEANUP_PROC_REBUILD);
+		testCleanupProcedure(rebuildStructure);		
 	}
 
 } }

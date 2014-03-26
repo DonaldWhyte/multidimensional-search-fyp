@@ -21,8 +21,15 @@ namespace mdsearch
 	{
 
 	public:
+		enum CleanupProcedure
+		{
+			CLEANUP_PROC_DEFRAGMENT = 0,
+			CLEANUP_PROC_REBUILD
+		};
+
 		PyramidTree(unsigned int numDimensions, const Region& boundary,
-			int maxEmptyElements = DEFAULT_MAX_EMPTY_ELEMENTS);
+			int maxEmptyElements = DEFAULT_MAX_EMPTY_ELEMENTS,
+			CleanupProcedure cleanupProcedure = CLEANUP_PROC_DEFRAGMENT);
 
 		/* Clear all points currently stored in the structure. */
 		virtual void clear();
@@ -68,6 +75,10 @@ namespace mdsearch
 		/* Given the index of the last removed point in the 'points' array,
 		 * update the remaining index entries in the hash table. */
 		void updatePointIndices(unsigned int removedIndex);
+		/* Rebuilts the entire Pyramid tree structure, ensuring unused
+		 * points (which have been marked for deletion) are not present
+		 * in the  new structure. */
+		void rebuild();
 
 		// Contains all the full d-dimensional points stored in the Pyramid tree
 		PointList points;
@@ -88,6 +99,7 @@ namespace mdsearch
 		// Maximum amount of empty elements allowed before the list is defragmented
 		// A value of -1 means the point list will NEVER be defragmented
 		int maxEmptyElements;
+		CleanupProcedure cleanupProcedure;
 
 		// Entire region of space the Pyramid tree covers
 		// (points outside this region are ignored)
