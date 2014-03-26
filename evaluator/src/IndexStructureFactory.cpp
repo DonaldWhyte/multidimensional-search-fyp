@@ -136,7 +136,7 @@ namespace mdsearch
 		// Add generators defined in this source file
 		addGenerator("sequential_scan", generateSequentialScan);
 		addGenerator("octree", generateOctree);
-		addGenerator("pyramid_tree", generateIndexPyramidTree);
+		addGenerator("pyramid_tree", generatePyramidTree);
 		addGenerator("index_pyramid_tree", generateIndexPyramidTree);
 		addGenerator("splay_pyramid_tree", generateSplayPyramidTree);
 	}
