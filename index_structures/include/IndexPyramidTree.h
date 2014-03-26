@@ -4,18 +4,10 @@
 #include <vector>
 #include <boost/unordered_map.hpp>
 #include "IndexStructure.h"
+#include "PyramidTree.h" // for 'ihash' structure
 
 namespace mdsearch
 {
-
-	/* Hash function used for the underlying 1D hash map data structure. */
-	struct ihash : std::unary_function<int, size_t>
-	{
-		size_t operator()(int const& x) const
-		{
-			return x;
-		}
-	};
 
 	class IndexPyramidTree : public IndexStructure
 	{
@@ -58,7 +50,7 @@ namespace mdsearch
 		const PointList& allPoints() const;
 		/* Return indices of all ele,ents of point array which are deleted. */
 		const IndexList& emptyIndices() const;
-		/* Return spatial region this Pyramid covers. */
+		/* Return spatial region this tree covers. */
 		const Region& getBoundary() const;
 
 	private:

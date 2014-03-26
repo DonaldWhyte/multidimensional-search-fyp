@@ -1,24 +1,39 @@
-#ifndef MDSEARCH_SPLAYPYRAMIDTREE_H
-#define MDSEARCH_SPLAYPYRAMIDTREE_H
+#ifndef MDSEARCH_PYRAMIDTREE_H
+#define MDSEARCH_PYRAMIDTREE_H
 
 #include <vector>
+#include <boost/unordered_map.hpp>
 #include "IndexStructure.h"
-#include "SplayTree.h"
-#include "PyramidTree.h"
 
 namespace mdsearch
 {
 
-	class SplayPyramidTree : public IndexStructure
+	/* Hash function used for the underlying 1D hash map data structure. */
+	struct ihash : std::unary_function<int, size_t>
+	{
+		size_t operator()(int const& x) const
+		{
+			return x;
+		}
+	};
+
+	/* Structure used for Pyramid tree buckets. */
+	struct PTBucket
+	{
+		PointList points;
+		RealList pointSums;
+	};	
+
+	class PyramidTree : public IndexStructure
 	{
 
 	public:
-		SplayPyramidTree(unsigned int numDimensions, const Region& boundary);
+		PyramidTree(unsigned int numDimensions, const Region& boundary);
 
 		/* Clear all points currently stored in the structure. */
 		virtual void clear();
 
-		/* Insert point into the tree.
+		/* Insert point into the Pyramid Tree.
 		 * Returns true if the point was inserted successfully and
 		 * false if the point is already stored in the structure. */
 		virtual bool insert(const Point& point);
@@ -36,7 +51,7 @@ namespace mdsearch
 		 * within the given spatial region. */
 		virtual PointList pointsInRegion(const Region& region);
 
-		/* Return spatial region this Pyramid covers. */
+		/* Return spatial region the tree covers. */
 		const Region& getBoundary() const;
 
 	private:
@@ -47,8 +62,12 @@ namespace mdsearch
 		int getPointIndexInBucket(const Point& point, const PTBucket* bucket) const;
 		int hashPoint(const Point& myPoint);
 
-		typedef SplayTree<int, PTBucket> SplayTreeType;
-		SplayTreeType splayTree;
+		// Unordered_map for storing the points
+		// Key = hashed 1D representation of point,
+		// Vsalue = list of points in BUCKET
+		// Each key can contain MULTIPLE indices
+		typedef boost::unordered_map<Real, PTBucket, ihash> OneDMap;
+		OneDMap hashMap;
 
 		// Entire region of space the Pyramid tree covers
 		// (points outside this region are ignored)

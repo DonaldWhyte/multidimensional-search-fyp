@@ -69,8 +69,8 @@ namespace mdsearch
 		if (keyValue != hashMap.end())
 		{
 			// Search through points in bucket to see if it contains the given point
-			std::vector<int>& indices = keyValue->second;
-			std::vector<int>::iterator pointIndex = indices.begin();
+			IndexList& indices = keyValue->second;
+			IndexList::iterator pointIndex = indices.begin();
 			for (pointIndex; (pointIndex != indices.end()); pointIndex++)
 			{
 				if (point == points[*pointIndex])

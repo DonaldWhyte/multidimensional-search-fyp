@@ -1,11 +1,12 @@
-#include "SplayPyramidTree.h"
+#include "PyramidTree.h"
+#include "Util.h"
 
 namespace mdsearch
 {
 
-	SplayPyramidTree::SplayPyramidTree(unsigned int nDimensions,
-		const Region& treeBoundary) : IndexStructure(nDimensions),
-		boundary(treeBoundary), bucketInterval(1), medianPoint(nDimensions)
+	PyramidTree::PyramidTree(unsigned int nDimensions, const Region& treeBoundary) :
+		IndexStructure(nDimensions), boundary(treeBoundary),
+		bucketInterval(1), medianPoint(nDimensions)
 	{
 		// Compute the interval between buckets 
 		bucketInterval = static_cast<Real>(
@@ -30,12 +31,14 @@ namespace mdsearch
 		}
 	}
 
-	void SplayPyramidTree::clear()
+	void PyramidTree::clear()
 	{
-		splayTree.clear();
+		// NOTE: Using assigment not clear() to ensure memory is de-allocated
+		// (through destructors of containers)
+		hashMap = OneDMap();
 	}
 
-	bool SplayPyramidTree::insert(const Point& point)
+	bool PyramidTree::insert(const Point& point)
 	{
 		// TODO: add boundary check w/ point here???
 		
@@ -60,7 +63,7 @@ namespace mdsearch
 		}
 	}
 
-	bool SplayPyramidTree::remove(const Point& point)
+	bool PyramidTree::remove(const Point& point)
 	{
 		PTBucket* bucket = getContainingBucket(point);
 		// PTBucket has been found, point MIGHT be stored in structure
@@ -87,7 +90,7 @@ namespace mdsearch
 		}
 	}
 
-	bool SplayPyramidTree::update(const Point& oldPoint, const Point& newPoint)
+	bool PyramidTree::update(const Point& oldPoint, const Point& newPoint)
 	{
 		if (remove(oldPoint)) // if point was removed successfully (i.e. it existed)
 		{
@@ -100,24 +103,24 @@ namespace mdsearch
 		}
 	}
 
-	bool SplayPyramidTree::pointExists(const Point& point)
+	bool PyramidTree::pointExists(const Point& point)
 	{
 		PTBucket* bucket = getContainingBucket(point);
 		return (bucket && (getPointIndexInBucket(point, bucket) != -1));
 	}
 
-	PointList SplayPyramidTree::pointsInRegion(const Region& region)
+	PointList PyramidTree::pointsInRegion(const Region& region)
 	{
 		// TODO
 		return PointList();
 	}
 
-	const Region& SplayPyramidTree::getBoundary() const
+	const Region& PyramidTree::getBoundary() const
 	{
 		return boundary;
 	}
 
-	void SplayPyramidTree::insertToStructure(const Point& point, PTBucket* bucket)
+	void PyramidTree::insertToStructure(const Point& point, PTBucket* bucket)
 	{
 		if (bucket) // if bucket for point already exisrs
 		{
@@ -130,19 +133,24 @@ namespace mdsearch
 			PTBucket newBucket;
 			newBucket.points.push_back(point);
 			newBucket.pointSums.push_back(point.sum());
-			splayTree.insert(searchKey, newBucket);
+			hashMap[searchKey] = newBucket;
 		}
 	}
 
-	PTBucket* SplayPyramidTree::getContainingBucket(const Point& point)
+	PTBucket* PyramidTree::getContainingBucket(const Point& point)
 	{
 		// Hash point into one-dimensional key
 		int searchKey = hashPoint(point);
 		// Search underlying splay tree to find point's bucket
-		return splayTree.getValue(searchKey);
+		OneDMap::iterator it = hashMap.find(searchKey);
+		if (it != hashMap.end())
+			return &(it->second); // pointer to bucket
+		else
+			return NULL;
 	}
 
-	int SplayPyramidTree::getPointIndexInBucket(const Point& point, const PTBucket* bucket) const
+	int PyramidTree::getPointIndexInBucket(const Point& point,
+		const PTBucket* bucket) const
 	{
 		// Search through points in bucket to see if it contains the given point
 		Real pSum = point.sum();
@@ -151,8 +159,9 @@ namespace mdsearch
 				return index;
 		return -1;
 	}
+	
 
-	int SplayPyramidTree::hashPoint(const Point& point)
+	int PyramidTree::hashPoint(const Point& point)
 	{
 		int searchKey = 0 ;
 		int value[numDimensions];
