@@ -52,62 +52,149 @@ When a point is deleted from a leaf, the contents of the leaf and all of its sib
 
 \subsection{Pyramid Tree}
 
-As described in Section \ref{sec:pyramid-tree}, the Pyramid tree reduces multi-dimensional points to one dimension, which can then be used in a one-dimensional index structure. The School of Computing have an existing implementation of the Pyramid tree, written by TODO. While Berchtold et al. in \cite{pyramid-tree} used a B${}^{+}$-tree as the underlying 1D structure, this implementation uses a hash map (specifically \texttt{boost::unordered\_map}). All the points are stored in a single \texttt{std::vector}. Each point is hashed to an integer representation which acts as the key to a bucket stored in the hash map. A bucket is
+As described in Section \ref{sec:pyramid-tree}, the Pyramid tree reduces multi-dimensional points to one dimension, which can then be used in a one-dimensional index structure. The School of Computing have an existing implementation of the Pyramid tree, written by Zhao Geng\footnote{Z.Geng@leeds.ac.uk}. While Berchtold et al. in \cite{pyramid-tree} used a B${}^{+}$-tree as the underlying 1D structure, this implementation uses a hash map (specifically \texttt{boost::unordered\_map}). All the points are stored in a single \texttt{std::vector}. Each point is hashed to an integer representation which acts as the key to a bucket stored in the hash map. A bucket is
  a \texttt{std::vector} which contains indices to points in the large point array.
  
 Simple optimisations were initially made to the original implementation. The original implementation passed many heap allocated structures by-value, resulting in excessive copies and more time being spent allocating memory and copying data. These copies were not necessary and were removed where possible by passing the data by-reference.
 
-The original Pyramid tree implementation did not provide \texttt{delete} and \texttt{update} operations. Therefore, a \texttt{delete} procedure was added to the implementation. To delete a point $p$, the point is first hashed and the bucket containing the point is found. The index pointing to $p$ in the bucket is removed from the bucket, but the actual point itself is not removed the point array. In other words, the memory is never released until the whole structure is deleted. This makes the structure useful for batch computation because it can be discarded straight after a task, releasing all allocated memory then. However, if the structure is used as part of a long-running process then this is not suitable because there is the potential to run out of memory. This will be referred to as the \textbf{Batch Pyramid Tree} for the rest of this document.
+The original Pyramid tree implementation did not provide \texttt{delete} and \texttt{update} operations. Therefore, a \texttt{delete} procedure was added to the implementation. To delete a point $p$, the point is first hashed and the bucket containing the point is found. The index pointing to $p$ in the bucket is removed from the bucket, but the actual point itself is not removed the point array. In other words, the memory is never released until the whole structure is deleted. This makes the structure useful for batch computation because it can be discarded straight after a task, releasing all allocated memory then. However, if the structure is used as part of a long-running process then this is not suitable because there is the potential to run out of memory. This will be referred to as the \textbf{Batch Index Pyramid Tree} for the rest of this document.
 
-Therefore, a variant of this structure was implemented, which shall be referred to as the \textbf{Defragmented Pyramid Tree}. When a point's index is deleted from a bucket, the element at the index is marked for deletion from the array at a later time. If the number of marked elements exceeds a certain number $R$, then the $R + 1$ marked elements are erased from the vector (i.e. memory is released). The indices in each bucket are then updated to point to the correct element in the modified array. Even though \texttt{delete} is normally a constant time operation, the worst case is $O(n^2)$ because of this defragmentation procedure.
+Therefore, a variant of this structure was implemented, which shall be referred to as the \textbf{Defragmented INdex Pyramid Tree}. When a point's index is deleted from a bucket, the element at the index is marked for deletion from the array at a later time. If the number of marked elements exceeds a certain number $R$, then the $R + 1$ marked elements are erased from the vector (i.e. memory is released). The indices in each bucket are then updated to point to the correct element in the modified array. Even though \texttt{delete} is normally a constant time operation, the worst case is $O(n^2)$ because of this defragmentation procedure.
+
+\subsection{Heap Allocation and \texttt{tcmalloc}}
+
+TODO: explain what heap allocation is, and WHY it's expensive
+
+TODO: state that a common method of optimising is to try and reduce the number of heap allocations, but that you inevitable need some heap allocations (why???)
+
+TODO: explain what tcmalloc is and how it can be used in ALL builds of structure binaries (linking library)
+
+TODO: describe results below and use it to justify WHY tcmalloc will be used going forward
+
+\begin{table}
+	\centering
+	\begin{tabular}{|l|l|l|l|}
+		\hline
+		\textbf{Structure} & \textbf{Operation} & No \texttt{tcmalloc} & \texttt{tcmalloc} \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Sequential Scan}} & \textbf{Insert} & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Octree}} & \textbf{Insert} & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Batch Index Pyramid Tree}} & \textbf{Insert} & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Defragmented Index Pyramid Tree}} & \textbf{Insert} & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 \\	
+		\hline
+	\end{tabular}
+	\caption{Average Execution Time of Structure Operations With and Without \texttt{tcmalloc} (10D Dataset, 10,000 points used)}
+	\label{tab:tcmalloc}
+\end{table}
 
 \subsection{Compiler Optimisation}
 
-TODO: compiler optimisation -- why I decided to not use -O3, despite it making CPU profiling unclear
+The C++ compiler used throughout development was GCC\footnote{GCC, the GNU Compiler Collection -- \url{http://gcc.gnu.org/}}. GCC provides options to automatically modify the source code to make it more efficient on the target platform. There are multiple levels of optimisations, going from 0 (no optimisation) to 3 (maximum optimisation). The default optimisation level is 0. In order to make the structures as fast as possible, level 3 optimisation was used to compile the structures. Table \ref{tab:compiler-optimisation} shows the average execution times for the three operations for each structure, using a 10D random uniformly distributed dataset with 10,000 points. TODO: state how the speed gains are huge, using percentages/speedup rates
 
-TODO: optmisations 
+\begin{table}
+	\centering
+	\begin{tabular}{|l|l|l|l|}
+		\hline
+		\textbf{Structure} & \textbf{Operation} & \texttt{-O0} & \texttt{-O3} \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Sequential Scan}} & \textbf{Insert} & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Octree}} & \textbf{Insert} & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Batch Index Pyramid Tree}} & \textbf{Insert} & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Defragmented Index Pyramid Tree}} & \textbf{Insert} & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 \\	
+		\hline
+	\end{tabular}
+	\caption{Average Execution Time of Structure Operations With and Without Compiler Optimisations (10D Dataset, 10,000 points used)}
+	\label{tab:compiler-optimisation}
+\end{table}
+
+While it can appear this speedup is, there are some downsides. Using full optimisaiton can increase the size of the program binaries and it makes the program harder to debug, because the code is restructred and managed, making it difficult to get a method call trace \cite{gcc}. This also makes applications harder to profile. One could profile an application using no optimisation to avoid this issue, but there is no guarantee that functions/methods which are bottlenecks in the non-optimised binary are still bottlenecks in the fully optimised binary. Therefore, optimising the code to remove particular bottlenecks in the non-optimised version may have little, if no, impact on the fully optimised binary (which ptoentially still performs faster).
+
+To summarise, full compiler optimisation will be used during performance analysis of the structures as the speed gains can be huge. Despite CPU profiling potentially being harder to understand and less useful on fully optimised binaries, this shall still be done over profiling the non-optimised binary because of the aforementioned reasons.
 
 \subsection{Performance Analysis}
 
-For this analysis, the three synthetic datasets described in Section \ref{sec:TODO} were used, each having $10000$ points and varying dimensions. Timestep 100 of the astrophysics turbulence simulation was also used at an eighth of the resolution, producing a uniformly sampled $75 \times 31 \times 31$ grid with $72075$ points.th
+For this analysis, the three synthetic datasets described in Section \ref{sec:datasets} were used, each having $10000$ points and varying dimensions. Timestep 100 of the astrophysics turbulence simulation was also used at an eighth of the resolution, producing a uniformly sampled $75 \times 31 \times 31$ grid with $72075$ points. The structures being analysed in this iteration are sequential scan, octree and the index pyramid trees (batch and defragmented).
 
-TODO: introduced tables and figures
+Table \ref{tab:perf1-randuniform} shows the \textit{average} runtime of \texttt{insert}, \texttt{delete} and point query operations for uniformly randomly generated points. Multiple datasets, with different dimensions, were used to observe how the structure's performance behaves as the dimensionality is increased. The execution times for skewed and clustered data was almost identical to the uniformly random datasets; for the sake of brevity, the tables and plots for these datasets have been placed in Appendix \ref{chap:supp-material}.
 
 TODO: CPU and heap profiling
 
-TODO: show all the graphs, tables, etc.
-
 \begin{table}
 	\centering
-	\begin{tabular}{|l|l|l|l|l|l|l|l|l|}
+	\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|}
 		\hline
-		\textbf{Structure} & \textbf{1D} & \textbf{2D} & \textbf{3D} & \textbf{5D} & \textbf{10D} & \textbf{50D} & \textbf{100D} & \textbf{200D} \\
+		\textbf{Structure} & \textbf{Operation} & \textbf{1D} & \textbf{2D} & \textbf{3D} & \textbf{5D} & \textbf{10D} & \textbf{30D} & \textbf{50D} & \textbf{100D} & \textbf{200D} \\
 		\hline
-		\textbf{Sequential Scan} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-		\textbf{Octree} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-		\textbf{Defragmented Pyramid Tree} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-		\textbf{Batch Pyramid Tree} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+		\multirow{ 4}{*}{\textbf{Sequential Scan}} & \textbf{Insert} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Octree}} & \textbf{Insert} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Batch Index Pyramid Tree}} & \textbf{Insert} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Defragmented Index Pyramid Tree}} & \textbf{Insert} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
 		\hline
 	\end{tabular}
-	\caption{Execution Time of Structures for Uniform Randomly Generated Points with \texttt{-O1} Compiler Flag}
-	\label{tab:perf1-randuniform-o1}
+	\caption{Average Execution Time of Structure Operations for Uniformly Random Points}
+	\label{tab:perf1-randuniform}
 \end{table}
 
 \begin{table}
 	\centering
-	\begin{tabular}{|l|l|l|l|l|l|l|l|l|}
+	\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|}
 		\hline
-		\textbf{Structure} & \textbf{1D} & \textbf{2D} & \textbf{3D} & \textbf{5D} & \textbf{10D} & \textbf{50D} & \textbf{100D} & \textbf{200D} \\
+		\textbf{Structure} & \textbf{Operation} & \text{InsertAll-QueryAll-DeleteAll} & \text{Random Operations} \\
 		\hline
-		\textbf{Sequential Scan} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-		\textbf{Octree} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-		\textbf{Defragmented Pyramid Tree} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-		\textbf{Batch Pyramid Tree} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+		\multirow{ 4}{*}{\textbf{Sequential Scan}} & \textbf{Insert} & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Octree}} & \textbf{Insert} & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Index Pyramid Tree}} & \textbf{Insert} & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Defragmented Index Pyramid Tree}} & \textbf{Insert} & 0 & 0 \\
+		 & \textbf{Delete} & 0 & 0 \\
+		 & \textbf{Point Query} & 0 & 0 \\
 		\hline
 	\end{tabular}
-	\caption{Execution Time of Structures for Uniform Randomly Generated Points with \texttt{-O3} Compiler Flag}
-	\label{tab:perf1-randuniform-o3}
+	\caption{Average Execution Time of Structures for Sampled Astrophysics Dataset}
+	\label{tab:perf1-astrophysics}
 \end{table}
+
 \begin{figure}
 	\centering
 	\includegraphics[scale=0.8]{../results/end_of_iteration1/all_insert_randuniform.pdf}

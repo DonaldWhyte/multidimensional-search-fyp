@@ -42,7 +42,8 @@ TODO: formally defined an operation test
 
 TODO: mention trace of Joint Contour Net behaviour that will be used to see how the index structures perform with a real application -- AND TO SEE HOW INTERLEAVED OPERATIONS 
 
-\section{Data}
+\section{Datasets}
+\label{sec:datasets}
 
 Both synthetic, artificially generated data and a real dataset will be used for the evaluation. Three types of \textbf{synthetic} datasets will be generated -- uniformly distributed, skewed and clustered. Multiple instances of these datasets will be used, with varying numbers of dimensions (e.g. 1, 2, 3, 5, 10, 50, 100). Using such datasets was inspired by Wang et al. and Berchtold et al., who used similar datasets to evaluate the performance of the PK-tree and pyramid tree respectively \cite{pk-tree, pyramid-tree}. The reason for testing the index structures with these datasets is that the variety of point distributions and number of dimensions should tease out which data the implementations struggle with and which they work well at.
 
