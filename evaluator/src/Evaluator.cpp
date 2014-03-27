@@ -1,12 +1,32 @@
 #include "Evaluator.h"
 #include <ctime>
 #include <sstream>
-#include <boost/timer.hpp>
 #include <gperftools/profiler.h>
 #include <gperftools/heap-profiler.h>
 
+#if defined(_WIN32)
+	#include <time.h>
+#elif defined(unix)
+	#include <sys/time.h>
+#else
+	#error No timing mechanism supported for this platform
+#endif
+
 namespace mdsearch
 {
+
+	Timing getTime()
+	{
+	#if defined(_WIN32)
+		return static_cast<Timing>(time(NULL));
+	#elif defined(unix)
+		timespec ts;
+		clock_gettime(CLOCK_REALTIME, &ts); 
+		return static_cast<Timing>(ts.tv_nsec) / 1000000000.0;
+	#else
+		return 0.0;
+	#endif
+	}
 
 	Evaluator::Evaluator(const std::vector<IndexStructure*>& structures,
 		unsigned int numTestRuns, bool profileCPU, bool profileHeap, bool verbose)
@@ -104,8 +124,7 @@ namespace mdsearch
 			ProfilerStart(cpuProfilerOutputFilename.c_str());
 		}
 		// Keep track of the time the performance test starts
-		boost::timer timer;
-		timer.restart();
+		Timing startTime = getTime();
 
 		// Iteration through all operations
 		for (TestOperationList::const_iterator op = operations.begin();
@@ -129,7 +148,7 @@ namespace mdsearch
 		}
 
 		// Store time elapsed during execution of the operations
-		Timing elapsed = timer.elapsed();
+		Timing elapsed = getTime() - startTime;
 		// Stop profilers
 		if (profileCPU)
 		{

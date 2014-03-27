@@ -102,7 +102,7 @@ TODO: describe results below and use it to justify WHY tcmalloc will be used goi
 
 \subsection{Compiler Optimisation}
 
-The C++ compiler used throughout development was GCC\footnote{GCC, the GNU Compiler Collection -- \url{http://gcc.gnu.org/}}. GCC provides options to automatically modify the source code to make it more efficient on the target platform. There are multiple levels of optimisations, going from 0 (no optimisation) to 3 (maximum optimisation). The default optimisation level is 0. In order to make the structures as fast as possible, level 3 optimisation was used to compile the structures. Table \ref{tab:compiler-optimisation} shows the average execution times for the three operations for each structure, using a 10D random uniformly distributed dataset with 10,000 points. TODO: state how the speed gains are huge, using percentages/speedup rates
+GCC\footnote{GCC, the GNU Compiler Collection -- \url{http://gcc.gnu.org/}} was the C++ compiler used throughout development and analysis. GCC provides options to automatically modify the source code to make it more efficient on the target platform. There are multiple levels of optimisations, going from 0 (no optimisation) to 3 (maximum optimisation). The default optimisation level is 0. In order to make the structures as fast as possible, level 3 optimisation was used to compile the structures. Table \ref{tab:compiler-optimisation} shows the average execution times for the three operations for each structure, using a 10D random uniformly distributed dataset with 10,000 points. TODO: state how the speed gains are huge, using percentages/speedup rates
 
 \begin{table}
 	\centering

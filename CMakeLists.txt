@@ -16,6 +16,7 @@ include_directories(${DEPENDENCIES})
 set( LIBS
 	${DEPENDENCIES}/libgtest.a
 	pthread
+	rt
 )
 # If current machine is a lab machine where the main performance
 # tests of the project are being run on, then use the libraries
