@@ -18,11 +18,11 @@ namespace mdsearch
 	Timing getTime()
 	{
 	#if defined(_WIN32)
-		return static_cast<Timing>(time(NULL));
+		return static_cast<Timing>(time(NULL)); // in seconds already
 	#elif defined(unix)
 		timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts); 
-		return static_cast<Timing>(ts.tv_nsec) / 1000000000.0;
+		return static_cast<Timing>(ts.tv_sec) + (static_cast<Timing>(ts.tv_nsec) / 1000000000.0);
 	#else
 		return 0.0;
 	#endif
