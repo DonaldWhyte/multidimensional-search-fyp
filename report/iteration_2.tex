@@ -1,18 +1,18 @@
 \section{Iteration \#2 -- Pyramid Tree Variants}
 
-TODO: explanation of iteration objectives
+In the first iteration, the Pyramid tree showed great promise as an efficient index structure for high-dimensional data. The core limitation of the implementation was that \texttt{delete} operations were dramatically slower than other operations because of its worst case complexity of $O(n^2)$ when releasing memory. This iteration focuses on modifying the Pyramid tree in attempt to maintain the good performance of \texttt{insert} and point queries, but increase \texttt{delete} speed. Iteration 2's objectives are:
 \begin{itemize}
+	\item Implement variant of the index Pyramid tree and a non-index based Pyramid tree
 	\item Implement Splay tree
-	\item Implement Splay Pyramid Tree (Splay tree as one-dimensional back-end)
-	\item Implement two variants (rebuilding and non-contiguous point storage) of hashmap-based Pyramid tree 
-	\item Analyse performance of all Pyramid tree variants
+	\item Implement Splay Pyramid Tree (which uses splay tree as one-dimensional back-end)
+	\item Analyse performance of all Pyramid tree variants and determine the best performing one
 \end{itemize}
 
-\subsection{Rebuilding Pyramid Tree}
+\subsection{Rebuild Index Pyramid Tree}
 
 TODO
 
-\subsection{Non-Contiguous Point Storage Pyramid Tree}
+\subsection{Bucket Pyramid Tree}
 
 TODO
 
@@ -22,11 +22,13 @@ TODO
 
 \subsection{Performance Analysis}
 
-TODO: five structures
-	Pyramid Tree (No Defragmentation) (HAVE THIS AT ALL? MAKE IT REQUIREMENT TO CLEAR UP MEMORY??)
-	Pyramid Tree (Defragmentation)
-	Pyramid Tree (Rebuilding)
-	Pyramid Tree (Non-Contiguous Point Storage)
+TODO: four structures
+	Defragment Index Pyramid Tree
+	Rebuild Index Pyramid Tree
+	Bucket Pyramid Tree
+	Splay Pyramid Tree
+
+TODO: justify WHY no-defrag (batch))Pyramid tree is not being used
 
 \subsection{Evaluation}
 

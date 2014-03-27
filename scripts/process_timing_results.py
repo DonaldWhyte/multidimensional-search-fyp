@@ -40,6 +40,12 @@ def getStructureTimings(timingFiles, structureNames, testOpListIndex = 0):
 	for name in structureNames:
 		structureTimings[name] = []
 
+	hasOctree = ("octree" in structureNames)
+	if hasOctree:
+		octreeIndex = structureNames.index("octree")
+	else:
+		octreeIndex = -1
+
 	for d, filePath in timingFiles:
 		with open(filePath, "r") as f:
 			# Scan through file until required test operation list index is found
@@ -52,6 +58,11 @@ def getStructureTimings(timingFiles, structureNames, testOpListIndex = 0):
 				match = STRUCTURE_TIMING_LINE_REGEX.match(line)
 				if match:
 					index = int(match.group(1))
+					# HACK: If structure is >= octree index and the dimensionality is
+					# greather than 10, ADD to the index. This is because octree performance
+					# is NOT MEASURED ABOVE 10 DIMENSIONS (due to exponential increase in memory).
+					if hasOctree and index >= octreeIndex and d > 10:
+						index += 1
 					timingValue = match.group(2)
 					structureTimings[structureNames[index]].append( (d, timingValue) )
 				else:
