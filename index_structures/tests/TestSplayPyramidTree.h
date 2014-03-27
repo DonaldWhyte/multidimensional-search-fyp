@@ -8,6 +8,8 @@
 namespace mdsearch { namespace tests
 {
 
+	static const unsigned int NUM_SPLAYPYRAMIDTREE_DIMENSIONS = 3;
+
 	class SplayPyramidTreeTests : public ::testing::Test
 	{
 
@@ -18,21 +20,20 @@ namespace mdsearch { namespace tests
 			initialBoundary = Region(3, initialBoundaryIntervals);			
 		}
 
-		static const unsigned int NUM_DIMENSIONS = 3;
 		Region initialBoundary;
 
 	};
 
 	TEST_F(SplayPyramidTreeTests, Construction)
 	{
-		SplayPyramidTree structure(NUM_DIMENSIONS, initialBoundary);
-		ASSERT_EQ(NUM_DIMENSIONS, structure.dimensionality());
+		SplayPyramidTree structure(NUM_SPLAYPYRAMIDTREE_DIMENSIONS, initialBoundary);
+		ASSERT_EQ(NUM_SPLAYPYRAMIDTREE_DIMENSIONS, structure.dimensionality());
 		ASSERT_EQ(initialBoundary, structure.getBoundary());
 	}
 
 	TEST_F(SplayPyramidTreeTests, Clear)
 	{
-		SplayPyramidTree structure(NUM_DIMENSIONS, initialBoundary);
+		SplayPyramidTree structure(NUM_SPLAYPYRAMIDTREE_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();
 		structure.loadPoints(testPoints);
@@ -48,7 +49,7 @@ namespace mdsearch { namespace tests
 
 	TEST_F(SplayPyramidTreeTests, InsertionAndRemoval)
 	{
-		SplayPyramidTree structure(NUM_DIMENSIONS, initialBoundary);
+		SplayPyramidTree structure(NUM_SPLAYPYRAMIDTREE_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();
 

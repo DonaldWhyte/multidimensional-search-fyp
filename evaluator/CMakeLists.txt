@@ -20,7 +20,7 @@ add_executable( evaluator
 # Ensure include directory is in search path
 include_directories ("include")
 # Link both the data and index structure libraries to evaluator
-target_link_libraries (evaluator data)
+target_link_libraries (evaluator data ${LIBS})
 include_directories(${PROJECT_ROOT}/data/include)
 target_link_libraries (evaluator index_structures)
 include_directories(${PROJECT_ROOT}/index_structures/include)
@@ -41,9 +41,6 @@ include_directories ({DEPENDENCIES})
 # Add Boost as dependency for evaluator and the unit tests
 target_link_libraries(evaluator ${Boost_LIBRARIES})
 target_link_libraries(evaluator_tests ${Boost_LIBRARIES})
-# Link google performance tools library to evaluator and the unit tests
-target_link_libraries ( evaluator profiler tcmalloc )
-target_link_libraries ( evaluator_tests profiler tcmalloc )
 
 # Copy additional test files to build directory
 file( COPY tests/test_files DESTINATION ${BUILD_DIR} )

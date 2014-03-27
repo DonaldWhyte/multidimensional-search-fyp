@@ -2,6 +2,7 @@
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <iostream>
 
 namespace mdsearch
 {

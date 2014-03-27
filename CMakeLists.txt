@@ -15,8 +15,19 @@ include_directories(${DEPENDENCIES})
 # Add static libraries of all dependencies here
 set( LIBS
 	${DEPENDENCIES}/libgtest.a
-	pthread # for google-test
+	pthread
 )
+# If current machine is a lab machine where the main performance
+# tests of the project are being run on, then use the libraries
+# specificially build for the lab.
+# NOTE: Linking tcmalloc to ALL executables and libraries so they
+# all benefit from a faster malloc().
+if(DEFINED ENV{LAB_MACHINE})
+	set ( LIBS ${LIBS} ${DEPENDENCIES}/lab_libs/libprofiler.a ${DEPENDENCIES}/lab_libs/libtcmalloc.a )
+else()
+	set ( LIBS ${LIBS} ${DEPENDENCIES}/libprofiler.a ${DEPENDENCIES}/libtcmalloc.a )
+endif()
+
 # Search for Boost library
 set(Boost_USE_STATIC_LIBS ON) 
 set(Boost_USE_MULTITHREADED ON)  
@@ -33,6 +44,9 @@ set (LIBRARY_OUTPUT_PATH ${BUILD_DIR})
 
 # Set compiler flags
 set( EXTRA_CXX_COMPILER_FLAGS -O3 ) # exceptions are being disabled!
+# This is added rather than manually specifying the phread library with
+# "-lpthread" since it requires some special compilation steps (in GCC)
+set( EXTRA_CXX_COMPILER_FLAGS -pthread )
 set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${EXTRA_CXX_COMPILER_FLAGS}" )
 
 # Process all sub-projects

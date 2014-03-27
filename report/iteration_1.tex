@@ -40,9 +40,7 @@ Every index structure defined in the \texttt{index\_structures} module implement
 	\item \texttt{remove} -- remove point from structure
 	\item \texttt{update} -- modify value of a specific point stored in the structure
 	\item \texttt{pointExists} -- equivalent to a point query
-	\item \texttt{pointsInRegion} -- returns all stored points in given region of space TODO: remove from interface and document???
 \end{itemize}
-Therefore, each index structure impplements the required operations for the performance evaluations. (TODO: even include this line???)
 
 \subsection{Baseline Implementations}
  
@@ -59,17 +57,19 @@ As described in Section \ref{sec:pyramid-tree}, the Pyramid tree reduces multi-d
  
 Simple optimisations were initially made to the original implementation. The original implementation passed many heap allocated structures by-value, resulting in excessive copies and more time being spent allocating memory and copying data. These copies were not necessary and were removed where possible by passing the data by-reference.
 
-The original Pyramid tree implementation did not provide \texttt{delete} and \texttt{update} operations. Therefore, a \texttt{delete} procedure was added to the implementation. To delete a point $p$, the point is first hashed and the bucket containing the point is found. The index pointing to $p$ in the bucket is removed from the bucket, but the actual point itself is not removed the point array. In other words, the memory is never released until the whole structure is deleted. This makes the structure useful for batch computational tasks because it can be discarded straight after the task, releasing all allocated memory then. However, if the structure is used as part of a long-running process then this is not suitable because there is the potential to run out of memory. This will be referred to as the \textbf{Batch Pyramid Tree} for the rest of this document.
+The original Pyramid tree implementation did not provide \texttt{delete} and \texttt{update} operations. Therefore, a \texttt{delete} procedure was added to the implementation. To delete a point $p$, the point is first hashed and the bucket containing the point is found. The index pointing to $p$ in the bucket is removed from the bucket, but the actual point itself is not removed the point array. In other words, the memory is never released until the whole structure is deleted. This makes the structure useful for batch computation because it can be discarded straight after a task, releasing all allocated memory then. However, if the structure is used as part of a long-running process then this is not suitable because there is the potential to run out of memory. This will be referred to as the \textbf{Batch Pyramid Tree} for the rest of this document.
 
 Therefore, a variant of this structure was implemented, which shall be referred to as the \textbf{Defragmented Pyramid Tree}. When a point's index is deleted from a bucket, the element at the index is marked for deletion from the array at a later time. If the number of marked elements exceeds a certain number $R$, then the $R + 1$ marked elements are erased from the vector (i.e. memory is released). The indices in each bucket are then updated to point to the correct element in the modified array. Even though \texttt{delete} is normally a constant time operation, the worst case is $O(n^2)$ because of this defragmentation procedure.
 
 \subsection{Compiler Optimisation}
 
-TODO: compiler optimisation -- why I decided to not use -O1 
+TODO: compiler optimisation -- why I decided to not use -O3, despite it making CPU profiling unclear
+
+TODO: optmisations 
 
 \subsection{Performance Analysis}
 
-For this analysis, the three synthetic datasets with $10000$ points and varying dimensions were used. Timestep 100 of the astrophysics turbulence simulation was also used at an eighth of the resolution, producing a uniformly sampled $75 \times 31 \times 31$ grid with $72075$ points. TODO: operation lists
+For this analysis, the three synthetic datasets described in Section \ref{sec:TODO} were used, each having $10000$ points and varying dimensions. Timestep 100 of the astrophysics turbulence simulation was also used at an eighth of the resolution, producing a uniformly sampled $75 \times 31 \times 31$ grid with $72075$ points.th
 
 TODO: introduced tables and figures
 

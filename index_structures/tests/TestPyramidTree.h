@@ -8,6 +8,8 @@
 namespace mdsearch { namespace tests
 {
 
+	static const unsigned int NUM_PYRAMIDTREE_DIMENSIONS = 3;
+
 	class PyramidTreeTests : public ::testing::Test
 	{
 
@@ -17,22 +19,21 @@ namespace mdsearch { namespace tests
 			Interval initialBoundaryIntervals[3] = { Interval(0, 10), Interval(0, 10), Interval(0, 10) };
 			initialBoundary = Region(3, initialBoundaryIntervals);			
 		}
-
-		static const unsigned int NUM_DIMENSIONS = 3;
+		
 		Region initialBoundary;
 
 	};
 
 	TEST_F(PyramidTreeTests, Construction)
 	{
-		PyramidTree structure(NUM_DIMENSIONS, initialBoundary);
-		ASSERT_EQ(NUM_DIMENSIONS, structure.dimensionality());
+		PyramidTree structure(NUM_PYRAMIDTREE_DIMENSIONS, initialBoundary);
+		ASSERT_EQ(NUM_PYRAMIDTREE_DIMENSIONS, structure.dimensionality());
 		ASSERT_EQ(initialBoundary, structure.getBoundary());
 	}
 
 	TEST_F(PyramidTreeTests, Clear)
 	{
-		PyramidTree structure(NUM_DIMENSIONS, initialBoundary);
+		PyramidTree structure(NUM_PYRAMIDTREE_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();
 		structure.loadPoints(testPoints);
@@ -48,7 +49,7 @@ namespace mdsearch { namespace tests
 
 	TEST_F(PyramidTreeTests, InsertionAndRemoval)
 	{
-		PyramidTree structure(NUM_DIMENSIONS, initialBoundary);
+		PyramidTree structure(NUM_PYRAMIDTREE_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();
 

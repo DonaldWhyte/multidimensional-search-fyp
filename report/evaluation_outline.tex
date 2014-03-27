@@ -28,7 +28,7 @@ TODO: explain what amortmisation is
 
 TODO: state that it has been used for theoretical analysis of algorithms (amortised analysis), such as the splay quadtree, quadtreap and Splay tree (Robert Tarjan was first one to use such a thing, or one of the first???)
 
-This project will use this concept for evaluation by measuring the \textit{average} runtime of each operation, over many thousands of such operations. A typical performance test therefore has the following steps:
+This project will use a similar concept for evaluation. Instead of measuring the time of a single operartion, the times of measuring many thousands of operations will be measured, and the \textit{average} runtime for an operation will be used. A typical performance test therefore has the following steps:
 \begin{enumerate}
 	\item \textbf{Initial Build} -- incrementally build structure by adding each point in test dataset one-by-one
 	\item \textbf{Query Points} -- query each point in the dataset, which should not be in the structure
@@ -60,4 +60,4 @@ TODO: table listing all the different datasets and OPERATION LISTS that were use
 
 There is little use in measuring the performance of the implemented index structures for the purposes of evaluation if there is nothing to compare the results to. As such, two baseline index structure implementations will be developed -- \textbf{sequential scan} and the \textbf{PR octree} (see Section \ref{sec:recursive-partition-structures}). The reason for choosing sequential scan as a baseline is that it's the na\"{i}ve brute-force approach to performing search. The PR octree is the basis of many index structures, both old and new. Thus, the structure is well-known in the field and makes a suitable baseline.
 
-These baselines will be developed in C++ to match the technology used to develop the initially implemented index structure.
+These baselines have been developed in C++ to match the technology used to develop the initially implemented index structure.
