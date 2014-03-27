@@ -18,7 +18,11 @@ TODO
 
 \subsection{Splay Pyramid Tree}
 
-TODO
+Unlile the other implementations, the Splay Pyramid Tree does not use a hash map as the underyling one-dimensional index structure, but a splay tree. The splay tree is a self-adjusting variant of the binary search tree that uses a \textit{splaying} operation (a heuristic) to allow faster access to recently accessed elements. \cite{splay-tree}. The splaying operation achieves this by performing a series of tree rotations that move a given node up to the root of the tree. Through amortised analysis and empirical experiments, it has been shown splay trees can be more efficient than standard binary trees for a series of non-random operations \cite{splay-tree, TODO}, despite the asymptotic worst case bound being worse than binary search trees.
+
+TODO: more detail about the splay tree, including in-depth algorithms??
+
+Nodes in the Splay Pyramid tree correspond to individual buckets in the Bucket Pyramid Tree, meaning each node can store multiple points. Since the splay tree is implemented as a collection of heap-allocated nodes with pointers to link them, deletions are cheap as a low amount of memory needs to be de-allocated per \texttt{delete} operation. The hope is that this, combined with the self-adjusting nature of the splay tree, will produce a Pyramid Tree implementation that is more efficient for non-random operations.
 
 \subsection{Performance Analysis}
 
