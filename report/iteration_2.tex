@@ -1,6 +1,6 @@
 \section{Iteration \#2 -- Pyramid Tree Variants}
 
-In the first iteration, the Pyramid tree showed great promise as an efficient index structure for high-dimensional data. The core limitation of the implementation was that \texttt{delete} operations were dramatically slower than other operations because of its worst case complexity of $O(n^2)$ when releasing memory. This iteration focuses on modifying the Pyramid tree in attempt to maintain the good performance of \texttt{insert} and point queries, but increase \texttt{delete} speed. Iteration 2's objectives are:
+In the first iteration, the Pyramid tree showed great promise as an efficient index structure for high-dimensional data. The core limitation of the implementations was that \texttt{delete} operations were dramatically slower than other operations because of its worst case complexity of $O(n^2)$ if memory must be released. This iteration focuses on modifying the Pyramid tree in attempt to maintain the good performance of \texttt{insert} and point queries, but increase \texttt{delete} speed. Iteration 2's objectives are:
 \begin{itemize}
 	\item Implement variant of the index Pyramid tree and a non-index based Pyramid tree
 	\item Implement Splay tree
@@ -10,11 +10,11 @@ In the first iteration, the Pyramid tree showed great promise as an efficient in
 
 \subsection{Rebuild Index Pyramid Tree}
 
-TODO
+This variant of the pyramid tree uses a different strategy for releasing memory for unused points. Instead of defragmenting the array by peforming a sequence of array deletions when $R + 1$ elements are marked for deletion, the entire structure is rebuilt. This new cleanup procedure starts by clearing the structure and incrementally building the new structure by only adding points \textit{not} marked for deletion. $n - R$ points will be re-instered and insertion in the worst case is $O(n)$, meaning the worst case complexity of \texttt{delete} is $O((n - R)n)$. The larger $R$ is, the less time it takes to perform this procedure but a larger amount of allocated memory goes unused at a time.
 
 \subsection{Bucket Pyramid Tree}
 
-TODO
+The Bucket Pyramid Tree implementation does not use a single array to store the points. Instead of buckets containing an array of point indices, it has an arrya of actual points. No clenaup procedure is necessary because the memory for a point is released immediately afer it's removed, by simply erasing it from the corresponding bucket's array. The array deletion is a $O(n)$ peration since the case where a single bucket stores all $n$ points is possible, making \texttt{delete} $O(n)$ in the worst case.
 
 \subsection{Splay Pyramid Tree}
 

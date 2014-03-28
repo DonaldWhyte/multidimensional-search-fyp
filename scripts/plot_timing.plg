@@ -1,7 +1,0 @@
-set xlabel "Number of Dimensions"
-set ylabel "Execution Time (seconds)"
-
-set terminal postscript
-set output outputFilename
-
-plot inputFilename using 1:2 with lines title plotTitle
