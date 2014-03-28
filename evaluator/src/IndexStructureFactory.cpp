@@ -95,7 +95,7 @@ namespace mdsearch
 			IndexPyramidTree::CleanupProcedure cleanupProc = IndexPyramidTree::CLEANUP_PROC_DEFRAGMENT; // default is defragmentation
 			if (args.size() >= requiredArgCount + 2)
 			{
-				const std::string& procStr = args[requiredArgCount];
+				const std::string& procStr = args[requiredArgCount + 1];
 				if (procStr == "defragment")
 					cleanupProc = IndexPyramidTree::CLEANUP_PROC_DEFRAGMENT;
 				else if (procStr == "rebuild")

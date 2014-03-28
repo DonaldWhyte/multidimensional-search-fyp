@@ -91,9 +91,13 @@ namespace mdsearch
 					emptyElementIndices.size() >= maxEmptyElements)
 				{
 					if (cleanupProcedure == CLEANUP_PROC_REBUILD)
+					{
 						rebuild();
+					}
 					else
+					{
 						defragment();
+					}
 				}
 
 				return true;

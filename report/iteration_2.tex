@@ -32,7 +32,9 @@ TODO: four structures
 	Bucket Pyramid Tree
 	Splay Pyramid Tree
 
-TODO: justify WHY no-defrag (batch))Pyramid tree is not being used
+TODO: justify WHY no-defrag (batch))Pyramid tree is not being tested
+
+TODO: refer to plots and justify why only there's only two here (rest are in appendices)
 
 
 \begin{landscape}
@@ -43,25 +45,21 @@ TODO: justify WHY no-defrag (batch))Pyramid tree is not being used
 			\hline
 			\textbf{Structure} & \textbf{Operation} & \textbf{1D} & \textbf{2D} & \textbf{3D} & \textbf{5D} & \textbf{8D} & \textbf{10D} & \textbf{30D} & \textbf{50D} & \textbf{100D} & \textbf{200D} \\
 			\hline
-			\multirow{ 4}{*}{\textbf{Batch Pyramid Tree}} & \textbf{Insert} & 1.3231 & 1.32399 & 1.34724 & 1.34221 & 1.35646 & 1.33851 & 1.33868 & 1.35468 & 1.36842 & 1.3897 \\
-			 & \textbf{Delete} & 5.04424 & 5.23621 & 5.45242 & 5.33007 & 5.22835 & 5.24009 & 5.39258 & 5.6565 & 6.1458 & 8.62731 \\
-			 & \textbf{Point Query} & 1.3237 & 1.33977 & 1.3343 & 1.33835 & 1.33869 & 1.34081 & 1.34866 & 1.36927 & 1.38503 & 1.41755 \\
-			\hline
-			\multirow{ 4}{*}{\textbf{Defragmented Index Pyramid Tree}} & \textbf{Insert} & 0.0183021 & 0.0166689 & 0.0190752 & 0.0516295 & 0.225318 & 1.2355 & - & - & - & - \\
-			 & \textbf{Delete} & 0.013881 & 0.0132252 & 0.0171539 & 0.0385456 & 0.17537 & 0.705648 & - & - & - & - \\
-			 & \textbf{Point Query} & 0.0110365 & 0.010704 & 0.013623 & 0.0327345 & 0.16158 & 0.561102 & - & - & - & - \\
-			\hline
-			\multirow{ 4}{*}{\textbf{Rebuild Index Pyramid Tree}} & \textbf{Insert} & 0.0101357 & 0.0110918 & 0.0121604 & 0.0149288 & 0.0200418 & 0.0237795 & 0.0984435 & 0.226254 & 0.793372 & 2.97842 \\
-			 & \textbf{Delete} & 0.00279808 & 0.00330198 & 0.00448108 & 0.00571299 & 0.00821567 & 0.00997543 & 0.0482181 & 0.114467 & 0.409958 & 1.52056 \\
-			 & \textbf{Point Query} & 0.00279832 & 0.00328636 & 0.00394356 & 0.0056293 & 0.00833821 & 0.0102698 & 0.0498525 & 0.116923 & 0.408903 & 1.51992 \\
-			\hline
-			\multirow{ 4}{*}{\textbf{Bucket Pyramid Tree}} & \textbf{Insert} & 0.0100861 & 0.0110824 & 0.0125415 & 0.0150796 & 0.0198269 & 0.0243051 & 0.0977912 & 0.226317 & 0.793781 & 2.97191 \\
+			\multirow{ 4}{*}{\textbf{Defragmented Index Pyramid Tree}} & \textbf{Insert} & 0.0100861 & 0.0110824 & 0.0125415 & 0.0150796 & 0.0198269 & 0.0243051 & 0.0977912 & 0.226317 & 0.793781 & 2.97191 \\
 			 & \textbf{Delete} & 12.582 & 12.8934 & 12.9759 & 12.9543 & 12.8519 & 12.9391 & 13.1583 & 13.4074 & 14.2005 & 16.7081 \\
 			 & \textbf{Point Query} & 0.0027684 & 0.00324225 & 0.00386536 & 0.00551307 & 0.00820208 & 0.0104848 & 0.049884 & 0.117446 & 0.408223 & 1.56195 \\
 			\hline
-			\multirow{ 4}{*}{\textbf{Splay Pyramid Tree}} & \textbf{Insert} & 0.0100861 & 0.0110824 & 0.0125415 & 0.0150796 & 0.0198269 & 0.0243051 & 0.0977912 & 0.226317 & 0.793781 & 2.97191 \\
-			 & \textbf{Delete} & 12.582 & 12.8934 & 12.9759 & 12.9543 & 12.8519 & 12.9391 & 13.1583 & 13.4074 & 14.2005 & 16.7081 \\
-			 & \textbf{Point Query} & 0.0027684 & 0.00324225 & 0.00386536 & 0.00551307 & 0.00820208 & 0.0104848 & 0.049884 & 0.117446 & 0.408223 & 1.56195 \\
+			\multirow{ 4}{*}{\textbf{Rebuild Index Pyramid Tree}} & \textbf{Insert} & 0.0102503 & 0.0110619 & 0.0121741 & 0.0150467 & 0.0195684 & 0.0236087 & 0.0975364 & 0.226686 & 0.794168 & 2.98335 \\
+			 & \textbf{Delete} & 12.5761 & 12.741 & 12.8164 & 12.8492 & 13.0039 & 13.0666 & 13.2909 & 13.582 & 14.5668 & 17.1137 \\
+			 & \textbf{Point Query} & 0.00272942 & 0.00336814 & 0.00388157 & 0.00560772 & 0.00868261 & 0.0109097 & 0.0504385 & 0.117767 & 0.417613 & 1.54181 \\
+			\hline
+			\multirow{ 4}{*}{\textbf{Bucket Pyramid Tree}} & \textbf{Insert} & 0.015999 & 0.0172538 & 0.0181366 & 0.0208803 & 0.0257906 & 0.030085 & 0.103178 & 0.23306 & 0.798941 & 2.97632 \\
+			 & \textbf{Delete} & 0.00354707 & 0.00423968 & 0.00467753 & 0.00626874 & 0.00936306 & 0.0119662 & 0.050822 & 0.120001 & 0.42113 & 1.52593 \\
+			 & \textbf{Point Query} & 0.00234234 & 0.00291753 & 0.0036248 & 0.00529063 & 0.00801969 & 0.0101838 & 0.0508173 & 0.11813 & 0.413853 & 1.53966 \\
+			\hline
+			\multirow{ 4}{*}{\textbf{Splay Pyramid Tree}} & \textbf{Insert} & 0.0174001 & 0.0185397 & 0.0195724 & 0.0224078 & 0.0268705 & 0.0309955 & 0.104663 & 0.234407 & 0.799793 & 2.97659 \\
+			 & \textbf{Delete} & 0.00412166 & 0.00481606 & 0.00533354 & 0.00767851 & 0.0102245 & 0.0132186 & 0.0525625 & 0.120654 & 0.424749 & 1.53488  \\
+			 & \textbf{Point Query} & 0.00304317 & 0.00362563 & 0.0044601 & 0.00626445 & 0.00898099 & 0.0118438 & 0.0515605 & 0.119636 & 0.412084 & 1.53412 \\
 			\hline
 		\end{tabular}
 		\caption{Execution Time of 10,0000 Structure Operations for Uniformly Random Points}
@@ -74,10 +72,10 @@ TODO: justify WHY no-defrag (batch))Pyramid tree is not being used
 			\hline
 			\textbf{Structure} & \textbf{InsertAll-QueryAll-DeleteAll} & \textbf{10,000 Random Operations} \\
 			\hline
-			\textbf{Sequential Scan} & 164.779 & 71.2321 \\
-			\textbf{Octree} & - & - \\
-			\textbf{Index Pyramid Tree} & 39.3135 & 32.4736 \\
-			\textbf{Defragmented Index Pyramid Tree} & 124.578 & 60.2028 \\
+			\textbf{Defragmented Index Pyramid Tree} & 126.073 & 61.1827 \\
+			\textbf{Rebuild Index Pyramid Tree} & 127.648 & 60.9528 \\
+			\textbf{Bucket Pyramid Tree} & 39.9721 & 17.872 \\
+			\textbf{Splay Pyramid Tree} & 39.7724 & 17.9326 \\
 			\hline
 		\end{tabular}
 		\caption{Average Execution Time of Structures for Sampled Astrophysics Dataset}
@@ -85,6 +83,9 @@ TODO: justify WHY no-defrag (batch))Pyramid tree is not being used
 	\end{table}
 
 \end{landscape}
+
+TODO: plot of insert() w/ skewed data
+TODO: plot of delete() w/ rand uniform data
 
 \subsection{Evaluation}
 

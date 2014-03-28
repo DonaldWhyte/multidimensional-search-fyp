@@ -44,10 +44,10 @@ set (EXECUTABLE_OUTPUT_PATH ${BUILD_DIR})
 set (LIBRARY_OUTPUT_PATH ${BUILD_DIR})
 
 # Set compiler flags
-set( EXTRA_CXX_COMPILER_FLAGS -O3 ) # exceptions are being disabled!
+set( EXTRA_CXX_COMPILER_FLAGS "-O3" )
 # This is added rather than manually specifying the phread library with
 # "-lpthread" since it requires some special compilation steps (in GCC)
-set( EXTRA_CXX_COMPILER_FLAGS -pthread )
+set( EXTRA_CXX_COMPILER_FLAGS "${EXTRA_CXX_COMPILER_FLAGS} -pthread" )
 set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${EXTRA_CXX_COMPILER_FLAGS}" )
 
 # Process all sub-projects

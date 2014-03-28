@@ -62,46 +62,9 @@ The original Pyramid tree implementation did not provide \texttt{delete} and \te
 
 Therefore, a variant of this structure was implemented, which shall be referred to as the \textbf{Defragmented Index Pyramid Tree}. When a point's index is deleted from a bucket, the element at the index is marked for deletion from the array at a later time (by adding the index of the point to another \texttt{std::vector}). If the number of marked elements exceeds a certain number $R$, then the $R + 1$ marked elements are erased from the vector (i.e. memory is released). The indices in each bucket are then updated to point to the correct element in the modified array. Even though \texttt{delete} is normally a constant time operation, the worst case is $O(n^2)$ because of this defragmentation procedure.
 
-\subsection{Heap Allocation and \texttt{tcmalloc}}
-
-TODO: explain what heap allocation is, and WHY it's expensive
-
-TODO: state that a common method of optimising is to try and reduce the number of heap allocations, but that you inevitable need some heap allocations (why???)
-
-TODO: explain what tcmalloc is and how it can be used in ALL builds of structure binaries (linking library)
-
-TODO: describe results below and use it to justify WHY tcmalloc will be used going forward
-
-\begin{table}
-	\centering
-	\begin{tabular}{|l|l|l|l|}
-		\hline
-		\textbf{Structure} & \textbf{Operation} & No \texttt{tcmalloc} & \texttt{tcmalloc} \\
-		\hline
-		\multirow{ 4}{*}{\textbf{Sequential Scan}} & \textbf{Insert} & 0 & 0 \\
-		 & \textbf{Delete} & 0 & 0 \\
-		 & \textbf{Point Query} & 0 & 0 \\
-		\hline
-		\multirow{ 4}{*}{\textbf{Octree}} & \textbf{Insert} & 0 & 0 \\
-		 & \textbf{Delete} & 0 & 0 \\
-		 & \textbf{Point Query} & 0 & 0 \\
-		\hline
-		\multirow{ 4}{*}{\textbf{Batch Index Pyramid Tree}} & \textbf{Insert} & 0 & 0 \\
-		 & \textbf{Delete} & 0 & 0 \\
-		 & \textbf{Point Query} & 0 & 0 \\
-		\hline
-		\multirow{ 4}{*}{\textbf{Defragmented Index Pyramid Tree}} & \textbf{Insert} & 0 & 0 \\
-		 & \textbf{Delete} & 0 & 0 \\
-		 & \textbf{Point Query} & 0 & 0 \\	
-		\hline
-	\end{tabular}
-	\caption{Average Execution Time of Structure Operations With and Without \texttt{tcmalloc} (10D Dataset, 10,000 points used)}
-	\label{tab:tcmalloc}
-\end{table}
-
 \subsection{Compiler Optimisation}
 
-GCC\footnote{GCC, the GNU Compiler Collection -- \url{http://gcc.gnu.org/}} was the C++ compiler used throughout development and analysis. GCC provides options to automatically modify the source code to make it more efficient on the target platform. There are multiple levels of optimisations, going from 0 (no optimisation) to 3 (maximum optimisation). The default optimisation level is 0. In order to make the structures as fast as possible, level 3 optimisation was used to compile the structures. Table \ref{tab:compiler-optimisation} shows the average execution times for the three operations for each structure, using a 10D random uniformly distributed dataset with 10,000 points. TODO: state how the speed gains are huge, using percentages/speedup rates
+GCC\footnote{GCC, the GNU Compiler Collection -- \url{http://gcc.gnu.org/}} was the C++ compiler used throughout development and analysis. GCC provides options to automatically modify the source code to make it more efficient on the target platform. There are multiple levels of optimisations, specifying using command line flags, going from 0 (\texttt{-O0} flag, no optimisation) to 3 (\texttt{-O3} flag, maximum optimisation). The default optimisation level is 0. In order to make the structures as fast as possible, level 3 optimisation was used to compile the structures. Table \ref{tab:compiler-optimisation} shows the average execution times for the three operations for each structure, using a 10D random uniformly distributed dataset with 10,000 points. The potential speed gains are huge. For example, the octree's point queries are approximately $6.5$ times faster, just by enabling level 3 optimisation.
 
 \begin{table}
 	\centering
@@ -109,28 +72,28 @@ GCC\footnote{GCC, the GNU Compiler Collection -- \url{http://gcc.gnu.org/}} was 
 		\hline
 		\textbf{Structure} & \textbf{Operation} & \texttt{-O0} & \texttt{-O3} \\
 		\hline
-		\multirow{ 4}{*}{\textbf{Sequential Scan}} & \textbf{Insert} & 0 & 0 \\
-		 & \textbf{Delete} & 0 & 0 \\
-		 & \textbf{Point Query} & 0 & 0 \\
+		\multirow{ 4}{*}{\textbf{Sequential Scan}} & \textbf{Insert} & 1.33509 & 0.111372 \\
+		 & \textbf{Delete} & 5.29548 & 0.623759 \\
+		 & \textbf{Point Query} & 1.33468 & 0.111909 \\
 		\hline
-		\multirow{ 4}{*}{\textbf{Octree}} & \textbf{Insert} & 0 & 0 \\
-		 & \textbf{Delete} & 0 & 0 \\
-		 & \textbf{Point Query} & 0 & 0 \\
+		\multirow{ 4}{*}{\textbf{Octree}} & \textbf{Insert} & 1.23108 & 0.243256 \\
+		 & \textbf{Delete} & 0.73156 & 0.13589 \\
+		 & \textbf{Point Query} & 0.559736 & 0.0860926 \\
 		\hline
-		\multirow{ 4}{*}{\textbf{Batch Index Pyramid Tree}} & \textbf{Insert} & 0 & 0 \\
-		 & \textbf{Delete} & 0 & 0 \\
-		 & \textbf{Point Query} & 0 & 0 \\
+		\multirow{ 4}{*}{\textbf{Batch Index Pyramid Tree}} & \textbf{Insert} & 0.0240852 & 0.00549841 \\
+		 & \textbf{Delete} & 0.0108411  & 0.0023433 \\
+		 & \textbf{Point Query} & 0.0103358 & 0.00242341 \\
 		\hline
-		\multirow{ 4}{*}{\textbf{Defragmented Index Pyramid Tree}} & \textbf{Insert} & 0 & 0 \\
-		 & \textbf{Delete} & 0 & 0 \\
-		 & \textbf{Point Query} & 0 & 0 \\	
+		\multirow{ 4}{*}{\textbf{Defragmented Index Pyramid Tree}} & \textbf{Insert} & 0.0236123 & 0.00558329 \\
+		 & \textbf{Delete} & 13.3113 & 1.49306 \\
+		 & \textbf{Point Query} & 0.0103173 & 0.00235689 \\
 		\hline
 	\end{tabular}
-	\caption{Average Execution Time of Structure Operations With and Without Compiler Optimisations (10D Dataset, 10,000 points used)}
+	\caption{Average Execution Time (in seconds) of Structure Operations With and Without Compiler Optimisations (10D Randomly Uniform  Dataset, 10,000 points used)}
 	\label{tab:compiler-optimisation}
 \end{table}
 
-While it can appear this speedup is, there are some downsides. Using full optimisaiton can increase the size of the program binaries and it makes the program harder to debug, because the code is restructred and managed, making it difficult to get a method call trace \cite{gcc}. This also makes applications harder to profile. One could profile an application using no optimisation to avoid this issue, but there is no guarantee that functions/methods which are bottlenecks in the non-optimised binary are still bottlenecks in the fully optimised binary. Therefore, optimising the code to remove particular bottlenecks in the non-optimised version may have little, if no, impact on the fully optimised binary (which ptoentially still performs faster).
+While the potential performance boost can be high, there are some downsides to compiler optimisation. Using full optimisaiton can increase the size of the program binaries and it makes the program harder to debug, because the code is restructred and managed, making it difficult to get a method call trace \cite{gcc}. This also makes applications harder to profile. One could profile an application using no optimisation to avoid this issue, but there is no guarantee that functions/methods which are bottlenecks in the non-optimised binary are still bottlenecks in the fully optimised binary. Therefore, optimising the code to remove particular bottlenecks in the non-optimised version may have little, if no, impact on the fully optimised binary (which ptoentially still performs faster).
 
 To summarise, full compiler optimisation will be used during performance analysis of the structures as the speed gains can be huge. Despite CPU profiling potentially being harder to understand and less useful on fully optimised binaries, this shall still be done over profiling the non-optimised binary because of the aforementioned reasons.
 
@@ -181,7 +144,7 @@ TODO: explain that "-" meant out of memory
 			\hline
 			\textbf{Sequential Scan} & 164.779 & 71.2321 \\
 			\textbf{Octree} & - & - \\
-			\textbf{Index Pyramid Tree} & 39.3135 & 32.4736 \\
+			\textbf{Batch Index Pyramid Tree} & 39.3135 & 32.4736 \\
 			\textbf{Defragmented Index Pyramid Tree} & 124.578 & 60.2028 \\
 			\hline
 		\end{tabular}
