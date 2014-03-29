@@ -107,9 +107,9 @@ All three plots show that dimensionality has little effect on \textit{insert} an
 
 Both variants of the Index Pyramid Tree have the same speed for \texttt{insert} and point queries, which significant outperfoms Sequential Scan and Octree. However, the performance of the trees decreases as $d$ increases and eventually the structure is slower than Sequential Scan (in this case, sequential scan starts being faster when $d \approx 57$). This is most likely due to the Pyrmaid Tree's hashing function, which is a $O(d)$ operation. The $O(n^2)$ defragmentation procedure used by the Defragmented Index Pyrmaid Tree causes it to be the slowest structure for deleting points, taking almost twice as long as Squential Scan. The Batch Pyramid Tree on the other hand has the fastest deletion speed, because it only removes the point's index and not the point itself (no expensive memory de-allocations).
 
-In addition to testing performance with respect to dimensionality, the structures have been tested against data of varying size. A uniformly randomly generated dataset with 1,000,000 points has been created. The performance of the three operations has been timed for different sized datasets, sampled from the 1,000,000 point dataset. Again, the three operations are timed using the insert-query-delete sequences of operations. The times are displayed in Table \ref{tab:perf1-sizevary} and Figures \ref{fig:perf-sizevary-insert}, \ref{fig:perf-sizevary-delete} and \ref{fig:perf-sizevary-query}. Since the number of operations \textit{varies} for each dataset, unlike the previous two tests, the times given in the table and plots is the \textit{average} operation time, not the \textit{total}, so a fair comparison of the per-operation tmes can be made between different values of $n$.
+In addition to testing performance with respect to dimensionality, the structures have been tested against data of varying size. A uniformly randomly generated dataset with 1,000,000 points has been created. The performance of the three operations has been timed for different sized datasets, sampled from the 1,000,000 point dataset. Again, the three operations are timed using the insert-query-delete sequence of operations. The times are displayed in Table \ref{tab:perf1-sizevary} and Figures \ref{fig:perf-sizevary-insert}, \ref{fig:perf-sizevary-delete} and \ref{fig:perf-sizevary-query}. Unlike the previous two tests, the number of operations \textit{varies} for each dataset, so the times given in the table and plots are for \textit{single} operations, not the \textit{total}. This allows a fair comparison between operation times of each structure to be made as $n$ increases.
 
-TODO
+TODO: up-date data
 
 \begin{landscape}
 
@@ -138,18 +138,16 @@ TODO
 			\hline
 			\textbf{Structure} & \textbf{Operation} & $n = 10$ & $n = 100$ & $n = 1000$ & $n = 5000$ & $n = 10000$ & $n = 50000$ & $n = 100000$ & $n = 500000$ \\
 			\hline
-			\multirow{ 4}{*}{\textbf{Sequential Scan}} & \textbf{Insert} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-			 & \textbf{Delete} & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\ & \textbf{Point Query} & 0.0834135 & 0.0842911 & 0.0849031 & 0.095202 & 0.0950359 & 0.110287 & 0 & 0 \\
+			\multirow{ 4}{*}{\textbf{Sequential Scan}} & \textbf{Insert} & 2.38419e-07 & 4.33922e-05 & 0.00095439 & 0.0278358 & 0.1248 & 3.32167 & 15.5559 & 627.169 \\textbf{Delete} & 4.05312e-06 & 0.000162601 & 0.00687075 & 0.169203 & 0.677672 & 17.5086 & 68.9738 & 1785.64 \\ & \textbf{Point Query} & 1.19209e-06 & 2.59876e-05 & 0.000880718 & 0.0276701 & 0.123303 & 3.21367 & 14.7421 & 594.116 \\
 			\hline
-			\multirow{ 4}{*}{\textbf{Batch Index Pyramid Tree}} & \textbf{Insert} & 0.00182509 & 0.00201285 & 0.00209451 & 0.00268757 & 0.0040772 & 0.00534821 & 0.0345241 & 0.0927804 \\ & \textbf{Delete} & 0.000421524 & 0.000508428 & 0.000604391 & 0.000930548 & 0.00166643 & 0.0023284 & 0.0171595 & 0.0467448 \\ & \textbf{Point Query} & 0.000406027 & 0.00050652 & 0.000588536 & 0.00090754 & 0.00173366 & 0.00235772 & 0.0171422 & 0.046788 \\
+			\multirow{ 4}{*}{\textbf{Batch Index Pyramid Tree}} & \textbf{Insert} & 2.38419e-07 & 0.000285149 & 0.00124717 & 0.00609732 & 0.0120718 & 0.0630434 & 0.129801 & 0.701564 \\ & \textbf{Delete} & 1.3113e-05 & 0.000115395 & 0.000515223 & 0.0026114 & 0.00523591 & 0.0301635 & 0.058435 & 0.320833 \\ & \textbf{Point Query} & 8.82149e-06 & 0.000114202 & 0.000506878 & 0.00257206 & 0.00516725 & 0.0274308 & 0.0576677 & 0.308225 \\
 			\hline
-			\multirow{ 4}{*}{\textbf{Defragmented Index Pyramid Tree}} & \textbf{Insert} & 0.00182939 & 0.0019474 & 0.0020951 & 0.00262773 & 0.00407147 & 0.00530696 & 0.0345504 & 0.0927966 \\ & \textbf{Delete} & 1.31443 & 1.40514 & 1.48344 & 1.49642 & 1.43011 & 1.48568 & 1.52637 & 1.66116 \\ & \textbf{Point Query} & 0.00040555 & 0.000497341 & 0.000604749 & 0.000905514 & 0.00168335 & 0.00233459 & 0.0172749 & 0.046602 \\
+			\multirow{ 4}{*}{\textbf{Defragmented Index Pyramid Tree}} & \textbf{Insert} & 1.2492e-05 & 0.000272274 & 0.00123382 & 0.0064342 & 0.0121651 & 0.0645452 & 0.132141 & 0.71633 \\ & \textbf{Delete} & 1.23978e-05 & 0.000114918 & 0.000509501 & 0.223743 & 1.49966 & 56.2795 & 304.191 & 8100.46 \\ & \textbf{Point Query} & 7.86781e-06 & 0.000114202 & 0.000509501 & 0.00257087 & 0.00517821 & 0.0274258 & 0.0571394 & 0.309029 \\
 			\hline
 		\end{tabular}
-		\caption{Average Execution Time (in Seconds) of $n$ Structure Operations for $n$ Uniformly Random Points}
+		\caption{Execution Time (in Seconds) of Individual Operations on Different Sized Stuctures}
 		\label{tab:perf1-sizevary}
 	\end{table}
-
 
 	\begin{table}
 		\centering
