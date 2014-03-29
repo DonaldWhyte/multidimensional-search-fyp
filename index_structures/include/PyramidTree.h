@@ -75,7 +75,8 @@ namespace mdsearch
 		// Interval between buckets
 		unsigned int bucketInterval;
 		// Median values of the data set.
-		Point medianPoint;
+		std::vector<int> medianPoint;
+		std::vector<int> cumulativeMedianProducts;
 
 	};
 

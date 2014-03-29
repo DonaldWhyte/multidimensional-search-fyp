@@ -63,33 +63,27 @@ namespace mdsearch
 
 			for (unsigned r = 0; (r < numTestRuns); r++)
 			{
+				if (verbose)
+					std::cout << "\t\tExecuting test run" << (r + 1) << "..." << std::endl;
 				for (unsigned int s = 0; (s < structures.size()); s++)
 				{
 					if (verbose)
 						std::cout << "\tRunning operations on structure (" << s << ")..." << std::endl;
-
-					Timing sumOfTimes = 0;
-					for (unsigned int i = 0; (i < numTestRuns); i++) // multiple runs of operations
+					// Ensure structure is completely empty
+					structures[s]->clear();
+					// Pre-load specified points
+					if (dataToPreload.size() > 0)
 					{
-						// Ensure structure is completely empty
-						structures[s]->clear();
-						// Pre-load specified points
-						if (dataToPreload.size() > 0)
-						{
-							if (verbose)
-								std::cout << "\t\tPre-loading " << dataToPreload.size() << " points into structure for run " << (i + 1) << std::endl;
-							structures[s]->loadPoints(dataToPreload);
-						}
-						// Run test operations on structure and add time elapsed
-						// to the total sum
 						if (verbose)
-							std::cout << "\t\tExecuting test run" << (i + 1) << "..." << std::endl;
-						structureTimingsAll[s][r] = runOperations(structures[s],
-							testOperationLists[t],
-							generateCPUProfilerFilename(t, s),
-							generateHeapProfilerFilename(t, s)
-						);
+							std::cout << "\t\tPre-loading " << dataToPreload.size() << " points into structure for run " << (r + 1) << std::endl;
+						structures[s]->loadPoints(dataToPreload);
 					}
+					// Run test operations on structure and store to compute average later
+					structureTimingsAll[s][r] = runOperations(structures[s],
+						testOperationLists[t],
+						generateCPUProfilerFilename(t, s),
+						generateHeapProfilerFilename(t, s)
+					);
 				}
 			}
 			// Now compute average times for each structure 

@@ -1,12 +1,13 @@
 #include "PyramidTree.h"
 #include "Util.h"
+#include <algorithm>
 
 namespace mdsearch
 {
 
 	PyramidTree::PyramidTree(unsigned int nDimensions, const Region& treeBoundary) :
 		IndexStructure(nDimensions), boundary(treeBoundary),
-		bucketInterval(1), medianPoint(nDimensions)
+		bucketInterval(1)
 	{
 		// Compute the interval between buckets 
 		bucketInterval = static_cast<Real>(
@@ -16,10 +17,7 @@ namespace mdsearch
 		// Compute initial median value
 		Real m = static_cast<Real>(1.0 / numDimensions);
 		int div = ceil(pow(MAX_BUCKET_NUMBER, m));
-		for (unsigned int d = 0; d < numDimensions; d++)
-		{
-			medianPoint[d] = div;
-		}
+		medianPoint = std::vector<int>(numDimensions, div);
 		// Ensure boundaries are NEVER ZERO SIZED and the maximum
 		// values are always larger than the minimum
 		for (unsigned int d = 0; d < numDimensions; d++)
@@ -28,6 +26,15 @@ namespace mdsearch
 			{
 				boundary[d].max = boundary[d].min + 1;
 			}
+		}
+
+		// Pre-compute the cumlative products of the median to
+		// speed up the hashPoint() function
+		cumulativeMedianProducts.resize(numDimensions);
+		cumulativeMedianProducts[0] = 1;
+		for (unsigned int d = 1; (d < numDimensions); d++)
+		{
+			cumulativeMedianProducts[d] = medianPoint[d - 1] * cumulativeMedianProducts[d - 1];
 		}
 	}
 
@@ -159,31 +166,17 @@ namespace mdsearch
 				return index;
 		return -1;
 	}
-	
 
 	int PyramidTree::hashPoint(const Point& point)
 	{
-		int searchKey = 0 ;
-		int value[numDimensions];
-		for (int d = 0; d < numDimensions; d++ )
-		{
-			value[d] = static_cast<int>(
-				static_cast<Real>((point[d] - boundary[d].min) / (boundary[d].max - boundary[d].min))
-				* medianPoint[d]);
-			if (value[d] >= medianPoint[d])
-			{
-				value[d] = medianPoint[d] - 1;
-			}
-		}
-		
+		int searchKey = 0;
 		for (int d = 0; d < numDimensions; d++)
 		{
-			int temp = value[d];
-			for (int j = 0; j < d; j++)
-			{	
-				temp = temp * medianPoint[j];
-			}
-			searchKey = searchKey + temp;
+			int value = std::min(
+				static_cast<int>((point[d] - boundary[d].min) / (boundary[d].max - boundary[d].min) * medianPoint[d]),
+				medianPoint[d] - 1
+			);
+			searchKey += value * cumulativeMedianProducts[d];
 		}
 		return searchKey;
 	}
