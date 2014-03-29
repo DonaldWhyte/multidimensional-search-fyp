@@ -101,7 +101,7 @@ To summarise, full compiler optimisation will be used during performance analysi
 
 For this analysis, the three synthetic datasets described in Section \ref{sec:datasets} were used, each having $10000$ points and varying dimensions. Each of the three operations -- \texttt{insert}, point queries and \texttt{delete}, are tested by inserting all points in the structure, querying all points and then deleting all points from the dataset respectively. Timestep 100 of the astrophysics turbulence simulation was also used at an eighth of the resolution, producing a uniformly sampled $75 \times 31 \times 31$ grid with $72075$ points, with two different operation lists. The first list inserts all points in the sampeld ataset, queries them and deletes them. The secnod is a sequence of random operations that use the points from the sampled dataset. The structures being analysed in this iteration are sequential scan, octree and the index pyramid trees (batch and defragmented). A value of 3000 was chosen for $R$, meaning the Defagmented Index Pyramid Tree defragments when 3001 elements have been marked for deletion.
 
-Table \ref{tab:perf1-randuniform} shows the \textit{total} runtime of \texttt{insert}, \texttt{delete} and point query operations for uniformly randomly generated points.Multiple datasets, with different dimensions, were used to observe how the structure's performance behaves as the dimensionality is increased.  When \`-" is shown instead of the number of seconds, it means that the performance test could not finish due to the machine running out of memory. The execution times for skewed and clustered data was almost identical to the uniformly random datasets; for the sake of brevity, the tables and plots for these datasets have been placed in Appendix \ref{chap:supp-material}. Table \ref{tab:perf1-astrophysics} shows the total runtime of the two astrophysics dataset operation lists.
+Table \ref{tab:perf1-randuniform} shows the \textit{total} runtime of \texttt{insert}, \texttt{delete} and point query for uniformly randomly generated points.Multiple datasets, with different dimensions, were used to observe how the structure's performance behaves as the dimensionality is increased.  When \`-" is shown instead of the number of seconds, it means that the performance test could not finish due to the machine running out of memory. The execution times for skewed and clustered data was almost identical to the uniformly random datasets; for the sake of brevity, the tables and plots for these datasets have been placed in Appendix \ref{chap:supp-material}. Table \ref{tab:perf1-astrophysics} shows the total runtime of the two astrophysics dataset operation lists.
 
 In addition to testing performance with respect to dimensionality, the structures have been tested against data of varying size. A uniformly randomly generated dataset with 1,000,000 points has been created. The performance of the three operations has been timed for different sized datasets, sampled from the 1,000,000 point dataset. Again, the three operations are timed using the insert-query-delete sequences of operations. The times are displayed in Table \ref{tab:perf1-sizevary} and Figures \ref{fig:perf-sizevary-insert}, \ref{fig:perf-sizevary-delete} and \ref{fig:perf-sizevary-query}. Since the number of operations \textit{varies} for each dataset, unlike the previous two tests, the times given in the table and plots is the \textit{average} operation time, not the \textit{total}, so a per-operation comparison can be made.
 
@@ -184,17 +184,21 @@ In addition to testing performance with respect to dimensionality, the structure
 	\label{fig:perf-1-allpquery-d}
 \end{figure}
 
+TODO: evaluation
+
 \subsection{Profiling Results}
 
-CPU profiling was performed on each structure to determine where the performance bottlenecks were. Table 
+CPU and heap profiling was performed on each structure to determine where the performance bottlenecks are and how much memory each structure uses. Table \ref{fig:perf1-profiling} shows which functions took the majority of the execution time for each structure, as well as how much heap memory the structure consumed when storing the 10,000 points. The dataset used was 10,000 10D uniform random points and the CPU profiling was performed over 10,000 insertions, 10,000 point queries and 10,000 deletions. 
+
+TODO: define the insert-query-delete sequence formally for brevity
 
 \begin{table}
 	\centering
-	\begin{tabular}{|p{6cm}|p{7.5cm}|p{2.5cm}|}
+	\begin{tabular}{|p{6cm}|p{6cm}|p{2.5cm}|}
 		\hline
 		\textbf{Structure} &
 			\textbf{Dominant Functions (\% time spent on average)}
-		& \textbf{Total Heap Memory Used for 10,000 10D Points} \\
+		& \textbf{Total Heap Memory Used} \\
 		\hline
 		\textbf{Sequential Scan} & 
 			\begin{tabular}{l} \texttt{Point::operator==()} (63.3\%) \\ \texttt{std::vector::remove()} (21.6\%)
@@ -205,14 +209,16 @@ CPU profiling was performed on each structure to determine where the performance
 		\textbf{Defragmented Index Pyramid Tree} & \texttt{defragment()} (72.7\%) & 1.5 MB \\
 		\hline
 	\end{tabular}
-	\caption{Function where most execution time was spent and total heap memory used for each structure on average, from 10D tests performed for Table \ref{tab:perf1-randuniform}}
+	\caption{Function Bottlebecks and Total Heap Memory Used On Average for 10,000 10D Points}
 	\label{fig:perf1-profiling}
 \end{table}
 
-\subsection{Evaluation}
-
-TODO: evaluate results in previous section
+TODO: evaluation of table results
 
  Sequential scan's core bottleneck, for all three operations, was the point equality checking function, taking approximately 97.5\% of the structure's total execution time. There is little additional computation or logic performed by sequential scan, so this is to be expected. Point equality consumes most of the execution time because of the algorithm itself. The structure iterates through the stored points, comparing them with a given point. Therefore, if the structure stores $n$ points, up to $n$ point comparisons may be made for each point (in the worst case).
+
+\subsection{Summary}
+
+TODO: summarise 
 
 TODO state what was decided to do for next iteration (and why)
