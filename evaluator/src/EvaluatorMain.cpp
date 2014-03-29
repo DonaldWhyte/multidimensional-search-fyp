@@ -113,16 +113,33 @@ int main(int argc, char* argv[])
 	// Create evaluator object and fill it with loaded structures
 	Evaluator evaluator(structures, args.testRunsToPerform(),
 		args.profileCPU(), args.profileHeap(), args.isVerbose());
-	// Run evaluation on loaded datasets and operation lists
-	OperationListTimings timings = evaluator.timePerformance(
-		testOperationLists, datasetToPreload);
-	std::cout << generateTimingReport(timings) << std::endl;
-	// Write timing results to file if an output filename was given
-	if (!args.resultFilename().empty())
+
+	// If there are any test operation lists
+	if (testOperationLists.size() > 0)
 	{
-		writeResultsToFile(args.resultFilename(), timings,
-			args, testOperationLists, datasetToPreload);
+		// Run evaluation on loaded datasets and operation lists
+		OperationListTimings timings = evaluator.timePerformance(
+			testOperationLists, datasetToPreload);
+		std::cout << generateTimingReport(timings) << std::endl;
+		// Write timing results to file if an output filename was given
+		if (!args.resultFilename().empty())
+		{
+			writeResultsToFile(args.resultFilename(), timings,
+				args, testOperationLists, datasetToPreload);
+		}
 	}
+	// If there are any datasets to test indiviudal point counts
+	/*if (datasetsForIndividualOpTests.size() > 0)
+	{
+		std::vector<StructureOperationTimings> individualOpTimings =
+			evaluator.timeIndividualOperations(datasetsForIndividualOpTests,
+			pointCountsToSample);
+		for (unsigned int s = 0; (s < individualOpTimings.size()); s++)
+		{
+			std::string filename = "individual_op_timings_0_0"
+			writeIndividualOperationTimings(filename, individualOpTimings[s]);
+		}
+	}*/
 
 	return 0;
 }

@@ -1,6 +1,6 @@
 #include "Evaluator.h"
-#include <ctime>
 #include <sstream>
+#include <algorithm>
 #include <gperftools/profiler.h>
 #include <gperftools/heap-profiler.h>
 
@@ -110,6 +110,64 @@ namespace mdsearch
 			std::cout << "PERFORMANCE TESTS FINISHED" << std::endl;
 
 		return testOpTimings;
+	}
+
+	std::vector<StructureOperationTimings> Evaluator::timeIndividualOperations(
+		const PointList& dataset,
+		const std::vector<int>& pointCountsToTime) const
+	{
+		if (verbose)
+		{
+			std::cout << "STARTING INDIVIDUAL OPERATION PERFORMANCE TESTS USING " << dataset.size()
+				<< " POINTS, SAMPLING AT" << pointCountsToTime.size() << "STRUCTURE SIZES, FOR "
+				<< structures.size()  << "INDEX STRUCTUES" << std::endl;
+		}
+
+		std::vector<StructureOperationTimings> individualOpTimings;
+		for (unsigned int s = 0; (s < structures.size()); s++)
+		{
+			if (verbose)
+				std::cout << "\tTiming individual operations of structure (" << s << ")..." << std::endl;			
+			structures[s]->clear();
+
+			StructureOperationTimings structOpTimings;
+			for (unsigned int p = 0; (p < dataset.size()); p++)	
+			{
+				// Insert next point in dataset
+				structures[s]->insert(dataset[p]);
+				// If operations with this structure size should be timed!
+				if (std::find(pointCountsToTime.begin(), pointCountsToTime.end(), p + 1) != pointCountsToTime.end())
+				{
+					OperationTimings opTimings;
+					opTimings.n = p + 1;
+					// Remove point and time
+					Timing startTime = getTime();
+					structures[s]->remove(dataset[p]);
+					opTimings.remove = getTime() - startTime;
+					// Insert same point, then time point query
+					structures[s]->insert(dataset[p]);
+					startTime = getTime();
+					structures[s]->pointExists(dataset[p]);
+					opTimings.pointQuery = getTime() - startTime;
+					// Insert ANOTHER point and time
+					startTime = getTime();
+					structures[s]->insert(dataset[p]);
+					opTimings.insert = getTime() - startTime;
+					// Remove that point to prepare for next iteration of loop
+					structures[s]->remove(dataset[p]);
+
+					// Add recorded timings to structure
+					structOpTimings.push_back(opTimings);
+				}
+			}
+
+			individualOpTimings.push_back(structOpTimings);
+		}
+
+		if (verbose)
+			std::cout << "INDIVIDUAL OPERATION PERFORMANCE TESTS FINISHED" << std::endl;
+
+		return individualOpTimings;
 	}
 
 	bool Evaluator::isVerbose() const

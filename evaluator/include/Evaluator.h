@@ -13,6 +13,15 @@ namespace mdsearch
 	typedef std::vector<Timing> StructureTimings;
 	typedef std::vector<StructureTimings> OperationListTimings;
 
+	struct OperationTimings
+	{
+		unsigned int n; // current size of structure when timings were made
+		Timing insert;
+		Timing remove;
+		Timing pointQuery;
+	};
+	typedef std::vector<OperationTimings> StructureOperationTimings; // for a single structure
+
 	/* Generate string that contains human-readable report of
 	 * recorded dataset timings. */
 	std::string generateTimingReport(const OperationListTimings& timings);
@@ -40,9 +49,19 @@ namespace mdsearch
 		 * BEFORE timing the operations on it, then this can be passed in
 		 * as the 'dataToPreload' argument.
 		 */
-		 OperationListTimings timePerformance(
+		OperationListTimings timePerformance(
 			const std::vector<TestOperationList>& testOperationLists,
 			const PointList& dataToPreload = PointList()) const;
+		/* Given a dataset, time how long each individual insert(),
+		 * delete() and point query takes at the different structure
+		 * sizes specified in 'pointCountsToTime'.
+		 *
+		 * A vector of vectors is returned, where each vector contains
+		 * the individual operation timings at different structure
+		 * sizes for a SINGLE STRUCTURE TYPE. */
+		std::vector<StructureOperationTimings> timeIndividualOperations(
+			const PointList& dataset,
+			const std::vector<int>& pointCountsToTime) const;
 
 		/* Accessors */
 		bool isVerbose() const;
