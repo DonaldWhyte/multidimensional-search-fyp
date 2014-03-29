@@ -17,6 +17,48 @@ namespace mdsearch
 		}
 	};
 
+	
+	namespace {
+		/* TODO */
+		inline int hashPoint(unsigned int numDimensions, const Point& point, const Region& boundary,
+			const std::vector<int>& medianPoint, const std::vector<int>& cumulativeMedianProducts)
+		{
+			int searchKey = 0;
+			for (int d = 0; d < numDimensions; d++)
+			{
+				int value = std::min(
+					static_cast<int>((point[d] - boundary[d].min) / (boundary[d].max - boundary[d].min) * medianPoint[d]),
+					medianPoint[d] - 1
+				);
+				searchKey += value * cumulativeMedianProducts[d];
+			}
+			return searchKey;
+		}
+
+		/* Used to pre-compute the cumulative products of the median to
+		 * speed up the hashPoint() function. */
+		std::vector<int> computeCumMedianProducts(const std::vector<int>& medianPoint)
+		{
+			std::vector<int> cumulativeMedianProducts(medianPoint.size());
+			if (!medianPoint.empty())
+			{
+				cumulativeMedianProducts[0] = 1;
+				for (unsigned int d = 1; (d < medianPoint.size()); d++)
+				{
+					cumulativeMedianProducts[d] = medianPoint[d - 1] * cumulativeMedianProducts[d - 1];
+				}
+			}
+			return cumulativeMedianProducts;
+		}
+
+		std::vector<int> computeInitialMedianPoint(int maxBucketNumber, int numDimensions)
+		{
+			Real m = static_cast<Real>(1.0 / numDimensions);
+			int div = ceil(pow(maxBucketNumber, m));
+			return std::vector<int>(numDimensions, div);
+		}
+	}
+
 	/* Structure used for Pyramid tree buckets. */
 	struct PTBucket
 	{
@@ -60,7 +102,6 @@ namespace mdsearch
 		void insertToStructure(const Point& point, PTBucket* bucket = NULL);
 		PTBucket* getContainingBucket(const Point& point);
 		int getPointIndexInBucket(const Point& point, const PTBucket* bucket) const;
-		int hashPoint(const Point& myPoint);
 
 		// Unordered_map for storing the points
 		// Key = hashed 1D representation of point,

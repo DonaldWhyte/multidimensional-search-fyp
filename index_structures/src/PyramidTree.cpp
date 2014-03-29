@@ -14,10 +14,8 @@ namespace mdsearch
 			MAX_BUCKET_NUMBER / (numDimensions * 2)
 		);
 		bucketInterval = floor(bucketInterval);
-		// Compute initial median value
-		Real m = static_cast<Real>(1.0 / numDimensions);
-		int div = ceil(pow(MAX_BUCKET_NUMBER, m));
-		medianPoint = std::vector<int>(numDimensions, div);
+		medianPoint = computeInitialMedianPoint(MAX_BUCKET_NUMBER, numDimensions);
+
 		// Ensure boundaries are NEVER ZERO SIZED and the maximum
 		// values are always larger than the minimum
 		for (unsigned int d = 0; d < numDimensions; d++)
@@ -27,15 +25,7 @@ namespace mdsearch
 				boundary[d].max = boundary[d].min + 1;
 			}
 		}
-
-		// Pre-compute the cumlative products of the median to
-		// speed up the hashPoint() function
-		cumulativeMedianProducts.resize(numDimensions);
-		cumulativeMedianProducts[0] = 1;
-		for (unsigned int d = 1; (d < numDimensions); d++)
-		{
-			cumulativeMedianProducts[d] = medianPoint[d - 1] * cumulativeMedianProducts[d - 1];
-		}
+		cumulativeMedianProducts = computeCumMedianProducts(medianPoint);
 	}
 
 	void PyramidTree::clear()
@@ -136,7 +126,7 @@ namespace mdsearch
 		}
 		else // if bucket does not exist for point, create it!
 		{
-			int searchKey = hashPoint(point);
+			int searchKey = hashPoint(numDimensions, point, boundary, medianPoint, cumulativeMedianProducts);
 			PTBucket newBucket;
 			newBucket.points.push_back(point);
 			newBucket.pointSums.push_back(point.sum());
@@ -147,7 +137,7 @@ namespace mdsearch
 	PTBucket* PyramidTree::getContainingBucket(const Point& point)
 	{
 		// Hash point into one-dimensional key
-		int searchKey = hashPoint(point);
+		int searchKey = hashPoint(numDimensions, point, boundary, medianPoint, cumulativeMedianProducts);
 		// Search underlying splay tree to find point's bucket
 		OneDMap::iterator it = hashMap.find(searchKey);
 		if (it != hashMap.end())
@@ -165,20 +155,6 @@ namespace mdsearch
 			if (pSum == bucket->pointSums[index] && point == bucket->points[index])
 				return index;
 		return -1;
-	}
-
-	int PyramidTree::hashPoint(const Point& point)
-	{
-		int searchKey = 0;
-		for (int d = 0; d < numDimensions; d++)
-		{
-			int value = std::min(
-				static_cast<int>((point[d] - boundary[d].min) / (boundary[d].max - boundary[d].min) * medianPoint[d]),
-				medianPoint[d] - 1
-			);
-			searchKey += value * cumulativeMedianProducts[d];
-		}
-		return searchKey;
 	}
 
 }

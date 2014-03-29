@@ -61,7 +61,6 @@ namespace mdsearch
 
 		void insertToStructure(const Point& point, bool searchKeyExists);
 		int getPointIndex(const Point& point);
-		int hashPoint(const Point& myPoint);
 		/* Defragments internal point arrays by deleting all unused points. */
 		void defragment();
 		/* Given the index of the last removed point in the 'points' array,
@@ -99,7 +98,8 @@ namespace mdsearch
 		// Interval between buckets
 		unsigned int bucketInterval;
 		// Median values of the data set.
-		Point medianPoint;
+		std::vector<int> medianPoint;
+		std::vector<int> cumulativeMedianProducts;
 
 	};
 

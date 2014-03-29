@@ -15,13 +15,8 @@ namespace mdsearch
 			MAX_BUCKET_NUMBER / (numDimensions * 2)
 		);
 		bucketInterval = floor(bucketInterval);
-		// Compute initial median value
-		Real m = static_cast<Real>(1.0 / numDimensions);
-		int div = ceil(pow(MAX_BUCKET_NUMBER, m));
-		for (unsigned int d = 0; d < numDimensions; d++)
-		{
-			medianPoint[d] = div;
-		}
+		medianPoint = computeInitialMedianPoint(MAX_BUCKET_NUMBER, numDimensions);
+		
 		// Ensure boundaries are NEVER ZERO SIZED and the maximum
 		// values are always larger than the minimum
 		for (unsigned int d = 0; d < numDimensions; d++)
@@ -31,6 +26,7 @@ namespace mdsearch
 				boundary[d].max = boundary[d].min + 1;
 			}
 		}
+		cumulativeMedianProducts = computeCumMedianProducts(medianPoint);
 	}
 
 	void IndexPyramidTree::clear()
@@ -63,7 +59,7 @@ namespace mdsearch
 	bool IndexPyramidTree::remove(const Point& point)
 	{
 		// Find bucket the point would belong to
-		int searchKey = hashPoint(point);
+		int searchKey = hashPoint(numDimensions, point, boundary, medianPoint, cumulativeMedianProducts);
 		OneDMap::iterator keyValue = hashMap.find(searchKey);
 		// Bucket has been found, point MIGHT be stored in structure
 		if (keyValue != hashMap.end())
@@ -160,7 +156,7 @@ namespace mdsearch
 		points.push_back(point);
 		pointSums.push_back(point.sum());
 
-		int searchKey = hashPoint(point);
+		int searchKey = hashPoint(numDimensions, point, boundary, medianPoint, cumulativeMedianProducts);
 		int currentIndex = points.size() - 1;
 		if (searchKeyExists)
 		{
@@ -183,7 +179,7 @@ namespace mdsearch
 	int IndexPyramidTree::getPointIndex(const Point& point)
 	{
 		// First check if this point's bucket exists
-		int searchKey = hashPoint(point);
+		int searchKey = hashPoint(numDimensions, point, boundary, medianPoint, cumulativeMedianProducts);
 		OneDMap::const_iterator keyValue = hashMap.find(searchKey);
 		if (keyValue != hashMap.end())
 		{
@@ -216,34 +212,7 @@ namespace mdsearch
 		}
 	}	
 
-	int IndexPyramidTree::hashPoint(const Point& point)
-	{
-		int searchKey = 0 ;
-		int value[numDimensions];
-		for (int d = 0; d < numDimensions; d++ )
-		{
-			value[d] = static_cast<int>(
-				static_cast<Real>((point[d] - boundary[d].min) / (boundary[d].max - boundary[d].min))
-				* medianPoint[d]);
-			if (value[d] >= medianPoint[d])
-			{
-				value[d] = medianPoint[d] - 1;
-			}
-		}
-		
-		for (int d = 0; d < numDimensions; d++)
-		{
-			int temp = value[d];
-			for (int j = 0; j < d; j++)
-			{	
-				temp = temp * medianPoint[j];
-			}
-			searchKey = searchKey + temp;
-		}
-		return searchKey;
-	}
-
-	/* Fucntion used to sort integer values in DESCENDING ORDER. */
+	/* Function used to sort integer values in DESCENDING ORDER. */
 	bool descendingSorter(unsigned int i, unsigned int j)
 	{
 		return (i > j);	

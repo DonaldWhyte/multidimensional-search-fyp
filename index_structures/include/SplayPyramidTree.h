@@ -45,7 +45,6 @@ namespace mdsearch
 		void insertToStructure(const Point& point, PTBucket* bucket = NULL);
 		PTBucket* getContainingBucket(const Point& point);
 		int getPointIndexInBucket(const Point& point, const PTBucket* bucket) const;
-		int hashPoint(const Point& myPoint);
 
 		typedef SplayTree<int, PTBucket> SplayTreeType;
 		SplayTreeType splayTree;
@@ -56,7 +55,8 @@ namespace mdsearch
 		// Interval between buckets
 		unsigned int bucketInterval;
 		// Median values of the data set.
-		Point medianPoint;
+		std::vector<int> medianPoint;
+		std::vector<int> cumulativeMedianProducts;
 
 	};
 
