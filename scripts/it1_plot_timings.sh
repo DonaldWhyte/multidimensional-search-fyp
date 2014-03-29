@@ -8,7 +8,12 @@ timingsDirectory="$1"
 
 function plotMultipleTimings {
 	# Arguments: <resultsDirectory> <operationType> <dataset>
-	gnuplot -e "inputDirectory='$timingsDirectory/'" -e "operation='$2'" -e "dataset='$3'" it1_plotscript.plg
+	gnuplot -e "inputDirectory='$1/'" -e "operation='$2'" -e "dataset='$3'" it1_plotscript.plg
+}
+
+function plotSizeTimings {
+	# Arguments: <resultsDirectory> <operationType>
+	gnuplot -e "inputDirectory='$1/'" -e "operation='$2'" it1_size_plotscript.plg	
 }
 
 # Plotting all four structures in one graph, for each operation-dataset pair
@@ -21,3 +26,7 @@ plotMultipleTimings "$timingsDirectory" "delete" "clustered"
 plotMultipleTimings "$timingsDirectory" "pquery" "randuniform"
 plotMultipleTimings "$timingsDirectory" "pquery" "skewed"
 plotMultipleTimings "$timingsDirectory" "pquery" "clustered"
+
+plotSizeTimings "$timingsDirectory" "insert"
+plotSizeTimings "$timingsDirectory" "delete"
+plotSizeTimings "$timingsDirectory" "pquery"

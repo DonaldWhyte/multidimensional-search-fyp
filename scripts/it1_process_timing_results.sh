@@ -19,3 +19,7 @@ outputDirectory="$2"
 ./process_timing_results.py "$outputDirectory" "$inputDirectory" pquery randuniform sequentialscan octree indexpyramidtree indexpyramidtree_defragment
 ./process_timing_results.py "$outputDirectory" "$inputDirectory" pquery skewed sequentialscan octree indexpyramidtree indexpyramidtree_defragment
 ./process_timing_results.py "$outputDirectory" "$inputDirectory" pquery clustered sequentialscan octree indexpyramidtree indexpyramidtree_defragment
+
+./process_size_results.py "$outputDirectory" "$inputDirectory" insert sequentialscan indexpyramidtree indexpyramidtree_defragment
+./process_size_results.py "$outputDirectory" "$inputDirectory" delete sequentialscan indexpyramidtree indexpyramidtree_defragment
+./process_size_results.py "$outputDirectory" "$inputDirectory" pquery sequentialscan indexpyramidtree indexpyramidtree_defragment
