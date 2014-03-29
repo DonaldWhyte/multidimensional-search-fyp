@@ -26,9 +26,16 @@ static const Interval UNIFORM_CLUSTER_INTERVALS[] = { // first elem 'min', secon
 static const unsigned int NUM_CLUSTERS = 2;
 static const unsigned int NUM_POINTS_PER_CLUSTER = NUM_POINTS_PER_DATASET / NUM_CLUSTERS;
 
+static const unsigned int N_VARYING_DIMENSIONALITY = 16;
+static const unsigned int POINT_COUNTS[] = {
+	10, 100, 1000, 5000, 10000, 50000, 100000, 500000, 1000000
+};
+static const unsigned int NUM_POINT_COUNTS = 9;
+
 static const std::string RANDOM_UNIFORM_DATASET_PREFIX = "randuniform";
 static const std::string SKEWED_DATASET_PREFIX = "skewed";
 static const std::string CLUSTERED_DATASET_PREFIX = "clustered";
+static const std::string N_VARYING_DATASET_PREFIX = "sizevary";
 static const std::string EXTENSION = "dat";
 
 std::string datasetFilename(const std::string& prefix, unsigned int numDimensions)
@@ -38,6 +45,14 @@ std::string datasetFilename(const std::string& prefix, unsigned int numDimension
 	ss << numDimensions;
 	std::string numDimensionsStr = ss.str();
 	return prefix + "_" + numDimensionsStr + "d." + EXTENSION;
+}
+
+std::string pointCountDatasetFilename(const std::string& prefix, unsigned int numPoints)
+{
+	std::stringstream ss;
+	ss << numPoints;
+	std::string numPointsStr = ss.str();
+	return prefix + "_n" + numPointsStr + "." + EXTENSION;
 }
 
 int main(int argc, char* argv[])
@@ -108,7 +123,24 @@ int main(int argc, char* argv[])
 		dataset.clear();
 
 		std::cout << "\tGenerated " << d << "D dataset" << std::endl;
-	}	
+	}
+
+	std::cout << "Generating " << N_VARYING_DIMENSIONALITY << "D datasets of varying size" << std::endl;
+	// First generate uniformly randomly distributed 100D dataset with highest number of points
+	Region region(N_VARYING_DIMENSIONALITY, Interval(MIN_VALUE, MAX_VALUE));
+	int maxPoints = POINT_COUNTS[NUM_POINT_COUNTS - 1];
+	std::vector<ClusterSpecification> specifications;
+	specifications.push_back(ClusterSpecification(region, maxPoints));
+	PointList allPoints = clusteredGenerator.generate(N_VARYING_DIMENSIONALITY, specifications);
+	for (unsigned int i = 0; (i < NUM_POINT_COUNTS); i++)
+	{
+		unsigned int n = POINT_COUNTS[i];
+		std::cout << "\tGenerating " << n << " point dataset..." << std::endl;
+		std::string filename = pointCountDatasetFilename(N_VARYING_DATASET_PREFIX, n);
+		PointList dataset(allPoints.begin(), allPoints.begin() + n);
+		std::cout << "\t\t" << dataset.size() << std::endl;
+		writePointsToFile(filename, N_VARYING_DIMENSIONALITY, dataset);
+	}
 
 	return 0;
 }
