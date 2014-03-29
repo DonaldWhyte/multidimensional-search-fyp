@@ -186,10 +186,33 @@ In addition to testing performance with respect to dimensionality, the structure
 
 \subsection{Profiling Results}
 
-TODO: CPU and heap profiling
+CPU profiling was performed on each structure to determine where the performance bottlenecks were. Table 
+
+\begin{table}
+	\centering
+	\begin{tabular}{|p{6cm}|p{7.5cm}|p{2.5cm}|}
+		\hline
+		\textbf{Structure} &
+			\textbf{Dominant Functions (\% time spent on average)}
+		& \textbf{Total Heap Memory Used for 10,000 10D Points} \\
+		\hline
+		\textbf{Sequential Scan} & 
+			\begin{tabular}{l} \texttt{Point::operator==()} (63.3\%) \\ \texttt{std::vector::remove()} (21.6\%)
+			\end{tabular}
+			& 0.9 MB \\
+		\textbf{Octree} & \texttt{subdivide()} (34.4\%) & 291.3 MB \\
+		\textbf{Batch Index Pyramid Tree} & \texttt{hashPoint()} (99.7\%) & 1.5 MB \\
+		\textbf{Defragmented Index Pyramid Tree} & \texttt{defragment()} (72.7\%) & 1.5 MB \\
+		\hline
+	\end{tabular}
+	\caption{Function where most execution time was spent and total heap memory used for each structure on average, from 10D tests performed for Table \ref{tab:perf1-randuniform}}
+	\label{fig:perf1-profiling}
+\end{table}
 
 \subsection{Evaluation}
 
 TODO: evaluate results in previous section
+
+ Sequential scan's core bottleneck, for all three operations, was the point equality checking function, taking approximately 97.5\% of the structure's total execution time. There is little additional computation or logic performed by sequential scan, so this is to be expected. Point equality consumes most of the execution time because of the algorithm itself. The structure iterates through the stored points, comparing them with a given point. Therefore, if the structure stores $n$ points, up to $n$ point comparisons may be made for each point (in the worst case).
 
 TODO state what was decided to do for next iteration (and why)
