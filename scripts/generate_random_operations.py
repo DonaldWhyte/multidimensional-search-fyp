@@ -79,4 +79,4 @@ if __name__ == "__main__":
 	print("{} {}".format(numDimensions, numOperations))
 	# Generate points and print them on-the-fly
 	for i in range(numOperations):
-		print operationToStr( generateRandomOperation(numDimensions, cumulativeOpProbs) )
+		print(operationToStr(generateRandomOperation(numDimensions, cumulativeOpProbs)))

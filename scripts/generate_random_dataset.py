@@ -35,4 +35,4 @@ if __name__ == "__main__":
 	print("{} {}".format(numDimensions, numPoints))
 	# Generate points and print them on-the-fly
 	for i in range(numPoints):
-		print pointToStr( generatePoint(numDimensions) )
+		print(pointToStr(generatePoint(numDimensions)))
