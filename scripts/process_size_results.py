@@ -7,7 +7,8 @@ from process_timing_results import writeTimings
 
 TIMING_FILENAME_FORMAT = r"times_{}_sizevary_n(\d+)\.txt"
 STRUCTURE_TIMING_LINE_REGEX = re.compile( r"\t\tStructure \((\d+)\): ([\d\.]+(e[+-]{1}\d+)?) seconds" )
-OUTPUT_STRUCTURE_TIMING_FILENAME_FORMAT = "{}_{}_sizevary.times"
+OUTPUT_STRUCTURE_TOTAL_TIMING_FILENAME_FORMAT = "{}_{}_sizevary_total.times"
+OUTPUT_STRUCTURE_AVERAGE_TIMING_FILENAME_FORMAT = "{}_{}_sizevary_average.times"
 
 def getFilesToProcess(resultsDirectory, operation):
 	filenameFormatRegex = re.compile( TIMING_FILENAME_FORMAT.format(operation) )
@@ -39,7 +40,7 @@ def getStructureTimings(timingFiles, structureNames, testOpListIndex = 0):
 				if match:
 					index = int(match.group(1))
 					timingValue = match.group(2)
-					structureTimings[structureNames[index]].append( (n, timingValue) )
+					structureTimings[structureNames[index]].append( (int(n), float(timingValue)) )
 				else:
 					break
 	# Sort structure timing lists by dimensionality
@@ -64,6 +65,16 @@ if __name__ == "__main__":
 	)
 
 	for structureName, timings in structureTimings.items():
-		filename = OUTPUT_STRUCTURE_TIMING_FILENAME_FORMAT.format(structureName, operation)
+		# Write TOTAL timings
+		filename = OUTPUT_STRUCTURE_TOTAL_TIMING_FILENAME_FORMAT.format(structureName, operation)
 		outputPath = os.path.join(outputDirectory, filename)
 		writeTimings(outputPath, timings)
+		# Write AVERAGE timings
+		averageTimings = list(timings) # compute them first!
+		for i in range(len(averageTimings)):
+			n = averageTimings[i][0]
+			timing = averageTimings[i][1]
+			averageTimings[i] = ( n, (timing / n) )
+		filename = OUTPUT_STRUCTURE_AVERAGE_TIMING_FILENAME_FORMAT.format(structureName, operation)
+		outputPath = os.path.join(outputDirectory, filename)
+		writeTimings(outputPath, averageTimings)

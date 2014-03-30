@@ -99,17 +99,23 @@ To summarise, full compiler optimisation will be used during performance analysi
 
 \subsection{Performance Timings}
 
-For this analysis, the three synthetic datasets described in Section \ref{sec:datasets} were used, each having $10000$ points and varying dimensions. Each of the three operations -- \texttt{insert}, point queries and \texttt{delete}, are tested by inserting all points in the structure, querying all points and then deleting all points from the dataset respectively. Timestep 100 of the astrophysics turbulence simulation was also used at an eighth of the resolution, producing a uniformly sampled $75 \times 31 \times 31$ grid with $72075$ points, with two different operation lists. The first list inserts all points in the sampeld ataset, queries them and deletes them. The secnod is a sequence of random operations that use the points from the sampled dataset. The structures being analysed in this iteration are sequential scan, octree and the index pyramid trees (batch and defragmented). A value of 3000 was chosen for $R$, meaning the Defagmented Index Pyramid Tree defragments when 3001 elements have been marked for deletion.
+For this analysis, the three synthetic datasets described in Section \ref{sec:datasets} were used, each having 10,000 points and varying dimensions. Each of the three operations -- \texttt{insert}, point queries and \texttt{delete}, are tested by inserting all points in the structure, querying all points and then deleting all points from the dataset respectively. Timestep 100 of the astrophysics turbulence simulation was also used at an eighth of the resolution, producing a uniformly sampled $75 \times 31 \times 31$ grid with $72075$ points, with two different operation lists. The first list inserts all points in the sampled dataset, queries them and deletes them. The secnod is a sequence of random operations that use the points from the sampled dataset. The structures being analysed in this iteration are sequential scan, octree and the index pyramid trees (batch and defragmented). A value of 3000 was chosen for $R$, meaning the Defagmented Index Pyramid Tree defragments when 3001 elements have been marked for deletion.
 
-Table \ref{tab:perf1-randuniform} shows the \textit{total} runtime of \texttt{insert}, \texttt{delete} and point query for uniformly randomly generated points.Multiple datasets, with different dimensions, were used to observe how the structure's performance behaves as the dimensionality is increased.  When \`-" is shown instead of the number of seconds, it means that the performance test could not finish due to the machine running out of memory. The execution times for skewed and clustered data was almost identical to the uniformly random datasets; for the sake of brevity, the tables and plots for these datasets have been placed in Appendix \ref{chap:supp-material}. Table \ref{tab:perf1-astrophysics} shows the total runtime of the two astrophysics dataset operation lists.
+Table \ref{tab:perf1-randuniform} contains the \textit{total} runtime of \texttt{insert}, \texttt{delete} and point query for uniformly randomly generated points for the analyses structures. Plots with dimension against execution time are shown for the three operations in Figures \ref{fig:perf1-allinsert-d}, \ref{fig:perf1-alldelete-d} and \ref{fig:perf1-allpquery-d}
+
+Multiple datasets, with different dimensions, were used to observe how the structure's performance behaves as the dimensionality is increased.  When \`-" is shown instead of the number of seconds, it means that the performance test could not finish due to the machine running out of memory. The execution times for skewed and clustered data was almost identical to the uniformly random datasets; for the sake of brevity, the tables and plots for these datasets have been placed in Appendix \ref{chap:supp-material}. Table \ref{tab:perf1-astrophysics} shows the total runtime of the two astrophysics dataset operation lists.
 
 All three plots show that dimensionality has little effect on \textit{insert} and point queries for Sequential Scan. \texttt{delete}'s exeuction time increases as $d$ does, most likely because higher $d$ means more data has to be moved when a point is deleted from the undelying array. As expected, the Octree takes exponentially longer as $d$ increases, due to the exponential increase in nodes at each level ($2^d$ children per node). After $d = 10$ the number of excessive nodes was so high that the performance tests crashed due to there being no more memory to allocate.
 
-Both variants of the Index Pyramid Tree have the same speed for \texttt{insert} and point queries, which significant outperfoms Sequential Scan and Octree. However, the performance of the trees decreases as $d$ increases and eventually the structure is slower than Sequential Scan (in this case, sequential scan starts being faster when $d \approx 57$). This is most likely due to the Pyrmaid Tree's hashing function, which is a $O(d)$ operation. The $O(n^2)$ defragmentation procedure used by the Defragmented Index Pyrmaid Tree causes it to be the slowest structure for deleting points, taking almost twice as long as Squential Scan. The Batch Pyramid Tree on the other hand has the fastest deletion speed, because it only removes the point's index and not the point itself (no expensive memory de-allocations).
+Both variants of the Index Pyramid Tree have the same speed for \texttt{insert} and point queries, which significant outperfoms Sequential Scan and Octree. However, the performance of the trees decreases as $d$ increases and eventually the structure is slower than Sequential Scan (in this case, Sequential Scan starts being faster when $d \approx 57$). This is most likely due to the Pyrmaid Tree's hashing function, which is currently a $O(d^2)$ operation. The $O(n^2)$ defragmentation procedure used by the Defragmented Index Pyramid Tree causes it to be the slowest structure for deleting points, taking almost twice as long as Squential Scan. The Batch Pyramid Tree on the other hand has the fastest deletion speed, because it only removes the point's index and not the point itself (no expensive memory de-allocations).
 
-In addition to testing performance with respect to dimensionality, the structures have been tested against data of varying size. A uniformly randomly generated dataset with 1,000,000 points has been created. The performance of the three operations has been timed for different sized datasets, sampled from the 1,000,000 point dataset. Again, the three operations are timed using the insert-query-delete sequence of operations. The times are displayed in Table \ref{tab:perf1-sizevary} and Figures \ref{fig:perf-sizevary-insert}, \ref{fig:perf-sizevary-delete} and \ref{fig:perf-sizevary-query}. Unlike the previous two tests, the number of operations \textit{varies} for each dataset, so the times given in the table and plots are for \textit{single} operations, not the \textit{total}. This allows a fair comparison between operation times of each structure to be made as $n$ increases.
+TODO
 
-TODO: up-date data
+In addition to testing performance with respect to dimensionality, the structures have been tested against data of varying size. A uniformly randomly generated dataset with 1,000,000 points has been created. The performance of the three operations has been timed for different sized datasets sampled from the 1,000,000 point dataset. Again, the three operations are timed using the insert-query-delete sequence of operations. The times are displayed in Table \ref{tab:perf1-sizevary} and Figures \ref{fig:perf1-allinsert-n}, \ref{fig:perf1-alldelete-n} and \ref{fig:perf1-allpquery-n}. Unlike the previous two tests, the number of operations \textit{varies} for each dataset, so the times given in the table and plots is the \textbf{average} time of an operation, not the \textit{total}. This allows a fair comparison between operation times of each structure to be made as $n$ increases.
+
+By measuring the average execution time of an operation in this way, insight into each structure's performance behaviour can be gained. If there is a linear relationship between the average time and $n$, then it is shown a structure's performance decreases linearly with dataset size. If the average timing does not change at all, then dataset size does not affect a structure's performance.
+
+TODO: further argumentation here???
 
 \begin{landscape}
 
@@ -138,14 +144,14 @@ TODO: up-date data
 			\hline
 			\textbf{Structure} & \textbf{Operation} & $n = 10$ & $n = 100$ & $n = 1000$ & $n = 5000$ & $n = 10000$ & $n = 50000$ & $n = 100000$ & $n = 500000$ \\
 			\hline
-			\multirow{ 4}{*}{\textbf{Sequential Scan}} & \textbf{Insert} & 2.38419e-07 & 4.33922e-05 & 0.00095439 & 0.0278358 & 0.1248 & 3.32167 & 15.5559 & 627.169 \\textbf{Delete} & 4.05312e-06 & 0.000162601 & 0.00687075 & 0.169203 & 0.677672 & 17.5086 & 68.9738 & 1785.64 \\ & \textbf{Point Query} & 1.19209e-06 & 2.59876e-05 & 0.000880718 & 0.0276701 & 0.123303 & 3.21367 & 14.7421 & 594.116 \\
+			\multirow{ 4}{*}{\textbf{Sequential Scan}} & \textbf{Insert} & 2.38419e-08 & 4.33922e-07 & 9.543899999999999e-07 & 5.56716e-06 & 1.2479999999999999e-05 & 6.64334e-05 & 0.000155559 & 0.001254338 \\ & \textbf{Delete} & 4.0531199999999997e-07 & 1.62601e-06 & 6.87075e-06 & 3.3840599999999996e-05 & 6.77672e-05 & 0.00035017200000000005 & 0.000689738 & 0.00357128 \\ & \textbf{Point Query} & 1.1920899999999999e-07 & 2.5987599999999996e-07 & 8.80718e-07 & 5.5340199999999996e-06 & 1.23303e-05 & 6.42734e-05 & 0.000147421 & 0.001188232 \\
 			\hline
-			\multirow{ 4}{*}{\textbf{Batch Index Pyramid Tree}} & \textbf{Insert} & 2.38419e-07 & 0.000285149 & 0.00124717 & 0.00609732 & 0.0120718 & 0.0630434 & 0.129801 & 0.701564 \\ & \textbf{Delete} & 1.3113e-05 & 0.000115395 & 0.000515223 & 0.0026114 & 0.00523591 & 0.0301635 & 0.058435 & 0.320833 \\ & \textbf{Point Query} & 8.82149e-06 & 0.000114202 & 0.000506878 & 0.00257206 & 0.00516725 & 0.0274308 & 0.0576677 & 0.308225 \\
+			\multirow{ 4}{*}{\textbf{Batch Index Pyramid Tree}} & \textbf{Insert} & 2.38419e-08 & 2.85149e-06 & 1.24717e-06 & 1.219464e-06 & 1.2071800000000001e-06 & 1.260868e-06 & 1.29801e-06 & 1.4031279999999999e-06 \\ & \textbf{Delete} & 1.3113e-06 & 1.15395e-06 & 5.15223e-07 & 5.222799999999999e-07 & 5.23591e-07 & 6.0327e-07 & 5.8435e-07 & 6.416659999999999e-07 \\ & \textbf{Point Query} & 8.82149e-07 & 1.14202e-06 & 5.06878e-07 & 5.14412e-07 & 5.16725e-07 & 5.48616e-07 & 5.76677e-07 & 6.1645e-07 \\
 			\hline
-			\multirow{ 4}{*}{\textbf{Defragmented Index Pyramid Tree}} & \textbf{Insert} & 1.2492e-05 & 0.000272274 & 0.00123382 & 0.0064342 & 0.0121651 & 0.0645452 & 0.132141 & 0.71633 \\ & \textbf{Delete} & 1.23978e-05 & 0.000114918 & 0.000509501 & 0.223743 & 1.49966 & 56.2795 & 304.191 & 8100.46 \\ & \textbf{Point Query} & 7.86781e-06 & 0.000114202 & 0.000509501 & 0.00257087 & 0.00517821 & 0.0274258 & 0.0571394 & 0.309029 \\
+			\multirow{ 4}{*}{\textbf{Defragmented Index Pyramid Tree}} & \textbf{Insert} & 0.0 & 2.7227399999999996e-06 & 1.23382e-06 & 1.28684e-06 & 1.21651e-06 & 1.290904e-06 & 1.32141e-06 & 1.43266e-06 \\ & \textbf{Delete} & 1.23978e-06 & 1.14918e-06 & 5.09501e-07 & 4.47486e-05 & 0.000149966 & 0.0011255899999999999 & 0.0030419099999999997 & 0.01620092 \\ & \textbf{Point Query} & 7.86781e-07 & 1.14202e-06 & 5.09501e-07 & 5.14174e-07 & 5.17821e-07 & 5.48516e-07 & 5.71394e-07 & 6.18058e-07 \\
 			\hline
 		\end{tabular}
-		\caption{Execution Time (in Seconds) of Individual Operations on Different Sized Stuctures}
+		\caption{Total Execution Time (in Seconds) of $n$ Operations on an $n$-Sized Structure}
 		\label{tab:perf1-sizevary}
 	\end{table}
 
@@ -170,22 +176,43 @@ TODO: up-date data
 \begin{figure}
 	\centering
 	\includegraphics[scale=0.8]{figures/performance_analysis/iteration_1/all_insert_randuniform.pdf}
-	\caption{\texttt{insert} Performance on Randomly Generated Uniformly Distributed Datasets}
-	\label{fig:perf-1-allinsert-d}
+	\caption{\texttt{insert} Performance on Random Uniformly Distributed Datasets of Varying Dimensions}
+	\label{fig:perf1-allinsert-d}
 \end{figure}
 
 \begin{figure}
 	\centering
 	\includegraphics[scale=0.8]{figures/performance_analysis/iteration_1/all_delete_randuniform.pdf}
-	\caption{\texttt{delete} Performance on Randomly Generated Uniformly Distributed Datasets}
-	\label{fig:perf-1-alldelete-d}
+	\caption{\texttt{delete} Performance on Random Uniformly Distributed Datasets of Varying Dimensions}
+	\label{fig:perf1-alldelete-d}
 \end{figure}
 
 \begin{figure}
 	\centering
 	\includegraphics[scale=0.8]{figures/performance_analysis/iteration_1/all_pquery_randuniform.pdf}
-	\caption{Point Query Performance on Randomly Generated Uniformly Distributed Datasets}
-	\label{fig:perf-1-allpquery-d}
+	\caption{Point Query Performance on Random Uniformly Distributed Datasets of Varying Dimensions}
+	\label{fig:perf1-allpquery-d}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.8]{figures/performance_analysis/iteration_1/all_insert_sizevary_average.pdf}
+	\caption{\texttt{insert} Performance on 16D Random Uniformly Distributed Datasets of Varying Size. This represents the time to build a structure with $n$ points.}
+	\label{fig:perf1-allinsert-n}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.8]{figures/performance_analysis/iteration_1/all_delete_sizevary_average.pdf}
+	\caption{\texttt{delete} Performance on 16D Random Uniformly Distributed Datasets of Varying Size}
+	\label{fig:perf1-alldelete-n}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.8]{figures/performance_analysis/iteration_1/all_pquery_sizevary_average.pdf}
+	\caption{Point Query Performance on 16D Random Uniformly Distributed Datasets of Varying Size}
+	\label{fig:perf1-allpquery-n}
 \end{figure}
 
 \subsection{Profiling Results}

@@ -12,8 +12,8 @@ function plotMultipleTimings {
 }
 
 function plotSizeTimings {
-	# Arguments: <resultsDirectory> <operationType>
-	gnuplot -e "inputDirectory='$1/'" -e "operation='$2'" it1_size_plotscript.plg	
+	# Arguments: <resultsDirectory> <operationType> {total|average}
+	gnuplot -e "inputDirectory='$1/'" -e "operation='$2'" -e "timingType='$3'" it1_size_plotscript.plg	
 }
 
 # Plotting all four structures in one graph, for each operation-dataset pair
@@ -26,7 +26,9 @@ plotMultipleTimings "$timingsDirectory" "delete" "clustered"
 plotMultipleTimings "$timingsDirectory" "pquery" "randuniform"
 plotMultipleTimings "$timingsDirectory" "pquery" "skewed"
 plotMultipleTimings "$timingsDirectory" "pquery" "clustered"
-
-plotSizeTimings "$timingsDirectory" "insert"
-plotSizeTimings "$timingsDirectory" "delete"
-plotSizeTimings "$timingsDirectory" "pquery"
+plotSizeTimings "$timingsDirectory" "insert" "total"
+plotSizeTimings "$timingsDirectory" "delete" "total"
+plotSizeTimings "$timingsDirectory" "pquery" "total"
+plotSizeTimings "$timingsDirectory" "insert" "average"
+plotSizeTimings "$timingsDirectory" "delete" "average"
+plotSizeTimings "$timingsDirectory" "pquery" "average"

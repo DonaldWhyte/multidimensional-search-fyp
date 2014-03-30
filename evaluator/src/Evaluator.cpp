@@ -113,8 +113,8 @@ namespace mdsearch
 		if (verbose)
 		{
 			std::cout << "STARTING INDIVIDUAL OPERATION PERFORMANCE TESTS USING " << dataset.size()
-				<< " POINTS, SAMPLING AT" << pointCountsToTime.size() << "STRUCTURE SIZES, FOR "
-				<< structures.size()  << "INDEX STRUCTUES" << std::endl;
+				<< " POINTS, SAMPLING AT " << pointCountsToTime.size() << " STRUCTURE SIZES, FOR "
+				<< structures.size()  << " INDEX STRUCTUES" << std::endl;
 		}
 
 		std::vector<StructureOperationTimings> individualOpTimings;

@@ -126,7 +126,9 @@ int main(int argc, char* argv[])
 	const StringList& individualOpDatasetFilenames = args.individualOpDatasetFilenames();
 	for (unsigned int i = 0; (i < individualOpDatasetFilenames.size()); i++)
 	{
-		datasetLoader.load(individualOpDatasetFilenames[i]);
+		datasetsForIndividualOpTests.push_back(
+			datasetLoader.load(individualOpDatasetFilenames[i])
+		);
 	}
 
 	// Load specified test operations
@@ -163,30 +165,27 @@ int main(int argc, char* argv[])
 
 	// If there are any datasets to test indiviudal point counts,
 	// run the tests and store the results
-	if (datasetsForIndividualOpTests.size() > 0)
+	for (unsigned int i = 0; (i < datasetsForIndividualOpTests.size()); i++)
 	{
-		for (unsigned int i = 0; (i < datasetsForIndividualOpTests.size()); i++)
-		{
-			std::vector<StructureOperationTimings> individualOpTimings =
-				evaluator.timeIndividualOperations(
-					datasetsForIndividualOpTests[i],
-					args.pointCountsToSample());
-			if (args.isVerbose())
-				std::cout << "WRTITING TIMINGS TO FILES" << std::endl;
+		std::vector<StructureOperationTimings> individualOpTimings =
+			evaluator.timeIndividualOperations(
+				datasetsForIndividualOpTests[i],
+				args.pointCountsToSample());
+		if (args.isVerbose())
+			std::cout << "WRTITING TIMINGS TO FILES" << std::endl;
 
-			for (unsigned int s = 0; (s < individualOpTimings.size()); s++)
-			{
-				const StructureOperationTimings& structureOpTimings = individualOpTimings[s];
-				writeSizeTimingTable(
-					 generateIndividualOpTimingFilename(s, i, "insert"),
-					 getTimingTableForOperation(structureOpTimings, TestOperation::OPERATION_TYPE_INSERT));
-				writeSizeTimingTable(
-					 generateIndividualOpTimingFilename(s, i, "delete"),
-					 getTimingTableForOperation(structureOpTimings, TestOperation::OPERATION_TYPE_DELETE));
-				writeSizeTimingTable(
-					 generateIndividualOpTimingFilename(s, i, "pquery"),
-					 getTimingTableForOperation(structureOpTimings, TestOperation::OPERATION_TYPE_POINTQUERY));
-			}
+		for (unsigned int s = 0; (s < individualOpTimings.size()); s++)
+		{
+			const StructureOperationTimings& structureOpTimings = individualOpTimings[s];
+			writeSizeTimingTable(
+				 generateIndividualOpTimingFilename(s, i, "insert"),
+				 getTimingTableForOperation(structureOpTimings, TestOperation::OPERATION_TYPE_INSERT));
+			writeSizeTimingTable(
+				 generateIndividualOpTimingFilename(s, i, "delete"),
+				 getTimingTableForOperation(structureOpTimings, TestOperation::OPERATION_TYPE_DELETE));
+			writeSizeTimingTable(
+				 generateIndividualOpTimingFilename(s, i, "pquery"),
+				 getTimingTableForOperation(structureOpTimings, TestOperation::OPERATION_TYPE_POINTQUERY));
 		}
 	}
 
