@@ -179,7 +179,58 @@ namespace mdsearch { namespace tests
 		ASSERT_FALSE(parsedArgs.profileCPU());
 		parsedArgs = CommandLineArguments(2, testArgs2);
 		ASSERT_TRUE(parsedArgs.profileCPU());
-	}	
+	}
+
+	TEST_F(CommandLineArgumentsTests, IndividualOperationDatasets)
+	{
+		char* testArgs1[] = { "./evaluator" };
+		char* testArgs2[] = { "./evaluator", "-isome_dataset.ops" };
+		char* testArgs3[] = { "./evaluator", "--individual_optest_datasets=some_dataset.ops" };
+		char* testArgs4[] = { "./evaluator", "-isome_dataset.ops", "--individual_optest_datasets=another_dataset.ops" };
+
+		CommandLineArguments parsedArgs(1, testArgs1);
+		ASSERT_EQ(0, parsedArgs.individualOpDatasetFilenames().size());
+		parsedArgs = CommandLineArguments(2, testArgs2);
+		ASSERT_EQ(1, parsedArgs.individualOpDatasetFilenames().size());
+		ASSERT_EQ("some_dataset.ops", parsedArgs.individualOpDatasetFilenames()[0]);
+		parsedArgs = CommandLineArguments(2, testArgs3);
+		ASSERT_EQ(1, parsedArgs.individualOpDatasetFilenames().size());
+		ASSERT_EQ("some_dataset.ops", parsedArgs.individualOpDatasetFilenames()[0]);
+		parsedArgs = CommandLineArguments(3, testArgs4);
+		ASSERT_EQ(2, parsedArgs.individualOpDatasetFilenames().size());
+		ASSERT_EQ("some_dataset.ops", parsedArgs.individualOpDatasetFilenames()[0]);
+		ASSERT_EQ("another_dataset.ops", parsedArgs.individualOpDatasetFilenames()[1]);
+	}
+
+	TEST_F(CommandLineArgumentsTests, PointCounts)
+	{
+		char* testArgs1[] = { "./evaluator" };
+		char* testArgs2[] = { "./evaluator", "-c2" };
+		char* testArgs3[] = { "./evaluator", "--point_counts=5" };
+		char* testArgs4[] = { "./evaluator", "-c2", "-c5", "--point_counts=123" };
+		char* testArgs5[] = { "./evaluator", "-c2", "-chahaha" };
+
+		CommandLineArguments parsedArgs(1, testArgs1);
+		ASSERT_TRUE(parsedArgs.isValid());
+		ASSERT_EQ(0, parsedArgs.pointCountsToSample().size());
+		parsedArgs = CommandLineArguments(2, testArgs2);
+		ASSERT_TRUE(parsedArgs.isValid());
+		ASSERT_EQ(1, parsedArgs.pointCountsToSample().size());
+		ASSERT_EQ(2, parsedArgs.pointCountsToSample()[0]);
+		parsedArgs = CommandLineArguments(2, testArgs3);
+		ASSERT_TRUE(parsedArgs.isValid());
+		ASSERT_EQ(1, parsedArgs.pointCountsToSample().size());
+		ASSERT_EQ(5, parsedArgs.pointCountsToSample()[0]);
+		parsedArgs = CommandLineArguments(4, testArgs4);
+		ASSERT_TRUE(parsedArgs.isValid());
+		ASSERT_EQ(3, parsedArgs.pointCountsToSample().size());
+		ASSERT_EQ(2, parsedArgs.pointCountsToSample()[0]);
+		ASSERT_EQ(5, parsedArgs.pointCountsToSample()[1]);
+		ASSERT_EQ(123, parsedArgs.pointCountsToSample()[2]);
+		// Test invalid count (non-integer given)
+		parsedArgs = CommandLineArguments(3, testArgs5);
+		ASSERT_FALSE(parsedArgs.isValid());
+	}
 
 } }
 

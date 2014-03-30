@@ -41,6 +41,8 @@ namespace mdsearch
 		const StringList& testOperationFilenames() const;
 		const std::string& resultFilename() const;
 
+		const StringList& individualOpDatasetFilenames() const;
+		const std::vector<int>& pointCountsToSample() const;
 
 	private:
 		// If this flag is set to true, then some of the required arguments
@@ -55,6 +57,9 @@ namespace mdsearch
 		std::string preloadedDatasetFilename;
 		StringList testOperations;
 		std::string outputFilename;
+
+		StringList individualOpDatasets;
+		std::vector<int> pCountsToSample;
 
 
 	};

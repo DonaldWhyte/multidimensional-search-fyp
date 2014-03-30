@@ -2,6 +2,7 @@
 #define MDSEARCH_EVALUATOR_H
 
 #include <vector>
+#include <map>
 #include "IndexStructure.h"
 #include "TestOperation.h"
 
@@ -22,9 +23,16 @@ namespace mdsearch
 	};
 	typedef std::vector<OperationTimings> StructureOperationTimings; // for a single structure
 
+	typedef std::map<int, Timing> SizeTimingTable;
+
 	/* Generate string that contains human-readable report of
 	 * recorded dataset timings. */
 	std::string generateTimingReport(const OperationListTimings& timings);
+	/* Create map of dataset size to operation runtime for a specified
+	 * operation, using all the timings from a structure. */
+	SizeTimingTable getTimingTableForOperation(
+		const StructureOperationTimings& structureTimings,
+		TestOperation::Type opType);
 
 	/* Used to evaluate multiple index structures' performance using a collection
 	 * of datasets and operation lists. */

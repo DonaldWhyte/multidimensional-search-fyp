@@ -266,4 +266,30 @@ namespace mdsearch
 		return ss.str();
 	}
 
+	SizeTimingTable getTimingTableForOperation(
+		const StructureOperationTimings& structureTimings,
+		TestOperation::Type opType)
+	{
+		SizeTimingTable table;
+
+		for (StructureOperationTimings::const_iterator timings = structureTimings.begin();
+			(timings != structureTimings.end()); timings++)
+		{
+			switch (opType)
+			{
+			case TestOperation::OPERATION_TYPE_INSERT:
+				table[timings->n] = timings->insert;
+				break;
+			case TestOperation::OPERATION_TYPE_DELETE:
+				table[timings->n] = timings->remove;
+				break;
+			case TestOperation::OPERATION_TYPE_POINTQUERY:
+				table[timings->n] = timings->pointQuery;
+				break;
+			}
+		}
+
+		return table;
+	}
+
 }

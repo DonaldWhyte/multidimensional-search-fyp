@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include "CommandLineArguments.h"
 #include "IndexStructureFactory.h"
 #include "DatasetFileLoader.h"
@@ -51,6 +52,28 @@ void writeResultsToFile(const std::string& filename,
 	file.close();
 }
 
+std::string generateIndividualOpTimingFilename(unsigned int structureIndex,
+	unsigned int datasetIndex, const std::string& operation)
+{
+	std::stringstream ss;
+	ss << "individual_op_timing_" << structureIndex << "_"
+		<< datasetIndex << "_" << operation << ".times";
+	return ss.str();
+}
+
+void writeSizeTimingTable(const std::string& filename, const SizeTimingTable& table)
+{
+	std::ofstream file(filename.c_str());
+
+	// NOTE: Guaranteed to iterate through keys in ascending order
+	for (SizeTimingTable::const_iterator it = table.begin(); it != table.end(); it++)
+	{
+		file << it->first << " " << it->second << "\n";
+	}
+
+	file.close();
+}
+
 int main(int argc, char* argv[])
 {
 	// Parse command line arguments
@@ -96,6 +119,15 @@ int main(int argc, char* argv[])
 	PointList datasetToPreload = datasetLoader.load(
 		args.datasetToPreloadFilename()
 	);
+	// Load datasets for individual operation counts
+	if (args.isVerbose())
+		std::cout << "Loading datasets to use for individual operation timings" << std::endl;	
+	std::vector<PointList> datasetsForIndividualOpTests;
+	const StringList& individualOpDatasetFilenames = args.individualOpDatasetFilenames();
+	for (unsigned int i = 0; (i < individualOpDatasetFilenames.size()); i++)
+	{
+		datasetLoader.load(individualOpDatasetFilenames[i]);
+	}
 
 	// Load specified test operations
 	std::vector<TestOperationList> testOperationLists;
@@ -128,18 +160,35 @@ int main(int argc, char* argv[])
 				args, testOperationLists, datasetToPreload);
 		}
 	}
-	// If there are any datasets to test indiviudal point counts
-	/*if (datasetsForIndividualOpTests.size() > 0)
+
+	// If there are any datasets to test indiviudal point counts,
+	// run the tests and store the results
+	if (datasetsForIndividualOpTests.size() > 0)
 	{
-		std::vector<StructureOperationTimings> individualOpTimings =
-			evaluator.timeIndividualOperations(datasetsForIndividualOpTests,
-			pointCountsToSample);
-		for (unsigned int s = 0; (s < individualOpTimings.size()); s++)
+		for (unsigned int i = 0; (i < datasetsForIndividualOpTests.size()); i++)
 		{
-			std::string filename = "individual_op_timings_0_0"
-			writeIndividualOperationTimings(filename, individualOpTimings[s]);
+			std::vector<StructureOperationTimings> individualOpTimings =
+				evaluator.timeIndividualOperations(
+					datasetsForIndividualOpTests[i],
+					args.pointCountsToSample());
+			if (args.isVerbose())
+				std::cout << "WRTITING TIMINGS TO FILES" << std::endl;
+
+			for (unsigned int s = 0; (s < individualOpTimings.size()); s++)
+			{
+				const StructureOperationTimings& structureOpTimings = individualOpTimings[s];
+				writeSizeTimingTable(
+					 generateIndividualOpTimingFilename(s, i, "insert"),
+					 getTimingTableForOperation(structureOpTimings, TestOperation::OPERATION_TYPE_INSERT));
+				writeSizeTimingTable(
+					 generateIndividualOpTimingFilename(s, i, "delete"),
+					 getTimingTableForOperation(structureOpTimings, TestOperation::OPERATION_TYPE_DELETE));
+				writeSizeTimingTable(
+					 generateIndividualOpTimingFilename(s, i, "pquery"),
+					 getTimingTableForOperation(structureOpTimings, TestOperation::OPERATION_TYPE_POINTQUERY));
+			}
 		}
-	}*/
+	}
 
 	return 0;
 }

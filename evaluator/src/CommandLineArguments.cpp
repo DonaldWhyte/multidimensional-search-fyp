@@ -31,7 +31,10 @@ namespace mdsearch
 				("runs,r", po::value<unsigned int>(), "number of runs to perform of test operations to get AVERAGE time")
 				("index_structures,s", po::value<std::vector<std::string> >(), "index structure to evaluate")
 				("preloaded_dataset,p", po::value<std::string>(), "dataset of points which are pre-loaded into structure before running timed tests")
-				("test_operations,t", po::value<std::vector<std::string> >(), "list of test operations to perform");
+				("test_operations,t", po::value<std::vector<std::string> >(), "list of test operations to perform")
+				("individual_optest_datasets,i", po::value<std::vector<std::string> >(), "list of datasets to use for individual operation performance tests")
+				("point_counts,c", po::value<std::vector<int> >(), "different structure sizes (in points stored) to sample individual operation times at");
+
 			// Parse given command line arguments
 			po::variables_map parsedArgs;
 			po::store( po::parse_command_line(argc, argv, description), parsedArgs );
@@ -106,6 +109,12 @@ namespace mdsearch
 			// Get all specified test operation lists
 			if (parsedArgs.count("test_operations"))
 				testOperations = parsedArgs["test_operations"].as<StringList>();
+			// Get all specified individual operation test datasets
+			if (parsedArgs.count("individual_optest_datasets"))
+				individualOpDatasets = parsedArgs["individual_optest_datasets"].as<StringList>();
+			// Get all point counts to time individual operations at
+			if (parsedArgs.count("point_counts"))
+				pCountsToSample = parsedArgs["point_counts"].as<std::vector<int> >();
 		}
 		catch(po::error& error)
 		{
@@ -156,6 +165,16 @@ namespace mdsearch
 	const std::string& CommandLineArguments::resultFilename() const
 	{
 		return outputFilename;
+	}
+
+	const StringList& CommandLineArguments::CommandLineArguments::individualOpDatasetFilenames() const
+	{
+		return individualOpDatasets;
+	}
+
+	const std::vector<int>& CommandLineArguments::pointCountsToSample() const
+	{
+		return pCountsToSample;
 	}
 
 }
