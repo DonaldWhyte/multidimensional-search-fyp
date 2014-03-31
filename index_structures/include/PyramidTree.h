@@ -80,6 +80,13 @@ namespace mdsearch
 		/* Return spatial region the tree covers. */
 		const Region& getBoundary() const;
 
+		/* Return total number of points currently stored in the structure. */
+		unsigned int numPointsStored() const;
+		/* Return average number of points stored in a bucket. */
+		Real averagePointsPerBucket() const;
+		/* Return string reprensetation of Pyrmaid tree. */
+		std::string toString() const;
+
 	private:
 		static const unsigned int MAX_BUCKET_NUMBER = 300000;
 

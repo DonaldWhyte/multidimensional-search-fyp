@@ -2,6 +2,7 @@
 #include "Hashing.h"
 #include "Util.h"
 #include <algorithm>
+#include <sstream>
 
 namespace mdsearch
 {
@@ -116,6 +117,34 @@ namespace mdsearch
 	const Region& PyramidTree::getBoundary() const
 	{
 		return boundary;
+	}
+
+	unsigned int PyramidTree::numPointsStored() const
+	{
+		int total = 0;
+		for (OneDMap::const_iterator it = hashMap.begin(); (it != hashMap.end()); it++)
+			total += it->second.points.size();
+		return total;
+	}
+
+	Real PyramidTree::averagePointsPerBucket() const
+	{
+		return static_cast<Real>(numPointsStored()) / hashMap.size();
+	}
+
+	std::string PyramidTree::toString() const
+	{
+		std::stringstream ss;
+		ss << "Pyramid Tree\n";
+		ss << "\tLoad Factor of Hash Table: " << hashMap.load_factor() << "\n";
+		ss << "\tTotal Points Stored: " << numPointsStored() << "\n";
+		ss << "\tAverage Points Per Bucket: " << averagePointsPerBucket() << "\n";
+		ss << "\tBuckets:\n";
+		for (OneDMap::const_iterator it = hashMap.begin(); (it != hashMap.end()); it++)
+		{
+			ss << "\t\tKey: " << it->first << ", Num Elements: " << it->second.points.size() << "\n";
+		}
+		return ss.str();
 	}
 
 	void PyramidTree::insertToStructure(const Point& point, PTBucket* bucket)

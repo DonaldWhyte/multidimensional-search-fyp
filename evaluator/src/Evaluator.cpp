@@ -44,7 +44,7 @@ namespace mdsearch
 		if (verbose)
 		{
 			std::cout << "STARTING PERFORMANCE TESTS USING " << testOperationLists.size()
-				<< " OPERATION SETS FOR" << structures.size() << " INDEX STRUCTUES" << std::endl;
+				<< " OPERATION SETS FOR" << structures.size() << " INDEX STRUCTURES" << std::endl;
 		}
 
 		OperationListTimings testOpTimings;
