@@ -95,10 +95,12 @@ namespace mdsearch
 		// Entire region of space the Pyramid tree covers
 		// (points outside this region are ignored)
 		Region boundary;
+		Point minPoint;
+		Point maxPoint;
 		// Interval between buckets
 		unsigned int bucketInterval;
 		// Median values of the data set.
-		std::vector<int> medianPoint;
+		Point medianPoint;
 
 	};
 

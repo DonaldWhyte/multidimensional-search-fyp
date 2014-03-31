@@ -9,7 +9,8 @@ namespace mdsearch
 		int maxEmptyElements, CleanupProcedure cleanupProcedure) :
 		IndexStructure(nDimensions),
 		maxEmptyElements(maxEmptyElements), cleanupProcedure(cleanupProcedure),
-		boundary(treeBoundary),  bucketInterval(1), medianPoint(nDimensions)
+		boundary(treeBoundary), minPoint(nDimensions), maxPoint(nDimensions),
+		medianPoint(nDimensions), bucketInterval(1)
 	{
 		// Compute the interval between buckets 
 		bucketInterval = static_cast<Real>(
@@ -27,6 +28,12 @@ namespace mdsearch
 				boundary[d].max = boundary[d].min + 1;
 			}
 		}
+		// Construct min-max points for SSE hashing function
+		for (unsigned int i = 0; (i < boundary.numDimensions()); i++)
+		{
+			minPoint[i] = boundary[i].min;
+			maxPoint[i] = boundary[i].max;
+		}	
 	}
 
 	void IndexPyramidTree::clear()
@@ -59,7 +66,7 @@ namespace mdsearch
 	bool IndexPyramidTree::remove(const Point& point)
 	{
 		// Find bucket the point would belong to
-		int searchKey = hashPoint(numDimensions, point, boundary, medianPoint);
+		int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
 		OneDMap::iterator keyValue = hashMap.find(searchKey);
 		// Bucket has been found, point MIGHT be stored in structure
 		if (keyValue != hashMap.end())
@@ -156,7 +163,7 @@ namespace mdsearch
 		points.push_back(point);
 		pointSums.push_back(point.sum());
 
-		int searchKey = hashPoint(numDimensions, point, boundary, medianPoint);
+		int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
 		int currentIndex = points.size() - 1;
 		if (searchKeyExists)
 		{
@@ -179,7 +186,7 @@ namespace mdsearch
 	int IndexPyramidTree::getPointIndex(const Point& point)
 	{
 		// First check if this point's bucket exists
-		int searchKey = hashPoint(numDimensions, point, boundary, medianPoint);
+		int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
 		OneDMap::const_iterator keyValue = hashMap.find(searchKey);
 		if (keyValue != hashMap.end())
 		{

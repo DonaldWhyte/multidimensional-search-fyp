@@ -6,7 +6,8 @@ namespace mdsearch
 
 	SplayPyramidTree::SplayPyramidTree(unsigned int nDimensions,
 		const Region& treeBoundary) : IndexStructure(nDimensions),
-		boundary(treeBoundary), bucketInterval(1), medianPoint(nDimensions)
+		boundary(treeBoundary), minPoint(nDimensions), maxPoint(nDimensions),
+		medianPoint(nDimensions), bucketInterval(1)
 	{
 		// Compute the interval between buckets 
 		bucketInterval = static_cast<Real>(
@@ -24,6 +25,12 @@ namespace mdsearch
 				boundary[d].max = boundary[d].min + 1;
 			}
 		}
+		// Construct min-max points for SSE hashing function
+		for (unsigned int i = 0; (i < boundary.numDimensions()); i++)
+		{
+			minPoint[i] = boundary[i].min;
+			maxPoint[i] = boundary[i].max;
+		}			
 	}
 
 	void SplayPyramidTree::clear()
@@ -122,7 +129,7 @@ namespace mdsearch
 		}
 		else // if bucket does not exist for point, create it!
 		{
-			int searchKey = hashPoint(numDimensions, point, boundary, medianPoint);
+			int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
 			PTBucket newBucket;
 			newBucket.points.push_back(point);
 			newBucket.pointSums.push_back(point.sum());
@@ -133,7 +140,7 @@ namespace mdsearch
 	PTBucket* SplayPyramidTree::getContainingBucket(const Point& point)
 	{
 		// Hash point into one-dimensional key
-		int searchKey = hashPoint(numDimensions, point, boundary, medianPoint);
+		int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
 		// Search underlying splay tree to find point's bucket
 		return splayTree.getValue(searchKey);
 	}

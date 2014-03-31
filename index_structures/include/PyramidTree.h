@@ -8,7 +8,9 @@
 namespace mdsearch
 {
 
-	std::vector<int> computeInitialMedianPoint(int maxBucketNumber, int numDimensions);
+	/* Compute initial media point to use for a Pyramid tree, given the 
+	 * maximum bucket number and the dimensionality of the data. */
+	Point computeInitialMedianPoint(int maxBucketNumber, int numDimensions);
 
 	/* Structure used for Pyramid tree buckets. */
 	struct PTBucket
@@ -71,10 +73,12 @@ namespace mdsearch
 		// Entire region of space the Pyramid tree covers
 		// (points outside this region are ignored)
 		Region boundary;
+		Point minPoint;
+		Point maxPoint;
 		// Interval between buckets
 		unsigned int bucketInterval;
 		// Median values of the data set.
-		std::vector<int> medianPoint;
+		Point medianPoint;
 
 	};
 

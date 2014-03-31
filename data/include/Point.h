@@ -44,6 +44,9 @@ namespace mdsearch
 		inline Real operator[](int index) const { return values[index]; }
 		inline unsigned int numDimensions() const { return nDimensions; }
 
+		inline const Real* toArray() const { return &values[0]; }
+		inline Real* toArray() { return &values[0]; }
+
 		/* Return sum of all elements/coordinates of this point. */
 		inline Real sum() const
 		{
