@@ -11,13 +11,15 @@ namespace mdsearch
 
 	/* Use Pyramid-Technique to hash n-dimensional point to a single dimension,
 	 * which is an integer value. */
-	inline int hashPoint(unsigned int numDimensions, const Point& point, const Region& boundary,
-		const std::vector<int>& medianPoint, const std::vector<int>& cumulativeMedianProducts)
+	inline int hashPoint(unsigned int numDimensions, const Point& point,
+		const Region& boundary, const std::vector<int>& medianPoint)
 	{
 		int searchKey = 0;
 		for (int d = 0; d < numDimensions; d++)
 		{
-			searchKey += static_cast<int>((point[d] - boundary[d].min) / (boundary[d].max - boundary[d].min) * medianPoint[d]);
+			searchKey += static_cast<int>(
+				(point[d] - boundary[d].min) / (boundary[d].max - boundary[d].min) * medianPoint[d]
+			);
 		}
 		return searchKey;
 	}

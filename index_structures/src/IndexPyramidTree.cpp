@@ -27,7 +27,6 @@ namespace mdsearch
 				boundary[d].max = boundary[d].min + 1;
 			}
 		}
-		cumulativeMedianProducts = computeCumMedianProducts(medianPoint);
 	}
 
 	void IndexPyramidTree::clear()
@@ -60,7 +59,7 @@ namespace mdsearch
 	bool IndexPyramidTree::remove(const Point& point)
 	{
 		// Find bucket the point would belong to
-		int searchKey = hashPoint(numDimensions, point, boundary, medianPoint, cumulativeMedianProducts);
+		int searchKey = hashPoint(numDimensions, point, boundary, medianPoint);
 		OneDMap::iterator keyValue = hashMap.find(searchKey);
 		// Bucket has been found, point MIGHT be stored in structure
 		if (keyValue != hashMap.end())
@@ -157,7 +156,7 @@ namespace mdsearch
 		points.push_back(point);
 		pointSums.push_back(point.sum());
 
-		int searchKey = hashPoint(numDimensions, point, boundary, medianPoint, cumulativeMedianProducts);
+		int searchKey = hashPoint(numDimensions, point, boundary, medianPoint);
 		int currentIndex = points.size() - 1;
 		if (searchKeyExists)
 		{
@@ -180,7 +179,7 @@ namespace mdsearch
 	int IndexPyramidTree::getPointIndex(const Point& point)
 	{
 		// First check if this point's bucket exists
-		int searchKey = hashPoint(numDimensions, point, boundary, medianPoint, cumulativeMedianProducts);
+		int searchKey = hashPoint(numDimensions, point, boundary, medianPoint);
 		OneDMap::const_iterator keyValue = hashMap.find(searchKey);
 		if (keyValue != hashMap.end())
 		{

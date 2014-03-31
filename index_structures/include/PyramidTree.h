@@ -8,30 +8,7 @@
 namespace mdsearch
 {
 
-	namespace {
-		/* Used to pre-compute the cumulative products of the median to
-		 * speed up the hashPoint() function. */
-		std::vector<int> computeCumMedianProducts(const std::vector<int>& medianPoint)
-		{
-			std::vector<int> cumulativeMedianProducts(medianPoint.size());
-			if (!medianPoint.empty())
-			{
-				cumulativeMedianProducts[0] = 1;
-				for (unsigned int d = 1; (d < medianPoint.size()); d++)
-				{
-					cumulativeMedianProducts[d] = medianPoint[d - 1] * cumulativeMedianProducts[d - 1];
-				}
-			}
-			return cumulativeMedianProducts;
-		}
-
-		std::vector<int> computeInitialMedianPoint(int maxBucketNumber, int numDimensions)
-		{
-			Real m = static_cast<Real>(1.0 / numDimensions);
-			int div = ceil(pow(maxBucketNumber, m));
-			return std::vector<int>(numDimensions, div);
-		}
-	}
+	std::vector<int> computeInitialMedianPoint(int maxBucketNumber, int numDimensions);
 
 	/* Structure used for Pyramid tree buckets. */
 	struct PTBucket
@@ -98,7 +75,6 @@ namespace mdsearch
 		unsigned int bucketInterval;
 		// Median values of the data set.
 		std::vector<int> medianPoint;
-		std::vector<int> cumulativeMedianProducts;
 
 	};
 
