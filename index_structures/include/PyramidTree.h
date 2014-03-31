@@ -35,12 +35,33 @@ namespace mdsearch
 			return cumulativeMedianProducts;
 		}
 
+		Point computeCumMedianProductsP(const Point& medianPoint)
+		{
+			Point cumulativeMedianProducts(medianPoint.numDimensions(), 0.0f);
+			if (medianPoint.numDimensions() > 0)
+			{
+				cumulativeMedianProducts[0] = 1;
+				for (unsigned int d = 1; (d < medianPoint.numDimensions()); d++)
+				{
+					cumulativeMedianProducts[d] = medianPoint[d - 1] * cumulativeMedianProducts[d - 1];
+				}
+			}
+			return cumulativeMedianProducts;
+		}
+
 		std::vector<int> computeInitialMedianPoint(int maxBucketNumber, int numDimensions)
 		{
 			Real m = static_cast<Real>(1.0 / numDimensions);
 			int div = ceil(pow(maxBucketNumber, m));
 			return std::vector<int>(numDimensions, div);
 		}
+
+		Point computeInitialMedianPointP(int maxBucketNumber, int numDimensions)
+		{
+			Real m = static_cast<Real>(1.0 / numDimensions);
+			int div = ceil(pow(maxBucketNumber, m));
+			return Point(numDimensions, div);
+		}		
 	}
 
 	/* Structure used for Pyramid tree buckets. */
@@ -104,11 +125,13 @@ namespace mdsearch
 		// Entire region of space the Pyramid tree covers
 		// (points outside this region are ignored)
 		Region boundary;
+		Point minPoint;
+		Point maxPoint;
 		// Interval between buckets
 		unsigned int bucketInterval;
 		// Median values of the data set.
-		std::vector<int> medianPoint;
-		std::vector<int> cumulativeMedianProducts;
+		Point medianPoint;
+		Point cumulativeMedianProducts;
 
 	};
 

@@ -9,6 +9,8 @@ namespace mdsearch
 
 	PyramidTree::PyramidTree(unsigned int nDimensions, const Region& treeBoundary) :
 		IndexStructure(nDimensions), boundary(treeBoundary),
+		minPoint(nDimensions), maxPoint(nDimensions),
+		medianPoint(nDimensions), cumulativeMedianProducts(nDimensions),
 		bucketInterval(1)
 	{
 		// Compute the interval between buckets 
@@ -16,7 +18,7 @@ namespace mdsearch
 			MAX_BUCKET_NUMBER / (numDimensions * 2)
 		);
 		bucketInterval = floor(bucketInterval);
-		medianPoint = computeInitialMedianPoint(MAX_BUCKET_NUMBER, numDimensions);
+		medianPoint = computeInitialMedianPointP(MAX_BUCKET_NUMBER, numDimensions);
 
 		// Ensure boundaries are NEVER ZERO SIZED and the maximum
 		// values are always larger than the minimum
@@ -27,7 +29,13 @@ namespace mdsearch
 				boundary[d].max = boundary[d].min + 1;
 			}
 		}
-		cumulativeMedianProducts = computeCumMedianProducts(medianPoint);
+		cumulativeMedianProducts = computeCumMedianProductsP(medianPoint);
+		// Store boundary as separate minimum and maximum points for SSE
+		for (unsigned int d = 0; d < numDimensions; d++)
+		{
+			minPoint[d] = boundary[d].min;
+			maxPoint[d] = boundary[d].max;
+		}
 	}
 
 	void PyramidTree::clear()
@@ -156,7 +164,7 @@ namespace mdsearch
 		}
 		else // if bucket does not exist for point, create it!
 		{
-			int searchKey = hashPoint(numDimensions, point, boundary, medianPoint, cumulativeMedianProducts);
+			int searchKey = hashPointSSE(numDimensions, point.toArray(), minPoint.toArray(), maxPoint.toArray(), medianPoint.toArray(), cumulativeMedianProducts.toArray());
 			PTBucket newBucket;
 			newBucket.points.push_back(point);
 			newBucket.pointSums.push_back(point.sum());
@@ -167,7 +175,7 @@ namespace mdsearch
 	PTBucket* PyramidTree::getContainingBucket(const Point& point)
 	{
 		// Hash point into one-dimensional key
-		int searchKey = hashPoint(numDimensions, point, boundary, medianPoint, cumulativeMedianProducts);
+		int searchKey = hashPointSSE(numDimensions, point.toArray(), minPoint.toArray(), maxPoint.toArray(), medianPoint.toArray(), cumulativeMedianProducts.toArray());
 		// Search underlying splay tree to find point's bucket
 		OneDMap::iterator it = hashMap.find(searchKey);
 		if (it != hashMap.end())
