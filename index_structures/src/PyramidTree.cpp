@@ -1,4 +1,5 @@
 #include "PyramidTree.h"
+#include "Hashing.h"
 #include "Util.h"
 #include <algorithm>
 

@@ -42,7 +42,7 @@ namespace mdsearch { namespace tests
 			ASSERT_TRUE(structure.pointExists(testPoints[i]));
 		// Clear the entire structure
 		structure.clear();
-		// Ensure all points are no longer store din structure
+		// Ensure all points are no longer stored in structure
 		for (unsigned int i = 0; (i < testPoints.size()); i++)
 			ASSERT_FALSE(structure.pointExists(testPoints[i]));
 	}

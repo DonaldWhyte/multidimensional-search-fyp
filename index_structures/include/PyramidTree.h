@@ -19,22 +19,6 @@ namespace mdsearch
 
 	
 	namespace {
-		/* TODO */
-		inline int hashPoint(unsigned int numDimensions, const Point& point, const Region& boundary,
-			const std::vector<int>& medianPoint, const std::vector<int>& cumulativeMedianProducts)
-		{
-			int searchKey = 0;
-			for (int d = 0; d < numDimensions; d++)
-			{
-				int value = std::min(
-					static_cast<int>((point[d] - boundary[d].min) / (boundary[d].max - boundary[d].min) * medianPoint[d]),
-					medianPoint[d] - 1
-				);
-				searchKey += value * cumulativeMedianProducts[d];
-			}
-			return searchKey;
-		}
-
 		/* Used to pre-compute the cumulative products of the median to
 		 * speed up the hashPoint() function. */
 		std::vector<int> computeCumMedianProducts(const std::vector<int>& medianPoint)

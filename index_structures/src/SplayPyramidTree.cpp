@@ -1,4 +1,5 @@
 #include "SplayPyramidTree.h"
+#include "Hashing.h"
 
 namespace mdsearch
 {
