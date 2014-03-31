@@ -79,7 +79,7 @@ namespace mdsearch
 		// Unordered_map for storing the key values of 1-dimensional interpolated point.
 		// Key = hashed Point, value = list of indices of potential points
 		// Each key can contain MULTIPLE indices
-		typedef boost::unordered_map<Real, IndexList, ihash> OneDMap;
+		typedef boost::unordered_map<int, IndexList> OneDMap;
 		OneDMap hashMap;   
 		// Stores the indices which are empty in the linear points list
 		// As a point is removed from the structure, the index is removed but

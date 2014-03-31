@@ -8,16 +8,6 @@
 namespace mdsearch
 {
 
-	/* Hash function used for the underlying 1D hash map data structure. */
-	struct ihash : std::unary_function<int, size_t>
-	{
-		size_t operator()(int const& x) const
-		{
-			return x;
-		}
-	};
-
-	
 	namespace {
 		/* Used to pre-compute the cumulative products of the median to
 		 * speed up the hashPoint() function. */
@@ -98,7 +88,7 @@ namespace mdsearch
 		// Key = hashed 1D representation of point,
 		// Vsalue = list of points in BUCKET
 		// Each key can contain MULTIPLE indices
-		typedef boost::unordered_map<Real, PTBucket, ihash> OneDMap;
+		typedef boost::unordered_map<int, PTBucket> OneDMap;
 		OneDMap hashMap;
 
 		// Entire region of space the Pyramid tree covers
