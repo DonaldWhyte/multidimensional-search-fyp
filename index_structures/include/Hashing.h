@@ -6,9 +6,28 @@
 #include "Point.h"
 #include "Region.h"
 
+// Only define this is index structures should use SSE-enabled hashing
+// (done to potentially increase speed of structures)
+#define MDSEARCH_USE_SSE_HASHING 1
+
 namespace mdsearch
 {
 
+	/* Use Pyramid-Technique to hash n-dimensional point to a single dimension,
+	 * which is an integer value. */
+	inline int hashPoint(unsigned int numDimensions, const Point& point,
+		const Point& minPoint, const Point& maxPoint, const Point& median)
+	{
+		int searchKey = 0;
+		for (int d = 0; d < numDimensions; d++)
+		{
+			searchKey += static_cast<int>(
+				(point[d] - minPoint[d]) / (maxPoint[d] - minPoint[d]) * median[d]
+			);
+		}
+
+		return searchKey;
+	}
 
 	inline int hashPointSSE(unsigned int numDimensions, const Point& point,
 		const Point& minPoint, const Point& maxPoint, const Point& median)
@@ -49,37 +68,6 @@ namespace mdsearch
 		}
 		return hashValue;
 	}
-
-	/* Use Pyramid-Technique to hash n-dimensional point to a single dimension,
-	 * which is an integer value. */
-	inline int hashPoint(unsigned int numDimensions, const Point& point,
-		const Region& boundary, const std::vector<int>& medianPoint)
-	{
-		int searchKey = 0;
-		for (int d = 0; d < numDimensions; d++)
-		{
-			searchKey += static_cast<int>(
-				(point[d] - boundary[d].min) / (boundary[d].max - boundary[d].min) * medianPoint[d]
-			);
-		}
-
-		/*Point minPoint(numDimensions);
-		Point maxPoint(numDimensions);
-		for (unsigned int i = 0; (i < boundary.numDimensions()); i++)
-		{
-			minPoint[i] = boundary[i].min;
-			maxPoint[i] = boundary[i].max;
-		}
-		Point median(numDimensions);
-		for (unsigned int i = 0; (i < medianPoint.size()); i++)
-			median[i] = medianPoint[i];
-
-		std::cout << "Non-SSE: " << searchKey << std::endl;
-		std::cout << "SSE: " << hashPointSSE(numDimensions, point, minPoint, maxPoint, median) << std::endl;*/
-
-		return searchKey;
-	}
-
 
 }
 

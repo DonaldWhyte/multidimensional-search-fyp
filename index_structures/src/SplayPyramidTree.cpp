@@ -129,7 +129,11 @@ namespace mdsearch
 		}
 		else // if bucket does not exist for point, create it!
 		{
-			int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
+			#ifdef MDSEARCH_USE_SSE_HASHING
+				int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
+			#else
+				int searchKey = hashPoint(numDimensions, point, minPoint, maxPoint, medianPoint);
+			#endif
 			PTBucket newBucket;
 			newBucket.points.push_back(point);
 			newBucket.pointSums.push_back(point.sum());
@@ -140,7 +144,11 @@ namespace mdsearch
 	PTBucket* SplayPyramidTree::getContainingBucket(const Point& point)
 	{
 		// Hash point into one-dimensional key
-		int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
+		#ifdef MDSEARCH_USE_SSE_HASHING
+			int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
+		#else
+			int searchKey = hashPoint(numDimensions, point, minPoint, maxPoint, medianPoint);
+		#endif
 		// Search underlying splay tree to find point's bucket
 		return splayTree.getValue(searchKey);
 	}

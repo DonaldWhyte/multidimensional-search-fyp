@@ -14,7 +14,9 @@ This variant of the pyramid tree uses a different strategy for releasing memory 
 
 \subsection{Bucket Pyramid Tree}
 
-The Bucket Pyramid Tree implementation does not use a single array to store the points. Instead of buckets containing an array of point indices, it has an arrya of actual points. No clenaup procedure is necessary because the memory for a point is released immediately afer it's removed, by simply erasing it from the corresponding bucket's array. The array deletion is a $O(n)$ peration since the case where a single bucket stores all $n$ points is possible, making \texttt{delete} $O(n)$ in the worst case.
+The Bucket Pyramid Tree implementation does not use a single array to store the points. Instead of buckets containing an array of point indices, it has an arrya of actual points. No clenaup procedure is necessary because the memory for a point is released immediately afer it's removed, by simply erasing it from the corresponding bucket's array.
+
+Array deletion is a $O(n)$ operation since the case where a single bucket stores all $n$ points is possible, making \texttt{delete} $O(n)$ in the worst case. TODO: state erase-remove idiom and said it's been used here to prevent loads of mem-copies -- ORDER NOT DOES MATTER!
 
 \subsection{Splay Pyramid Tree}
 
@@ -22,13 +24,15 @@ Unlile the other implementations, the Splay Pyramid Tree does not use a hash map
 
 TODO: more detail about the splay tree, including in-depth algorithms??
 
-Nodes in the Splay Pyramid tree correspond to individual buckets in the Bucket Pyramid Tree, meaning each node can store multiple points. Since the splay tree is implemented as a collection of heap-allocated nodes with pointers to link them, deletions are cheap as a low amount of memory needs to be de-allocated per \texttt{delete} operation. The hope is that this, combined with the self-adjusting nature of the splay tree, will produce a Pyramid Tree implementation that is more efficient for non-random operations.
+Nodes in the Splay Pyramid tree correspond to individual buckets in the Bucket Pyramid Tree, meaning each node can store multiple points. Since the splay tree is implemented as a collection of heap-allocated nodes with pointers to link them, deletions are cheap as a low amount of memory needs to be de-allocated per \texttt{delete} operation. The hope is that this, combined with the self-adjusting nature of the splay tree, will produce a Pyramid Tree implementation that is more efficient for non-random operations
 
 \subsection{Accelerating Hash Function}
 
 TODO: refer back to profiling and resutls from previous iteration -- justify how this is important
 
-TODO: say what you did to try and improve the function
+TODO: say what you did to try and improve the function ($O(d^2)$) to a new one ($O(d)$). State how this new function is easier to compute and provides better bucket utliisation -- BE SURE TO GIVE THE MEASUREMENTS FOR THIS TO PROVE IT! Discuss why bucket utilisation is better at a sweet spot (not too low, not too high)
+
+ (give structures a DIFFERENT NAME because its not technically the py-tree at this point)
 
 \subsection{Performance Analysis}
 
@@ -47,6 +51,8 @@ TODO: refer to plots and justify why only there's only two here (rest are in app
 TODO: CPU/heap profilign
 
 \begin{landscape}
+
+	TODO: update tables in this
 
 	\begin{table}
 		\centering
