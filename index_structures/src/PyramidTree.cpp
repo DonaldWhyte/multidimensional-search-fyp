@@ -85,8 +85,13 @@ namespace mdsearch
 			// If the point was found in bucket
 			if (index != -1)
 			{
-				bucket->points.erase(bucket->points.begin() + index);
-				bucket->pointSums.erase(bucket->pointSums.begin() + index);
+				// Swapping last element with the element to remove, so when the
+				// desired point is removed it won't cause a potentially O(n) move
+				// operation.
+				std::iter_swap(bucket->points.begin() + index, bucket->points.end() - 1);
+				std::iter_swap(bucket->pointSums.begin() + index, bucket->pointSums.end() - 1);
+				bucket->points.erase(bucket->points.end() - 1);
+				bucket->pointSums.erase(bucket->pointSums.end() - 1);
 				return true;
 			}
 			// Point is not contained in bucket -- cannot remove
