@@ -25,7 +25,6 @@ namespace mdsearch
 				(point[d] - minPoint[d]) / (maxPoint[d] - minPoint[d]) * median[d]
 			);
 		}
-
 		return searchKey;
 	}
 

@@ -40,7 +40,7 @@ namespace mdsearch
 		{
 			minPoint[i] = boundary[i].min;
 			maxPoint[i] = boundary[i].max;
-		}		
+		}
 	}
 
 	void PyramidTree::clear()
