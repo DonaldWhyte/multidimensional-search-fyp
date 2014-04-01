@@ -1,5 +1,6 @@
 #include "SplayPyramidTree.h"
 #include "Hashing.h"
+#include "Util.h"
 
 namespace mdsearch
 {
@@ -73,8 +74,8 @@ namespace mdsearch
 			// If the point was found in bucket
 			if (index != -1)
 			{
-				bucket->points.erase(bucket->points.begin() + index);
-				bucket->pointSums.erase(bucket->pointSums.begin() + index);
+				removeElementAtIndex(bucket->points, index);
+				removeElementAtIndex(bucket->pointSums, index);
 				return true;
 			}
 			// Point is not contained in bucket -- cannot remove

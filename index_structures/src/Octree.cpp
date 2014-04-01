@@ -1,4 +1,5 @@
 #include "Octree.h"
+#include "Util.h"
 #include <cmath>
 
 namespace mdsearch
@@ -126,7 +127,7 @@ namespace mdsearch
 				// If the point was found, then ERASE it and return true!
 				if (*it == p)
 				{
-					points.erase(it);
+					removeElementAtIterator(points, it);
 					totalPointsInsideNode--;
 					return true;
 				}

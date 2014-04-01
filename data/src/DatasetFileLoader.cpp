@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 
 namespace mdsearch
 {
@@ -17,10 +18,22 @@ namespace mdsearch
 			return points;
 
 		// Read header information
-		int numDimensions;
-		file >> numDimensions;
-		int numPoints;
-		file >> numPoints;
+		std::string numDimensionsStr;
+		file >> numDimensionsStr;
+		std::string numPointsStr;
+		file >> numPointsStr;
+		// Convert strings to integers
+		int numDimensions = 0;
+		int numPoints = 0;
+		try
+		{
+			numDimensions = boost::lexical_cast<int>(numDimensionsStr);
+			numPoints = boost::lexical_cast<int>(numPointsStr);
+		}
+		catch (boost::bad_lexical_cast& ex) // not integers -- invalid file!!
+		{
+			return points;
+		}
 		// Only continue reading points if the points have at least
 		// one dimension and there is at least one point in the dataset
 		if (numDimensions < 1 || numPoints < 1)

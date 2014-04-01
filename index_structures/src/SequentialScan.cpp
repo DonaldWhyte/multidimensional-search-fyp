@@ -57,19 +57,19 @@ namespace mdsearch
 
 	bool SequentialScan::update(const Point& oldPoint, const Point& newPoint)
 	{
+		// Corner case: check points are not the same (do nothing if so)
+		if (oldPoint == newPoint)
+			return true;
 		// Find point with given value
 		PointList::iterator currPoint = points.begin();
 		for (currPoint; (currPoint != points.end()); currPoint++)
 		{
 			if (*currPoint == oldPoint) // we've found the desired point!
 			{
-				// Corner case: check points are not the same (do nothing if so)
-				if (oldPoint == newPoint)
-					return true;
 				// Check if the new point already exists. If so, just erase the old point
 				if (pointExists(newPoint))
-					points.erase(currPoint);
-				// Chnage the point if the new one does NOT EXIST
+					remove(*currPoint);
+				// Change the point if the new one does NOT EXIST
 				else
 					*currPoint = newPoint;
 				// Point was found, so we just return true

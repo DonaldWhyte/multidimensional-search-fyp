@@ -27,6 +27,14 @@ namespace mdsearch
 		std::iter_swap(vec.begin() + index, vec.end() - 1);
 		vec.erase(vec.end() - 1);
 	}
+	/* Same as removeElementAtIndex, but uses an iterator to represent
+	 * the element that should be removed. */
+	template <typename T>
+	inline void removeElementAtIterator(std::vector<T>& vec, typename std::vector<T>::iterator it)
+	{
+		std::iter_swap(it, vec.end() - 1);
+		vec.erase(vec.end() - 1);
+	}	
 
 	/* Write generated points to a text file.
 	 * Format:

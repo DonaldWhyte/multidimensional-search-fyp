@@ -77,21 +77,21 @@ namespace mdsearch
 		{
 			// Search through points in bucket to see if it contains the given point
 			IndexList& indices = keyValue->second;
-			IndexList::iterator pointIndex = indices.begin();
-			for (pointIndex; (pointIndex != indices.end()); pointIndex++)
+			IndexList::iterator pointIt = indices.begin();
+			for (pointIt; (pointIt != indices.end()); pointIt++)
 			{
-				if (point == points[*pointIndex])
+				if (point == points[*pointIt])
 				{
 					break;
 				}
 			}
 			// If the point was found
-			if (pointIndex != indices.end())
+			if (pointIt != indices.end())
 			{
 				// Add the index to the lsit 
-				emptyElementIndices.push_back(*pointIndex);				
+				emptyElementIndices.push_back(*pointIt);				
 				// Remove index pointing to the point in the bucket
-				indices.erase(pointIndex);
+				removeElementAtIterator(indices, pointIt);
 				// If the amount of empty elements of the point array is
 				// higher than a certain threshold, clean up unused points
 				if (maxEmptyElements != -1 && // NOTE: -1 means the list should NOT be cleaned
@@ -248,9 +248,9 @@ namespace mdsearch
 		for (IndexList::const_iterator index = emptyElementIndices.begin();
 			(index != emptyElementIndices.end()); index++)
 		{
-			points.erase(pBegin + (*index));
-			pointSums.erase(sBegin + (*index));
-			updatePointIndices((*index));
+			points.erase(points.begin() + *index); // can't use erase-remove idiom because order matters!
+			pointSums.erase(pointSums.begin() + *index);
+			updatePointIndices(*index);
 		}
 
 		emptyElementIndices.clear();
