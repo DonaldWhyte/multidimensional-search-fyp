@@ -4,12 +4,29 @@
 #include "DataTypes.h"
 #include "Point.h"
 #include <cmath>
+#include <algorithm>
 
 namespace mdsearch
 {
 
 	/* Generate random real number r such that minimum <= r <= maximum. */
 	Real generateRandomNumber(Real minimum, Real maximum);
+
+	/* Remove element at given index from vector, using erase-remove
+	 * idiom to prevent $(n) move operation. 
+	 *
+	 * NOTE: This deletes an element, but does NOT preserve the
+	 * vector's order.
+	 *
+	 * NOTE: This does NOT perform a check to ensure the given index
+	 * is within the bounds of the vector -- this be done by the calling
+	 * code. */
+	template <typename T>
+	inline void removeElementAtIndex(std::vector<T>& vec, unsigned int index)
+	{
+		std::iter_swap(vec.begin() + index, vec.end() - 1);
+		vec.erase(vec.end() - 1);
+	}
 
 	/* Write generated points to a text file.
 	 * Format:
