@@ -8,12 +8,19 @@ timingsDirectory="$1"
 
 function plotMultipleTimings {
 	# Arguments: <resultsDirectory> <operationType> <dataset>
-	gnuplot -e "inputDirectory='$1/'" -e "operation='$2'" -e "dataset='$3'" it1_plotscript.plg
+	outputFilename="$1/all_$2_$3.pdf"
+	python2 plot_2d_datasets.py "$outputFilename" "Dimensions" "Execution Time (in seconds)" "Sequential Scan" $1/sequentialscan_$2_$3.times "Octree" $1/octree_$2_randuniform.times "Index Pyramid Tree" $1/indexpyramidtree_$2_$3.times "Index Pyramid Tree (Defragmented)" $1/indexpyramidtree_defragment_$2_$3.times 
 }
 
 function plotSizeTimings {
 	# Arguments: <resultsDirectory> <operationType> {total|average}
-	gnuplot -e "inputDirectory='$1/'" -e "operation='$2'" -e "timingType='$3'" it1_size_plotscript.plg	
+	outputFilename="$1/all_$2_sizevary_$3.pdf"
+	if [ "$3" = "total" ] ; then
+		prefix="Total"
+	else
+		prefix="Average"
+	fi
+	python2 plot_2d_datasets.py "$outputFilename" "Number of Points (n)" "$prefix Execution Time (in seconds)" "Sequential Scan" $1/sequentialscan_$2_sizevary_$3.times "Index Pyramid Tree" $1/indexpyramidtree_$2_sizevary_$3.times "Index Pyramid Tree (Defragmented)" $1/indexpyramidtree_defragment_$2_sizevary_$3.times
 }
 
 # Plotting all four structures in one graph, for each operation-dataset pair
