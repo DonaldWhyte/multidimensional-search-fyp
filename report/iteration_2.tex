@@ -30,9 +30,27 @@ Nodes in the Splay Pyramid tree correspond to individual buckets in the Bucket P
 
 TODO: refer back to profiling and resutls from previous iteration -- justify how this is important
 
-TODO: say what you did to try and improve the function ($O(d^2)$) to a new one ($O(d)$). State how this new function is easier to compute and provides better bucket utliisation -- BE SURE TO GIVE THE MEASUREMENTS FOR THIS TO PROVE IT! Discuss why bucket utilisation is better at a sweet spot (not too low, not too high)
+TODO: say what you did to try and improve the function ($O(d^2)$) to an equiavelent one ($O(d)$) by pre-computing. Use measurements to prove increased spped (showing Pyramid tree gets worse tha seq scan at a later $d$ value)
 
  (give structures a DIFFERENT NAME because its not technically the py-tree at this point)
+
+\subsection{Improving Bucket Utlisation}
+
+Define new hashign functions
+
+ State how this new function is easier to compute and provides better bucket utliisation -- BE SURE TO GIVE THE MEASUREMENTS FOR THIS TO PROVE IT! Discuss why bucket utilisation is better at a sweet spot (not too low, not too high)
+
+TODO: define what this is and how it can affect perform (too low, random access, too high, too many points to seach per query)
+
+TODO: discuss scaling factor, what it deos and why it can help (plots with scaling factor against bucket utlisation + execution time)
+
+\subsection{Parallelising Hashing Function}
+
+TODO: SIMD and what I did
+
+\subsection{Parallelising Bucket Search}
+
+TODO: thread pools and stuff. Differerent analyses
 
 \subsection{Performance Analysis}
 
@@ -42,13 +60,13 @@ TODO: four structures
 	Bucket Pyramid Tree
 	Splay Pyramid Tree
 
-	R = 3
+	R = 3000
 
 TODO: justify WHY no-defrag (batch))Pyramid tree is not being tested
 
 TODO: refer to plots and justify why only there's only two here (rest are in appendices)
 
-TODO: CPU/heap profilign
+TODO: CPU/heap profiling
 
 \begin{landscape}
 
