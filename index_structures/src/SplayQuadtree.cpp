@@ -24,13 +24,19 @@ namespace mdsearch
 
 	bool SplayQuadtree::insert(const Point& p)
 	{
+		// Initial check to see if point is within the bounds of the tree
+		if (!boundary.contains(p))
+			return false;
+
 		LeafNode* leaf = findContainingNode(p);
 		if (!leaf) // if no node containing the point could be found (out of bounds)
 		{
+			std::cout << "Could not find containing node!" << std::endl;
 			return false;
 		}
 		else if (!leaf->containsInnerBox && leaf->point == p) // if point already exists
 		{
+			std::cout << "Point Already exists!" << std::endl;
 			return false;
 		}
 		else 
@@ -60,9 +66,11 @@ namespace mdsearch
 					case OUTER_CHILD_RELATION:
 						parent->outerChild = newNode;
 						break;
-					// leaf is not actually child of its assigned parent -- sohuld never happen
-					// Return false if so, as the tree structure is invalid
+					// leaf is not actually child of its assigned parent -- should never happen!
+					// Return false if so, as the tree structure is invalid (making sure to delete the leaf)
 					default:
+						std::cout << "Illegal structure detected!" << std::endl;
+						delete leaf;
 						return false;
 					}
 					delete leaf; // free memory used for old leaf
@@ -269,47 +277,95 @@ namespace mdsearch
 		Node* node = root;
 		while (true)
 		{
-			if (node->outerBox.contains(p))
+			if (node->type == SHRINKSPLIT_NODE)
 			{
-				if (node->type == SHRINKSPLIT_NODE)
+				ShrinkSplitNode* nonLeaf = dynamic_cast<ShrinkSplitNode*>(node);
+				if (nonLeaf->leftChild && nonLeaf->leftChild->contains(p))
 				{
-					ShrinkSplitNode* nonLeaf = dynamic_cast<ShrinkSplitNode*>(node);
-					if (nonLeaf->leftChild && nonLeaf->leftChild->outerBox.contains(p))
-					{
-						node = nonLeaf->leftChild;
-					}
-					else if (nonLeaf->rightChild && nonLeaf->rightChild->outerBox.contains(p))
-					{
-						node = nonLeaf->rightChild;
-					}
-					// If the point is contained in the shrink split node, but NOT
-					// the left or right children regions (which together form the
-					// inner box of the outer child), then the point MUST be in the
-					// outer child!
-					else
-					{
-						node = nonLeaf->outerChild;
-					}
+					node = nonLeaf->leftChild;
 				}
-				else // leaf node
+				else if (nonLeaf->rightChild && nonLeaf->rightChild->contains(p))
 				{
-					return dynamic_cast<LeafNode*>(node);
+					node = nonLeaf->rightChild;
+				}
+				// If the point is contained in the shrink split node, but NOT
+				// the left or right children regions (which together form the
+				// inner box of the outer child), then the point MUST be in the
+				// outer child!
+				else
+				{
+					node = nonLeaf->outerChild;
 				}
 			}
-			else
+			else // leaf node
 			{
-				return NULL;
+				return dynamic_cast<LeafNode*>(node);
 			}
 		}
 	}
 
 	SplayQuadtree::LeafNode* SplayQuadtree::findNodeStoredIn(const Point& p) const
 	{
-		LeafNode* leaf = findContainingNode(p);
-		if (leaf && !leaf->containsInnerBox && leaf->point == p)
-			return leaf;
-		else
-			return NULL;
+		Node* node = root;
+		while (true)
+		{
+			if (node->type == SHRINKSPLIT_NODE)
+			{
+				// Cast to get children
+				ShrinkSplitNode* nonLeaf = dynamic_cast<ShrinkSplitNode*>(node);
+				// True if the point is contained within the LEFT or RIGHT
+				// child regions. If this is the case, there's no need to go
+				// to the outer box
+				bool containedInChildrenRegions = false;
+
+				if (nonLeaf->leftChild && nonLeaf->leftChild->contains(p))
+				{
+					containedInChildrenRegions = true;
+					if (node->type == FILLED_LEAF_NODE)
+					{
+						LeafNode* leaf = dynamic_cast<LeafNode*>(node);
+						if (!leaf->containsInnerBox && leaf->point == p)
+							return leaf;
+						else
+							node = nonLeaf->leftChild;
+					}
+				}
+				if (nonLeaf->rightChild && nonLeaf->rightChild->contains(p))
+				{
+					containedInChildrenRegions = true;
+					if (node->type == FILLED_LEAF_NODE)
+					{
+						LeafNode* leaf = dynamic_cast<LeafNode*>(node);
+						if (!leaf->containsInnerBox && leaf->point == p)
+							return leaf;
+						else
+							node = nonLeaf->rightChild;
+					}
+				}
+				// If the point is contained in the shrink split node, but NOT
+				// the left or right children regions (which together form the
+				// inner box of the outer child), then the point MUST be in the
+				// outer child!
+				if (!containedInChildrenRegions)
+				{
+					// NOTE: No leaf node check here since outer box will always
+					// either be SHRINK-SPLIT nodes or leaf nodes with INNER BOXES
+					node = nonLeaf->outerChild;
+				}
+				else
+				{
+					return NULL;
+				}
+			}
+			else // leaf node
+			{
+				LeafNode* leaf = dynamic_cast<LeafNode*>(node);
+				if (!leaf->containsInnerBox && leaf->point == p)
+					return leaf;
+				else
+					return NULL;
+			}
+		}
 	}
 
 	SplayQuadtree::ShrinkSplitNode* SplayQuadtree::performShrinkSplit(
@@ -398,7 +454,9 @@ namespace mdsearch
 		// Find length of longest side of box to expand
 		Real longestLength = parentCell.longestLength();
 
-		for (unsigned int d = 0; (d < numDimensions); d++)
+		int longestSide = 0;
+		int shortestSide = 0;
+		for (unsigned int d = 0; (d < numDimensions); d++) // so the stickiness property holds
 		{
 			// Gaps between tight bound box and parent cell box
 			Real gapHi = parentCell[d].max - boxToExpand[d].max;
@@ -408,6 +466,13 @@ namespace mdsearch
 			if (gapLow < longestLength * BOX_GAP_THRESHOLD)
 				boxToExpand[d].min = parentCell[d].min;
 		}
+		// Expand the shortest side in both directions so the bounding
+		// box is a quadtree box (has an aspect ratio of 2)
+		/*Real longSideLength = boxToExpand[longestSide].max / boxToExpand[longestSide].min;
+		Real shortSideLength = boxToExpand[shortestSide].max / boxToExpand[shortestSide].min;
+		Real sizeToIncrease = longestSide / ;
+		boxToExpand[shortestSide].min = sizeToIncrease / 2.0f;
+		boxToExpand[shortestSide].max = sizeToIncrease / 2.0f;*/
 	}
 
 	std::string SplayQuadtree::toString() const

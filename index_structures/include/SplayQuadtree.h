@@ -46,12 +46,22 @@ namespace mdsearch
 			NodeType type;
 			// Region of space the node covers
 			Region outerBox;
+			Region innerBox;
 
 			Node(NodeType type, const Region& outerBox, Node* parent = NULL) :
-				parent(parent), type(type), outerBox(outerBox)
+				parent(parent), type(type), outerBox(outerBox), innerBox(0)
+			{
+			}
+			Node(NodeType type, const Region& outerBox, const Region& innerBox, Node* parent = NULL) :
+				parent(parent), type(type), outerBox(outerBox), innerBox(innerBox)
 			{
 			}
 			virtual ~Node() { } // so class counts as polymorphic type
+
+			virtual bool contains(const Point& p)
+			{
+				return (outerBox.contains(p) && (innerBox.numDimensions() == 0 || !innerBox.contains(p)));
+			}
 		};
 
 		struct ShrinkSplitNode : public Node
@@ -72,31 +82,34 @@ namespace mdsearch
 				delete rightChild;
 				delete outerChild;
 			}
+
+			bool contains(const Point& p)
+			{
+				return outerBox.contains(p);
+			}
 		};
 
 		struct LeafNode : public Node
 		{
 			// If true, then the point contains an inner box and NOT a point
 			bool containsInnerBox;
-			// Which of these is set depends on 'containsInnerBox' flag
-			Region innerBox;
+			// Set only if 'containsInnerBox' flag is NOT
 			Point point;
 
 			LeafNode(const Region& outerBox, Node* parent = NULL) :
-				Node(EMPTY_LEAF_NODE, outerBox, parent), containsInnerBox(false),
-				innerBox(0), point(0)
+				Node(EMPTY_LEAF_NODE, outerBox, parent), containsInnerBox(false), point(0)
 			{
 			}
 
 			LeafNode(const Region& outerBox, const Region& innerBox, Node* parent) :
-				Node(FILLED_LEAF_NODE, outerBox, parent), containsInnerBox(true),
-				innerBox(innerBox), point(0)
+				Node(FILLED_LEAF_NODE, outerBox, innerBox, parent),
+				containsInnerBox(true), point(0)
 			{
 			}
 
 			LeafNode(const Region& outerBox, const Point& point, Node* parent) :
 				Node(FILLED_LEAF_NODE, outerBox, parent), containsInnerBox(false),
-				innerBox(0), point(point)
+				point(point)
 			{
 			}
 		};
