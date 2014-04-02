@@ -27,7 +27,7 @@ namespace mdsearch
 		bool pointExists(const Point& p);
 		PointList pointsInRegion(const Region& region);
 
-	private:
+	protected:
 		PointList points;
 
 	};

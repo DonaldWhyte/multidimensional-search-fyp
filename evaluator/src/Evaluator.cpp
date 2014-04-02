@@ -12,6 +12,8 @@
 	#error No timing mechanism supported for this platform
 #endif
 
+#include "PyramidTree.h"
+
 namespace mdsearch
 {
 
@@ -84,6 +86,14 @@ namespace mdsearch
 						generateCPUProfilerFilename(t, s),
 						generateHeapProfilerFilename(t, s)
 					);
+
+					PyramidTree* pt = dynamic_cast<PyramidTree*>(structures[s]);
+					if (pt)
+					{
+						std::cout << "Bucket utilisation: " << pt->averagePointsPerBucket() << std::endl;
+						std::cout << "\tLoad factor: " << (pt->averagePointsPerBucket() / testOperationLists[t].size()) << std::endl;
+					}	
+
 				}
 			}
 			// Now compute average times for each structure 
@@ -200,9 +210,9 @@ namespace mdsearch
 			case TestOperation::OPERATION_TYPE_INSERT:
 				structure->insert(op->operand1);
 				break;
-			case TestOperation::OPERATION_TYPE_DELETE:
+			/*case TestOperation::OPERATION_TYPE_DELETE:
 				structure->remove(op->operand1);
-				break;
+				break;*/
 			case TestOperation::OPERATION_TYPE_UPDATE:
 				structure->update(op->operand1, op->operand2);
 				break;

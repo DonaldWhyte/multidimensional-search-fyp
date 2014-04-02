@@ -25,18 +25,18 @@ set( LIBS
 # all benefit from a faster malloc().
 if(DEFINED ENV{LAB_MACHINE})
 	set ( LIBS ${LIBS} ${DEPENDENCIES}/lab_libs/libprofiler.a ${DEPENDENCIES}/lab_libs/libtcmalloc.a )
+	set ( LIBS ${LIBS} ${DEPENDENCIES}/lab_libs/libboost_program_options.a ${DEPENDENCIES}/lab_libs/libboost_thread.a ${DEPENDENCIES}/lab_libs/libboost_system.a  )
 else()
-	set ( LIBS ${LIBS} ${DEPENDENCIES}/libprofiler.a ${DEPENDENCIES}/libtcmalloc.a )
+	# Search for Boost library
+	set(BOOST_LIBRARYDIR ${BOOST_ROOT}/stage/lib/)
+	set(Boost_USE_STATIC_LIBS ON) 
+	set(Boost_USE_MULTITHREADED ON)  
+	set(Boost_USE_STATIC_RUNTIME OFF) 
+	find_package(Boost 1.41.0 COMPONENTS program_options thread system REQUIRED)
+	# NOTE: Variables BOOST_INCLUDE_DIRS and Boost_LIBRARIES contain
+	# a list of Boost's include directories and static libraries.
+	include_directories(${Boost_INCLUDE_DIRS})
 endif()
-
-# Search for Boost library
-set(Boost_USE_STATIC_LIBS ON) 
-set(Boost_USE_MULTITHREADED ON)  
-set(Boost_USE_STATIC_RUNTIME OFF) 
-find_package(Boost 1.41.0 COMPONENTS program_options REQUIRED)
-# NOTE: Variables BOOST_INCLUDE_DIRS and Boost_LIBRARIES contain
-# a list of Boost's include directories and static libraries.
-include_directories(${Boost_INCLUDE_DIRS})
 
 # Set directory all build files go to
 set_property (GLOBAL PROPERTY RUNTIME_OUTPUT_DIRECTORY ${BUILD_DIR})

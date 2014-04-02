@@ -9,6 +9,7 @@
 #include "TestSplayQuadtree.h"
 #include "TestSplayTree.h"
 #include "TestSplayPyramidTree.h"
+#include "TestParallelSequentialScan.h"
 
 int main(int argc, char* argv[])
 {
