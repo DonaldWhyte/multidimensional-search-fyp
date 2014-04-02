@@ -5,6 +5,7 @@
 #include "PyramidTree.h"
 #include "IndexPyramidTree.h"
 #include "SplayPyramidTree.h"
+#include "ParallelSequentialScan.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -24,7 +25,7 @@ namespace mdsearch
 		{
 			boundary[d] = Interval(min, max);
 		}
-		return boundary;		
+		return boundary;
 	}
 
 	/* ALL INDEX STRUCTURE GENERATORS ARE DEFINED HERE */
@@ -116,7 +117,6 @@ namespace mdsearch
 		// Check there are enough arguments to construct n-dimensional boundary
 		if (args.size() < 2) // min + max args for every dimension
 			return NULL;
-
 		try
 		{
 			Region boundary = parseBoundary(numDimensions, args);
@@ -126,8 +126,26 @@ namespace mdsearch
 		{
 			return NULL;
 		}		
-	}	
+	}
 
+	IndexStructure* generateParallelSequentialScan(unsigned int numDimensions,
+		const std::vector<std::string>& args)
+	{
+		if (args.size() < 1) // number of threads to use
+			return NULL;
+		try
+		{
+			int numThreads = boost::lexical_cast<int>(args[0]);
+			if (numThreads >= 1)
+				return new ParallelSequentialScan(numDimensions, numThreads);
+			else
+				return NULL;
+		}	
+		catch (const boost::bad_lexical_cast& ex)
+		{
+			return NULL;
+		}	
+	}
 
 
 
@@ -139,6 +157,7 @@ namespace mdsearch
 		addGenerator("pyramid_tree", generatePyramidTree);
 		addGenerator("index_pyramid_tree", generateIndexPyramidTree);
 		addGenerator("splay_pyramid_tree", generateSplayPyramidTree);
+		addGenerator("par_sequential_scan", generateParallelSequentialScan);
 	}
 
 	void IndexStructureFactory::addGenerator(const std::string& structureType,

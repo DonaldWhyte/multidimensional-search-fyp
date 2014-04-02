@@ -20,9 +20,8 @@ add_executable( evaluator
 # Ensure include directory is in search path
 include_directories ("include")
 # Link both the data and index structure libraries to evaluator
-target_link_libraries (evaluator data ${LIBS})
+target_link_libraries (evaluator data index_structures ${LIBS})
 include_directories(${PROJECT_ROOT}/data/include)
-target_link_libraries (evaluator index_structures)
 include_directories(${PROJECT_ROOT}/index_structures/include)
 
 # Executable for running unit and/or integration tests
