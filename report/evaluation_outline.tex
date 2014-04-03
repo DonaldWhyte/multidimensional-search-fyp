@@ -23,7 +23,7 @@ One assumption being made about the target data is that it is dynamic, meaning p
 \section{Timing Operations}
 \label{sec:timing-operations}
 
-\textbf{Amortised analysis}, introduced by Tarjan in 1985, is used to analyse the performance of algorithms over a sequence of operations, rather than an individual one \cite{amortised-analysis}. This type of analysis is typically used for algorithms where some operations take longer than others, with the goal of making operations later quicker. The amortised time complexity of an algorithm. Some index structures, particularly self-adjusting ones, have used this to bound the running time of their operations, such as the Splay tree, Quadtreap and Splay Quadtree \cite{splay-tree, quadtreap, splay-quadtree}.
+\textbf{Amortised analysis}, introduced by Tarjan in 1985, is used to analyse the performance of algorithms over a sequence of operations, rather than an individual one \cite{amortised-analysis}. This type of analysis is typically used for algorithms where some operations take longer than others, with the goal of making operations later quicker. The amortised time complexity of an algorithm. Some index structures, particularly self-adjusting ones, have used this to bound the running time of their operations, such as the Splay Tree, Quadtreap and Splay Quadtree \cite{splay-tree, quadtreap, splay-quadtree}.
 
 This project will use a similar concept for measuring the execution time of the structures. Instead of measuring the time of a single operartion, the times of many thousands of operations will be measured. This is to get an idea on what the runtime of an operation is on average, over a sequence of operations. This prevents single, slow operations from causing the execution time to appear worse, or short operations making the performance appear better. A typical performance test therefore has the following steps:
 \begin{enumerate}
@@ -112,6 +112,35 @@ There is little use in measuring the performance of the implemented index struct
 
 These baselines have been developed in C++ to match the technology used to develop the initially implemented index structure.
 
-\section{Timing}
+\section{Evaluation Environment}
 
-TODO: different timing mechanisms, advantages and disadvantages
+The machines in the University of Leeds' School of Computing laboratory have been used to develop the index structures and measure their performance. Table \ref{tab:system-specifications} lists the hardware, operating system and tool versions these machines use.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|r|l|}
+		\hline
+		\textbf{CPU} & Intel(R) Xeon(R) CPU E3-1225 V2 @ 3.20 GHz (four cores) \\
+		\hline
+		\textbf{Main Memory (RAM)} & 15.5 GB \\
+		\hline
+		\textbf{Operating System} & Linux CentOS 6.5 (Final) \\
+		\hline
+		\textbf{Linux Kernel Version} & 2.6.32-431.3.1.el6.x86\_64 \\
+		\hline
+		\textbf{C++ Compiler} & GCC 4.4.7 (Released 2013-03-13) \\
+		\hline
+		\textbf{Boost Library Version} & 1.41.0 \\
+		\hline
+	\end{tabular}
+	\caption{Hardware, Operaring System and Tool Versions used for Development and Performance Testing}
+	\label{tab:system-specifications}
+\end{table}
+
+\subsection{Measuring Execution Time of Code}
+
+There are various ways of measuring the execution time of an application. Individual index structure operations are typically much lower than a second, sometimes even less than a millisecond. A high level of precision and accuracy is required because even millisecond savings are important when optimising index structure operations are required.
+
+C/C++ come with two standard timing mechanisms. \texttt{time()}\footnote{Online documentation for \texttt{time()}: \url{http://www.cplusplus.com/reference/ctime/time/}} returns the number of seconds since the Unix epoch (00:00, 01/01/1970 UTC). Since it returns seconds, it is not precise enough for this project. \texttt{clock()}\footnote{Online documentation for \texttt{clock()}: \url{http://www.cplusplus.com/reference/ctime/clock/}}  measures the number of CPU ticks since some epoch (typically the launch of the application). The amount of real time (i.e. milliseconds, seconds, etc.) a CPU tick takes is constant, but depends on the hardware.
+
+\texttt{clock\_gettime()}\footnote{Online documentation for \texttt{clock\_gettime()}: \url{http://linux.die.net/man/3/clock_gettime}} returns a time with nanosecond precision, but is only available on specific systems (e.g. Linux). Since the operating system used for the evaluation framework is Linux and this level of precision is desired, \texttt{clock\_gettime()} has been used for timing all operations.
