@@ -1,14 +1,9 @@
 import sys
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
-from numpy.random import random
 
 def extract2DCoordinates(points):
 	return [ p[0] for p in points ], [ p[1] for p in points ]
-
-def plotScatter(plot, points, colour, marker):
-	xValues, yValues = extract2DCoordinates(points)
-	return plot.scatter(xValues, yValues, color=colour, marker=marker)
 
 def plotLine(plot, points, colour, marker):
 	xValues, yValues = extract2DCoordinates(points)
@@ -18,16 +13,13 @@ class Dataset:
 
 	def __init__(self, name, type, points, colour, marker):
 		self.name = name
-		self.type = type
+		self.type = type # NOTE: unused for now
 		self.points = points
 		self.colour = colour
 		self.marker = marker
 
 	def plot(self, plot):
-		if self.type == "scatter":
-			return plotScatter(plot, self.points, self.colour, self.marker)
-		elif self.type == "line":
-			return plotLine(plot, self.points, self.colour, self.marker)
+		return plotLine(plot, self.points, self.colour, self.marker)
 
 def readPoints(filename):
 	points = []

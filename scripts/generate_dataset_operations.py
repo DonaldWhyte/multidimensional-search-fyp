@@ -49,6 +49,22 @@ def printSingleOperationTypeList(opType, numDimensions, dataset):
 		op = (opType, list(p))
 		print(operationToStr(op))
 
+def loadDataset(filename):
+	dataset = []
+	numDimensions = 0
+	numDatasetPoints = 0
+	
+	with open(filename, "r") as f:
+		headerFields = f.readline().split()
+		if len(headerFields) < 2:
+			sys.exit("Dataset header file does not have both #dimensions and #points")	
+		numDimensions, numDatasetPoints = int(headerFields[0]), int(headerFields[1])
+
+		dataset = [ parsePointStr(line) for line in f.readlines() ]
+		dataset = dataset[:numDatasetPoints]
+
+	return numDimensions, numDatasetPoints, dataset
+
 
 if __name__ == "__main__":
 	# Seed random number generator
@@ -75,16 +91,7 @@ if __name__ == "__main__":
 	operationMaximums = getOperationMaximums(sys.argv[8:])
 	
 	# Load specified dataset into memory
-	numDimensions = 0
-	dataset = []
-	with open(datasetFilename, "r") as f:
-		headerFields = f.readline().split()
-		if len(headerFields) < 2:
-			sys.exit("Dataset header file does not have both #dimensions and #points")	
-		numDimensions, numDatasetPoints = int(headerFields[0]), int(headerFields[1])
-
-		dataset = [ parsePointStr(line) for line in f.readlines() ]
-		dataset = dataset[:numDatasetPoints]
+	numDimensions, numDatasetPoints, dataset = loadDataset(datasetFilename)
 
 	# If generate mode is 'all', then all points are inserted, queries, then deleted in bulk
 	if listType == "all":

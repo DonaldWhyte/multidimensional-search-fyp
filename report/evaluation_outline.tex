@@ -24,11 +24,9 @@ One assumption being made about the target data is that it is dynamic, meaning p
 
 \section{Timing Operations}
 
-TODO: explain what amortmisation is
+\textbf{Amortised analysis}, introduced by Tarjan in 1985, is used to analyse the performance of algorithms over a sequence of operations, rather than an individual one \cite{amortised-analysis}. This type of analysis is typically used for algorithms where some operations take longer than others, with the goal of making operations later quicker. The amortised time complexity of an algorithm. Some index structures, particularly self-adjusting ones, have used this to bound the running time of their operations, such as the Splay tree, Quadtreap and Splay Quadtree \cite{splay-tree, quadtreap, splay-quadtree}.
 
-TODO: state that it has been used for theoretical analysis of algorithms (amortised analysis), such as the splay quadtree, quadtreap and Splay tree (Robert Tarjan was first one to use such a thing, or one of the first???)
-
-This project will use a similar concept for evaluation. Instead of measuring the time of a single operartion, the times of measuring many thousands of operations will be measured. This is to get an idea on what the runtime of an operation is on average and prevent single, long-running operations from skewing the results. A typical performance test therefore has the following steps:
+This project will use a similar concept for measuring the execution time of the structures. Instead of measuring the time of a single operartion, the times of many thousands of operations will be measured. This is to get an idea on what the runtime of an operation is on average, over a sequence of operations. This prevents single, slow operations from causing the execution time to appear worse, or short operations making the performance appear better. A typical performance test therefore has the following steps:
 \begin{enumerate}
 	\item \textbf{Initial Build} -- incrementally build structure by adding each point in test dataset one-by-one
 	\item \textbf{Query Points} -- query each point in the dataset, which should not be in the structure
@@ -38,24 +36,72 @@ Using this process allows the speed of large numbers of \texttt{insert}, \texttt
 
 By interleaving \texttt{insert} and \texttt{delete} operations with a number of point queries, more insight can be gained into how well the implementations perform in real applications that use dynamic data structures, where the pattern of operations is less straightforward. The performance of the implementations on interleaved operations may be different from the test process described previously due to cache coherency. The contents of the cache may change frequently due to different operations being performed consecutively, potentially causing a greater number of cache misses.
 
-TODO: formally defined an operation test
+The term \textbf{operation list} will be used to refer to a sequence of operations. Each operation will either be an \texttt{insert}, \texttt{delete} or point query, and will be paired with a $d$-dimensional point. These points will be pulled from the datasets described in the next section.
 
-TODO: mention trace of Joint Contour Net behaviour that will be used to see how the index structures perform with a real application -- AND TO SEE HOW INTERLEAVED OPERATIONS 
+% TODO: mention trace of Joint Contour Net behaviour that will be used to see how the index structures perform with a real application -- AND TO SEE HOW INTERLEAVED OPERATIONS
 
 \section{Datasets}
 \label{sec:datasets}
 
 Both synthetic, artificially generated data and a real dataset will be used for the evaluation. Three types of \textbf{synthetic} datasets will be generated -- uniformly distributed, skewed and clustered. Multiple instances of these datasets will be used, with varying numbers of dimensions (e.g. 1, 2, 3, 5, 10, 50, 100). Using such datasets was inspired by Wang et al. and Berchtold et al., who used similar datasets to evaluate the performance of the PK-tree and pyramid tree respectively \cite{pk-tree, pyramid-tree}. The reason for testing the index structures with these datasets is that the variety of point distributions and number of dimensions should tease out which data the implementations struggle with and which they work well at.
 
-TODO: how synthetic data was generated
+The synthetic data was generating randomly using the \texttt{boost::random} library and the Mersenne twister pseudorandom number generator (PRNG) \cite{mersenne-twister}.  The Mersenne twister passes ``stringent statistical tests" of randomness, including diehard \cite{mersenne-twister}. \texttt{boost::random} was chosen over using the C standard library function \texttt{rand()} because the latter is platform-dependant, so it is know as to what underlying PRNG will be used and if it passes these stastical tests.
 
-The real dataset being used for the evaluation is the result of an \textbf{astrophysics turbulence simulation}, where a $600 \times 248 \times 248$ regular mesh was used to simulate ``three-dimensional radiation hydrodynamical calculations of ionization front instabilities" \cite{astrophysics-dataset}. Each point of the mesh has ten scalar fields, which include particle density, temperature and eight chemical species. 200 timesteps were recorded, each being approximately 126 to 128 years apart \cite{astrophysics-dataset}. For each evaluation, only \textbf{one timestep} of the simulation will be used at a time. Since some of the timesteps have different distributions, multiple tests with different timesteps may be performed.
+Figure \ref{fig:synthetic-data} shows 2D randomly generated points using uniform, skewed and clustered distributions. 
 
-The astrophysics was chosen because it is large (almost 37 million points) and has a high number of dimensions (10). The core focus of the project is high-dimensional data, so this data will provide a true test of how well the implementations perform with real instances of such data. Various resolutions of the dataset may be used for testing to reduce the amount of data being tested at any one point. Datasets with smaller resolutions will be constructed by \textbf{uniformly sampling} the points of the original simulation's mesh.
+\begin{figure}
+		\begin{center}
+			\begin{subfloat}[Uniform Distribution\label{fig:uniform-distribution}]{%
+				\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+			}
+			\end{subfloat}~
+			\begin{subfloat}[Skewed Distribution\label{fig:skewed-distribution}]{%
+				\includegraphics[scale=0.25]{figures/skewed_distribution.pdf}
+			}
+			\end{subfloat}~
+			\begin{subfloat}[Clustered Distribution using Hypercubes\label{fig:clustered-distribution}] {%
+				\includegraphics[scale=0.25]{figures/clustered_distribution.pdf}
+			}
+			\end{subfloat}			  
+		\end{center}
 
-TODO: how the astrophysics dataset was uniformly sampled
+		\caption{Three Types of Synthetic Dataset Used For Evaluation, with 3000 Points Each}
+		\label{fig:synthetic-data}
+\end{figure}
 
-TODO: table listing all the different datasets and OPERATION LISTS that were used for tests
+The real dataset being used for the evaluation is the result of an \textbf{astrophysics turbulence simulation}, where a $600 \times 248 \times 248$ regular mesh was used to simulate ``three-dimensional radiation hydrodynamical calculations of ionization front instabilities" \cite{astrophysics-dataset}. Figure \ref{fig:ionisation-front-instabilities} shows an example of a visualisation generated using a 2D slice of the data. Each point of the mesh has ten scalar fields, which include particle density, temperature and eight chemical species. 200 timesteps were recorded, each being approximately 126 to 128 years apart \cite{astrophysics-dataset}. For each evaluation, only \textbf{one timestep} of the simulation will be used at a time. Since some of the timesteps have different distributions, multiple tests with different timesteps may be performed.
+
+\begin{wrapfigure}[12]{r}{0.4\textwidth}
+	\vspace{-20pt}
+	\begin{center}
+		\includegraphics[scale=0.2]{figures/ionisation_front_instabilities.pdf}
+	\end{center}
+	\vspace{-20pt}
+	\caption{Shadow Instability Forming in One 2D Slice Through the Astrophysics Dataset Over Time \cite{astrophysics-dataset}}
+	\label{fig:ionisation-front-instabilities}
+\end{wrapfigure}
+
+The astrophysics was chosen because it is large (almost 37 million points) and has a high number of dimensions (10). The core focus of the project is high-dimensional data, so this data will provide a true test of how well the implementations perform with real instances of such data. The original dataset has a large number of points. For intermediate evaluations, it was decided to use smaller instances of this dataset for performance tests. Sampling a sub-region of the grid or uniformly sampling to create a dataset with a smaller resolution may introduce \textit{bias} in the data, which affects the evaluation. Therefore, smaller instances of the dataset are generated by randomly picking $n$ points from the original dataset, discarding and picking other points whenever a point that has already been sampled was chosen. By the law of large numbers\footnote{\url{http://en.wikipedia.org/wiki/Law_of_large_numbers}}, as $n$ is increased, the smaller dataset tends to being more representative of whole dataset, making this method statistically fairer.
+
+TODO: exactly what dimensions and stuff are used!!!
+
+Table \ref{tab:operation-lists} shows the major operation lists that will be used for evaluation, which datasets the points will be pulled from and what the lists will be used to evaluate.
+
+\begin{table}
+	\centering
+	\begin{tabular}{|p{3.5cm}|p{3cm}|p{4cm}|p{5cm}|}
+		\hline
+		\textbf{Operation List} & \textbf{Distribution(s)} & \textbf{Varying Parameter} & \textbf{Parameter Values} \\
+		\hline
+		Insert-Query-Delete & Uniform, Skewed, Clustered & Dimension & 1, 2, 3, 5, 8, 10, 30, 50, 100, 200 \\
+		Insert-Query-Delete & Uniform & Input Size & 10, 100, 1,000, 5,000, 10,000, 50,000, 100,000, 500,000 \\
+		Insert-Query-Delete & Astrophysics & Input Size & 10, 100, 1,000, 5,000, 10,000, 50,000, 100,000, 500,000 \\
+		Random Operations & Astrophysics & Input Size & 10, 100, 1,000, 5,000, 10,000, 50,000, 100,000, 500,000 \\
+		\hline
+	\end{tabular}
+	\caption{Operation Lists Used for Main Evaluation}
+	\label{tab:operation-lists}
+\end{table}
 
 \section{Baselines}
 
