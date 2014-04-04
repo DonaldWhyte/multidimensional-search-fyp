@@ -6,7 +6,6 @@
 #include "TestOctree.h"
 #include "TestPyramidTree.h"
 #include "TestIndexPyramidTree.h"
-#include "TestSplayQuadtree.h"
 #include "TestSplayTree.h"
 #include "TestSplayPyramidTree.h"
 #include "TestParallelSequentialScan.h"

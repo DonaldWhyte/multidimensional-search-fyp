@@ -5,7 +5,6 @@ add_library( index_structures
 	"src/Octree.cpp"
 	"src/PyramidTree.cpp"
 	"src/IndexPyramidTree.cpp"
-	"src/SplayQuadtree.cpp"
 	"src/SplayPyramidTree.cpp"
 	"src/ParallelSequentialScan.cpp"
 	# Header files
@@ -14,7 +13,6 @@ add_library( index_structures
 	"include/Octree.h"
 	"include/PyramidTree.h"
 	"include/IndexPyramidTree.h"
-	"include/SplayQuadtree.h"
 	"include/SplayTree.h"
 	"include/SplayPyramidTree.h"
 	"include/ParallelSequentialScan.h"
@@ -32,7 +30,6 @@ add_executable ( structure_tests
 	"tests/TestOctree.h"
 	"tests/TestPyramidTree.h"
 	"tests/TestIndexPyramidTree.h"
-	"tests/TestSplayQuadtree.h"
 	"tests/TestSplayTree.h"
 )
 # Ensure google-test library is linked and include files are in search path
