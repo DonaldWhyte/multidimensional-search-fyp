@@ -15,7 +15,7 @@ namespace mdsearch
 
 	/* Scale factor to allow hashing function to distinguish points better
 	 * and separate them into different buckets.
-	 * NOTE: Higher valuyes typically decrease bucket utilisation. */
+	 * NOTE: Higher values typically decrease bucket utilisation. */
 	static const Real HASH_SCALING_FACTOR = 10.0f;
 
 	/* Use Pyramid-Technique to hash n-dimensional point to a single dimension,

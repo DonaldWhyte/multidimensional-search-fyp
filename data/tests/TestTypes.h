@@ -24,6 +24,8 @@ namespace mdsearch { namespace tests
 		EXPECT_EQ(oneA[0], 0);
 		EXPECT_EQ(oneB[0], 4);
 		EXPECT_EQ(oneC[0], 8);
+		EXPECT_TRUE(oneA == oneA);
+		EXPECT_TRUE(oneA != oneB);
 		Point twoA(2);
 		Point twoB(2, 3);
 		Real someValues[] = { 2, 4 };
@@ -31,6 +33,17 @@ namespace mdsearch { namespace tests
 		EXPECT_EQ(twoA[0], 0); EXPECT_EQ(twoA[1], 0);
 		EXPECT_EQ(twoB[0], 3); EXPECT_EQ(twoB[1], 3);
 		EXPECT_EQ(twoC[0], 2); EXPECT_EQ(twoC[1], 4);
+		EXPECT_TRUE(twoA == twoA);
+		EXPECT_TRUE(twoA != twoB);
+		// Testing these to ensure SSE (divides woirk by four) still works!
+		Point fourA(4);
+		Point fourB(4, 2.0f);
+		EXPECT_TRUE(fourA == fourA);
+		EXPECT_TRUE(fourA != fourB);
+		Point fiveA(5);
+		Point fiveB(5, 2.0f);
+		EXPECT_TRUE(fiveA == fiveA);
+		EXPECT_TRUE(fiveA != fiveB);
 	}
 
 	class RegionTests : public ::testing::Test
