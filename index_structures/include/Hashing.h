@@ -5,13 +5,45 @@
 #include <vector>
 #include "Point.h"
 #include "Region.h"
+#include <complex>
 
 // Only define this is index structures should use SSE-enabled hashing
 // (done to potentially increase speed of structures)
-#define MDSEARCH_USE_SSE_HASHING 1
+//#define MDSEARCH_USE_SSE_HASHING 1
 
 namespace mdsearch
 {
+
+	/* Compute pyramid value of the given point, using the original Pyramid-technique. */
+	inline int computePyramidValue(unsigned int numDimensions,
+		const Point& p, const Point& minPoint, const Point& maxPoint,
+		Real bucketInterval)
+	{
+		int index = 0;
+		int dMax = 0;
+		Real dMaxHeight = std::abs(
+			0.5f - ((p[0] - minPoint[0]) / (maxPoint[0] - minPoint[0]))
+		);
+		for (int d = 1; (d < numDimensions); d++)
+		{
+			Real currentHeight = std::abs(
+				0.5f - ((p[d] - minPoint[d]) / (maxPoint[d] - minPoint[d]))
+			);
+			if (dMaxHeight < currentHeight)
+			{
+				dMax = d;
+				dMaxHeight = currentHeight;
+			}
+		}
+		if (p[dMax] < 0.5f)
+			index = dMax; // pyramid lower than central point
+		else 
+		{
+			index = dMax + numDimensions; // pyramid higher than central point
+		}
+		return (index + std::abs(0.5f - p[index % numDimensions])) * bucketInterval;
+	}
+
 
 	/* Scale factor to allow hashing function to distinguish points better
 	 * and separate them into different buckets.
@@ -36,7 +68,6 @@ namespace mdsearch
 	inline int hashPointSSE(unsigned int numDimensions, const Point& point,
 		const Point& minPoint, const Point& maxPoint, const Point& median)
 	{
-		// TODO: handle dimensions not divisible by four
 		int numLoops = numDimensions / 4;
 		int numLeftover = numDimensions % 4;
 
@@ -71,8 +102,8 @@ namespace mdsearch
 			mPoint++;
 			mBoundaryMin++;
 			mBoundaryMax++;
-			mMedian++;
-		}
+				mMedian++;
+			}
 		// Handle leftover case sequentially
 		for (int d = (numDimensions - numLeftover - 1); (d < numDimensions); d++)
 		{
