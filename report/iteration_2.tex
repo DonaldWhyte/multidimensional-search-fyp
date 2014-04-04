@@ -9,6 +9,38 @@ In the first iteration, the Pseudo-Pyramid Tree showed great promise as an effic
 	\item Analyse performance of all Pseudo-Pyramid Tree variants and determine the best performing one
 \end{itemize}
 
+
+\subsection{Accelerating Hash Function}
+
+TODO: refer back to profiling and results from previous iteration -- justify how this is important
+
+The existing point hashing function (Equation \ref{eq:pseudo-pyramid-hash}) takes $O(d^2)$ time. This is caused by an inner loop which computes $\prod_{j=0}^{i}{\lbrack m_j \rbrack}$. If $m$ is changed during the structure's lifetime. otherwise the hash value of a point could change and stored points can become inaccessible. Therefore, $m$ is constant and the hashing function can computed in $O(d)$ time by \textit{pre-computing} $\prod_{j=0}^{i}{\lbrack m_j \rbrack}$. This pre-computation happens when the Pseudo-Pyramid tree is initialised. The new hashing function is given in Equation \ref{eq:new-pseudo-pyramid-hash}.
+
+\begin{multline}\\
+	h(p) = \sum_{i = 0}^{d} { \lbrack \texttt{toInt}( h_i(p) \times m_i ) \times M_i \rbrack } \\
+	\text{where } M_i = \prod_{j=0}^{i}{\lbrack m_j \rbrack} \;\;\; \text{for} 0 \leq i \leq d \\
+	\label{eq:new-pseudo-pyramid-hash}
+\end{multline}
+
+TODO: performance boost
+
+\begin{table}
+	\centering
+	\begin{tabular}{|l|l|l|}
+		\hline
+		\textbf{Operation} & \textbf{$O(d^2)$ Function} & \textbf{$O(d)$ Function} \\
+		\hline
+		\textbf{Insert} & TODO & TODO \\
+		\textbf{Delete} & TODO  & TODO \\
+		\textbf{Point Query} & TODO & TODO \\
+		\hline
+	\end{tabular}
+	\caption{Total Execution Time (in Seconds) of Batch Pseudo-Pyramid Tree Operations Using $O(d^2)$ and $O(d)$ Hash Function (10D Randomly Uniform Dataset, 10,000 points used)}
+	\label{tab:new-pseudo-pyramid-hash}
+\end{table}
+
+TODO: plot against sequential scan
+
 \subsection{Rebuild Pseudo-Pyramid Tree}
 
 This variant of the Pseudo-Pyramid Tree uses a different strategy for releasing memory for unused points. Instead of defragmenting the array by peforming a sequence of array deletions when $R + 1$ elements are marked for deletion, the entire structure is rebuilt. This new cleanup procedure starts by clearing the structure and incrementally building the new structure by only adding points \textit{not} marked for deletion. $n - R$ points will be re-instered and insertion in the worst case is $O(n)$, meaning the worst case complexity of \texttt{delete} is $O((n - R)n)$. The larger $R$ is, the less time it takes to perform this procedure but a larger amount of allocated memory goes unused at a time.
@@ -26,10 +58,6 @@ Unlile the other implementations, the Splay Pseudo-Pyramid Tree does not use a h
 TODO: more detail about the splay tree, including in-depth algorithms??
 
 Nodes in the Splay Pseudo-Pyramid Tree correspond to individual buckets in the Bucket Pseudo-Pyramid Tree, meaning each node can store multiple points. Since the splay tree is implemented as a collection of heap-allocated nodes with pointers to link them, deletions are cheap as a low amount of memory needs to be de-allocated per \texttt{delete} operation. The hope is that this, combined with the self-adjusting nature of the splay tree, will produce a Pseudo-Pyramid Tree implementation that is more efficient for non-random operations
-
-\subsection{Accelerating Hash Function}
-
-TODO: refer back to profiling and results from previous iteration -- justify how this is important
 
 TODO: say what you did to try and improve the function ($O(d^2)$) to an equiavelent one ($O(d)$) by pre-computing. Use measurements to prove increased spped (showing Pseudo-Pyramid Tree gets worse tha seq scan at a later $d$ value)
 
