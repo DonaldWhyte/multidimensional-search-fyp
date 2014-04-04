@@ -6,7 +6,7 @@
 #include "DataTypes.h"
 
 // Only define this if points should use SSE-enabled comparison
-#define MDSEARCH_USE_SSE_POINT_COMPARISON 1
+//#define MDSEARCH_USE_SSE_POINT_COMPARISON 1
 
 #if !defined(WIN32) && MDSEARCH_USE_SSE_POINT_COMPARISON
 	#include <xmmintrin.h>
@@ -44,14 +44,15 @@ namespace mdsearch
 							return false;
 					return true;
 				#else
-					int nLoop = nDimensions / 4;
-					int numLeftover = nDimensions % 4;
+					int numLoops = nDimensions / 4;
+					if ((nDimensions % 4) != 0)
+						numLoops += 1;
 					// Input data recast to 128-bit values (containing four values each)
 					const __m128* mA = reinterpret_cast<const __m128*>(&values[0]);
 					const __m128* mB = reinterpret_cast<const __m128*>(&other.values[0]);
 					__m128i mask;
 
-					for (unsigned int i = 0; (i < nLoop); i++)
+					for (unsigned int i = 0; (i < numLoops); i++)
 					{
 						mask = (__m128i)_mm_cmpeq_ps(*mA, *mB); 
 						unsigned short test = _mm_movemask_epi8(mask);
@@ -61,10 +62,6 @@ namespace mdsearch
 						mA++;
 						mB++;
 					}
-					// Handle leftover case sequentially
-					for (int d = (nDimensions - numLeftover); (d < nDimensions); d++)
-						if (values[d] != other.values[d])
-							return false;
 					return true;
 				#endif
 			}
