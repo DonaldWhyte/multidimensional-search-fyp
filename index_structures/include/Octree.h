@@ -46,18 +46,12 @@ namespace mdsearch
 		bool update(const Point& oldPoint, const Point& newPoint);
 		// Queries
 		bool pointExists(const Point& p);
-		PointList pointsInRegion(const Region& region);
-
+		
 	private:
 		// Sub-divide octree into four sub-regions (nodes)
 		void subdivide();
 		// Return true if this node stores the given point, false otherwise
 		bool storesPoint(const Point& p) const;
-		// Perform recursive search through octree to find all points inside
-		// the given region. At the top level, an empty PointList should be
-		// given. This will be populated with any found points at the
-		// end of the recursive algorithm.
-		void recursiveRegionQuery(const Region& region, PointList& foundPoints);
 		// Remove all child nodes from this Octree node
 		void removeAllChildren();
 

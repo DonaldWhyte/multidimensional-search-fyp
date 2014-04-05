@@ -51,10 +51,19 @@ namespace mdsearch
 	}
 
 	bool PyramidTree::insert(const Point& point)
-	{
-		// TODO: add boundary check w/ point here???
-		
-		PTBucket* bucket = getContainingBucket(point);
+	{		
+		// Retrieve containing bucket by hashing point into key
+		#ifdef MDSEARCH_USE_SSE_HASHING
+			int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
+		#else
+			int searchKey = hashPoint(numDimensions, point, minPoint, maxPoint, medianPoint);
+		#endif
+		// Search underlying 1D structure to find point's bucket
+		PTBucket* bucket = NULL;
+		OneDMap::iterator it = hashMap.find(searchKey);
+		if (it != hashMap.end())
+			bucket = &(it->second);
+
 		if (bucket) // if bucket for point exists
 		{
 			// If point is stored in bucket - it ALREADY EXISTS
@@ -64,13 +73,17 @@ namespace mdsearch
 			}
 			else
 			{
-				insertToStructure(point, bucket);
+				bucket->points.push_back(point);
+				bucket->pointSums.push_back(point.sum());
 				return true;
 			}
 		}
-		else // if bucker does not exist, pass NULL to indicate new bucket
+		else // if bucket does not exist for point, create it!
 		{
-			insertToStructure(point, NULL);
+			PTBucket newBucket;
+			newBucket.points.push_back(point);
+			newBucket.pointSums.push_back(point.sum());
+			hashMap[searchKey] = newBucket;
 			return true;
 		}
 	}
@@ -124,12 +137,6 @@ namespace mdsearch
 		return (bucket && (getPointIndexInBucket(point, bucket) != -1));
 	}
 
-	PointList PyramidTree::pointsInRegion(const Region& region)
-	{
-		// TODO
-		return PointList();
-	}
-
 	const Region& PyramidTree::getBoundary() const
 	{
 		return boundary;
@@ -163,27 +170,6 @@ namespace mdsearch
 		return ss.str();
 	}
 
-	void PyramidTree::insertToStructure(const Point& point, PTBucket* bucket)
-	{
-		if (bucket) // if bucket for point already exisrs
-		{
-			bucket->points.push_back(point);
-			bucket->pointSums.push_back(point.sum());
-		}
-		else // if bucket does not exist for point, create it!
-		{
-			#ifdef MDSEARCH_USE_SSE_HASHING
-				int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
-			#else
-				int searchKey = hashPoint(numDimensions, point, minPoint, maxPoint, medianPoint);
-			#endif
-			PTBucket newBucket;
-			newBucket.points.push_back(point);
-			newBucket.pointSums.push_back(point.sum());
-			hashMap[searchKey] = newBucket;
-		}
-	}
-
 	PTBucket* PyramidTree::getContainingBucket(const Point& point)
 	{
 		// Hash point into one-dimensional key
@@ -192,7 +178,7 @@ namespace mdsearch
 		#else
 			int searchKey = hashPoint(numDimensions, point, minPoint, maxPoint, medianPoint);
 		#endif
-		// Search underlying splay tree to find point's bucket
+		// Search underlying structure to find point's bucket
 		OneDMap::iterator it = hashMap.find(searchKey);
 		if (it != hashMap.end())
 			return &(it->second); // pointer to bucket

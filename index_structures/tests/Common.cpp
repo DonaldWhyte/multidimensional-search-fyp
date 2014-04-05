@@ -61,46 +61,4 @@ namespace mdsearch { namespace tests
 		}
 	}
 
-	void IndexStructureTester::testRegionQueries(IndexStructure* structure)
-	{
-		structure->loadPoints(testPoints);
-
-		// Construct test regions
-		Interval zeroSizedRegion1Intervals[3] = { Interval(0, 0), Interval(0, 0), Interval(0, 0) };
-		Interval zeroSizedRegion2Intervals[3] = { Interval(4, 4), Interval(0, 0), Interval(3, 3) };
-		Interval emptyRegionIntervals[3] = { Interval(-10, -5), Interval(-10, -5), Interval(-10, -5) };
-		Interval singlePointRegionIntervals[3] = { Interval(3.5, 5), Interval(-1, 1), Interval(-7, 3.1) };
-		Interval multiplePointsRegionIntervals[3] = { Interval(0, 10), Interval(2, 6), Interval(2, 7) };
-		Interval allPointsRegionIntervals[3] = { Interval(0, 10), Interval(0, 10), Interval(0, 10) };
-
-		Region zeroSizedRegion1(3, zeroSizedRegion1Intervals);
-		Region zeroSizedRegion2(3, zeroSizedRegion2Intervals);
-		Region emptyRegion(3, emptyRegionIntervals);
-		Region singlePointRegion(3, singlePointRegionIntervals);
-		Region multiplePointsRegion(3, multiplePointsRegionIntervals);
-		Region allPointsRegion(3, allPointsRegionIntervals);
-
-		// Construct lists of expected points in test regions
-		PointList zeroSizedRegion2Points;
-		zeroSizedRegion2Points.push_back(testPoints[2]);
-		PointList singlePointRegionPoints;
-		singlePointRegionPoints.push_back(testPoints[2]);
-		PointList multiplePointsRegionPoints;
-		multiplePointsRegionPoints.push_back(testPoints[1]);
-		multiplePointsRegionPoints.push_back(testPoints[7]);
-
-		// Test with zero-size region that is NOT a point
-		EXPECT_TRUE( vectorsContainSameElements(PointList(), structure->pointsInRegion(zeroSizedRegion1)) );
-		// Test with zero-size region that IS A POINT
-		EXPECT_TRUE( vectorsContainSameElements(zeroSizedRegion2Points, structure->pointsInRegion(zeroSizedRegion2)) );
-		// Test with region that contains no points
-		EXPECT_TRUE( vectorsContainSameElements(PointList(), structure->pointsInRegion(emptyRegion)) );
-		// Test with region that contains one point
-		EXPECT_TRUE( vectorsContainSameElements(singlePointRegionPoints, structure->pointsInRegion(singlePointRegion)) );
-		// Test with region that contains multiple points
-		EXPECT_TRUE( vectorsContainSameElements(multiplePointsRegionPoints, structure->pointsInRegion(multiplePointsRegion)) );
-		// Test with region that contains all points
-		EXPECT_TRUE( vectorsContainSameElements(testPoints, structure->pointsInRegion(allPointsRegion)) );
-	}
-
 } }

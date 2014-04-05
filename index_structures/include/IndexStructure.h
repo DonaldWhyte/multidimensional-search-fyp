@@ -36,7 +36,6 @@ namespace mdsearch
 		virtual bool update(const Point& oldPoint, const Point& newPoint) = 0;
 		// Queries
 		virtual bool pointExists(const Point& p) = 0;
-		virtual PointList pointsInRegion(const Region& region) = 0;
 
 		inline unsigned int dimensionality() const
 		{

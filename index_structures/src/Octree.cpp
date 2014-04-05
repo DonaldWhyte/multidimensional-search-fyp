@@ -213,42 +213,6 @@ namespace mdsearch
 		}
 	}
 
-	PointList Octree::pointsInRegion(const Region& region)
-	{
-		PointList foundPoints;
-		recursiveRegionQuery(region, foundPoints);
-		return foundPoints;
-	}
-
-	void Octree::recursiveRegionQuery(const Region& region, PointList& foundPoints)
-	{
-		if (boundary.intersects(region))
-		{
-			if (isLeaf())
-			{
-				for (PointList::const_iterator it = points.begin();
-					(it != points.end()); it++)
-				{
-					if (region.contains(*it))
-					{
-						foundPoints.push_back(*it);
-					}
-				}
-			}
-			else
-			{
-				for (OctreeNodeList::const_iterator it = children.begin();
-					(it != children.end()); it++)
-				{
-					// NOTE: Calling private method, but allowed because it is
-					// a method of the same class (automatic friend class).
-					// TODO: Code smell! Fix in the future??
-					(*it)->recursiveRegionQuery(region, foundPoints);
-				}
-			}
-		}
-	}
-
 	void Octree::subdivide()
 	{
 		// Do nothing if the octree has children. This is because a

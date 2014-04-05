@@ -89,15 +89,6 @@ namespace mdsearch { namespace tests
 		tester.testPointQueries(&structure);
 	}
 
-	TEST_F(SplayPyramidTreeTests, RegionQueries)
-	{
-		// TODO
-		/*
-		SplayPyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
-		IndexStructureTester tester;
-		tester.testRegionQueries(&structure);*/
-	}
-
 } }
 
 #endif

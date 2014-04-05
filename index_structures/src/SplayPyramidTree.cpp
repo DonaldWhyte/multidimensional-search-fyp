@@ -41,9 +41,15 @@ namespace mdsearch
 
 	bool SplayPyramidTree::insert(const Point& point)
 	{
-		// TODO: add boundary check w/ point here???
-		
-		PTBucket* bucket = getContainingBucket(point);
+		// Retrieve containing bucket by hashing point into key
+		#ifdef MDSEARCH_USE_SSE_HASHING
+			int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
+		#else
+			int searchKey = hashPoint(numDimensions, point, minPoint, maxPoint, medianPoint);
+		#endif
+		// Search underlying 1D structure to find point's bucket
+		PTBucket* bucket = splayTree.getValue(searchKey);
+
 		if (bucket) // if bucket for point exists
 		{
 			// If point is stored in bucket - it ALREADY EXISTS
@@ -53,13 +59,17 @@ namespace mdsearch
 			}
 			else
 			{
-				insertToStructure(point, bucket);
+				bucket->points.push_back(point);
+				bucket->pointSums.push_back(point.sum());
 				return true;
 			}
 		}
-		else // if bucker does not exist, pass NULL to indicate new bucket
+		else // if bucket does not exist for point, create it!
 		{
-			insertToStructure(point, NULL);
+			PTBucket newBucket;
+			newBucket.points.push_back(point);
+			newBucket.pointSums.push_back(point.sum());
+			splayTree.insert(searchKey, newBucket);
 			return true;
 		}
 	}
@@ -110,36 +120,9 @@ namespace mdsearch
 		return (bucket && (getPointIndexInBucket(point, bucket) != -1));
 	}
 
-	PointList SplayPyramidTree::pointsInRegion(const Region& region)
-	{
-		// TODO
-		return PointList();
-	}
-
 	const Region& SplayPyramidTree::getBoundary() const
 	{
 		return boundary;
-	}
-
-	void SplayPyramidTree::insertToStructure(const Point& point, PTBucket* bucket)
-	{
-		if (bucket) // if bucket for point already exisrs
-		{
-			bucket->points.push_back(point);
-			bucket->pointSums.push_back(point.sum());
-		}
-		else // if bucket does not exist for point, create it!
-		{
-			#ifdef MDSEARCH_USE_SSE_HASHING
-				int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
-			#else
-				int searchKey = hashPoint(numDimensions, point, minPoint, maxPoint, medianPoint);
-			#endif
-			PTBucket newBucket;
-			newBucket.points.push_back(point);
-			newBucket.pointSums.push_back(point.sum());
-			splayTree.insert(searchKey, newBucket);
-		}
 	}
 
 	PTBucket* SplayPyramidTree::getContainingBucket(const Point& point)

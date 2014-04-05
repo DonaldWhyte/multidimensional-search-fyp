@@ -91,16 +91,4 @@ namespace mdsearch
 		return false;
 	}
 
-	PointList SequentialScan::pointsInRegion(const Region& region)
-	{
-		PointList foundPoints;
-		for (PointList::const_iterator it = points.begin();
-			(it != points.end()); it++)
-		{
-			if (region.contains(*it))
-				foundPoints.push_back(*it);
-		}
-		return foundPoints;
-	}
-
 }

@@ -212,13 +212,6 @@ namespace mdsearch { namespace tests
 		tester.testPointQueries(&structure);
 	}
 
-	TEST_F(OctreeTests, RegionQueries)
-	{
-		Octree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
-		IndexStructureTester tester;
-		tester.testRegionQueries(&structure);
-	}
-
 } }
 
 #endif

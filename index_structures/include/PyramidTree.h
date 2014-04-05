@@ -42,9 +42,6 @@ namespace mdsearch
 		virtual bool update(const Point& oldPoint, const Point& newPoint);
 		/* Return true if the given point is being stored in the structure. */
 		virtual bool pointExists(const Point& point);
-		/* Return all points stored in this structure which are contained
-		 * within the given spatial region. */
-		virtual PointList pointsInRegion(const Region& region);
 
 		/* Return spatial region the tree covers. */
 		const Region& getBoundary() const;
@@ -59,7 +56,6 @@ namespace mdsearch
 	private:
 		static const unsigned int MAX_BUCKET_NUMBER = 300000;
 
-		void insertToStructure(const Point& point, PTBucket* bucket = NULL);
 		PTBucket* getContainingBucket(const Point& point);
 		int getPointIndexInBucket(const Point& point, const PTBucket* bucket) const;
 

@@ -20,7 +20,6 @@ namespace mdsearch { namespace tests {
 		 * being added) after these are called. */
 		void testUpdates(IndexStructure* structure);
 		void testPointQueries(IndexStructure* structure);
-		void testRegionQueries(IndexStructure* structure);
 
 		const PointList& getTestPoints() const;
 

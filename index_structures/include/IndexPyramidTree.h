@@ -40,9 +40,6 @@ namespace mdsearch
 		virtual bool update(const Point& oldPoint, const Point& newPoint);
 		/* Return true if the given point is being stored in the structure. */
 		virtual bool pointExists(const Point& point);
-		/* Return all points stored in this structure which are contained
-		 * within the given spatial region. */
-		virtual PointList pointsInRegion(const Region& region);
 
 		/* Return all points currently stored in the structure's array.
 		 * NOTE: May contain points recently deleted. Use emptyIndices()

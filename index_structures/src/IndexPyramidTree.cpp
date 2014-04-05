@@ -140,12 +140,6 @@ namespace mdsearch
 		return (getPointIndex(point) >= 0);
 	}
 
-	PointList IndexPyramidTree::pointsInRegion(const Region& region)
-	{
-		// TODO
-		return PointList();
-	}
-
 	const PointList& IndexPyramidTree::allPoints() const
 	{
 		return points;

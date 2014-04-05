@@ -152,15 +152,6 @@ namespace mdsearch { namespace tests
 		tester.testPointQueries(&structure);
 	}
 
-	TEST_F(IndexPyramidTreeTests, RegionQueries)
-	{
-		// TODO
-		/*
-		IndexPyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
-		IndexStructureTester tester;
-		tester.testRegionQueries(&structure);*/
-	}
-
 	TEST_F(IndexPyramidTreeTests, Defragment)
 	{
 		// Make max empty elements 2 for testing purposes

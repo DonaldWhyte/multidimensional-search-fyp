@@ -112,14 +112,6 @@ namespace mdsearch { namespace tests
 		tester.testPointQueries(&structure);
 	}
 
-	TEST_F(SequentialScanTests, RegionQueries)
-	{
-		SequentialScan structure(IndexStructureTester::NUM_TEST_DIMENSIONS);
-		IndexStructureTester tester;
-		tester.testRegionQueries(&structure);
-	}
-
-
 } }
 
 #endif
