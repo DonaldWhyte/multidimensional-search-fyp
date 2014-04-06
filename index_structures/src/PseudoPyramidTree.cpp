@@ -7,16 +7,25 @@ namespace mdsearch
 	PseudoPyramidTree::PseudoPyramidTree(unsigned int numDimensions, const Region& boundary)
 		: PyramidTree(numDimensions, boundary)
 	{
+		// Compute scale factors
+		Real m = static_cast<Real>(1.0 / numDimensions);
+		int div = ceil(pow(MAX_BUCKET_NUMBER, m));
+		scaleFactors = std::vector<int>(numDimensions, div);
+		// Pre-compute the cumlative products of the scale factors to
+		// speed up hashing function
+		cumulativeSFProducts.resize(numDimensions);
+		cumulativeSFProducts[0] = 1;
+		for (unsigned int d = 1; (d < numDimensions); d++)
+		{
+			cumulativeSFProducts[d] = scaleFactors[d - 1] * cumulativeSFProducts[d - 1];
+		}
 	}
 
 	bool PseudoPyramidTree::insert(const Point& point)
 	{
 		// Retrieve containing bucket by hashing point into key
-		#ifdef MDSEARCH_USE_SSE_HASHING
-			int searchKey = computePseudoPyramidValueSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#else
-			int searchKey = computePseudoPyramidValue(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#endif
+		int searchKey = computePseudoPyramidValue(numDimensions, point,
+			minPoint, maxPoint, scaleFactors, cumulativeSFProducts);
 		// Search underlying 1D structure to find point's bucket
 		PTBucket* bucket = NULL;
 		OneDMap::iterator it = hashMap.find(searchKey);
@@ -50,11 +59,8 @@ namespace mdsearch
 	PTBucket* PseudoPyramidTree::getContainingBucket(const Point& point)
 	{
 		// Hash point into one-dimensional key
-		#ifdef MDSEARCH_USE_SSE_HASHING
-			int searchKey = computePseudoPyramidValueSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#else
-			int searchKey = computePseudoPyramidValue(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#endif
+		int searchKey = computePseudoPyramidValue(numDimensions, point,
+			minPoint, maxPoint, scaleFactors, cumulativeSFProducts);
 		// Search underlying structure to find point's bucket
 		OneDMap::iterator it = hashMap.find(searchKey);
 		if (it != hashMap.end())

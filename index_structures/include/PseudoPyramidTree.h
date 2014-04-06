@@ -17,6 +17,9 @@ namespace mdsearch
 	private:
 		virtual PTBucket* getContainingBucket(const Point& point);
 
+		std::vector<int> scaleFactors;
+		std::vector<int> cumulativeSFProducts;
+
 	};
 
 }

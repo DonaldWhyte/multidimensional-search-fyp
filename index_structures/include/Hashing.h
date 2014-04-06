@@ -47,23 +47,25 @@ namespace mdsearch
 	/* Compute pseudo-pyramid value (hash) of n-dimensional point.
 	 * Credit: Zheng Ghao. */
 	inline int computePseudoPyramidValue(unsigned int numDimensions, const Point& point,
-		const Point& minPoint, const Point& maxPoint, const Point& median)
+		const Point& minPoint, const Point& maxPoint, const std::vector<int>& scaleFactor,
+		const std::vector<int>& cumulativeSFProducts)
 	{
-		// TODO
-		return 0;
+		int searchKey = 0;
+		for (int d = 0; d < numDimensions; d++)
+		{
+			int value = std::min(
+				static_cast<int>((point[d] - minPoint[d]) / (maxPoint[d] - minPoint[d]) * scaleFactor[d]),
+				scaleFactor[d] - 1
+			);
+			searchKey += value * cumulativeSFProducts[d];
+		}
+		return searchKey;
 	}
-	inline int computePseudoPyramidValueSSE(unsigned int numDimensions, const Point& point,
-		const Point& minPoint, const Point& maxPoint, const Point& median)
-	{
-		// TODO
-		return 0;	
-	}
-
 
 	/* Scale factor to allow hashing function to distinguish points better
 	 * and separate them into different buckets.
 	 * NOTE: Higher values typically decrease bucket utilisation. */
-	static const Real BDH_SCALING_FACTOR = 10.0f;
+	static const Real BDH_SCALING_FACTOR = 300.0f;
 
 	/* Use Boundary Distance Hashing  to reduce n-dimensional point to
 	 * one-dimensional search key. */
