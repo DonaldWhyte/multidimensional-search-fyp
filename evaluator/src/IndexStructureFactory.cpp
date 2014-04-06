@@ -6,6 +6,8 @@
 #include "IndexPyramidTree.h"
 #include "SplayPyramidTree.h"
 #include "ParallelSequentialScan.h"
+#include "PseudoPyramidTree.h"
+#include "BoundaryDistanceHashing.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -147,6 +149,42 @@ namespace mdsearch
 		}	
 	}
 
+	IndexStructure* generatePseudoPyramidTree(unsigned int numDimensions,
+		const std::vector<std::string>& args)
+	{
+		// Check there are enough arguments to construct n-dimensional boundary
+		if (args.size() < 2) // min + max args for every dimension
+			return NULL;
+
+		try
+		{
+			Region boundary = parseBoundary(numDimensions, args);
+			return new PseudoPyramidTree(numDimensions, boundary);
+		}	
+		catch (const boost::bad_lexical_cast& ex)
+		{
+			return NULL;
+		}		
+	}	
+
+	IndexStructure* generateBoundaryDistanceHashing(unsigned int numDimensions,
+		const std::vector<std::string>& args)
+	{
+		// Check there are enough arguments to construct n-dimensional boundary
+		if (args.size() < 2) // min + max args for every dimension
+			return NULL;
+
+		try
+		{
+			Region boundary = parseBoundary(numDimensions, args);
+			return new BoundaryDistanceHashing(numDimensions, boundary);
+		}	
+		catch (const boost::bad_lexical_cast& ex)
+		{
+			return NULL;
+		}		
+	}			
+
 
 
 	IndexStructureFactory::IndexStructureFactory()
@@ -158,6 +196,8 @@ namespace mdsearch
 		addGenerator("index_pyramid_tree", generateIndexPyramidTree);
 		addGenerator("splay_pyramid_tree", generateSplayPyramidTree);
 		addGenerator("par_sequential_scan", generateParallelSequentialScan);
+		addGenerator("pseudo_pyramid_tree", generatePseudoPyramidTree);
+		addGenerator("bdh", generateBoundaryDistanceHashing);
 	}
 
 	void IndexStructureFactory::addGenerator(const std::string& structureType,
