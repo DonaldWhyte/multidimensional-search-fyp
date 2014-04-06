@@ -42,11 +42,7 @@ namespace mdsearch
 	bool SplayPyramidTree::insert(const Point& point)
 	{
 		// Retrieve containing bucket by hashing point into key
-		#ifdef MDSEARCH_USE_SSE_HASHING
-			int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#else
-			int searchKey = hashPoint(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#endif
+		int searchKey = computePyramidValue(numDimensions, point, minPoint, maxPoint, bucketInterval);
 		// Search underlying 1D structure to find point's bucket
 		PTBucket* bucket = splayTree.getValue(searchKey);
 
@@ -128,11 +124,7 @@ namespace mdsearch
 	PTBucket* SplayPyramidTree::getContainingBucket(const Point& point)
 	{
 		// Hash point into one-dimensional key
-		#ifdef MDSEARCH_USE_SSE_HASHING
-			int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#else
-			int searchKey = hashPoint(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#endif
+		int searchKey = computePyramidValue(numDimensions, point, minPoint, maxPoint, bucketInterval);
 		// Search underlying splay tree to find point's bucket
 		return splayTree.getValue(searchKey);
 	}

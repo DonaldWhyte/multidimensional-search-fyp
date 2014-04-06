@@ -44,29 +44,43 @@ namespace mdsearch
 		return (index + std::abs(0.5f - p[index % numDimensions])) * bucketInterval;
 	}
 
+	/* Compute pseudo-pyramid value (hash) of n-dimensional point.
+	 * Credit: Zheng Ghao. */
+	inline int computePseudoPyramidValue(unsigned int numDimensions, const Point& point,
+		const Point& minPoint, const Point& maxPoint, const Point& median)
+	{
+		// TODO
+		return 0;
+	}
+	inline int computePseudoPyramidValueSSE(unsigned int numDimensions, const Point& point,
+		const Point& minPoint, const Point& maxPoint, const Point& median)
+	{
+		// TODO
+		return 0;	
+	}
+
 
 	/* Scale factor to allow hashing function to distinguish points better
 	 * and separate them into different buckets.
 	 * NOTE: Higher values typically decrease bucket utilisation. */
-	static const Real HASH_SCALING_FACTOR = 10.0f;
+	static const Real BDH_SCALING_FACTOR = 10.0f;
 
-	/* Use Pyramid-Technique to hash n-dimensional point to a single dimension,
-	 * which is an integer value. */
-	inline int hashPoint(unsigned int numDimensions, const Point& point,
-		const Point& minPoint, const Point& maxPoint, const Point& median)
+	/* Use Boundary Distance Hashing  to reduce n-dimensional point to
+	 * one-dimensional search key. */
+	inline int boundaryDistanceHash(unsigned int numDimensions, const Point& point,
+		const Point& minPoint, const Point& maxPoint, const Point& scaleFactor)
 	{
 		int hashValue = 0;
 		for (int d = 0; d < numDimensions; d++)
 		{
 			hashValue += static_cast<int>(
-				(point[d] - minPoint[d]) / (maxPoint[d] - minPoint[d]) * median[d] * HASH_SCALING_FACTOR
+				(point[d] - minPoint[d]) / (maxPoint[d] - minPoint[d]) * scaleFactor[d] * BDH_SCALING_FACTOR
 			);
 		}
 		return hashValue;
 	}
-
-	inline int hashPointSSE(unsigned int numDimensions, const Point& point,
-		const Point& minPoint, const Point& maxPoint, const Point& median)
+	inline int boundaryDistanceHashSSE(unsigned int numDimensions, const Point& point,
+		const Point& minPoint, const Point& maxPoint, const Point& scaleFactor)
 	{
 		int numLoops = numDimensions / 4;
 		int numLeftover = numDimensions % 4;
@@ -74,8 +88,8 @@ namespace mdsearch
 		const __m128* mPoint = reinterpret_cast<const __m128*>(point.toArray());
 		const __m128* mBoundaryMin = reinterpret_cast<const __m128*>(minPoint.toArray());
 		const __m128* mBoundaryMax = reinterpret_cast<const __m128*>(maxPoint.toArray());
-		const __m128* mMedian = reinterpret_cast<const __m128*>(median.toArray());
-		const __m128 mScalingFactor = _mm_set_ps1(HASH_SCALING_FACTOR);
+		const __m128* mScaleFactor = reinterpret_cast<const __m128*>(scaleFactor.toArray());
+		const __m128 mExtraScalingFactor = _mm_set_ps1(BDH_SCALING_FACTOR);
 
 		__m128 m1, m2, m3;
 		float components[4];
@@ -86,8 +100,8 @@ namespace mdsearch
 			m1 = _mm_sub_ps(*mPoint, *mBoundaryMin);
 			m2 = _mm_sub_ps(*mBoundaryMax, *mBoundaryMin);
 			m3 = _mm_div_ps(m1, m2);
-			m1 = _mm_mul_ps(m3, *mMedian);
-			m1 = _mm_mul_ps(m1, mScalingFactor);
+			m1 = _mm_mul_ps(m3, *mScaleFactor);
+			m1 = _mm_mul_ps(m1, mExtraScalingFactor);
 			_mm_store_ps(components, m1);
 			// NOTE: Reason first addition is wrapped in paranthesis is so its all
 			// cast to an integer, so each float will be truncated before adding,
@@ -102,13 +116,13 @@ namespace mdsearch
 			mPoint++;
 			mBoundaryMin++;
 			mBoundaryMax++;
-				mMedian++;
-			}
+			mScaleFactor++;
+		}
 		// Handle leftover case sequentially
 		for (int d = (numDimensions - numLeftover - 1); (d < numDimensions); d++)
 		{
 			hashValue += static_cast<int>(
-				(point[d] - minPoint[d]) / (maxPoint[d] - minPoint[d]) * median[d]
+				(point[d] - minPoint[d]) / (maxPoint[d] - minPoint[d]) * scaleFactor[d] * BDH_SCALING_FACTOR
 			);
 		}
 

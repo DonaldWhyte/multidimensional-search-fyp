@@ -66,11 +66,7 @@ namespace mdsearch
 	bool IndexPyramidTree::remove(const Point& point)
 	{
 		// Find bucket the point would belong to
-		#ifdef MDSEARCH_USE_SSE_HASHING
-			int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#else
-			int searchKey = hashPoint(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#endif
+		int searchKey = computePyramidValue(numDimensions, point, minPoint, maxPoint, bucketInterval);
 		OneDMap::iterator keyValue = hashMap.find(searchKey);
 		// Bucket has been found, point MIGHT be stored in structure
 		if (keyValue != hashMap.end())
@@ -161,11 +157,7 @@ namespace mdsearch
 		points.push_back(point);
 		pointSums.push_back(point.sum());
 
-		#ifdef MDSEARCH_USE_SSE_HASHING
-			int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#else
-			int searchKey = hashPoint(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#endif
+		int searchKey = computePyramidValue(numDimensions, point, minPoint, maxPoint, bucketInterval);
 		int currentIndex = points.size() - 1;
 		if (searchKeyExists)
 		{
@@ -188,11 +180,7 @@ namespace mdsearch
 	int IndexPyramidTree::getPointIndex(const Point& point)
 	{
 		// First check if this point's bucket exists
-		#ifdef MDSEARCH_USE_SSE_HASHING
-			int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#else
-			int searchKey = hashPoint(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#endif
+		int searchKey = computePyramidValue(numDimensions, point, minPoint, maxPoint, bucketInterval);
 		OneDMap::const_iterator keyValue = hashMap.find(searchKey);
 		if (keyValue != hashMap.end())
 		{
