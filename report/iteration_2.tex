@@ -45,29 +45,6 @@ Table \ref{tab:new-pseudo-pyramid-hash} shows operation execution time of the Ba
 	\label{fig:new-pseudo-pyramid-hash}
 \end{figure}
 
-\subsection{Improving Bucket Utlisation}
-
-TODO: define what this is and how it can affect perform (too low, random access, too high, too many points to seach per query)
-
-Define new hashign functions
-
-TODO: State how this new function is easier to compute and provides better bucket utliisation -- BE SURE TO GIVE THE MEASUREMENTS FOR THIS TO PROVE IT! Discuss why bucket utilisation is better at a sweet spot (not too low, not too high)
-
-TODO: discuss scaling factor, what it deos and why it can help (plots with scaling factor against bucket utilisation + execution time)
-
-\subsection{SSE Parallelisation}
-
-SIMD stands for Single Instruction, Multiple Data and was defined by Flynn as a classification of parallel computing \cite{flynns-taxonomy}. In SIMD, a single instruction is used to operation on multiple data items at the same time. If $p$ is the maximum number of data items that can be operated on in parallel at a time, then in an ideal scenario it is possible increase the speed of a computation by $p$ times. However, it is only suitable for computations where the same operation can be applied to multiple data items independantly, where the order in which those operations complete does not affect the final output.
-
-Streaming SIMD Extensions, or SSE, is a specification of an instruction set that performs SIMD operations for the widely used x86 CPU architecture\cite{sse}, which is the architecture used for the development and test environment of this project. It was seen as TODO
-
-TODO: speeding up NEW hashing function
-TODO: speeding up point comparison
-
-\subsection{Rebuild Pseudo-Pyramid Tree}
-
-This variant of the Pseudo-Pyramid Tree uses a different strategy for releasing memory for unused points. Instead of defragmenting the array by peforming a sequence of array deletions when $R + 1$ elements are marked for deletion, the entire structure is rebuilt. This new cleanup procedure starts by clearing the structure and incrementally building the new structure by only adding points \textit{not} marked for deletion. $n - R$ points will be re-instered and insertion in the worst case is $O(n)$, meaning the worst case complexity of \texttt{delete} is $O((n - R)n)$. The larger $R$ is, the less time it takes to perform this procedure but a larger amount of allocated memory goes unused at a time.
-
 \subsection{Bucket Pseudo-Pyramid Tree}
 
 The Bucket Pseudo-Pyramid Tree implementation does not use a single array to store the points. Instead of buckets containing an array of point indices, it has an array of actual points. No clenaup procedure is necessary because the memory for a point is released immediately afer it's removed, by simply erasing it from the corresponding bucket's array. The goal of this is to increase \textbf{cache coherency} when searhcing a bucket, since the point array can be searched sequentially. The index-based variants cause random accesses in the single point array (causing more cache misses) since a bucket's store indices may point to distant parts of the point array, which may become very large.
@@ -84,7 +61,31 @@ Unlile the other implementations, the Splay Pseudo-Pyramid Tree does not use a h
 
 TODO: more detail about the splay tree, including in-depth algorithms??
 
-Nodes in the Splay Pseudo-Pyramid Tree correspond to individual buckets in the Bucket Pseudo-Pyramid Tree, meaning each node can store multiple points. Since the splay tree is implemented as a collection of heap-allocated nodes with pointers to link them, deletions are cheap as a low amount of memory needs to be de-allocated per \texttt{delete} operation. The hope is that this, combined with the self-adjusting nature of the splay tree, will produce a Pseudo-Pyramid Tree implementation that is more efficient for non-random operations TODO.
+Nodes in the Splay Pseudo-Pyramid Tree correspond to individual buckets in the Bucket Pseudo-Pyramid Tree, meaning each node can store multiple points. Since the splay tree is implemented as a collection of heap-allocated nodes with pointers to link them, deletions are cheap as a low amount of memory needs to be de-allocated per \texttt{delete} operation. The aim is that this, combined with the self-adjusting nature of the splay tree, will produce a Pseudo-Pyramid Tree implementation that is more efficient for non-random operations.
+
+\subsection{Pyramid Tree}
+
+TODO
+
+\subsection{Improving Bucket Utlisation}
+
+TODO: define what this is and how it can affect perform (too low, random access, too high, too many points to seach per query)
+
+Define new hashign function !!
+
+TODO: State how this new function is easier to compute and provides better bucket utliisation -- BE SURE TO GIVE THE MEASUREMENTS FOR THIS TO PROVE IT! Discuss why bucket utilisation is better at a sweet spot (not too low, not too high)
+
+TODO: discuss scaling factor, what it deos and why it can help (plots with scaling factor against bucket utilisation + execution time)
+
+\subsection{SSE Parallelisation}
+
+SIMD stands for Single Instruction, Multiple Data and was defined by Flynn as a classification of parallel computing \cite{flynns-taxonomy}. In SIMD, a single instruction is used to operation on multiple data items at the same time. If $p$ is the maximum number of data items that can be operated on in parallel at a time, then in an ideal scenario it is possible increase the speed of a computation by $p$ times. However, it is only suitable for computations where the same operation can be applied to multiple data items independantly, where the order in which those operations complete does not affect the final output.
+
+Streaming SIMD Extensions, or SSE, is a specification of an instruction set that performs SIMD operations for the widely used x86 CPU architecture\cite{sse}, which is the architecture used for the development and test environment of this project. It was seen as TODO
+
+TODO: speeding up NEW hashing function
+TODO: speeding up point comparison
+
 
 \subsection{Parallelising Bucket Search}
 
