@@ -66,6 +66,7 @@ namespace mdsearch
 		typedef boost::unordered_map<int, PTBucket> OneDMap;
 		OneDMap hashMap;
 
+
 		// Entire region of space the Pyramid tree covers
 		// (points outside this region are ignored)
 		Region boundary;

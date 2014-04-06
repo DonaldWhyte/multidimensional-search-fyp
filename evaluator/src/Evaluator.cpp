@@ -6,7 +6,7 @@
 
 #if defined(_WIN32)
 	#include <time.h>
-#elif defined(unix)
+#elif defined(__unix__)
 	#include <sys/time.h>
 #else
 	#error No timing mechanism supported for this platform
@@ -21,7 +21,7 @@ namespace mdsearch
 	{
 	#if defined(_WIN32)
 		return static_cast<Timing>(time(NULL)); // in seconds already
-	#elif defined(unix)
+	#elif defined(__unix__)
 		timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts); 
 		return static_cast<Timing>(ts.tv_sec) + (static_cast<Timing>(ts.tv_nsec) / 1000000000.0);
