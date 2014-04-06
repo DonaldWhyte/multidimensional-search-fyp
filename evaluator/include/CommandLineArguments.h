@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "Region.h"
 
 namespace mdsearch
 {
@@ -19,7 +20,6 @@ namespace mdsearch
 		struct IndexStructureSpecification
 		{
 			std::string type;
-			unsigned int numDimensions;
 			StringList arguments;
 		};
 
@@ -44,6 +44,9 @@ namespace mdsearch
 		const StringList& individualOpDatasetFilenames() const;
 		const std::vector<int>& pointCountsToSample() const;
 
+		bool boundaryProvided() const;
+		const Region& structureBoundary() const;
+
 	private:
 		// If this flag is set to true, then some of the required arguments
 		// are either missing or invalid
@@ -61,6 +64,7 @@ namespace mdsearch
 		StringList individualOpDatasets;
 		std::vector<int> pCountsToSample;
 
+		Region boundary;
 
 	};
 }

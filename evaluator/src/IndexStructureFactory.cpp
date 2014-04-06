@@ -14,80 +14,35 @@
 namespace mdsearch
 {
 
-	Region parseBoundary(unsigned int numDimensions,
-		const std::vector<std::string>& args)
-	{
-		// Parse string arguments into real numbers that define
-		// interval for each dimension
-		Real min = boost::lexical_cast<Real>(args[0]);
-		Real max = boost::lexical_cast<Real>(args[1]);
-		// Construct Regio n object to represent boundary
-		Region boundary(numDimensions);
-		for (unsigned int d = 0; (d < numDimensions); d++)
-		{
-			boundary[d] = Interval(min, max);
-		}
-		return boundary;
-	}
-
 	/* ALL INDEX STRUCTURE GENERATORS ARE DEFINED HERE */
 	IndexStructure* generateSequentialScan(unsigned int numDimensions,
-		const std::vector<std::string>& args)
+		const Region& boundary, const std::vector<std::string>& args)
 	{
 		return new SequentialScan(numDimensions);
 	}
 
 	IndexStructure* generateOctree(unsigned int numDimensions,
-		const std::vector<std::string>& args)
+		const Region& boundary, const std::vector<std::string>& args)
 	{
-		// Check there are enough arguments to construct n-dimensional boundary
-		if (args.size() < 2) // min + max args for every dimension
-			return NULL;
-
-		try
-		{
-			Region boundary = parseBoundary(numDimensions, args);
-			return new Octree(numDimensions, boundary);
-		}	
-		catch (const boost::bad_lexical_cast& ex)
-		{
-			return NULL;
-		}		
+		return new Octree(numDimensions, boundary);		
 	}
 
 	IndexStructure* generatePyramidTree(unsigned int numDimensions,
-		const std::vector<std::string>& args)
+		const Region& boundary, const std::vector<std::string>& args)
 	{
-		// Check there are enough arguments to construct n-dimensional boundary
-		if (args.size() < 2) // min + max args for every dimension
-			return NULL;
-
-		try
-		{
-			Region boundary = parseBoundary(numDimensions, args);
-			return new PyramidTree(numDimensions, boundary);
-		}	
-		catch (const boost::bad_lexical_cast& ex)
-		{
-			return NULL;
-		}		
+		return new PyramidTree(numDimensions, boundary);		
 	}		
 
 	IndexStructure* generateIndexPyramidTree(unsigned int numDimensions,
-		const std::vector<std::string>& args)
+		const Region& boundary, const std::vector<std::string>& args)
 	{
-		unsigned int requiredArgCount = 2;
-		if (args.size() < requiredArgCount)
-			return NULL;
-
 		try
 		{
-			Region boundary = parseBoundary(numDimensions, args);
 			// Parse optional "MAX EMPTY ELEMENTS ALLOWED" argument
 			int maxEmptyElements = -1; // default is NO CLEANING UP EMPTY ELEMENTS
-			if (args.size() >= requiredArgCount + 1)
+			if (args.size() >= 1)
 			{
-				const std::string& emptyElementArg = args[requiredArgCount];
+				const std::string& emptyElementArg = args[0];
 				maxEmptyElements = boost::lexical_cast<int>(emptyElementArg);
 				// If negative maximum given (other than -1), return NULL
 				// as it's invalid!
@@ -96,9 +51,9 @@ namespace mdsearch
 			}
 			// Parse optional 'CLEANUP PROCEDURE' ARGUMENT
 			IndexPyramidTree::CleanupProcedure cleanupProc = IndexPyramidTree::CLEANUP_PROC_DEFRAGMENT; // default is defragmentation
-			if (args.size() >= requiredArgCount + 2)
+			if (args.size() >= 2)
 			{
-				const std::string& procStr = args[requiredArgCount + 1];
+				const std::string& procStr = args[1];
 				if (procStr == "defragment")
 					cleanupProc = IndexPyramidTree::CLEANUP_PROC_DEFRAGMENT;
 				else if (procStr == "rebuild")
@@ -114,24 +69,13 @@ namespace mdsearch
 	}
 
 	IndexStructure* generateSplayPyramidTree(unsigned int numDimensions,
-		const std::vector<std::string>& args)
+		const Region& boundary, const std::vector<std::string>& args)
 	{
-		// Check there are enough arguments to construct n-dimensional boundary
-		if (args.size() < 2) // min + max args for every dimension
-			return NULL;
-		try
-		{
-			Region boundary = parseBoundary(numDimensions, args);
-			return new SplayPyramidTree(numDimensions, boundary);
-		}	
-		catch (const boost::bad_lexical_cast& ex)
-		{
-			return NULL;
-		}		
+		return new SplayPyramidTree(numDimensions, boundary);
 	}
 
 	IndexStructure* generateParallelSequentialScan(unsigned int numDimensions,
-		const std::vector<std::string>& args)
+		const Region& boundary, const std::vector<std::string>& args)
 	{
 		if (args.size() < 1) // number of threads to use
 			return NULL;
@@ -150,39 +94,15 @@ namespace mdsearch
 	}
 
 	IndexStructure* generatePseudoPyramidTree(unsigned int numDimensions,
-		const std::vector<std::string>& args)
+		const Region& boundary, const std::vector<std::string>& args)
 	{
-		// Check there are enough arguments to construct n-dimensional boundary
-		if (args.size() < 2) // min + max args for every dimension
-			return NULL;
-
-		try
-		{
-			Region boundary = parseBoundary(numDimensions, args);
-			return new PseudoPyramidTree(numDimensions, boundary);
-		}	
-		catch (const boost::bad_lexical_cast& ex)
-		{
-			return NULL;
-		}		
+		return new PseudoPyramidTree(numDimensions, boundary);	
 	}	
 
 	IndexStructure* generateBoundaryDistanceHashing(unsigned int numDimensions,
-		const std::vector<std::string>& args)
+		const Region& boundary, const std::vector<std::string>& args)
 	{
-		// Check there are enough arguments to construct n-dimensional boundary
-		if (args.size() < 2) // min + max args for every dimension
-			return NULL;
-
-		try
-		{
-			Region boundary = parseBoundary(numDimensions, args);
-			return new BoundaryDistanceHashing(numDimensions, boundary);
-		}	
-		catch (const boost::bad_lexical_cast& ex)
-		{
-			return NULL;
-		}		
+		return new BoundaryDistanceHashing(numDimensions, boundary);
 	}			
 
 
@@ -209,7 +129,7 @@ namespace mdsearch
 
 	IndexStructure* IndexStructureFactory::constructIndexStructure(
 		const std::string& structureType, unsigned int numDimensions,
-		const std::vector<std::string>& arguments) const
+		const Region& boundary, const std::vector<std::string>& arguments) const
 	{
 		// Cannot construct index structure with zero dimensions
 		if (numDimensions == 0)
@@ -220,7 +140,7 @@ namespace mdsearch
 		if (it != generators.end())
 		{
 			StructureGenerator generator = it->second;
-			return generator(numDimensions, arguments);
+			return generator(numDimensions, boundary, arguments);
 		}
 		// Return NULL if the given structure type does not exist
 		else

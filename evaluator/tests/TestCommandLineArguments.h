@@ -41,9 +41,8 @@ namespace mdsearch { namespace tests
 	{
 		char* testArgs1[] = { "./evaluator", "--output=filename" };
 		char* testArgs2[] = { "./evaluator", "--output=filename", "--index_structure=octree" };
-		char* testArgs3[] = { "./evaluator", "--output=filename", "--index_structure=octree,2" };
-		char* testArgs4[] = { "./evaluator", "--output=filename", "--index_structure=octree,2,0,100,0,100" };
-		char* testArgs5[] = { "./evaluator", "--output=filename", "--index_structure=octree,2,0,100,0,100", "-ssequential_scan,10" };
+		char* testArgs4[] = { "./evaluator", "--output=filename", "--index_structure=octree,0,100,0,100" };
+		char* testArgs5[] = { "./evaluator", "--output=filename", "--index_structure=octree,0,100,0,100", "-ssequential_scan" };
 		char* testArgs6[] = { "./evaluator", "--output=filename", "--index_structure=octree,r4uhr4" };
 
 		// Test no index structures given
@@ -51,21 +50,11 @@ namespace mdsearch { namespace tests
 		StructureSpecList structures = parsedArgs.indexStructures();
 		EXPECT_TRUE(parsedArgs.isValid());
 		EXPECT_EQ(0, structures.size());
-		// Test single index structure w/ no args (INVALID, SO IT'S IGNORED)
+		// Test single index structure w/ no args
 		parsedArgs = CommandLineArguments(3, testArgs2);
 		structures = parsedArgs.indexStructures();
-		ASSERT_EQ(0, structures.size());
-		// Test single index structure w/ arg (invalid dimension)
-		parsedArgs = CommandLineArguments(3, testArgs6);
-		structures = parsedArgs.indexStructures();
-		ASSERT_EQ(0, structures.size());		
-		// Test single index structure w/ arg (dimension)
-		parsedArgs = CommandLineArguments(3, testArgs3);
-		structures = parsedArgs.indexStructures();
-		EXPECT_TRUE(parsedArgs.isValid());
 		ASSERT_EQ(1, structures.size());
 		EXPECT_EQ("octree", structures[0].type);
-		EXPECT_EQ(2, structures[0].numDimensions);
 		EXPECT_EQ(0, structures[0].arguments.size());
 		// Test single index structure w/ multiple args
 		parsedArgs = CommandLineArguments(3, testArgs4);
@@ -73,7 +62,6 @@ namespace mdsearch { namespace tests
 		EXPECT_TRUE(parsedArgs.isValid());
 		ASSERT_EQ(1, structures.size());
 		EXPECT_EQ("octree", structures[0].type);
-		EXPECT_EQ(2, structures[0].numDimensions);
 		EXPECT_EQ(4, structures[0].arguments.size());
 		EXPECT_EQ("0", structures[0].arguments[0]); EXPECT_EQ("100", structures[0].arguments[1]);
 		EXPECT_EQ("0", structures[0].arguments[2]); EXPECT_EQ("100", structures[0].arguments[3]);
@@ -85,11 +73,9 @@ namespace mdsearch { namespace tests
 		ASSERT_EQ(2, structures.size());
 		EXPECT_EQ("octree", structures[0].type);
 		EXPECT_EQ(4, structures[0].arguments.size());
-		EXPECT_EQ(2, structures[0].numDimensions);
 		EXPECT_EQ("0", structures[0].arguments[0]); EXPECT_EQ("100", structures[0].arguments[1]);
 		EXPECT_EQ("0", structures[0].arguments[2]); EXPECT_EQ("100", structures[0].arguments[3]);
 		EXPECT_EQ("sequential_scan", structures[1].type);
-		EXPECT_EQ(10, structures[1].numDimensions);
 		EXPECT_EQ(0, structures[1].arguments.size());
 	}
 

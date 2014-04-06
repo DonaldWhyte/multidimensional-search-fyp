@@ -17,7 +17,7 @@ namespace mdsearch
 	// If the construction of the structure fails because the
 	// required arguments were not passed/valid (or for some
 	// other reason), the function returns NULL.
-	typedef IndexStructure* (*StructureGenerator)(unsigned int, const std::vector<std::string>&);
+	typedef IndexStructure* (*StructureGenerator)(unsigned int, const Region&, const std::vector<std::string>&);
 
 	class IndexStructureFactory
 	{
@@ -31,7 +31,8 @@ namespace mdsearch
 		/* Construct index structure of given type, using the specified number of
 		 * dimensions and arguments. */
 		IndexStructure* constructIndexStructure(const std::string& structureType,
-			 unsigned int numDimensions, const std::vector<std::string>& arguments) const;
+			 unsigned int numDimensions, const Region& boundary,
+			 const std::vector<std::string>& arguments) const;
 
 	private:
 		typedef std::map<std::string, StructureGenerator> GeneratorMap;

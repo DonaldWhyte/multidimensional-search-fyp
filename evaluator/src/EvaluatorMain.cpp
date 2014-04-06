@@ -9,11 +9,46 @@
 
 using namespace mdsearch;
 
+Region computeOpListBoundary(const TestOperationList& opList)
+{
+	if (!opList.empty())
+	{
+		unsigned int numDimensions = opList[0].operand1.numDimensions();
+		Region boundary(numDimensions);
+		// Now search through all points in this operation list to find
+		// minimum and maximum values for each dimension
+		for (unsigned int i = 0; (i < opList.size()); i++)
+		{
+			const TestOperation& op = opList[i];
+			for (unsigned int d = 0; (d < numDimensions); d++)
+			{
+				if (op.operand1[d] < boundary[d].min)
+					boundary[d].min = op.operand1[d];
+				else if (op.operand1[d] > boundary[d].max)
+					boundary[d].max = op.operand1[d];
+				if (op.operand2.numDimensions() > 0) // if there is a second operand
+				{
+					if (op.operand2[d] < boundary[d].min)
+						boundary[d].min = op.operand2[d];
+					else if (op.operand2[d] > boundary[d].max)
+						boundary[d].max = op.operand2[d];
+				}
+			}
+		}
+		return boundary;
+	}
+	else
+	{
+		return Region(0);
+	}
+}
+
 void writeResultsToFile(const std::string& filename,
 	const OperationListTimings& timings,
 	const CommandLineArguments& args,
 	const std::vector<TestOperationList>& testOperationLists,
-	const PointList& datasetToPreload)
+	const PointList& datasetToPreload,
+	unsigned int globalNumDimensions)
 {
 	std::ofstream file(filename.c_str());
 	// Write structures used
@@ -22,7 +57,7 @@ void writeResultsToFile(const std::string& filename,
 	for (unsigned int i = 0; (i < structureSpecs.size()); i++)
 	{
 		const CommandLineArguments::IndexStructureSpecification& spec = structureSpecs[i];
-		file << "Structure (" << i << "):\n\tType: " << spec.type << "\n\tDimensionality: " << spec.numDimensions << "\n\t";
+		file << "Structure (" << i << "):\n\tType: " << spec.type << "\n\tDimensionality: " << globalNumDimensions << "\n\t";
 		file << "Arguments: ";
 		if (spec.arguments.size() > 0)
 		{
@@ -85,36 +120,9 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	// Construct specified index structures
-	if (args.isVerbose())
-		std::cout << "Loading index structures" << std::endl;	
-	std::vector<IndexStructure*> structures;
-
-	IndexStructureFactory structureFactory;
-	const std::vector<CommandLineArguments::IndexStructureSpecification> structureSpecs = args.indexStructures();
-	for (unsigned int i = 0; (i < structureSpecs.size()); i++)
-	{
-		// Use specification to load index structure
-		const CommandLineArguments::IndexStructureSpecification& spec = structureSpecs[i];
-		IndexStructure* structure = structureFactory.constructIndexStructure(
-			spec.type, spec.numDimensions, spec.arguments);
-		// If structure could not be constructed, display error message and exist program
-		if (!structure)
-		{
-			std::cout << "Could not load structure \"" << spec.type << "\" with arguments: [ ";
-			for (unsigned int j = 0; (j < spec.arguments.size()); j++)
-			{
-				std::cout << "\"" << spec.arguments[j] << "\" ";
-			}
-			std::cout << "]" << std::endl;
-			return 1;
-		}
-		structures.push_back(structure);
-	}
-
 	// Load dataset that will be pre-loaded into structure for each test
 	if (args.isVerbose())
-		std::cout << "Loading dataset to pre-load into structures" << std::endl;	
+		std::cout << "Loading dataset to pre-load into structures" << std::endl;
 	DatasetFileLoader datasetLoader;
 	PointList datasetToPreload = datasetLoader.load(
 		args.datasetToPreloadFilename()
@@ -130,7 +138,6 @@ int main(int argc, char* argv[])
 			datasetLoader.load(individualOpDatasetFilenames[i])
 		);
 	}
-
 	// Load specified test operations
 	std::vector<TestOperationList> testOperationLists;
 	if (args.isVerbose())
@@ -143,6 +150,59 @@ int main(int argc, char* argv[])
 		testOperationLists.push_back(testOpLoader.loadFromFile(
 			testOperationFilenames[i]) );
 	}
+	// Determine point dimensionality and boundaries to use for index structures
+	// from first operation list if specified
+	if (args.isVerbose())
+		std::cout << "Finding dimensionality and minimum /maximum boundary of dataset used for first operation list" << std::endl;
+
+	unsigned int globalNumDimensions = 0;
+	Region globalBoundary(0);
+	// If global boundary was provided in the command line arguments, use
+	// that and DON'T automatically compute boundary
+	if (args.boundaryProvided())
+	{
+		globalBoundary = args.structureBoundary();
+		globalNumDimensions = globalBoundary.numDimensions();
+	}
+	else if (!testOperationLists.empty())
+	{
+		const TestOperationList& firstList = testOperationLists[0];
+		globalBoundary = computeOpListBoundary(firstList);
+		globalNumDimensions = globalBoundary.numDimensions();
+	}
+	else
+	{
+		return 0;
+	}
+
+	// Construct specified index structures
+	if (args.isVerbose())
+		std::cout << "Loading index structures" << std::endl;	
+	std::vector<IndexStructure*> structures;
+
+	IndexStructureFactory structureFactory;
+	const std::vector<CommandLineArguments::IndexStructureSpecification> structureSpecs = args.indexStructures();
+	for (unsigned int i = 0; (i < structureSpecs.size()); i++)
+	{
+		// Use specification to load index structure
+		const CommandLineArguments::IndexStructureSpecification& spec = structureSpecs[i];
+		IndexStructure* structure = structureFactory.constructIndexStructure(
+			spec.type, globalNumDimensions, globalBoundary, spec.arguments);
+		// If structure could not be constructed, display error message and exist program
+		if (!structure)
+		{
+			std::cout << "Could not load structure \"" << spec.type << "\" with arguments: [ ";
+			for (unsigned int j = 0; (j < spec.arguments.size()); j++)
+			{
+				std::cout << "\"" << spec.arguments[j] << "\" ";
+			}
+			std::cout << "]" << std::endl;
+			return 1;
+		}
+		structures.push_back(structure);
+	}
+
+
 
 	// Create evaluator object and fill it with loaded structures
 	Evaluator evaluator(structures, args.testRunsToPerform(),
@@ -159,10 +219,9 @@ int main(int argc, char* argv[])
 		if (!args.resultFilename().empty())
 		{
 			writeResultsToFile(args.resultFilename(), timings,
-				args, testOperationLists, datasetToPreload);
+				args, testOperationLists, datasetToPreload, globalNumDimensions);
 		}
-	}
-
+	}	
 	// If there are any datasets to test indiviudal point counts,
 	// run the tests and store the results
 	for (unsigned int i = 0; (i < datasetsForIndividualOpTests.size()); i++)

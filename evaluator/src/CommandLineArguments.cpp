@@ -7,11 +7,33 @@
 namespace mdsearch
 {
 
+	/* Parse given list of strings based and retrieve boundaries
+	 * for each dimension from it. */
+	Region parseBoundary(const std::string& args)
+	{
+		// Split given argument string into individual fields
+		std::vector<std::string> fields;
+		boost::split(fields, args, boost::is_any_of(","));
+		// Determine number of dimensions by field count
+		unsigned int numDimensions = fields.size() / 2;
+
+		Region boundary(numDimensions);
+		for (unsigned int d = 0; (d < numDimensions); d++)
+		{
+			// Parse string arguments into real numbers
+			Real min = boost::lexical_cast<Real>(fields[d * 2]);
+			Real max = boost::lexical_cast<Real>(fields[d * 2 + 1]);
+			boundary[d] = Interval(min, max);
+		}
+		return boundary;		
+	}
+
 	const unsigned int CommandLineArguments::DEFAULT_TEST_RUNS = 1;
 
 	CommandLineArguments::CommandLineArguments(int argc, char* argv[]) :
 		validArguments(true), verbose(false), profileCPUFlag(false),
-		profileHeapFlag(false), runs(DEFAULT_TEST_RUNS)
+		profileHeapFlag(false), runs(DEFAULT_TEST_RUNS),
+		boundary(0)
 	{
 		// Shortened namespace for more concise code
 		namespace po = boost::program_options; 
@@ -28,7 +50,8 @@ namespace mdsearch
 				("verbose,v", "verbose output produced by evaluator if this flag is set")
 				("cpu", "CPU is profiled if this flag is set")
 				("heap", "heap is profiled if this flag is set")
-				("runs,r", po::value<unsigned int>(), "number of runs to perform of test operations to get AVERAGE time")
+				("boundary", po::value<std::string>(), "spatial boundary to use for each structure based on spatial decomposition (2d comma-separated numbers should be provided)")
+				("runs,r", po::value<unsigned int>(), "if flag set,  boundaries of spatial decomposition structures will be computed automatically using the first given dataset")
 				("index_structures,s", po::value<std::vector<std::string> >(), "index structure to evaluate")
 				("preloaded_dataset,p", po::value<std::string>(), "dataset of points which are pre-loaded into structure before running timed tests")
 				("test_operations,t", po::value<std::vector<std::string> >(), "list of test operations to perform")
@@ -65,6 +88,10 @@ namespace mdsearch
 			{
 				profileHeapFlag = true;
 			}
+			if (parsedArgs.count("boundary"))
+			{
+				boundary = parseBoundary(parsedArgs["boundary"].as<std::string>());
+			}
 			if (parsedArgs.count("runs"))
 			{
 				runs = parsedArgs["runs"].as<unsigned int>();
@@ -81,24 +108,15 @@ namespace mdsearch
 					// Split the structure into a list of strings using ","
 					std::vector<std::string> fields;
 					boost::split(fields, (*str), boost::is_any_of(","));
-					// If the type and dimensionality of the structure HAS NOT BEEN SPECIFIED,
-					// then ignore the structure
-					if (fields.size() < 2)
+					// If the type of the structure HAS NOT BEEN SPECIFIED, then ignore this spec
+					if (fields.size() < 1)
 						continue;
 
 					// Use first field as structure type and the rest as the structure's arguments
 					IndexStructureSpecification spec;
 					spec.type = fields[0];
-					try
-					{
-						spec.numDimensions = lexical_cast<unsigned int>(fields[1]);
-					}
-					catch (const bad_lexical_cast &) // IF INVALID DIMENSIONS -- IGNORE STRUCTURE!
-					{
-						continue;
-					}
 					spec.arguments.reserve(fields.size() - 1);
-					for (unsigned int i = 2; (i < fields.size()); i++)
+					for (unsigned int i = 1; (i < fields.size()); i++)
 						spec.arguments.push_back(fields[i]);
 					specifiedIndexStructures.push_back(spec);
 				}
@@ -175,6 +193,16 @@ namespace mdsearch
 	const std::vector<int>& CommandLineArguments::pointCountsToSample() const
 	{
 		return pCountsToSample;
+	}
+
+	bool CommandLineArguments::boundaryProvided() const
+	{
+		return (boundary.numDimensions() != 0);
+	}
+
+	const Region& CommandLineArguments::structureBoundary() const
+	{
+		return boundary;
 	}
 
 }
