@@ -7,6 +7,7 @@ add_library( index_structures
 	"src/IndexPyramidTree.cpp"
 	"src/SplayPyramidTree.cpp"
 	"src/ParallelSequentialScan.cpp"
+	"src/KDTree.cpp"
 	# Header files
 	"include/IndexStructure.h"
 	"include/SequentialScan.h"
@@ -16,6 +17,7 @@ add_library( index_structures
 	"include/SplayTree.h"
 	"include/SplayPyramidTree.h"
 	"include/ParallelSequentialScan.h"
+	"include/KDTree.h"
 )
 # Ensure include directory is in search path
 include_directories ("include")
@@ -31,6 +33,7 @@ add_executable ( structure_tests
 	"tests/TestPyramidTree.h"
 	"tests/TestIndexPyramidTree.h"
 	"tests/TestSplayTree.h"
+	"tests/TestKDTree.h"
 )
 # Ensure google-test library is linked and include files are in search path
 # NOTE: index_structures library is dependant on the 'data' library for the
