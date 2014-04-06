@@ -28,12 +28,12 @@ if(DEFINED ENV{LAB_MACHINE})
 	set ( LIBS ${LIBS} ${DEPENDENCIES}/lab_libs/libboost_program_options.a ${DEPENDENCIES}/lab_libs/libboost_thread.a ${DEPENDENCIES}/lab_libs/libboost_system.a )
 else()
 	# Search for Boost library
-	set(BOOST_LIBRARYDIR ${BOOST_ROOT}/stage/lib/)
-	include_directories(${Boost_INCLUDE_DIRS})
 	set(Boost_USE_STATIC_LIBS ON) 
 	set(Boost_USE_MULTITHREADED ON)  
 	set(Boost_USE_STATIC_RUNTIME OFF) 
 	find_package(Boost 1.41.0 COMPONENTS program_options thread system REQUIRED)
+	include_directories(${Boost_INCLUDE_DIRS})
+	set(BOOST_LIBRARYDIR ${BOOST_ROOT}/stage/lib/)
 endif()
 
 # Set directory all build files go to
