@@ -7,6 +7,8 @@ add_library( index_structures
 	"src/IndexPyramidTree.cpp"
 	"src/SplayPyramidTree.cpp"
 	"src/ParallelSequentialScan.cpp"
+	"src/PseudoPyramidTree.cpp"
+	"src/BoundaryDistanceHashing.cpp"
 	"src/KDTree.cpp"
 	# Header files
 	"include/IndexStructure.h"
@@ -17,6 +19,8 @@ add_library( index_structures
 	"include/SplayTree.h"
 	"include/SplayPyramidTree.h"
 	"include/ParallelSequentialScan.h"
+	"include/PseudoPyramidTree.h"
+	"include/BoundaryDistanceHashing.h"
 	"include/KDTree.h"
 )
 # Ensure include directory is in search path
@@ -33,6 +37,8 @@ add_executable ( structure_tests
 	"tests/TestPyramidTree.h"
 	"tests/TestIndexPyramidTree.h"
 	"tests/TestSplayTree.h"
+	"tests/TestPseudoPyramidTree.h"
+	"tests/TestBoundaryDistanceHashing.h"
 	"tests/TestKDTree.h"
 )
 # Ensure google-test library is linked and include files are in search path

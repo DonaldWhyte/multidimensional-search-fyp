@@ -53,11 +53,11 @@ namespace mdsearch
 		/* Return string reprensetation of Pyrmaid tree. */
 		std::string toString() const;
 
-	private:
+	protected:
 		static const unsigned int MAX_BUCKET_NUMBER = 300000;
 
-		PTBucket* getContainingBucket(const Point& point);
-		int getPointIndexInBucket(const Point& point, const PTBucket* bucket) const;
+		virtual PTBucket* getContainingBucket(const Point& point);
+		virtual int getPointIndexInBucket(const Point& point, const PTBucket* bucket) const;
 
 		// Unordered_map for storing the points
 		// Key = hashed 1D representation of point,

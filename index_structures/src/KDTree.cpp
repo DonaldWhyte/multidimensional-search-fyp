@@ -3,7 +3,7 @@
 namespace mdsearch
 {
 
-		KDTree::KDTree(unsigned int numDimensions) : IndexStructure(numDimensions)
+		KDTree::KDTree(unsigned int numDimensions) : IndexStructure(numDimensions), root(NULL)
 		{
 			// TODO
 		}

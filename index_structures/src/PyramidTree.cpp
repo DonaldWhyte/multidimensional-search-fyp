@@ -53,11 +53,7 @@ namespace mdsearch
 	bool PyramidTree::insert(const Point& point)
 	{		
 		// Retrieve containing bucket by hashing point into key
-		#ifdef MDSEARCH_USE_SSE_HASHING
-			int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#else
-			int searchKey = hashPoint(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#endif
+		int searchKey = computePyramidValue(numDimensions, point, minPoint, maxPoint, bucketInterval);
 		// Search underlying 1D structure to find point's bucket
 		PTBucket* bucket = NULL;
 		OneDMap::iterator it = hashMap.find(searchKey);
@@ -173,11 +169,7 @@ namespace mdsearch
 	PTBucket* PyramidTree::getContainingBucket(const Point& point)
 	{
 		// Hash point into one-dimensional key
-		#ifdef MDSEARCH_USE_SSE_HASHING
-			int searchKey = hashPointSSE(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#else
-			int searchKey = hashPoint(numDimensions, point, minPoint, maxPoint, medianPoint);
-		#endif
+		int searchKey = computePyramidValue(numDimensions, point, minPoint, maxPoint, bucketInterval);
 		// Search underlying structure to find point's bucket
 		OneDMap::iterator it = hashMap.find(searchKey);
 		if (it != hashMap.end())
