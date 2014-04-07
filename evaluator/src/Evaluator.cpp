@@ -12,7 +12,7 @@
 	#error No timing mechanism supported for this platform
 #endif
 
-#include "PyramidTree.h"
+#include "DuplicateHashTable.h"
 
 namespace mdsearch
 {
@@ -87,15 +87,9 @@ namespace mdsearch
 						generateHeapProfilerFilename(t, s)
 					);
 
-					PyramidTree* pt = dynamic_cast<PyramidTree*>(structures[s]);
-					if (pt)
-					{
-						std::cout << "Average points per bucket: " << pt->averagePointsPerBucket() << std::endl;
-						std::cout << "Standard deviation of points per bucket: " << pt->stdevPointsPerBucket() << std::endl;
-						std::cout << "Min points per bucket: " << pt->minPointsPerBucket() << std::endl;
-						std::cout << "Max points per bucket: " << pt->maxPointsPerBucket() << std::endl;
-					}	
-
+					DuplicateHashTable* dht = dynamic_cast<DuplicateHashTable*>(structures[s]);
+					if (dht)
+						std::cout << dht->toString() << std::endl;
 				}
 			}
 			// Now compute average times for each structure 

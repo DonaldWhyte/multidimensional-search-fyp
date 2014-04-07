@@ -10,6 +10,7 @@
 #include "BoundaryDistanceHashing.h"
 #include "KDTree.h"
 #include "UniqueHashTable.h"
+#include "DuplicateHashTable.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -119,6 +120,12 @@ namespace mdsearch
 		return new UniqueHashTable(numDimensions);
 	}
 
+	IndexStructure* generateDuplicateHashTable(unsigned int numDimensions,
+		const Region& boundary, const std::vector<std::string>& args)
+	{
+		return new DuplicateHashTable(numDimensions);
+	}
+
 
 
 	IndexStructureFactory::IndexStructureFactory()
@@ -134,6 +141,7 @@ namespace mdsearch
 		addGenerator("bdh", generateBoundaryDistanceHashing);
 		addGenerator("kdtree", generateKDTree);
 		addGenerator("uht", generateUniqueHashTable);
+		addGenerator("dht", generateDuplicateHashTable);
 	}
 
 	void IndexStructureFactory::addGenerator(const std::string& structureType,

@@ -13,6 +13,7 @@
 #include "TestBoundaryDistanceHashing.h"
 #include "TestKDTree.h"
 #include "TestUniqueHashTable.h"
+#include "TestDuplicateHashTable.h"
 
 int main(int argc, char* argv[])
 {
