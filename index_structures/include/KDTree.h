@@ -13,6 +13,7 @@ namespace mdsearch
 		KDNode* rightChild;
 
 		KDNode(const Point& p);
+		virtual ~KDNode();
 	};
 
 	class KDTree : public IndexStructure

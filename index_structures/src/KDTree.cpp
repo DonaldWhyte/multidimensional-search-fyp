@@ -13,9 +13,14 @@ namespace mdsearch
 	{
 	}
 
+	KDNode::~KDNode()
+	{
+		delete leftChild;
+		delete rightChild;
+	}
+
 	KDTree::KDTree(unsigned int numDimensions) : IndexStructure(numDimensions), root(NULL)
 	{
-		// TODO
 	}
 
 	KDTree::~KDTree()

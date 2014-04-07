@@ -8,6 +8,7 @@
 #include "ParallelSequentialScan.h"
 #include "PseudoPyramidTree.h"
 #include "BoundaryDistanceHashing.h"
+#include "KDTree.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -97,12 +98,18 @@ namespace mdsearch
 		const Region& boundary, const std::vector<std::string>& args)
 	{
 		return new PseudoPyramidTree(numDimensions, boundary);	
-	}	
+	}
 
 	IndexStructure* generateBoundaryDistanceHashing(unsigned int numDimensions,
 		const Region& boundary, const std::vector<std::string>& args)
 	{
 		return new BoundaryDistanceHashing(numDimensions, boundary);
+	}
+
+	IndexStructure* generateKDTree(unsigned int numDimensions,
+		const Region& boundary, const std::vector<std::string>& args)
+	{
+		return new KDTree(numDimensions);
 	}			
 
 
@@ -118,6 +125,7 @@ namespace mdsearch
 		addGenerator("par_sequential_scan", generateParallelSequentialScan);
 		addGenerator("pseudo_pyramid_tree", generatePseudoPyramidTree);
 		addGenerator("bdh", generateBoundaryDistanceHashing);
+		addGenerator("kdtree", generateKDTree);
 	}
 
 	void IndexStructureFactory::addGenerator(const std::string& structureType,
