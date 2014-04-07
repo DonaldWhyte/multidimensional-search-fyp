@@ -32,7 +32,7 @@ namespace mdsearch
 	bool KDTree::insert(const Point& p)
 	{
 		KDNode* previous = NULL; // previous node traversed
-		bool leftChildOfPrevious = false; // TODO
+		bool leftChildOfPrevious = false; // set to true if 'current' is left child of 'previous'
 		KDNode* current = root;
 		unsigned int cuttingDim = 0;
 
@@ -77,14 +77,22 @@ namespace mdsearch
 
 	bool KDTree::remove(const Point& p)
 	{
-		// TODO
-		return false;
+		bool removed = false;
+		root = recursiveRemove(root, p, 0, &removed);
+		return removed;
 	}
 
 	bool KDTree::update(const Point& oldPoint, const Point& newPoint)
 	{
-		// TODO
-		return false;
+		if (remove(oldPoint))
+		{
+			insert(newPoint);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	bool KDTree::pointExists(const Point& p)
@@ -110,14 +118,179 @@ namespace mdsearch
 		return false;
 	}
 
+	KDNode* KDTree::rootNode() const
+	{
+		return root;
+	}
+
+	const Point* KDTree::findMinimum(KDNode* node, unsigned int dimension, unsigned int cuttingDim)
+	{
+		// Reached leaf node
+		if (node == NULL)
+		{
+			return NULL;
+		}
+		// If cutting dimension is dimension we're looking for minimum in, just search left child!
+		else if (dimension == cuttingDim)
+		{
+			if (node->leftChild == NULL) // if no more 
+				return &node->point;
+			else
+				return findMinimum(node->leftChild, dimension, nextCuttingDimension(cuttingDim, numDimensions));
+		}
+		// Otherwise, we have to search BOTH children
+		else
+		{
+			const Point* a = findMinimum(node->leftChild, dimension, nextCuttingDimension(cuttingDim, numDimensions));
+			const Point* b = findMinimum(node->rightChild, dimension, nextCuttingDimension(cuttingDim, numDimensions));
+			if (a && b) // if minimums were returned from both children
+			{
+				Real minVal = std::min(node->point[dimension], std::min((*a)[dimension], (*b)[dimension]));
+				if (minVal == node->point[dimension])
+				{
+					return &node->point;
+				}
+				else if (minVal == (*a)[dimension])
+					return a;
+				else
+					return b;
+			}
+			else if (a) // if minimum was just returned from left child
+			{
+				Real minVal = std::min(node->point[dimension], (*a)[dimension]);
+				if (minVal == node->point[dimension])
+					return &node->point;
+				else
+					return a;
+			}
+			else if (b) // if minimum was just returned from right child
+			{
+				Real minVal = std::min(node->point[dimension], (*b)[dimension]);
+				if (minVal == node->point[dimension])
+					return &node->point;
+				else
+					return b;
+			}
+			else // no minimums returned!
+			{
+				return &node->point;
+			}
+
+		}
+	}
+
+	const Point* KDTree::findMaximum(KDNode* node, unsigned int dimension, unsigned int cuttingDim)
+	{
+		// Reached leaf node
+		if (node == NULL)
+		{
+			return NULL;
+		}
+		// If cutting dimension is dimension we're looking for minimum in, just search left child!
+		else if (dimension == cuttingDim)
+		{
+			if (node->leftChild == NULL) // if no more 
+				return &node->point;
+			else
+				return findMaximum(node->leftChild, dimension, nextCuttingDimension(cuttingDim, numDimensions));
+		}
+		// Otherwise, we have to search BOTH children
+		else
+		{
+			const Point* a = findMaximum(node->leftChild, dimension, nextCuttingDimension(cuttingDim, numDimensions));
+			const Point* b = findMaximum(node->rightChild, dimension, nextCuttingDimension(cuttingDim, numDimensions));
+			if (a && b) // if minimums were returned from both children
+			{
+				Real maxVal = std::max(node->point[dimension], std::max((*a)[dimension], (*b)[dimension]));
+				if (maxVal == node->point[dimension])
+				{
+					return &node->point;
+				}
+				else if (maxVal == (*a)[dimension])
+					return a;
+				else
+					return b;
+			}
+			else if (a) // if minimum was just returned from left child
+			{
+				Real maxVal = std::max(node->point[dimension], (*a)[dimension]);
+				if (maxVal == node->point[dimension])
+					return &node->point;
+				else
+					return a;
+			}
+			else if (b) // if minimum was just returned from right child
+			{
+				Real maxVal = std::max(node->point[dimension], (*b)[dimension]);
+				if (maxVal == node->point[dimension])
+					return &node->point;
+				else
+					return b;
+			}
+			else // no minimums returned!
+			{
+				return &node->point;
+			}
+
+		}
+	}
+
+	KDNode* KDTree::recursiveRemove(KDNode* node, const Point& p, unsigned int cuttingDim, bool* removed)
+	{
+		if (node == NULL)
+		{
+			return NULL;
+		}
+		else if (p[cuttingDim] < node->point[cuttingDim])
+		{
+			node->leftChild = recursiveRemove(node->leftChild, p,
+				nextCuttingDimension(cuttingDim, numDimensions), removed);
+		}
+		else if (p[cuttingDim] > node->point[cuttingDim])
+		{
+			node->rightChild = recursiveRemove(node->rightChild, p,
+				nextCuttingDimension(cuttingDim, numDimensions), removed);
+		}
+		else // found node that stores given point
+		{
+			// If node with point is leaf node, simply delete it!
+			if (node->leftChild == NULL && node->rightChild == NULL)
+			{
+				*removed = true; // now we can set the 'removed' flag to true as removal has been successful
+				delete node;
+				return NULL; // to remove reference to node in parent
+			}
+			else
+			{
+				// Find minimum point for cutting dimension and REPLACE node's point with it
+				if (node->rightChild)
+				{
+					node->point = *findMinimum(node->rightChild, cuttingDim,
+						nextCuttingDimension(cuttingDim, numDimensions));
+					node->rightChild = recursiveRemove(node->rightChild, node->point,
+						nextCuttingDimension(cuttingDim, numDimensions), removed);
+				}
+				else // if there is no right child!!
+				{
+					node->point = *findMinimum(node->leftChild, cuttingDim,
+						nextCuttingDimension(cuttingDim, numDimensions));
+					node->leftChild = recursiveRemove(node->leftChild, node->point,
+						nextCuttingDimension(cuttingDim, numDimensions), removed);
+					// TODO
+					node->rightChild = node->leftChild;
+					node->leftChild = NULL;
+				}
+			}
+		}
+		// If this point is reached, node should not be removed so we
+		// just return the node
+		return node;		
+	}
+
+
 	std::string KDTree::toString() const
 	{
 		return nodeToString("ROOT:", root, 0);
-	}
-
-	KDNode* KDTree::recursiveInsert(const Point& p, KDNode* node, unsigned int cuttingDim)
-	{
-
 	}
 
 	std::string KDTree::nodeToString(const std::string& title, const KDNode* node, unsigned int cuttingDim, unsigned int level) const

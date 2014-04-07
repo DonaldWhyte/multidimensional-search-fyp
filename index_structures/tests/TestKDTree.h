@@ -54,8 +54,6 @@ namespace mdsearch { namespace tests
 				ASSERT_FALSE(structure.pointExists(testPoints[j]));
 		}
 
-		std::cout << structure.toString() << std::endl;
-
 		// Now do the same for remove()
 		for (unsigned int i = 0; (i < testPoints.size()); i++)
 		{
@@ -79,6 +77,33 @@ namespace mdsearch { namespace tests
 		KDTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS);
 		IndexStructureTester tester;
 		tester.testPointQueries(&structure);
+	}
+
+	TEST_F(KDTreeTests, FindMinimum)
+	{
+		KDTree structure(NUM_KDTREE_DIMENSIONS);
+		IndexStructureTester tester;
+		const PointList& testPoints = tester.getTestPoints();
+
+		// Test on empty structure
+		EXPECT_EQ(NULL, structure.findMinimum(structure.rootNode(), 0));
+
+		// Test on filled structure
+		structure.loadPoints(testPoints);
+		const Point* returnedPoint = structure.findMinimum(structure.rootNode(), 0);
+		ASSERT_TRUE(returnedPoint);
+		EXPECT_EQ(testPoints[5], *returnedPoint);
+		returnedPoint = structure.findMinimum(structure.rootNode(), 1);
+		ASSERT_TRUE(returnedPoint);
+		EXPECT_EQ(testPoints[2], *returnedPoint);
+		// Case where there are MULTIPLE minimum points 
+		// Doesn't matter which is returned, as long one of them is
+		returnedPoint = structure.findMinimum(structure.rootNode(), 2);
+		ASSERT_TRUE(returnedPoint);
+		EXPECT_TRUE(testPoints[0] == *returnedPoint
+			|| testPoints[5] == *returnedPoint
+			|| testPoints[6] == *returnedPoint
+			|| testPoints[9] == *returnedPoint);
 	}
 
 } }

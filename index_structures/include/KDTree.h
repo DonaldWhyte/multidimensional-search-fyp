@@ -28,10 +28,21 @@ namespace mdsearch
 		virtual bool update(const Point& oldPoint, const Point& newPoint);
 		virtual bool pointExists(const Point& p);
 
+		KDNode* rootNode() const;
+
+		/* Find point with minimum value of a specific dimension in subtree
+		 * rooted at given node. */
+		const Point* findMinimum(KDNode* node, unsigned int dimension, unsigned int cuttingDim = 0);
+		/* Find point with maximum value of a specific dimension in subtree
+		 * rooted at given node. */
+		const Point* findMaximum(KDNode* node, unsigned int dimension, unsigned int cuttingDim = 0);
+
 		virtual std::string toString() const;
 
 	private:
-		KDNode* recursiveInsert(const Point& p, KDNode* t, unsigned int cuttingDim);
+		KDNode* recursiveRemove(KDNode* node, const Point& p,
+			unsigned int cuttingDim, bool* removed);
+
 		std::string nodeToString(const std::string& title, const KDNode* node,
 			unsigned int cuttingDim, unsigned int level = 0) const;
 
