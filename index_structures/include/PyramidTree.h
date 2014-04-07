@@ -68,7 +68,7 @@ namespace mdsearch
 		// Key = hashed 1D representation of point,
 		// Vsalue = list of points in BUCKET
 		// Each key can contain MULTIPLE indices
-		typedef boost::unordered_map<int, PTBucket> OneDMap;
+		typedef boost::unordered_map<Real, PTBucket> OneDMap;
 		OneDMap hashMap;
 
 

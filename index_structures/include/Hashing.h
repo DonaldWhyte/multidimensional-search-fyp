@@ -7,41 +7,61 @@
 #include "Region.h"
 #include <complex>
 
+#include <boost/functional/hash.hpp>
+
 // Only define this is index structures should use SSE-enabled hashing
 // (done to potentially increase speed of structures)
-//#define MDSEARCH_USE_SSE_HASHING 1
+#define MDSEARCH_USE_SSE_HASHING 1
 
 namespace mdsearch
 {
 
+	/* Return unique hash for d-dimensional point. */
+    inline std::size_t hashPoint(const Point& p)
+	{
+		size_t seed = 0;
+		const Real* coord = p.toArray();
+		for (coord; (coord != (coord + p.numDimensions())); ++coord)
+			boost::hash_combine(seed, *coord);
+		return seed;
+	}
+
+	/* Normalise value into 0-1 range based on min-max interval. */
+	inline Real normaliseCoord(Real coord, Real min, Real max)
+	{
+		return (coord - min) / (max - min);
+	}
+
 	/* Compute pyramid value of the given point, using the original Pyramid-technique. */
-	inline int computePyramidValue(unsigned int numDimensions,
+	inline Real computePyramidValue(unsigned int numDimensions,
 		const Point& p, const Point& minPoint, const Point& maxPoint,
 		Real bucketInterval)
 	{
 		int index = 0;
 		int dMax = 0;
 		Real dMaxHeight = std::abs(
-			0.5f - ((p[0] - minPoint[0]) / (maxPoint[0] - minPoint[0]))
+			0.5f - normaliseCoord(p[0], minPoint[0], maxPoint[0])
 		);
 		for (int d = 1; (d < numDimensions); d++)
 		{
 			Real currentHeight = std::abs(
-				0.5f - ((p[d] - minPoint[d]) / (maxPoint[d] - minPoint[d]))
-			);
+				0.5f - normaliseCoord(p[d], minPoint[d], maxPoint[d])
+			); 
 			if (dMaxHeight < currentHeight)
 			{
 				dMax = d;
 				dMaxHeight = currentHeight;
 			}
 		}
-		if (p[dMax] < 0.5f)
+		if (normaliseCoord(p[dMax], minPoint[dMax], maxPoint[dMax]) < 0.5f)
 			index = dMax; // pyramid lower than central point
 		else 
 		{
 			index = dMax + numDimensions; // pyramid higher than central point
 		}
-		return (index + std::abs(0.5f - p[index % numDimensions])) * bucketInterval;
+
+		int otherIndex = index % numDimensions;
+		return index + std::abs(0.5f - normaliseCoord(p[otherIndex], minPoint[otherIndex], maxPoint[otherIndex]));
 	}
 
 	/* Compute pseudo-pyramid value (hash) of n-dimensional point.
