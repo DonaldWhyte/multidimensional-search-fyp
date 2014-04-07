@@ -8,12 +8,15 @@ namespace mdsearch
 
 	struct KDNode
 	{
-		// TODO
+		Point point;
+		KDNode* leftChild;
+		KDNode* rightChild;
+
+		KDNode(const Point& p);
 	};
 
 	class KDTree : public IndexStructure
 	{
-
 
 	public:
 		KDTree(unsigned int numDimensions);
@@ -24,10 +27,16 @@ namespace mdsearch
 		virtual bool remove(const Point& p);
 		virtual bool update(const Point& oldPoint, const Point& newPoint);
 		virtual bool pointExists(const Point& p);
-		virtual PointList pointsInRegion(const Region& region);
+
+		virtual std::string toString() const;
 
 	private:
+		KDNode* recursiveInsert(const Point& p, KDNode* t, unsigned int cuttingDim);
+		std::string nodeToString(const std::string& title, const KDNode* node,
+			unsigned int cuttingDim, unsigned int level = 0) const;
+
 		KDNode* root;
+
 
 	};
 

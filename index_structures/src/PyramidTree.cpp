@@ -151,6 +151,34 @@ namespace mdsearch
 		return static_cast<Real>(numPointsStored()) / hashMap.size();
 	}
 
+	Real PyramidTree::stdevPointsPerBucket() const
+	{
+		Real mean = averagePointsPerBucket();
+		Real sum = 0;
+		for (OneDMap::const_iterator it = hashMap.begin(); (it != hashMap.end()); it++)
+		{
+			Real difference = static_cast<Real>(it->second.points.size()) - mean;
+			sum += (difference * difference);
+		}
+		Real inverseBucketCount = 1.0f / hashMap.size();
+		return sqrt(inverseBucketCount * sum);
+	}
+
+	unsigned int PyramidTree::minPointsPerBucket() const
+	{
+		size_t minCount = 0;
+		for (OneDMap::const_iterator it = hashMap.begin(); (it != hashMap.end()); it++)
+			minCount = std::min(minCount, it->second.points.size());
+		return minCount;
+	}
+	unsigned int PyramidTree::maxPointsPerBucket() const
+	{
+		size_t maxCount = 0;
+		for (OneDMap::const_iterator it = hashMap.begin(); (it != hashMap.end()); it++)
+			maxCount = std::max(maxCount, it->second.points.size());
+		return maxCount;
+	}
+
 	std::string PyramidTree::toString() const
 	{
 		std::stringstream ss;

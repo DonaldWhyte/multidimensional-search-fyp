@@ -17,7 +17,7 @@ namespace mdsearch
 	{
 		PointList points;
 		RealList pointSums;
-	};	
+	};
 
 	class PyramidTree : public IndexStructure
 	{
@@ -50,6 +50,11 @@ namespace mdsearch
 		unsigned int numPointsStored() const;
 		/* Return average number of points stored in a bucket. */
 		Real averagePointsPerBucket() const;
+		/* Return satdnard deviation of points in buckets. */
+		Real stdevPointsPerBucket() const;
+		/* Return mimimum and maximum number of points stored in a single bucket. */
+		unsigned int minPointsPerBucket() const;
+		unsigned int maxPointsPerBucket() const;
 		/* Return string reprensetation of Pyrmaid tree. */
 		std::string toString() const;
 

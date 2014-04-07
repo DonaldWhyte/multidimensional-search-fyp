@@ -90,8 +90,10 @@ namespace mdsearch
 					PyramidTree* pt = dynamic_cast<PyramidTree*>(structures[s]);
 					if (pt)
 					{
-						std::cout << "Bucket utilisation: " << pt->averagePointsPerBucket() << std::endl;
-						std::cout << "\tLoad factor: " << (pt->averagePointsPerBucket() / testOperationLists[t].size()) << std::endl;
+						std::cout << "Average points per bucket: " << pt->averagePointsPerBucket() << std::endl;
+						std::cout << "Standard deviation of points per bucket: " << pt->stdevPointsPerBucket() << std::endl;
+						std::cout << "Min points per bucket: " << pt->minPointsPerBucket() << std::endl;
+						std::cout << "Max points per bucket: " << pt->maxPointsPerBucket() << std::endl;
 					}	
 
 				}
