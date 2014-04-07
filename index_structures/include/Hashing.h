@@ -21,7 +21,8 @@ namespace mdsearch
 	{
 		size_t seed = 0;
 		const Real* coord = p.toArray();
-		for (coord; (coord != (coord + p.numDimensions())); ++coord)
+		const Real* end = coord + p.numDimensions();
+		for (coord; (coord != end); ++coord)
 			boost::hash_combine(seed, *coord);
 		return seed;
 	}

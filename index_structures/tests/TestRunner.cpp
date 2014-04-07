@@ -12,6 +12,7 @@
 #include "TestPseudoPyramidTree.h"
 #include "TestBoundaryDistanceHashing.h"
 #include "TestKDTree.h"
+#include "TestUniqueHashTable.h"
 
 int main(int argc, char* argv[])
 {

@@ -9,6 +9,7 @@
 #include "PseudoPyramidTree.h"
 #include "BoundaryDistanceHashing.h"
 #include "KDTree.h"
+#include "UniqueHashTable.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -110,7 +111,13 @@ namespace mdsearch
 		const Region& boundary, const std::vector<std::string>& args)
 	{
 		return new KDTree(numDimensions);
-	}			
+	}
+
+	IndexStructure* generateUniqueHashTable(unsigned int numDimensions,
+		const Region& boundary, const std::vector<std::string>& args)
+	{
+		return new UniqueHashTable(numDimensions);
+	}
 
 
 
@@ -126,6 +133,7 @@ namespace mdsearch
 		addGenerator("pseudo_pyramid_tree", generatePseudoPyramidTree);
 		addGenerator("bdh", generateBoundaryDistanceHashing);
 		addGenerator("kdtree", generateKDTree);
+		addGenerator("uht", generateUniqueHashTable);
 	}
 
 	void IndexStructureFactory::addGenerator(const std::string& structureType,

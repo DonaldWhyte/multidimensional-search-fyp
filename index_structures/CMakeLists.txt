@@ -10,6 +10,7 @@ add_library( index_structures
 	"src/PseudoPyramidTree.cpp"
 	"src/BoundaryDistanceHashing.cpp"
 	"src/KDTree.cpp"
+	"src/UniqueHashTable.cpp"
 	# Header files
 	"include/IndexStructure.h"
 	"include/SequentialScan.h"
@@ -22,6 +23,7 @@ add_library( index_structures
 	"include/PseudoPyramidTree.h"
 	"include/BoundaryDistanceHashing.h"
 	"include/KDTree.h"
+	"include/UniqueHashTable.h"
 )
 # Ensure include directory is in search path
 include_directories ("include")
@@ -40,6 +42,7 @@ add_executable ( structure_tests
 	"tests/TestPseudoPyramidTree.h"
 	"tests/TestBoundaryDistanceHashing.h"
 	"tests/TestKDTree.h"
+	"tests/TestUniqueHashTable.h"
 )
 # Ensure google-test library is linked and include files are in search path
 # NOTE: index_structures library is dependant on the 'data' library for the
