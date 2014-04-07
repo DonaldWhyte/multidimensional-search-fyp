@@ -5,7 +5,6 @@
 #include "PyramidTree.h"
 #include "IndexPyramidTree.h"
 #include "SplayPyramidTree.h"
-#include "ParallelSequentialScan.h"
 #include "PseudoPyramidTree.h"
 #include "BoundaryDistanceHashing.h"
 #include "KDTree.h"
@@ -77,25 +76,6 @@ namespace mdsearch
 		return new SplayPyramidTree(numDimensions, boundary);
 	}
 
-	IndexStructure* generateParallelSequentialScan(unsigned int numDimensions,
-		const Region& boundary, const std::vector<std::string>& args)
-	{
-		if (args.size() < 1) // number of threads to use
-			return NULL;
-		try
-		{
-			int numThreads = boost::lexical_cast<int>(args[0]);
-			if (numThreads >= 1)
-				return new ParallelSequentialScan(numDimensions, numThreads);
-			else
-				return NULL;
-		}	
-		catch (const boost::bad_lexical_cast& ex)
-		{
-			return NULL;
-		}	
-	}
-
 	IndexStructure* generatePseudoPyramidTree(unsigned int numDimensions,
 		const Region& boundary, const std::vector<std::string>& args)
 	{
@@ -136,7 +116,6 @@ namespace mdsearch
 		addGenerator("pyramid_tree", generatePyramidTree);
 		addGenerator("index_pyramid_tree", generateIndexPyramidTree);
 		addGenerator("splay_pyramid_tree", generateSplayPyramidTree);
-		addGenerator("par_sequential_scan", generateParallelSequentialScan);
 		addGenerator("pseudo_pyramid_tree", generatePseudoPyramidTree);
 		addGenerator("bdh", generateBoundaryDistanceHashing);
 		addGenerator("kdtree", generateKDTree);

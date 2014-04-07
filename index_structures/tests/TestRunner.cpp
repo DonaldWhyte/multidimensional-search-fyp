@@ -8,7 +8,6 @@
 #include "TestIndexPyramidTree.h"
 #include "TestSplayTree.h"
 #include "TestSplayPyramidTree.h"
-#include "TestParallelSequentialScan.h"
 #include "TestPseudoPyramidTree.h"
 #include "TestBoundaryDistanceHashing.h"
 #include "TestKDTree.h"
