@@ -80,7 +80,7 @@ All variants of the Pseudo-Pyramid Tree hash $d$-dimensional points to a one-dim
 
 The Rebuild Pseudo-Pyramid Tree, Bucket Pyramid-Tree and the Splay Pseudo-Pyramid Tree were timed with the full collection of synthetic and real datasets. The results were consistent throughout the different datasets. For brevity, only the times for the astrophysics dataset with the Insert-Query-Delete operation list will be provided. Table \ref{tab:perf2-astrophysic} shows the total execution times of each structure operation and Figure \ref{fig:perf2-astrophysics-delete} shows execution time of the \texttt{delete} operation as the number of points are increased.
 
-The results show that storing separate pint arrays for each bucket drastically reduces the speed of \texttt{delete} operations, with the Rebuuild Pseudo-Pyramid tree being slowest. The differences in speed between the bucket and splay variants is small, but the Bucket Pseudo-Pyramid Tree outperforms the Splay Tree with most datasets. With severely skewed synthetic data, the splay variant is \texttt{slightly} faster, but the speed increase is neglible. This could be an indication that self-adjusting structures are useful for heavily skewed data however, highlighting an area for further study. Based on these results, it was decided that any future variants of the tree will be based on the Bucket Pseudo-Pyramid Tree.
+The results show that storing separate point arrays for each bucket drastically reduces the speed of \texttt{delete} operations, with the Rebuuild Pseudo-Pyramid tree being slowest. The differences in speed between the bucket and splay variants is small, but the Bucket Pseudo-Pyramid Tree outperforms the Splay Tree with most datasets. With severely skewed synthetic data, the splay variant is \texttt{slightly} faster, but the speed increase is neglible. This could be an indication that self-adjusting structures are useful for heavily skewed data however, highlighting an area for further study. Based on these results, it was decided that any future variants of the tree will be based on the Bucket Pseudo-Pyramid Tree.
 
 \begin{table}
 	\centering
@@ -105,30 +105,19 @@ The results show that storing separate pint arrays for each bucket drastically r
 	\label{tab:perf2-astrophysics}
 \end{table}
 
-\subsubsection{Impact of Bucket Size and Boundary Distance Hashing}
+\subsubsection{Impact of Bucket Size}
 
-TODO: state how even though it's faster than sequential scan -- it's still only about 4/5 times faster than $O(n)$ sequential scan! why??????? BUCKET SIZE! THIS IS THE CORE FACTOR IN PERFORMANCE WITH THESE METHODS!
+Despite the work gone into increasing the speed of the Pseudo-Pyramid Tree, the speedup when compared to Sequential Scan seemed to be quite low. For example, $500,000$ insertion operations with the astrophysics dataset takes 445.716 seconds with Sequential Scan and 101.581 seconds with the Bucket Pseudo-Pyramid Tree, meaning a speed of $445.716/101.581 \approx 4.388$ has been achieved. Considering there exist algorithms which can perform search in $O(log_2 n)$ time, this raised the question of why the speedup is so low.
 
-TODO: define what this is and how it can affect perform (too low, random access, too high, too many points to seach per query)
+Despite hashing a point taking $O(d)$ time, point queries will take much longer if there are large numbers of points in buckets. If each bucket contains exactly one point, then the complexity approaches $O(d)$. On the other extreme, where a single bucket contains all points, the complexity becomes $O(n)$. The number of points in a bucket, or \textit{bucket size}, is one of the most important factors to consider when analysing the performance of hash-based index structures. The \textit{mean} and \textit{standard deviation} of bucket size has been used to determine why the structures are working so slowly.
 
-Define new hashign function !!
-
-TODO: State how this new function is easier to compute and provides better bucket utliisation -- BE SURE TO GIVE THE MEASUREMENTS FOR THIS TO PROVE IT! Discuss why bucket utilisation is better at a sweet spot (not too low, not too high)
-
-TODO: discuss scaling factor, what it deos and why it can help (plots with scaling factor against bucket utilisation + execution time)
-
-\subsubsection{SSE Parallelisation}
-
-SIMD stands for Single Instruction, Multiple Data and was defined by Flynn as a classification of parallel computing \cite{flynns-taxonomy}. In SIMD, a single instruction is used to operation on multiple data items at the same time. If $p$ is the maximum number of data items that can be operated on in parallel at a time, then in an ideal scenario it is possible increase the speed of a computation by $p$ times. However, it is only suitable for computations where the same operation can be applied to multiple data items independantly, where the order in which those operations complete does not affect the final output.
-
-Streaming SIMD Extensions, or SSE, is a specification of an instruction set that performs SIMD operations for the widely used x86 CPU architecture\cite{sse}, which is the architecture used for the development and test environment of this project. It was seen as TODO
-
-TODO: speeding up NEW hashing function
-TODO: speeding up point comparison
+After inserting $500,000$ points from the astrophysics dataset into the Bucket Pseudo-Pyramid Tree, the average and standard deviation of bucket size is TODO and TODO respectively. Therefore, on average, a point query will linearly scan through TODO points. To determine whether or not hash-based index structures can providce fast point queries, more research has been performed in decreasing bucket size by using diffewrent hashign functions. This research is discussed in the following secions.
 
 \subsection{Pyramid Tree}
 
-As described in Section \ref{sec:pyramid-tree}, the Pyramid tree reduces multi-dimensional points to one dimension, which can then be used in a one-dimensional index structure (a B${}^{+}$-tree in the original paper \cite{pyramid-tree}). The Pyramid tree partitions the data space into $2d$ Pyramids, where each is represented the $(d - 1)$ hyperplane  corresponding to the Pyramid's base. Each pyramid is is segmented by splitting them along $(d-1)$ hyperplanes parallel to the base of the pyramid. The one-dimensional value of a point, calle the \textit{pyramid tree}, describes which Pyramid it is in and the height of that point in that Pyramid. The resultant spatial partition looks like Figure \ref{fig:pyramid-tree-buckets}, where each Pyramid segment has a corresponding bucket which stores the points.
+As described in Section \ref{sec:pyramid-tree}, the Pyramid tree reduces multi-dimensional points to one dimension, which can then be used in a one-dimensional index structure (a B${}^{+}$-tree in the original paper \cite{pyramid-tree}). This reduction to a one-dimensional value can be seen as a hashing function, which can be used to generate search keys for the underlying hash map in the Bucket Pseudo-Pyramid Tree.
+
+To elaborate on the reduction technique, the Pyramid tree partitions the data space into $2d$ Pyramids, where each is represented the $(d - 1)$ hyperplane corresponding to the Pyramid's base. Each pyramid is is segmented by splitting them along $(d-1)$ hyperplanes parallel to the base of the pyramid. The one-dimensional value of a point, called the \textit{pyramid value}, describes which Pyramid it is in and the height of that point in that Pyramid. The resultant spatial partition looks like Figure \ref{fig:pyramid-tree-buckets}, where each Pyramid segment has a corresponding bucket which stores the points.
 
 \begin{figure}
 		\begin{center}
@@ -145,9 +134,50 @@ As described in Section \ref{sec:pyramid-tree}, the Pyramid tree reduces multi-d
 		\label{fig:pyramid-tree-partition}
 \end{figure}
 
-TODO: define pyramid value
+More formally, the pyramid value $pv_v$ of a point $v$ is given by $pv_v = (i + h_v)$, where $i$ represents the pyramid $v$ is contained in and $h_v$ is height of $v$ in pyramid $i$. $i$ and $h_v$ are given in Equations \ref{eq:pyramid-value-index} and \ref{eq:pyramid-value-height} respectively, where $MOD$ refers to the modulo operator.
 
-TODO: explain how a structure like the bucket ppt tree will be used
+\begin{multline}\\
+	i = \begin{cases}
+		j_{max},         & \text{if }v_{j_{max}} < 0.5\\
+		j_{max} + d,   & \text{if }v_{j_{max}} \geq 0.5\\
+	\end{cases} \\
+	j_{max} = \left( j \;|\; \forall k \; 0 \leq j,k \leq d, j \neq k: \;\; \lvert 0.5 - v_j \rvert \geq \lvert 0.5 - v_k \rvert \right) \\
+	\label{eq:pyramid-value-index}
+\end{multline}
+\begin{equation}
+	h_v = \lvert 0.5 - v_{i \; MOD \; d} \rvert
+	\label{eq:pyramid-value-height}
+\end{equation}
+
+The following shows that two distinct points can be mapped to the same Pyramid value. Therefore, using the Pyramid-technique as a hashing may cause points to be stored in the same bucket. As such, bucket size will be a key performance factor for the structure and will be measured to provide a comparison to other hash-based structures discussed in this iteration.
+
+\begin{proof}[\textbf{Lemma: } For $d > 2$, there exist two points $x$ and $y$, such that $x \neq y$ with the same pyramid value (i.e. $pv_x = pv_y$)]
+
+Let $d$ be the number of dimensions and $x = (x_0, x_1, \dots, x_{d -1})$, $y = (y_0, y_1, \dots, y_{d - 1})$ be two $d$-dimensional points. Without loss of generality, assume $0 \leq x_i \leq 1$ and $0 \leq y_i \leq 1$ for all $i = 1, 2, \dots, d$. Suppose $x_0 = y_0 = 0$, $x_{d - 1} = 0.1$, $y_{d - 1} = 0.2$ and $x_i = y_i = 0.1$ for all $i = 1, \dots, {d - 2}$. This means $x \neq y$. The following holds:
+\begin{enumerate}
+	\item $\forall k \; 0 \leq k \leq d, k \neq 0: \;\; \lvert 0.5 - x_0 \rvert \geq \lvert 0.5 - x_k \rvert$,
+	\item  $\forall k \; 0 \leq k \leq d, k \neq 0: \;\; \lvert 0.5 - y_0 \rvert \geq \lvert 0.5 - y_k \rvert$.
+\end{enumerate}
+Since $x_0 \leq 0.5$ and $y \leq 0.5$, both $x$ and $y$ are mapped to pyramid 0 ($i = 0$). It follows that $h_x = h_y = \lvert 0.5 - v_{0 \; MOD \; 3} \rvert = \lvert 0.5 - v_{0} \rvert = \lvert 0.5 - 0 \rvert = 0.5$. $pv_x = pv_y = 0 + 0.5 = 0.5$ and $x \neq y$, meaning two distinct points can have the same Pyramid value.
+
+\end{proof}
+
+\subsection{Boundary Distance Hashing}
+
+TODO: Define new hashign function !!
+
+TODO: State how this new function is easier to compute and provides better bucket utliisation -- BE SURE TO GIVE THE MEASUREMENTS FOR THIS TO PROVE IT! Discuss why bucket utilisation is better at a sweet spot (not too low, not too high)
+
+TODO: discuss scaling factor, what it deos and why it can help (plots with scaling factor against bucket utilisation + execution time)
+
+\subsubsection{SSE Parallelisation}
+
+SIMD stands for Single Instruction, Multiple Data and was defined by Flynn as a classification of parallel computing \cite{flynns-taxonomy}. In SIMD, a single instruction is used to operation on multiple data items at the same time. If $p$ is the maximum number of data items that can be operated on in parallel at a time, then in an ideal scenario it is possible increase the speed of a computation by $p$ times. However, it is only suitable for computations where the same operation can be applied to multiple data items independantly, where the order in which those operations complete does not affect the final output.
+
+Streaming SIMD Extensions, or SSE, is a specification of an instruction set that performs SIMD operations for the widely used x86 CPU architecture\cite{sse}, which is the architecture used for the development and test environment of this project. It was seen as TODO
+
+TODO: speeding up NEW hashing function
+TODO: speeding up point comparison
 
 \subsection{Simple Bucket Hashmap}
 
