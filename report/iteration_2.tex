@@ -149,14 +149,13 @@ More formally, the pyramid value $pv_v$ of a point $v$ is given by $pv_v = (i + 
 	\label{eq:pyramid-value-height}
 \end{equation}
 
-The following shows that two distinct points can be mapped to the same Pyramid value. Therefore, using the Pyramid-technique as a hashing may cause points to be stored in the same bucket. As such, bucket size will be a key performance factor for the structure and will be measured to provide a comparison to other hash-based structures discussed in this iteration.
+The following lemma shows that two distinct points can be mapped to the same Pyramid value. Using the Pyramid-technique as a hashing function may cause points to be stored in the same bucket. As such, bucket size will be a key performance factor for the structure and will be measured to provide a comparison to other hash-based structures discussed in this iteration.
 
-\begin{proof}[\textbf{Lemma: } For $d > 2$, there exist two points $x$ and $y$, such that $x \neq y$ with the same pyramid value (i.e. $pv_x = pv_y$)]
-
+\begin{proof}[\textbf{Lemma: } For $d \geq 2$, there exist two points $x$ and $y$, such that $x \neq y$, with the same pyramid value]\mbox{}\\*
 Let $d$ be the number of dimensions and $x = (x_0, x_1, \dots, x_{d -1})$, $y = (y_0, y_1, \dots, y_{d - 1})$ be two $d$-dimensional points. Without loss of generality, assume $0 \leq x_i \leq 1$ and $0 \leq y_i \leq 1$ for all $i = 1, 2, \dots, d$. Suppose $x_0 = y_0 = 0$, $x_{d - 1} = 0.1$, $y_{d - 1} = 0.2$ and $x_i = y_i = 0.1$ for all $i = 1, \dots, {d - 2}$. This means $x \neq y$. The following holds:
 \begin{enumerate}
 	\item $\forall k \; 0 \leq k \leq d, k \neq 0: \;\; \lvert 0.5 - x_0 \rvert \geq \lvert 0.5 - x_k \rvert$,
-	\item  $\forall k \; 0 \leq k \leq d, k \neq 0: \;\; \lvert 0.5 - y_0 \rvert \geq \lvert 0.5 - y_k \rvert$.
+	\item $\forall k \; 0 \leq k \leq d, k \neq 0: \;\; \lvert 0.5 - y_0 \rvert \geq \lvert 0.5 - y_k \rvert$.
 \end{enumerate}
 Since $x_0 \leq 0.5$ and $y \leq 0.5$, both $x$ and $y$ are mapped to pyramid 0 ($i = 0$). It follows that $h_x = h_y = \lvert 0.5 - v_{0 \; MOD \; 3} \rvert = \lvert 0.5 - v_{0} \rvert = \lvert 0.5 - 0 \rvert = 0.5$. $pv_x = pv_y = 0 + 0.5 = 0.5$ and $x \neq y$, meaning two distinct points can have the same Pyramid value.
 
@@ -164,17 +163,25 @@ Since $x_0 \leq 0.5$ and $y \leq 0.5$, both $x$ and $y$ are mapped to pyramid 0 
 
 \subsection{Boundary Distance Hashing}
 
-TODO: Define new hashign function !!
+Boundary Distance Hashing (BDH) is also based on the Bucket Pseudo-Pyramid Tree, which uses another new hashing function. Rather than using segmented pyramids to decompose space, it simply sums up the distances a point $p$ is along the data space boundaries, in a similar fashion to the Pseudo-Pyramid Tree. Figure \ref{fig:point-boundary-distance} illustrates the boundary distances for a point in 2D space. This is the same as the Pseudo-Pyramid hash function given in Equations \ref{eq:point-boundary-distance} and \ref{eq:pseudo-pyramid-hash}, except the cumulative scaling factor, $\prod_{j=0}^{i}{\lbrack m_j \rbrack}$, has been removed. Equation \ref{eq:boundary-distance-hashing} gives the boundary distance hashing function.
 
-TODO: State how this new function is easier to compute and provides better bucket utliisation -- BE SURE TO GIVE THE MEASUREMENTS FOR THIS TO PROVE IT! Discuss why bucket utilisation is better at a sweet spot (not too low, not too high)
+\begin{equation}
+	h(p) = \sum_{i = 0}^{d} { \lbrack \texttt{toInt}( h_i(p) \times m_i ) \rbrack }
+	\label{eq:boundary-distance-hashing}
+\end{equation}
 
-TODO: discuss scaling factor, what it deos and why it can help (plots with scaling factor against bucket utilisation + execution time)
+\begin{proof}[\textbf{Lemma: } For $d \geq 2$, there exist two points $x$ and $y$, such that $x \neq y$, with the same BDH value]\mbox{}\\*
+Let $d$ be the number of dimensions and $m = (m_0, m_1, \dots, m_{d - 1})$ be some scale factor. Let $x = (x_0, x_1, \dots, x_{d -1})$, $y = (y_0, y_1, \dots, y_{d - 1})$ be two $d$-dimensional points. Without loss of generality, assume $0 \leq x_i \leq 1$ and $0 \leq y_i \leq 1$ for all $i = 1, 2, \dots, d$. Suppose $x_0 = 0.1$, $y_{d - 1} = 1$, $x_i = 0$ for all $i = 1, \dots, d - 1$ and $y_j = 0$ for all $j = 0, \dots, d - 2$.
+
+It follows that $h_0(x) = h_{d - 1}(y)$, $h_i(x) = 0$ for all $i = 1, \dots, d - 1$ and $h_j(y) = 0$ for all $j = 0, \dots, d - 2$. Therefore, $h(x) = h(y)$. Since $h(x) = h(y)$ and $x \neq y$, two distinct points can be mapped to the same boundary distance hashed (BDH) value.
+
+\end{proof}
 
 \subsubsection{SSE Parallelisation}
 
 SIMD stands for Single Instruction, Multiple Data and was defined by Flynn as a classification of parallel computing \cite{flynns-taxonomy}. In SIMD, a single instruction is used to operation on multiple data items at the same time. If $p$ is the maximum number of data items that can be operated on in parallel at a time, then in an ideal scenario it is possible increase the speed of a computation by $p$ times. However, it is only suitable for computations where the same operation can be applied to multiple data items independantly, where the order in which those operations complete does not affect the final output.
 
-Streaming SIMD Extensions, or SSE, is a specification of an instruction set that performs SIMD operations for the widely used x86 CPU architecture\cite{sse}, which is the architecture used for the development and test environment of this project. It was seen as TODO
+Streaming SIMD Extensions, or SSE, is a specification of an instruction set that performs SIMD operations for the widely used x86 CPU architecture \cite{sse}, which is the architecture used for the development and test environment of this project. It was seen as TODO
 
 TODO: speeding up NEW hashing function
 TODO: speeding up point comparison
