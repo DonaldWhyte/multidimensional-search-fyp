@@ -170,7 +170,7 @@ Boundary Distance Hashing (BDH) is also based on the Bucket Pseudo-Pyramid Tree,
 	\label{eq:boundary-distance-hashing}
 \end{equation}
 
-The boundary distance hashing function iterates $d$ times to compute the desired output, with the computation at each iteration being \textit{independant} of each other. SSE2 was used to accelerate these two functions by computing the results of four iterations at once and reducing them to a single result. If $d$ is not divisible by four, as many iterations will be done in parallel as possible, with the remaining iterations being executed sequentially. The SSE-accelerated BDH function therefore executes $\lfloor \frac{d}{4}\rfloor + (d  \; MOD \; 4)$ iterations.
+The boundary distance hashing function iterates $d$ times to compute the desired output, with the computation at each iteration being \textit{independant} of each other. SSE2 was used to accelerate these two functions by computing the results of four iterations at once and reducing them to a single result. If $d$ is not divisible by four, as many iterations will be done in parallel as possible, with the remaining iterations being executed sequentially. The SSE-accelerated BDH function therefore executes $\lfloor \frac{d}{4}\rfloor + (d  \; MOD \; 4)$ iterations. TODO: provide timings??
 
 As with the other hashing techniques, the possibility of having two points hashed to the same value is a possibility (see the following lemma).
 
