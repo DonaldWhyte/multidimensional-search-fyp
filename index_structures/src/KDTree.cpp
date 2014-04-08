@@ -184,62 +184,6 @@ namespace mdsearch
 		}
 	}
 
-	const Point* KDTree::findMaximum(KDNode* node, unsigned int dimension, unsigned int cuttingDim)
-	{
-		// Reached leaf node
-		if (node == NULL)
-		{
-			return NULL;
-		}
-		// If cutting dimension is dimension we're looking for minimum in, just search left child!
-		else if (dimension == cuttingDim)
-		{
-			if (node->leftChild == NULL) // if no more 
-				return &node->point;
-			else
-				return findMaximum(node->leftChild, dimension, nextCuttingDimension(cuttingDim, numDimensions));
-		}
-		// Otherwise, we have to search BOTH children
-		else
-		{
-			const Point* a = findMaximum(node->leftChild, dimension, nextCuttingDimension(cuttingDim, numDimensions));
-			const Point* b = findMaximum(node->rightChild, dimension, nextCuttingDimension(cuttingDim, numDimensions));
-			if (a && b) // if minimums were returned from both children
-			{
-				Real maxVal = std::max(node->point[dimension], std::max((*a)[dimension], (*b)[dimension]));
-				if (maxVal == node->point[dimension])
-				{
-					return &node->point;
-				}
-				else if (maxVal == (*a)[dimension])
-					return a;
-				else
-					return b;
-			}
-			else if (a) // if minimum was just returned from left child
-			{
-				Real maxVal = std::max(node->point[dimension], (*a)[dimension]);
-				if (maxVal == node->point[dimension])
-					return &node->point;
-				else
-					return a;
-			}
-			else if (b) // if minimum was just returned from right child
-			{
-				Real maxVal = std::max(node->point[dimension], (*b)[dimension]);
-				if (maxVal == node->point[dimension])
-					return &node->point;
-				else
-					return b;
-			}
-			else // no minimums returned!
-			{
-				return &node->point;
-			}
-
-		}
-	}
-
 	KDNode* KDTree::recursiveRemove(KDNode* node, const Point& p, unsigned int cuttingDim, bool* removed)
 	{
 		if (node == NULL)
@@ -281,7 +225,7 @@ namespace mdsearch
 						nextCuttingDimension(cuttingDim, numDimensions));
 					node->leftChild = recursiveRemove(node->leftChild, node->point,
 						nextCuttingDimension(cuttingDim, numDimensions), removed);
-					// TODO
+					// Swap left child with right child
 					node->rightChild = node->leftChild;
 					node->leftChild = NULL;
 				}

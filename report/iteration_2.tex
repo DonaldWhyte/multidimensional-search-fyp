@@ -155,11 +155,23 @@ TODO: explain how a structure like the bucket ppt tree will be used
 
 \subsection{Simple Bucket Hashmap}
 
-TODO
+TODO: extreme form of minimising bucket size -- average size almost one!
 
-\subsection{New Baseline}
+\subsection{New Baseline: $kd$-Tree}
 
-TODO: kd-tree
+Since the Octree cannot be used with high-dimensional data, a new baseline for evaluation (other than Seuqential Scan) was desired. The $kd$-tree is a widely used structure for both low and high dimensional data. This structure is multi-dimensional binary tree, meaning it does not have the expontential memory requirements the Octree has. This is because it splits the data space in a single dimension per level of the tree (referred to as a \textit{cutting dimension}), instead of splitting by \textit{all} dimensions. $kd$-trees are typically used for \textit{approximate} queries in higher-dimensional space, as they tend to degenerate to Sequential Scan for exact range and nearest neighbour queries \cite{TODO}.
+
+There are many variants of $kd$-trees \cite{TODO, TODO, TODO}. The variant implemented for this project contains one point per node and cycles through each dimension when choosing deciding which cutting dimension to use for each level of the tree. If $n$ is a $kd$-tree node, $i$ is the cutting dimension on that node's level and $p$ is the point stored in this node, then:
+\begin{enumerate}
+	\item $\forall q$ stored in the \textbf{left} subtree rooted at $n$: $p_i > q_i$ 
+	\item $\forall q$ stored in the \textbf{right} subtree rooted at $n$: $p_i \leq q_i$.
+\end{enumerate}
+When inserting or querying a point $p$, the tree is traversed top-down in a similar fashion to a standard binary tree, by comparing $p_i$ to $n_i$, where $n$ is the point stored in the current node and $i$ is the cutting dimension of the current level.
+
+% TODO: pseudo-code for this???
+The \texttt{remove} operation\footnote{Algorithm for \texttt{remove} was inspired by the algorithm from: \url{TODO}} is more involved because it has to maintain the $kd$-tree invariant. To remove a point $p$, first the node containing $p$ is found using the aforementioned top-down traversal approach. Let $n$ be this node and $i$ be the current level's cutting dimension. If $n$ is a leaf, then the node can simply be deleted. Otherwise, let $n_L$ and $n_R$ be the left and right children of $n$ respectively. If $n_R$ exists, a node $m$ containing a point with the \textit{minimum} value for dimension $i$ is found in the sub-tree rooted at $n_R$. The points stored in nodes $n$ and $m$ are swapped and \texttt{delete($p$)} is called recursively on the sub-tree rooted at $n_R$. If $n_R$ does not exist, node $m$ is found in the sub-tree rooted at $n_L$ instead. In this case, after \texttt{delete($p$)} has been recursively called on the sub-tree rooted at $n_L$, the $i$th value of all points stored in this sub-tree are greater than or equal to the $i$th value of the new point in $n$. Therefore, $n_L$ then becomes the \textit{right} child of $n$ to maintain the $kd$-tree invariant.
+
+TODO: figures showing example kd-tree, one insert and one remove (3 figures)
 
 \subsection{Performance Timings}
 

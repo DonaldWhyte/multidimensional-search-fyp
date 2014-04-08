@@ -34,9 +34,6 @@ namespace mdsearch
 		/* Find point with minimum value of a specific dimension in subtree
 		 * rooted at given node. */
 		const Point* findMinimum(KDNode* node, unsigned int dimension, unsigned int cuttingDim = 0);
-		/* Find point with maximum value of a specific dimension in subtree
-		 * rooted at given node. */
-		const Point* findMaximum(KDNode* node, unsigned int dimension, unsigned int cuttingDim = 0);
 
 		virtual std::string toString() const;
 
