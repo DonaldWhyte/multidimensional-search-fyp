@@ -69,7 +69,7 @@ Nodes in the Splay Pseudo-Pyramid Tree correspond to individual buckets in the B
 
 \subsubsection {Best Pseudo-Pyramid Tree Variant}
 
-All variants of the Pseudo-Pyramid Tree hash $d$-dimensional points to a one-dimensional value, which is used as a key to search for a given point in a one-dimensional structure. What varies is how points are deleted and which underyling one-dimensional structure is used. The Defragmented Pseudo-Pyramid Tree is clearly inferior to the Rebuild Pseudo-Pyramid Tree from the last iteration and the Batch Pseudo-Pyramid Tree never releases memory after points are removed. For dynamic data which changes frequently, this ma ycause the machine to run out of memory. As such, both of these structures will not be explored further.
+All variants of the Pseudo-Pyramid Tree hash $d$-dimensional points to a one-dimensional value, which is used as a key to search for a given point in a one-dimensional structure. What varies is how points are deleted and which underyling one-dimensional structure is used. The Defragmented Pseudo-Pyramid Tree is clearly inferior to the Rebuild Pseudo-Pyramid Tree from the last iteration and the Batch Pseudo-Pyramid Tree never releases memory after points are removed. For dynamic data which changes frequently, this may cause the machine to run out of memory. As such, both of these structures will not be explored further.
 
 % TODO: create new plot
 \begin{wrapfigure}[12]{r}{0.5\textwidth}
@@ -84,7 +84,7 @@ All variants of the Pseudo-Pyramid Tree hash $d$-dimensional points to a one-dim
 
 The Rebuild Pseudo-Pyramid Tree, Bucket Pyramid-Tree and the Splay Pseudo-Pyramid Tree were timed with the full collection of synthetic and real datasets. The results were consistent throughout the different datasets. For brevity, only the times for the astrophysics dataset with the Insert-Query-Delete operation list will be provided. Table \ref{tab:perf2-astrophysic} shows the total execution times of each structure operation and Figure \ref{fig:perf2-astrophysics-delete} shows execution time of the \texttt{delete} operation as the number of points are increased.
 
-TODO: evaluation
+The results show that storing separate pint arrays for each bucket drastically reduces the speed of \texttt{delete} operations, with the Rebuuild Pseudo-Pyramid tree being slowest. The differences in speed between the bucket and splay variants is small, but the Bucket Pseudo-Pyramid Tree outperforms the Splay Tree with most datasets. With severely skewed synthetic data, the splay variant is \texttt{slightly} faster, but the speed increase is neglible. This could be an indication that self-adjusting structures are useful for heavily skewed data however, highlighting an area for further study. Based on these results, it was decided that any future variants of the tree will be based on the Bucket Pseudo-Pyramid Tree.
 
 \begin{table}
 	\centering
