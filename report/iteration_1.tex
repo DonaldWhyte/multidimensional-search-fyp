@@ -54,35 +54,21 @@ When a point is deleted from a leaf, the contents of the leaf and all of its sib
 
 \subsection{Pseudo-Pyramid Tree}
 
-As described in Section \ref{sec:pyramid-tree}, the Pyramid tree reduces multi-dimensional points to one dimension, which can then be used in a one-dimensional index structure (a B${}^{+}$-tree in the original paper \cite{pyramid-tree}). The Pyramid tree partitions the data space into $2d$ Pyramids, where each is represented the $(d - 1)$ hyperplane  corresponding to the Pyramid's base. Each pyramid is is segmented by splitting them along $(d-1)$ hyperplanes parallel to the base of the pyramid. The one-dimensional value of a point, calle the \textit{pyramid tree}, describes which Pyramid it is in and the height of that point in that Pyramid. The resultant spatial partition looks like Figure \ref{fig:pyramid-tree-buckets}, where each Pyramid segment has a corresponding bucket which stores the points.
+\begin{wrapfigure}[12]{r}{0.5\textwidth}
+	\vspace{-40pt}
+	\begin{center}
+		\includegraphics[scale=0.6]{figures/pseudo-pyramid_tree_point_boundary_distances.pdf}
+	\end{center}
+	\vspace{-20pt}
+	\caption{Computing Distance of Point Along Pseudo-Pyramid Tree Boundary Along Each Dimension}
+	\label{fig:evaluation-framework}
+\end{wrapfigure}
 
-\begin{figure}
-		\begin{center}
-			\begin{subfloat}[$2d$ Pyramids in 2D Data Space\label{fig:pyramid-tree-pyramids}]{%
-				\includegraphics[scale=0.5]{figures/pyramid_tree_partition.pdf}
-			}
-			\end{subfloat}~
-			\begin{subfloat}[Segmented $2d$ Pyramids, Each Associated with a Bucket\label{fig:pyramid-tree-buckets}] {%
-				\includegraphics[scale=0.5]{figures/pyramid_tree_buckets.pdf}
-			}
-			\end{subfloat}
-			\begin{subfloat}[Computing Distance of Point Along Pseudo-Pyramid Tree Boundary Along Each Dimension\label{fig:point-boundary-distance}] {%
-				\includegraphics[scale=0.6]{figures/pseudo-pyramid_tree_point_boundary_distances.pdf}
-			}
-			\end{subfloat}  
-		\end{center}
-
-		\label{fig:pyramid-tree-partition}
-\end{figure}
-
-The School of Computing have an existing implementation of the Pyramid tree, originally written by Zhao Geng\footnote{Z.Geng@leeds.ac.uk}, which uses a hash map (specifically \texttt{boost::unordered\_map}) instead of a B${}^{+}$-tree. All the points are stored in a single \texttt{std::vector}. Each point is hashed to an integer representation which acts as the key to a bucket stored in the hash map. A bucket is a \texttt{std::vector} that contains indices to points in the large point array.
+The School of Computing have an implementation of an index structure which is similar to the Pyramid tree, originally written by Zhao Geng\footnote{Z.Geng@leeds.ac.uk}. All the points are stored in a single \texttt{std::vector}. Each point is hashed to an integer representation which acts as the key to a bucket stored in a hash map (specifically \texttt{boost::unordered\_map}). A bucket is a \texttt{std::vector} that contains indices to points in the large point array.
 
 To determine if a point $p$ is stored in the structure, $p$ is first hashed into its one-dimensional representation. The corresponding bucket is then sequentially scanned until the point is found or the end of the bucket is reached. To reduce the number of floating point comparisons, especially for large $d$, the \textit{sums} of each point are stored when they are inserted. This way, a $O(d)$ point comparison needs to be made if the $O(1)$ point sum comparison passes. Simple optimisations were initially made to the original implementation. The original implementation passed many heap allocated structures by-value, resulting in excessive copies and more time being spent allocating memory and copying data. These copies were not necessary and were removed where possible by passing the data by-reference.
 
-In this report, this implementation of the Pyramid Tree shall be called the \textbf{Pseudo-Pyramid Tree}. This is because the hashing function used is \textit{inspired} by the Pyramid tree, but it does not convert a point to its pyramid value as described earlier\footnote{There is code to compute the pyramid value of a point in the original code, but curiously it is not used when inserting or querying points. The alternative hashing function was used instead.}. Let $min_i$ and $max_i$ define the minimum and maximum bounds for dimension $i$ and $p$ be a point. To hash $p$, how far along the boundary $p$ is in each dimension is computed using Equation \ref{eq:point-boundary-distance} first. See Figure \ref{fig:point-boundary-distance} for an illustration of what these values mean.
-
-% TODO: not needed?
-% Since $p \in [min,max]^d$ (see Section \ref{sec:definition}), $0 \leq h_i(p) \leq 1$.
+In this report, this implementation shall be called the \textbf{Pseudo-Pyramid Tree}. This is because the hashing function used is \textit{inspired} by the Pyramid tree, but is not the same\footnote{There is code to compute the pyramid value of a point in the original code, but curiously it is not used when inserting or querying points. An alternative hashing function was used instead.}. Let $min_i$ and $max_i$ define the minimum and maximum bounds for dimension $i$ and $p$ be a point. To hash $p$, how far along the boundary $p$ is in each dimension is computed using Equation \ref{eq:point-boundary-distance} first. See Figure \ref{fig:point-boundary-distance} for an illustration of what these values mean.
 
 \begin{equation}
 	h_i(p) = \frac{p_i - min_i}{max_i - min_i}
@@ -98,7 +84,7 @@ Let $B$ be a parameter which controls how likely points will be in the same buck
 
 Higher $B$ means higher $m$. This increases the magnitude of $h_i(p)$ before it is truncated to an integer, meaning less points will have the same hashed value, meaning less points in the same bucket on average. Lower $B$ will therefore mean more points will be in the same bucket on average.
 
-\subsection{Pseudo-Pyramid Tree \texttt{delete}}
+\subsubsection{Pseudo-Pyramid Tree \texttt{delete}}
 
 The original implementation of the Pseudo-Pyramid Tree did not provide \texttt{delete} and \texttt{update} operations, meaning a \texttt{delete} procedure had to be added. To delete a point $p$, the point is first hashed and the bucket containing the point is found. The index pointing to $p$ in the bucket is removed from the bucket, but the actual point itself is not removed the point array. In other words, the memory is never released until the whole structure is deleted. This makes the structure useful for batch computation because it can be discarded straight after a task, releasing all allocated memory then. However, if the structure is used as part of a long-running process then this is not suitable because there is the potential to run out of memory. This will be referred to as the \textbf{Batch Pseudo-Pyramid Tree} for the rest of this document.
 
@@ -206,33 +192,33 @@ TODO; do little bit of evaluation
 		\label{tab:perf1-sizevary}
 	\end{table}
 
-	\begin{table}
-		\centering
-		\begin{tabular}{|r|l|l|l|l|}
-			\hline
-			\textbf{Structure} & \textbf{Operation List} & $n = 10,000$ & $n = 100,000$ & $n = 500,000$ \\
-			\hline
-			\multirow{ 3}{*}{\textbf{Batch Pseudo-Pyramid Tree}} & \textbf{Insert-Query-Delete} & TODO & TODO & TODO \\
-			 & \textbf{Random Operations} & TODO & TODO & TODO \\
-			\hline
-			\multirow{ 3}{*}{\textbf{Octree}} & \textbf{Insert-Query-Delete} & TODO & TODO & TODO \\
-			 & \textbf{Random Operations} & TODO & TODO & TODO \\
-			\hline
-			\multirow{ 3}{*}{\textbf{Batch Pseudo-Pyramid Tree}} & \textbf{Insert-Query-Delete} & TODO & TODO & TODO \\
-			 & \textbf{Random Operations} & TODO & TODO & TODO \\
-			\hline
-			\multirow{ 3}{*}{\textbf{Defragmented Pseudo-Pyramid Tree}} & \textbf{Insert-Query-Delete} & TODO & TODO & TODO \\
-			 & \textbf{Random Operations} & TODO & TODO & TODO \\
-			\hline
-			\multirow{ 3}{*}{\textbf{Rebuld Pseudo-Pyramid Tree}} & \textbf{Insert-Query-Delete} &  0.571668 & 74.535 & 2104.63 \\
-			 & \textbf{Random Operations} & 0.0218163 & 2.79053 & 72.4116 \\
-			\hline
-		\end{tabular}
-		\caption{Total Execution Time (in Seconds) for Different Sample Sizes of Astrophysics Dataset}
-		\label{tab:perf1-astrophysics}
-	\end{table}	
-
 \end{landscape}
+
+\begin{table}
+	\centering
+	\begin{tabular}{|r|l|l|l|l|}
+		\hline
+		\textbf{Structure} & \textbf{Operation List} & $n = 10,000$ & $n = 100,000$ & $n = 500,000$ \\
+		\hline
+		\multirow{ 3}{*}{\textbf{Batch Pseudo-Pyramid Tree}} & \textbf{Insert-Query-Delete} & TODO & TODO & TODO \\
+		 & \textbf{Random Operations} & TODO & TODO & TODO \\
+		\hline
+		\multirow{ 3}{*}{\textbf{Octree}} & \textbf{Insert-Query-Delete} & TODO & TODO & TODO \\
+		 & \textbf{Random Operations} & TODO & TODO & TODO \\
+		\hline
+		\multirow{ 3}{*}{\textbf{Batch Pseudo-Pyramid Tree}} & \textbf{Insert-Query-Delete} & TODO & TODO & TODO \\
+		 & \textbf{Random Operations} & TODO & TODO & TODO \\
+		\hline
+		\multirow{ 3}{*}{\textbf{Defragmented Pseudo-Pyramid Tree}} & \textbf{Insert-Query-Delete} & TODO & TODO & TODO \\
+		 & \textbf{Random Operations} & TODO & TODO & TODO \\
+		\hline
+		\multirow{ 3}{*}{\textbf{Rebulid Pseudo-Pyramid Tree}} & \textbf{Insert-Query-Delete} &  0.571668 & 74.535 & 2104.63 \\
+		 & \textbf{Random Operations} & 0.0218163 & 2.79053 & 72.4116 \\
+		\hline		
+	\end{tabular}
+	\caption{Total Execution Time (in Seconds) for Different Sample Sizes of Astrophysics Dataset}
+	\label{tab:perf1-astrophysics}
+	\end{table}	
 
 \begin{figure}
 		\begin{center}
@@ -255,6 +241,7 @@ TODO; do little bit of evaluation
 		\label{fig:perf1-dimensionality}
 \end{figure}
 
+% TODO: change plots to total
 \begin{figure}
 		\begin{center}
 			\begin{subfloat}[\texttt{insert}\label{fig:perf1-allinsert-n}]{%

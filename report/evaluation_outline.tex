@@ -87,6 +87,9 @@ The astrophysics was chosen because it is large (almost 37 million points) and h
 % TODO: mentino skew in average runtime and say why it's a problem?
 Multiple synthetic datasets with 10,000 points have been generated for each distribution, with varying numbers of dimensions. Tests using these datasets will measure the \textit{total} runtime of the operations, as the number of operations is fixed, meaning a fair comparison can be made. The structures will also be measured against data of varying size. 500,000 randomly generated points with a uniform probability distribution has been generated, which will be sampled to construct each dataset. The large dataset has 16 dimensions, which was chosen to match the tests performed by Berchtold et. al for their Pyramid Tree in \cite{pyramid-tree}. Since the number of operations is dependant on the number of points in the dataset, which varies, the \textit{average} runtime of an operation will be measured. This allows a more fair comparison between operation times of each structure to be made as the dataset size increases. The Insert-Query-Delete operation list will be used for all of these datasets. 
 
+TODO: remove the whole bit about average. State that the total will also be used, despite the size varying. Discuss 
+TODO: this also means removing the performance measure column of the table below
+
 Timestep 100 of the astrophysics turbulence simulation will be used with a varying number of points, with both the Insert-Query-Delete and Random Operations lists. Again, the average runtime of operations will be measured Table \ref{tab:operation-lists} shows the operation lists that will be used for evaluation, which datasets the points will be pulled from, the different values the varying parameter (dimension or dataset size) will have and what performance measure will be used for an operation.
 
 \begin{table}

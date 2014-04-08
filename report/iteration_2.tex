@@ -1,4 +1,4 @@
-\section{Iteration \#2 -- Pseudo-Pyramid Tree Optimisation}
+\section{Iteration \#2 -- Pyramid Tree and the Limitations with Hash-Based Approaches}
 
 In the first iteration, the Pseudo-Pyramid Tree showed great promise as an efficient index structure for high-dimensional data. The core limitation of the implementations was that \texttt{delete} operations were dramatically slower than other operations because of its worst case complexity of $O(n^2)$ if memory must be released. This iteration focuses on modifying the Pseudo-Pyramid Tree in attempt to maintain the good performance of \texttt{insert} and point queries, but increase \texttt{delete} speed. Iteration 2's objectives are:
 \begin{itemize}
@@ -9,7 +9,11 @@ In the first iteration, the Pseudo-Pyramid Tree showed great promise as an effic
 	\item Analyse performance of all Pseudo-Pyramid Tree variants and determine the best performing one
 \end{itemize}
 
-\subsection{Accelerating Hash Function}
+\subsection{Pseudo-Pyramid Tree Optimisations}
+
+The Pseudo-Pyramid Tree performed better than Sequential Scan for point queries in high-dimensional data, up until a certain number of dimensions were reached. This section discusses the different optimisations and variants of this structure that were developed to increase its speed further and make it usable with a higher number of dimensions.
+
+\subsubsection{Accelerating Hash Function}
 
 It was shown in the last iteration that the Pseudo-Pyramid tree eventually becomes slower than Sequential Scan as $d$ increases. Since the plots showed the increase in the Pseudo-Pyramid Tree's execution time is roughly quadratic, and the structure spend most of that time in the $O(d^2)$ hashing function (Equation \ref{eq:pseudo-pyramid-hash}), it follows that speeding up the hashing function would provide large speed gains.
 
@@ -45,7 +49,7 @@ Table \ref{tab:new-pseudo-pyramid-hash} shows operation execution time of the Ba
 	\label{fig:new-pseudo-pyramid-hash}
 \end{figure}
 
-\subsection{Bucket Pseudo-Pyramid Tree}
+\subsubsection{Bucket Pseudo-Pyramid Tree}
 
 The Bucket Pseudo-Pyramid Tree implementation does not use a single array to store the points. Instead of buckets containing an array of point indices, it has an array of actual points. No clenaup procedure is necessary because the memory for a point is released immediately afer it's removed, by simply erasing it from the corresponding bucket's array. The goal of this is to increase \textbf{cache coherency} when searhcing a bucket, since the point array can be searched sequentially. The index-based variants cause random accesses in the single point array (causing more cache misses) since a bucket's store indices may point to distant parts of the point array, which may become very large.
 
@@ -53,21 +57,62 @@ The Bucket Pseudo-Pyramid Tree implementation does not use a single array to sto
 
 Array deletion is a $O(n)$ operation since the case where a single bucket stores all $n$ points is possible, making \texttt{delete} $O(n)$ in the worst case. Since the order the points are stored in a bucket do not matter, the C++ \textit{erase-remove} idiom has been used to delete elements from the bucket arrays, which swaps the element to delete with the last element in the array, removing the desired element when it's at the end of the array. This prevents the required $O(n)$ shift operation which tightly pack the elements after a deletion.
 
-\paragraph{\textbf{NOTE: }} From this point in the documentation onwards, all \texttt{std::vector} deletions where order does not matter will be performed using the erase-remove idiom.
+\paragraph{\textbf{NOTE: }} From this point in the document onwards, all \texttt{std::vector} deletions where order does not matter will be performed using the erase-remove idiom.
 
-\subsection{Splay Pseudo-Pyramid Tree}
+\subsubsection{Splay Pseudo-Pyramid Tree}
 
 Unlile the other implementations, the Splay Pseudo-Pyramid Tree does not use a hash map as the underyling one-dimensional index structure, but a splay tree. The splay tree is a self-adjusting variant of the binary search tree that uses a \textit{splaying} operation (a heuristic) to allow faster access to recently accessed elements. \cite{splay-tree}. The splaying operation achieves this by performing a series of tree rotations that move a given node up to the root of the tree. Through amortised analysis and empirical experiments, it has been shown splay trees can be more efficient than standard binary trees for a series of non-random operations \cite{splay-tree}, despite the asymptotic worst case bound being worse than binary search trees.
 
 TODO: more detail about the splay tree, including in-depth algorithms??
 
-Nodes in the Splay Pseudo-Pyramid Tree correspond to individual buckets in the Bucket Pseudo-Pyramid Tree, meaning each node can store multiple points. Since the splay tree is implemented as a collection of heap-allocated nodes with pointers to link them, deletions are cheap as a low amount of memory needs to be de-allocated per \texttt{delete} operation. The aim is that this, combined with the self-adjusting nature of the splay tree, will produce a Pseudo-Pyramid Tree implementation that is more efficient for non-random operations.
+Nodes in the Splay Pseudo-Pyramid Tree correspond to individual buckets in the Bucket Pseudo-Pyramid Tree, meaning each node can store multiple points. Since the splay tree is implemented as a collection of heap-allocated nodes with pointers to link them, deletions are cheap as a low amount of memory needs to be de-allocated per \texttt{delete} operation. The aim is that this, combined with the self-adjusting nature of the splay tree, will produce a Pseudo-Pyramid Tree implementation that is more efficient for non-random operations used in real applications.
 
-\subsection{Pyramid Tree}
+\subsubsection {Best Pseudo-Pyramid Tree Variant}
 
-TODO
+All variants of the Pseudo-Pyramid Tree hash $d$-dimensional points to a one-dimensional value, which is used as a key to search for a given point in a one-dimensional structure. What varies is how points are deleted and which underyling one-dimensional structure is used. The Defragmented Pseudo-Pyramid Tree is clearly inferior to the Rebuild Pseudo-Pyramid Tree from the last iteration and the Batch Pseudo-Pyramid Tree never releases memory after points are removed. For dynamic data which changes frequently, this ma ycause the machine to run out of memory. As such, both of these structures will not be explored further.
 
-\subsection{Improving Bucket Utlisation}
+The Rebuild Pseudo-Pyramid Tree, Bucket Pyramid-Tree and the Splay Pseudo-Pyramid Tree were timed with the full collection of synthetic and real datasets. The results were consistent throughout the different datasets. For brevity, only the times for the astrophysics dataset with the Insert-Query-Delete operation list will be provided. Table \ref{tab:perf2-astrophysic} shows the total execution times of each structure operation and Figure \ref{fig:perf2-astrophysics-delete} shows execution time of the \texttt{delete} operation as the number of points are increased.
+
+\begin{table}
+	\centering
+	\begin{tabular}{|r|l|l|l|l|}
+		\hline
+		\textbf{Structure} & \textbf{Operation List} & $n = 10,000$ & $n = 100,000$ & $n = 500,000$ \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Rebuild Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.0698843 & 5.99686 & 156.281 \\
+		 & \textbf{Delete} & 0.481668 & 59.3513 & 1328.2 \\
+		 & \textbf{Point Queries} & 0.0656809 & 5.96501 & 158.955 \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Bucket Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.0508634 & 4.5737 & 101.581 \\
+		 & \textbf{Delete} & 0.318228 & 29.4124 & 672.372 \\
+		 & \textbf{Point Queries} & 0.0495212 & 4.43291 & 96.1636 \\
+		\hline
+		\multirow{ 4}{*}{\textbf{Splay Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.0509274 & 4.64242 & 101.245 \\
+		 & \textbf{Delete} & 0.318251 & 29.6108 & 675.695 \\
+		 & \textbf{Point Queries} & 0.0507686 & 4.59311 & 99.1579 \\
+		\hline
+	\end{tabular}
+	\caption{Total Execution Time (in Seconds) for Different Sample Sizes of Astrophysics Dataset using the Insert-Query-Delete Operation List}
+	\label{tab:perf2-astrophysics}
+\end{table}	
+
+% TODO: create new plot
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.6]{figures/pseudo-pyramid_tree_point_boundary_distances.pdf}
+	\caption{Total Execution Time (in Seconds) of \texttt{delete} Operation for Different Sample Sizes of Astrophysics Dataset}
+	\label{fig:perf2-astrophysics-delete}
+\end{figure}
+
+
+TODO: 3 structures
+	Rebuild Pseudo-Pyramid Tree
+	Bucket Pseudo-Pyramid Tree
+	Splay Pseudo-Pyramid Tree
+
+\subsubsection{Impact of Bucket Size and Boundary Distance Hashing}
+
+TODO: state how even though it's faster than sequential scan -- it's still only about 4/5 times faster than $O(n)$ sequential scan! why??????? BUCKET SIZE! THIS IS THE CORE FACTOR IN PERFORMANCE WITH THESE METHODS!
 
 TODO: define what this is and how it can affect perform (too low, random access, too high, too many points to seach per query)
 
@@ -77,7 +122,7 @@ TODO: State how this new function is easier to compute and provides better bucke
 
 TODO: discuss scaling factor, what it deos and why it can help (plots with scaling factor against bucket utilisation + execution time)
 
-\subsection{SSE Parallelisation}
+\subsubsection{SSE Parallelisation}
 
 SIMD stands for Single Instruction, Multiple Data and was defined by Flynn as a classification of parallel computing \cite{flynns-taxonomy}. In SIMD, a single instruction is used to operation on multiple data items at the same time. If $p$ is the maximum number of data items that can be operated on in parallel at a time, then in an ideal scenario it is possible increase the speed of a computation by $p$ times. However, it is only suitable for computations where the same operation can be applied to multiple data items independantly, where the order in which those operations complete does not affect the final output.
 
@@ -86,79 +131,57 @@ Streaming SIMD Extensions, or SSE, is a specification of an instruction set that
 TODO: speeding up NEW hashing function
 TODO: speeding up point comparison
 
+\subsection{Pyramid Tree}
 
-\subsection{Parallelising Bucket Search}
+As described in Section \ref{sec:pyramid-tree}, the Pyramid tree reduces multi-dimensional points to one dimension, which can then be used in a one-dimensional index structure (a B${}^{+}$-tree in the original paper \cite{pyramid-tree}). The Pyramid tree partitions the data space into $2d$ Pyramids, where each is represented the $(d - 1)$ hyperplane  corresponding to the Pyramid's base. Each pyramid is is segmented by splitting them along $(d-1)$ hyperplanes parallel to the base of the pyramid. The one-dimensional value of a point, calle the \textit{pyramid tree}, describes which Pyramid it is in and the height of that point in that Pyramid. The resultant spatial partition looks like Figure \ref{fig:pyramid-tree-buckets}, where each Pyramid segment has a corresponding bucket which stores the points.
 
-TODO: thread pools and stuff. Differerent analyses
+\begin{figure}
+		\begin{center}
+			\begin{subfloat}[$2d$ Pyramids in 2D Data Space\label{fig:pyramid-tree-pyramids}]{%
+				\includegraphics[scale=0.5]{figures/pyramid_tree_partition.pdf}
+			}
+			\end{subfloat}~
+			\begin{subfloat}[Segmented $2d$ Pyramids, Each Associated with a Bucket\label{fig:pyramid-tree-buckets}] {%
+				\includegraphics[scale=0.5]{figures/pyramid_tree_buckets.pdf}
+			}
+			\end{subfloat}
+		\end{center}
 
-\subsection{Performance Analysis}
+		\label{fig:pyramid-tree-partition}
+\end{figure}
+
+TODO: define pyramid value
+
+TODO: explain how a structure like the bucket ppt tree will be used
+
+\subsection{Simple Bucket Hashmap}
+
+TODO
+
+\subsection{New Baseline}
+
+TODO: kd-tree
+
+\subsection{Performance Timings}
 
 TODO: four structures
-	Defragment Index Pseudo-Pyramid Tree
-	Rebuild Index Pseudo-Pyramid Tree
 	Bucket Pseudo-Pyramid Tree
-	Splay Pseudo-Pyramid Tree
-
-	R = 3000
-
-TODO: justify WHY no-defrag (batch))Pseudo-Pyramid Tree is not being tested
+	Boundary Distance Hashing
+	Pyramid Tree
+	kd-tree
+	Simple Hashing
 
 TODO: refer to plots and justify why only there's only two here (rest are in appendices)
 
-TODO: CPU/heap profiling
-
-\begin{landscape}
-
-	TODO: update tables in this
-
-	\begin{table}
-		\centering
-		\begin{tabular}{|p{2cm}|l|l|l|l|l|l|l|l|l|l|l|}
-			\hline
-			\textbf{Structure} & \textbf{Operation} & \textbf{1D} & \textbf{2D} & \textbf{3D} & \textbf{5D} & \textbf{8D} & \textbf{10D} & \textbf{30D} & \textbf{50D} & \textbf{100D} & \textbf{200D} \\
-			\hline
-			\multirow{ 4}{*}{\textbf{Defragmented Index Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.0100861 & 0.0110824 & 0.0125415 & 0.0150796 & 0.0198269 & 0.0243051 & 0.0977912 & 0.226317 & 0.793781 & 2.97191 \\
-			 & \textbf{Delete} & 12.582 & 12.8934 & 12.9759 & 12.9543 & 12.8519 & 12.9391 & 13.1583 & 13.4074 & 14.2005 & 16.7081 \\
-			 & \textbf{Point Query} & 0.0027684 & 0.00324225 & 0.00386536 & 0.00551307 & 0.00820208 & 0.0104848 & 0.049884 & 0.117446 & 0.408223 & 1.56195 \\
-			\hline
-			\multirow{ 4}{*}{\textbf{Rebuild Index Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.0102503 & 0.0110619 & 0.0121741 & 0.0150467 & 0.0195684 & 0.0236087 & 0.0975364 & 0.226686 & 0.794168 & 2.98335 \\
-			 & \textbf{Delete} & 12.5761 & 12.741 & 12.8164 & 12.8492 & 13.0039 & 13.0666 & 13.2909 & 13.582 & 14.5668 & 17.1137 \\
-			 & \textbf{Point Query} & 0.00272942 & 0.00336814 & 0.00388157 & 0.00560772 & 0.00868261 & 0.0109097 & 0.0504385 & 0.117767 & 0.417613 & 1.54181 \\
-			\hline
-			\multirow{ 4}{*}{\textbf{Bucket Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.015999 & 0.0172538 & 0.0181366 & 0.0208803 & 0.0257906 & 0.030085 & 0.103178 & 0.23306 & 0.798941 & 2.97632 \\
-			 & \textbf{Delete} & 0.00354707 & 0.00423968 & 0.00467753 & 0.00626874 & 0.00936306 & 0.0119662 & 0.050822 & 0.120001 & 0.42113 & 1.52593 \\
-			 & \textbf{Point Query} & 0.00234234 & 0.00291753 & 0.0036248 & 0.00529063 & 0.00801969 & 0.0101838 & 0.0508173 & 0.11813 & 0.413853 & 1.53966 \\
-			\hline
-			\multirow{ 4}{*}{\textbf{Splay Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.0174001 & 0.0185397 & 0.0195724 & 0.0224078 & 0.0268705 & 0.0309955 & 0.104663 & 0.234407 & 0.799793 & 2.97659 \\
-			 & \textbf{Delete} & 0.00412166 & 0.00481606 & 0.00533354 & 0.00767851 & 0.0102245 & 0.0132186 & 0.0525625 & 0.120654 & 0.424749 & 1.53488  \\
-			 & \textbf{Point Query} & 0.00304317 & 0.00362563 & 0.0044601 & 0.00626445 & 0.00898099 & 0.0118438 & 0.0515605 & 0.119636 & 0.412084 & 1.53412 \\
-			\hline
-		\end{tabular}
-		\caption{Execution Time (in Seconds) of 10,0000 Structure Operations for Uniformly Random Points}
-		\label{tab:perf2-randuniform}
-	\end{table}
-
-	\begin{table}
-		\centering
-		\begin{tabular}{|r|l|l|}
-			\hline
-			\textbf{Structure} & \textbf{InsertAll-QueryAll-DeleteAll} & \textbf{10,000 Random Operations} \\
-			\hline
-			\textbf{Defragmented Index Pseudo-Pyramid Tree} & 126.073 & 61.1827 \\
-			\textbf{Rebuild Index Pseudo-Pyramid Tree} & 127.648 & 60.9528 \\
-			\textbf{Bucket Pseudo-Pyramid Tree} & 39.9721 & 17.872 \\
-			\textbf{Splay Pseudo-Pyramid Tree} & 39.7724 & 17.9326 \\
-			\hline
-		\end{tabular}
-		\caption{Execution Time (in Seconds) of Structures for Sampled Astrophysics Dataset}
-		\label{tab:perf2-astrophysics}
-	\end{table}
-
-\end{landscape}
+TODO: table
 
 TODO: plot of insert() w/ skewed data
 TODO: plot of delete() w/ rand uniform data
 
-\subsection{Evaluation}
+\subsection{Profiling Results}
+
+TODO: CPU/heap profiling
+
+\subsection{Summary}
 
 TODO
