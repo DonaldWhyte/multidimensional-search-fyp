@@ -170,21 +170,16 @@ Boundary Distance Hashing (BDH) is also based on the Bucket Pseudo-Pyramid Tree,
 	\label{eq:boundary-distance-hashing}
 \end{equation}
 
+The boundary distance hashing function iterates $d$ times to compute the desired output, with the computation at each iteration being \textit{independant} of each other. SSE2 was used to accelerate these two functions by computing the results of four iterations at once and reducing them to a single result. If $d$ is not divisible by four, as many iterations will be done in parallel as possible, with the remaining iterations being executed sequentially. The SSE-accelerated BDH function therefore executes $\lfloor \frac{d}{4}\rfloor + (d  \; MOD \; 4)$ iterations.
+
+As with the other hashing techniques, the possibility of having two points hashed to the same value is a possibility (see the following lemma).
+
 \begin{proof}[\textbf{Lemma: } For $d \geq 2$, there exist two points $x$ and $y$, such that $x \neq y$, with the same BDH value]\mbox{}\\*
 Let $d$ be the number of dimensions and $m = (m_0, m_1, \dots, m_{d - 1})$ be some scale factor. Let $x = (x_0, x_1, \dots, x_{d -1})$, $y = (y_0, y_1, \dots, y_{d - 1})$ be two $d$-dimensional points. Without loss of generality, assume $0 \leq x_i \leq 1$ and $0 \leq y_i \leq 1$ for all $i = 1, 2, \dots, d$. Suppose $x_0 = 0.1$, $y_{d - 1} = 1$, $x_i = 0$ for all $i = 1, \dots, d - 1$ and $y_j = 0$ for all $j = 0, \dots, d - 2$.
 
-It follows that $h_0(x) = h_{d - 1}(y)$, $h_i(x) = 0$ for all $i = 1, \dots, d - 1$ and $h_j(y) = 0$ for all $j = 0, \dots, d - 2$. Therefore, $h(x) = h(y)$. Since $h(x) = h(y)$ and $x \neq y$, two distinct points can be mapped to the same boundary distance hashed (BDH) value.
+It follows that $h_0(x) = h_{d - 1}(y)$, $h_i(x) = 0$ for all $i = 1, \dots, d - 1$ and $h_j(y) = 0$ for all $j = 0, \dots, d - 2$. Therefore, $h(x) = h(y)$. Since $h(x) = h(y)$ and $x \neq y$, two distinct points can be mapped to the same boundary distance hashed value.
 
 \end{proof}
-
-\subsubsection{SSE Parallelisation}
-
-SIMD stands for Single Instruction, Multiple Data and was defined by Flynn as a classification of parallel computing \cite{flynns-taxonomy}. In SIMD, a single instruction is used to operation on multiple data items at the same time. If $p$ is the maximum number of data items that can be operated on in parallel at a time, then in an ideal scenario it is possible increase the speed of a computation by $p$ times. However, it is only suitable for computations where the same operation can be applied to multiple data items independantly, where the order in which those operations complete does not affect the final output.
-
-Streaming SIMD Extensions, or SSE, is a specification of an instruction set that performs SIMD operations for the widely used x86 CPU architecture \cite{sse}, which is the architecture used for the development and test environment of this project. It was seen as TODO
-
-TODO: speeding up NEW hashing function
-TODO: speeding up point comparison
 
 \subsection{Simple Bucket Hashmap}
 
