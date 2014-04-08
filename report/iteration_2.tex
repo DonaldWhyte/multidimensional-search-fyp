@@ -71,7 +71,20 @@ Nodes in the Splay Pseudo-Pyramid Tree correspond to individual buckets in the B
 
 All variants of the Pseudo-Pyramid Tree hash $d$-dimensional points to a one-dimensional value, which is used as a key to search for a given point in a one-dimensional structure. What varies is how points are deleted and which underyling one-dimensional structure is used. The Defragmented Pseudo-Pyramid Tree is clearly inferior to the Rebuild Pseudo-Pyramid Tree from the last iteration and the Batch Pseudo-Pyramid Tree never releases memory after points are removed. For dynamic data which changes frequently, this ma ycause the machine to run out of memory. As such, both of these structures will not be explored further.
 
+% TODO: create new plot
+\begin{wrapfigure}[12]{r}{0.5\textwidth}
+	\vspace{-40pt}
+	\begin{center}
+		\includegraphics[scale=0.5]{figures/performance_analysis/iteration_1/all_pquery_sizevary_average.pdf}
+	\end{center}
+	\vspace{-20pt}
+	\caption{Total Execution Time (in Seconds) of \texttt{delete} Operation for Different Sample Sizes of Astrophysics Dataset}
+	\label{fig:perf2-astrophysics-delete}
+\end{wrapfigure}
+
 The Rebuild Pseudo-Pyramid Tree, Bucket Pyramid-Tree and the Splay Pseudo-Pyramid Tree were timed with the full collection of synthetic and real datasets. The results were consistent throughout the different datasets. For brevity, only the times for the astrophysics dataset with the Insert-Query-Delete operation list will be provided. Table \ref{tab:perf2-astrophysic} shows the total execution times of each structure operation and Figure \ref{fig:perf2-astrophysics-delete} shows execution time of the \texttt{delete} operation as the number of points are increased.
+
+TODO: evaluation
 
 \begin{table}
 	\centering
@@ -94,21 +107,7 @@ The Rebuild Pseudo-Pyramid Tree, Bucket Pyramid-Tree and the Splay Pseudo-Pyrami
 	\end{tabular}
 	\caption{Total Execution Time (in Seconds) for Different Sample Sizes of Astrophysics Dataset using the Insert-Query-Delete Operation List}
 	\label{tab:perf2-astrophysics}
-\end{table}	
-
-% TODO: create new plot
-\begin{figure}
-	\centering
-	\includegraphics[scale=0.6]{figures/pseudo-pyramid_tree_point_boundary_distances.pdf}
-	\caption{Total Execution Time (in Seconds) of \texttt{delete} Operation for Different Sample Sizes of Astrophysics Dataset}
-	\label{fig:perf2-astrophysics-delete}
-\end{figure}
-
-
-TODO: 3 structures
-	Rebuild Pseudo-Pyramid Tree
-	Bucket Pseudo-Pyramid Tree
-	Splay Pseudo-Pyramid Tree
+\end{table}
 
 \subsubsection{Impact of Bucket Size and Boundary Distance Hashing}
 
