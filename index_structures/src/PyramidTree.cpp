@@ -182,15 +182,13 @@ namespace mdsearch
 	std::string PyramidTree::toString() const
 	{
 		std::stringstream ss;
-		ss << "Pyramid Tree\n";
-		ss << "\tLoad Factor of Hash Table: " << hashMap.load_factor() << "\n";
+		ss << "PyramidTree\n";
+		ss << "\tLoad Factor of Underlying Hash Table: " << hashMap.load_factor() << "\n";
 		ss << "\tTotal Points Stored: " << numPointsStored() << "\n";
 		ss << "\tAverage Points Per Bucket: " << averagePointsPerBucket() << "\n";
-		ss << "\tBuckets:\n";
-		for (OneDMap::const_iterator it = hashMap.begin(); (it != hashMap.end()); it++)
-		{
-			ss << "\t\tKey: " << it->first << ", Num Elements: " << it->second.points.size() << "\n";
-		}
+		ss << "\tStandard deviation of points per bucket: " << stdevPointsPerBucket() << "\n";
+		ss << "\tMin points per bucket: " << minPointsPerBucket() << "\n";
+		ss << "\tMax points per bucket: " << maxPointsPerBucket() << "\n";
 		return ss.str();
 	}
 

@@ -2,7 +2,7 @@
 
 # Set base directories for input data and output results
 inputDirectory="/usr/not-backed-up/DonaldFYP/test_data"
-outputDirectory="/usr/Maxtor/not-backed-up/results/end_of_iteration2/new"
+outputDirectory="/usr/not-backed-up/DonaldFYP/results/end_of_iteration2/new"
 
 # Ensure directory to store results is there
 mkdir "$outputDirectory" -p

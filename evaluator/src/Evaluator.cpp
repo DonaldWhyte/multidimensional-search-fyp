@@ -12,6 +12,7 @@
 	#error No timing mechanism supported for this platform
 #endif
 
+#include "PyramidTree.h"
 #include "DuplicateHashTable.h"
 
 namespace mdsearch
@@ -42,7 +43,6 @@ namespace mdsearch
 		const PointList& dataToPreload) const
 	{
 		// NOTE: reserve() calls are done to minimise the amount of dynamic allocations as possible
-
 		if (verbose)
 		{
 			std::cout << "STARTING PERFORMANCE TESTS USING " << testOperationLists.size()
@@ -87,9 +87,12 @@ namespace mdsearch
 						generateHeapProfilerFilename(t, s)
 					);
 
+					PyramidTree* pt = dynamic_cast<PyramidTree*>(structures[s]);
+					if (pt)
+						std::cout << pt->toString() << std::endl << std::endl;
 					DuplicateHashTable* dht = dynamic_cast<DuplicateHashTable*>(structures[s]);
 					if (dht)
-						std::cout << dht->toString() << std::endl;
+						std::cout << dht->toString() << std::endl << std::endl;
 				}
 			}
 			// Now compute average times for each structure 

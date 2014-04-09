@@ -113,11 +113,6 @@ namespace mdsearch
 		ss << "\tStandard deviation of points per bucket: " << stdevPointsPerBucket() << "\n";
 		ss << "\tMin points per bucket: " << minPointsPerBucket() << "\n";
 		ss << "\tMax points per bucket: " << maxPointsPerBucket() << "\n";
-		ss << "\tBuckets:\n";
-		for (PointMap::const_iterator it = hashMap.begin(); (it != hashMap.end()); it++)
-		{
-			//ss << "\t\tKey: " << it->first << ", Num Elements: " << it->second.size() << "\n";
-		}
 		return ss.str();
 	}
 
@@ -149,10 +144,19 @@ namespace mdsearch
 
 	unsigned int DuplicateHashTable::minPointsPerBucket() const
 	{
-		size_t minCount = 0;
-		for (PointMap::const_iterator it = hashMap.begin(); (it != hashMap.end()); it++)
-			minCount = std::min(minCount, it->second.size());
-		return minCount;
+		PointMap::const_iterator it = hashMap.begin();
+		if (it == hashMap.end())
+		{
+			return 0;
+		}
+		else
+		{
+			size_t minCount = it->second.size(); // set first bucket size to minCount
+			it++;
+			for (it; (it != hashMap.end()); it++)
+				minCount = std::min(minCount, it->second.size());
+			return minCount;
+		}
 	}
 
 	unsigned int DuplicateHashTable::maxPointsPerBucket() const
