@@ -159,48 +159,6 @@ Since $x_0 \leq 0.5$ and $y \leq 0.5$, both $x$ and $y$ are mapped to pyramid 0 
 
 \end{proof}
 
-\subsection{Boundary Distance Hashing}
-
-Boundary Distance Hashing (BDH) is also based on the Bucket Pseudo-Pyramid Tree, which uses another new hashing function. Rather than using segmented pyramids to decompose space, it simply sums up the distances a point $p$ is along the data space boundaries, in a similar fashion to the Pseudo-Pyramid Tree. Figure \ref{fig:point-boundary-distance} illustrates the boundary distances for a point in 2D space. This is the same as the Pseudo-Pyramid hash function given in Equations \ref{eq:point-boundary-distance} and \ref{eq:pseudo-pyramid-hash}, except the cumulative scaling factor, $\prod_{j=0}^{i}{\lbrack m_j \rbrack}$, has been removed. Equation \ref{eq:boundary-distance-hashing} gives the boundary distance hashing function.
-
-\begin{equation}
-	h(p) = \sum_{i = 0}^{d} { \lbrack \texttt{toInt}( h_i(p) \times m_i ) \rbrack }
-	\label{eq:boundary-distance-hashing}
-\end{equation}
-
-The boundary distance hashing function iterates $d$ times to compute the desired output, with the computation at each iteration being \textit{independant} of each other. SSE2 (see Section \ref{sec:sse}) was used to accelerate these two functions by computing the results of four iterations at once and reducing them to a single result. If $d$ is not divisible by four, as many iterations will be done in parallel as possible, with the remaining iterations being executed sequentially. The SSE-accelerated BDH function therefore executes $\lfloor \frac{d}{4}\rfloor + (d  \; MOD \; 4)$ iterations. Table \ref{tab:bdh-sse-timings} shows
-
-\begin{table}
-	\centering
-	\begin{tabular}{|r|l|l|}
-		\hline
-		\textbf{Dimensions} & \textbf{Without SSE} & \textbf{With SSE} \\
-		\hline
-		1 & 0.00603199 & 0.0094854 \\
-		2 & 0.00594473 & 0.009711 \\
-		3 & 0.00607402 & 0.0100043 \\
-		5 & 0.0132525 & 0.011889 \\
-		8 & 0.0335323 & 0.027851 \\
-		10 & 0.041379 & 0.035294 \\
-		30 & 0.142775 & 0.09923 \\
-		50 & 0.245265 & 0.150047 \\
-		100 & 0.513582 & 0.380295 \\
-		200 & 1.02594 & 0.74783 \\
-		\hline
-	\end{tabular}
-	\caption{Total Execution Time (in seconds) for 10,000,000 of BDH Function Calls With Varying Dimensions, With and Without SSE (Averaged Over 10 Runs)}
-	\label{tab:bdh-sse-timings}
-\end{table}
-
-As with the other hashing techniques, the possibility of having two points hashed to the same value is a possibility (see the following lemma).
-
-\begin{proof}[\textbf{Lemma: } For $d \geq 2$, there exist two points $x$ and $y$, such that $x \neq y$, with the same BDH value]\mbox{}\\*
-Let $d$ be the number of dimensions and $m = (m_0, m_1, \dots, m_{d - 1})$ be some scale factor. Let $x = (x_0, x_1, \dots, x_{d -1})$, $y = (y_0, y_1, \dots, y_{d - 1})$ be two $d$-dimensional points. Without loss of generality, assume $0 \leq x_i \leq 1$ and $0 \leq y_i \leq 1$ for all $i = 1, 2, \dots, d$. Suppose $x_0 = 0.1$, $y_{d - 1} = 1$, $x_i = 0$ for all $i = 1, \dots, d - 1$ and $y_j = 0$ for all $j = 0, \dots, d - 2$.
-
-It follows that $h_0(x) = h_{d - 1}(y)$, $h_i(x) = 0$ for all $i = 1, \dots, d - 1$ and $h_j(y) = 0$ for all $j = 0, \dots, d - 2$. Therefore, $h(x) = h(y)$. Since $h(x) = h(y)$ and $x \neq y$, two distinct points can be mapped to the same boundary distance hashed value.
-
-\end{proof}
-
 \subsection{Simple Bucket Hashmap}
 
 TODO: extreme form of minimising bucket size -- average size almost one!
