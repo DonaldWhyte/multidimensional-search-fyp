@@ -9,7 +9,7 @@
 namespace mdsearch
 {
 
-	// Types used for timinbg information
+	// Types used for timing information
 	typedef double Timing;
 	typedef std::vector<Timing> StructureTimings;
 	typedef std::vector<StructureTimings> OperationListTimings;
@@ -24,6 +24,9 @@ namespace mdsearch
 	typedef std::vector<OperationTimings> StructureOperationTimings; // for a single structure
 
 	typedef std::map<int, Timing> SizeTimingTable;
+
+	/* Return current time. */
+	Timing getTime();
 
 	/* Generate string that contains human-readable report of
 	 * recorded dataset timings. */

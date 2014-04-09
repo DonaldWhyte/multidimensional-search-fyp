@@ -8,7 +8,7 @@
 namespace mdsearch
 {
 
-	/* Compute initial media point to use for a Pyramid tree, given the 
+	/* Compute initial median point to use for a Pyramid tree, given the 
 	 * maximum bucket number and the dimensionality of the data. */
 	Point computeInitialMedianPoint(int maxBucketNumber, int numDimensions);
 

@@ -64,6 +64,7 @@ To perform the evaluation (see Section \ref{sec:evaluation}), a profiler that ca
 Many profilers were considered when choosing one for this project. Intel VTune \cite{intel-vtune} is feature-rich profiler for Intel-based machines, but it is proprietary, so it will not be used for this project. Valgrind \cite{valgrind}, Profiny \cite{profiny} and gperftools \cite{gperftools} are freely available profilers. Out of these, only Valgrind can measure both heap usage and cache misses. gperftools can generate a visualisation of program flow and where the program spends most of its time via a call graph image, with just a single command. gperftools provides a similar feature for heap profiling as well. Therefore, both Valgrind and gperftools will be used for profiling.
 
 \subsection{SSE Optimisation}
+\label{sec:sse}
 
 SIMD stands for Single Instruction, Multiple Data and was defined by Flynn as a classification of parallel computing \cite{flynns-taxonomy}. In SIMD, a single instruction is used to operation on multiple data items at the same time. If $p$ is the maximum number of data items that can be operated on in parallel at a time, then in an ideal scenario it is possible increase the speed of a computation by $p$ times. However, it is only suitable for computations where the same operation can be applied to multiple data items independantly, where the order in which those operations complete does not affect the final output.
 
