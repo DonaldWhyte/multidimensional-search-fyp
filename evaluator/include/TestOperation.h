@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "Point.h"
+#include "Region.h"
 
 namespace mdsearch
 {
@@ -16,17 +17,20 @@ namespace mdsearch
 			OPERATION_TYPE_DELETE,
 			OPERATION_TYPE_UPDATE,
 			OPERATION_TYPE_POINTQUERY,
+			OPERATION_TYPE_CLEAR
 		};
 
 		TestOperation(Type type, const Point& operandOne);
 		TestOperation(Type type, const Point& operandOne, const Point& operandTwo);
+		TestOperation(const Region& boundary); // constructor for Clear operations
 		/* Equality test for two structure test operations. Created for unit tests. */
 		bool operator==(const TestOperation& other) const;
 
 		// Fields
 		Type type;
 		Point operand1;
-		Point operand2;
+		Point operand2; //only used for Update
+		Region boundary; // only used for Clear
 
 	};
 

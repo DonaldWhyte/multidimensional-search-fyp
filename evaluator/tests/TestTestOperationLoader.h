@@ -56,6 +56,24 @@ namespace mdsearch { namespace tests
 		EXPECT_EQ(multipleOperations, loader.loadFromFile("test_files/multiple.ops"));
 	}
 
+	TEST_F(TestOperationLoaderTests, ClearOperation)
+	{
+		TestOperationLoader loader;
+		TestOperationList operations = loader.loadFromFile("test_files/clear.ops");
+
+		ASSERT_EQ(2, operations.size());
+		ASSERT_EQ(TestOperation::OPERATION_TYPE_CLEAR, operations[0].type);
+		ASSERT_EQ(3, operations[0].boundary.numDimensions());
+		EXPECT_EQ(Interval(0, 1), operations[0].boundary[0]);
+		EXPECT_EQ(Interval(0, 1), operations[0].boundary[1]);
+		EXPECT_EQ(Interval(0, 1), operations[0].boundary[2]);
+		ASSERT_EQ(TestOperation::OPERATION_TYPE_CLEAR, operations[1].type);
+		ASSERT_EQ(3, operations[1].boundary.numDimensions());
+		EXPECT_EQ(Interval(-453, 453), operations[1].boundary[0]);
+		EXPECT_EQ(Interval(0, 5563.1), operations[1].boundary[1]);
+		EXPECT_EQ(Interval(2, 1), operations[1].boundary[2]);
+	}
+
 } }
 
 #endif

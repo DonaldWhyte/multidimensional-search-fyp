@@ -41,6 +41,8 @@ namespace mdsearch
 		// Go through each line, looking for another test operation in each
 		while (!file.eof())
 		{
+			bool invalidOperation = false;
+
 			// Read next line in
 			std::getline(file, line);
 			boost::split(fields, line, boost::is_any_of(" "));
@@ -59,45 +61,78 @@ namespace mdsearch
 				type = TestOperation::OPERATION_TYPE_UPDATE;
 			else if (fields[0] == "P")
 				type = TestOperation::OPERATION_TYPE_POINTQUERY;
+			else if (fields[0] == "C")
+				type = TestOperation::OPERATION_TYPE_CLEAR;
 			else // ignore operation if the type is not known
 				continue;
 
-			// Read the coordinates of the operation's point
-			unsigned int iterCount = numDimensions;
-			// Read two points if it's an update operation
-			if (type == TestOperation::OPERATION_TYPE_UPDATE)
+			// If operation type is clear, read the cleared structure's boundary
+			if (type == TestOperation::OPERATION_TYPE_CLEAR)
 			{
-				// Also ensure that there are actually enough fields for the two points
-				// If not, IGNORE THE POINT
-				if (fields.size() < ((numDimensions * 2) + 1))
-					continue;
-				iterCount *= 2;
-			}
-			for (unsigned int d = 0; (d < iterCount); d++)
-			{
-				// Try storing next field as a real number
-				// If this fails, then the point's values are invalid so
-				// we ignore this test operation and move onto the next
-				try
+				Region boundary(numDimensions);
+				// Read intervals for each dimension by
+				for (unsigned int d = 0; (d < numDimensions); d++)
 				{
-					pointValues[d] = boost::lexical_cast<Real>( fields[d + 1] );
+					// Split field using ',' as delimiter
+					std::vector<std::string> intervalValues;
+					boost::split(intervalValues, fields[d + 1], boost::is_any_of(","));
+					// Ignore operation if there aren't enough values for interval (2)
+					if (intervalValues.size() < 2)
+					{
+						invalidOperation = true;
+						break;
+					}
+					// First number if min value and second is max!
+					boundary[d].min = boost::lexical_cast<Real>(intervalValues[0]);
+					boundary[d].max = boost::lexical_cast<Real>(intervalValues[1]);
 				}
-				catch (const boost::bad_lexical_cast& ex)
-				{
+				if (invalidOperation)
 					continue;
-				}
+				operations.push_back(TestOperation(boundary));
 			}
-
-			// Construct the operation object
-			Point operandOne(numDimensions, &pointValues[0]);
-			if (type == TestOperation::OPERATION_TYPE_UPDATE)
-			{
-				Point operandTwo(numDimensions, &pointValues[numDimensions]);
-				operations.push_back( TestOperation(type, operandOne, operandTwo) );
-			}
+			// If non-clear operation has been specified
 			else
 			{
-				operations.push_back( TestOperation(type, operandOne) );
+				// Read the coordinates of the operation's point
+				unsigned int iterCount = numDimensions;
+				// Read two points if it's an update operation
+				if (type == TestOperation::OPERATION_TYPE_UPDATE)
+				{
+					// Also ensure that there are actually enough fields for the two points
+					// If not, IGNORE THE POINT
+					if (fields.size() < ((numDimensions * 2) + 1))
+						continue;
+					iterCount *= 2;
+				}
+				for (unsigned int d = 0; (d < iterCount); d++)
+				{
+					// Try storing next field as a real number
+					// If this fails, then the point's values are invalid so
+					// we ignore this test operation and move on to the next
+					try
+					{
+						pointValues[d] = boost::lexical_cast<Real>( fields[d + 1] );
+					}
+					catch (const boost::bad_lexical_cast& ex)
+					{
+						invalidOperation = true;
+						break;
+					}
+					if (invalidOperation)
+						continue;
+				}
+
+				// Construct the operation object
+				Point operandOne(numDimensions, &pointValues[0]);
+				if (type == TestOperation::OPERATION_TYPE_UPDATE)
+				{
+					Point operandTwo(numDimensions, &pointValues[numDimensions]);
+					operations.push_back(TestOperation(type, operandOne, operandTwo));
+				}
+				else
+				{
+					operations.push_back(TestOperation(type, operandOne));
+				}
 			}
 		}
 
