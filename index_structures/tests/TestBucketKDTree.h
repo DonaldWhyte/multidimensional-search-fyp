@@ -13,17 +13,23 @@ namespace mdsearch { namespace tests
 	class BucketBucketKDTreeTests : public ::testing::Test
 	{
 
+	protected:
+		static const int MAX_POINTS_UNTIL_SPLIT = 4;
+		static const int MIN_POINTS_UNTIL_MERGE = 4;
+
 	};
 
 	TEST_F(BucketBucketKDTreeTests, Construction)
 	{
-		BucketKDTree structure(NUM_BUCKETKDTREE_DIMENSIONS);
+		BucketKDTree structure(NUM_BUCKETKDTREE_DIMENSIONS,
+			MAX_POINTS_UNTIL_SPLIT, MIN_POINTS_UNTIL_MERGE);
 		ASSERT_EQ(NUM_PYRAMIDTREE_DIMENSIONS, structure.dimensionality());
 	}
 
 	TEST_F(BucketBucketKDTreeTests, Clear)
 	{
-		BucketKDTree structure(NUM_BUCKETKDTREE_DIMENSIONS);
+		BucketKDTree structure(NUM_BUCKETKDTREE_DIMENSIONS,
+			MAX_POINTS_UNTIL_SPLIT, MIN_POINTS_UNTIL_MERGE);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();
 		structure.loadPoints(testPoints);
@@ -39,7 +45,8 @@ namespace mdsearch { namespace tests
 
 	TEST_F(BucketBucketKDTreeTests, InsertionAndRemoval)
 	{
-		BucketKDTree structure(NUM_BUCKETKDTREE_DIMENSIONS);
+		BucketKDTree structure(NUM_BUCKETKDTREE_DIMENSIONS,
+			MAX_POINTS_UNTIL_SPLIT, MIN_POINTS_UNTIL_MERGE);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();
 
@@ -54,15 +61,10 @@ namespace mdsearch { namespace tests
 				ASSERT_FALSE(structure.pointExists(testPoints[j]));
 		}
 
-		std::cout << "FULL STRUCTURE:" << std::endl;
-		std::cout << structure.toString() << std::endl;
-
 		// Now do the same for remove()
 		for (unsigned int i = 0; (i < testPoints.size()); i++)
 		{
 			ASSERT_TRUE(structure.remove(testPoints[i]));
-			std::cout << "REMOVED" << testPoints[i] << std::endl;
-			std::cout << structure.toString() << std::endl;
 			for (unsigned int j = 0; (j <= i); j++)
 				ASSERT_FALSE(structure.pointExists(testPoints[j]));
 			for (unsigned int j = i + 1; (j < testPoints.size()); j++)
@@ -72,14 +74,16 @@ namespace mdsearch { namespace tests
 
 	TEST_F(BucketBucketKDTreeTests, Updating)
 	{
-		BucketKDTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS);
+		BucketKDTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS,
+			MAX_POINTS_UNTIL_SPLIT, MIN_POINTS_UNTIL_MERGE);
 		IndexStructureTester tester;
 		tester.testUpdates(&structure);
 	}
 
 	TEST_F(BucketBucketKDTreeTests, PointQueries)
 	{
-		BucketKDTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS);
+		BucketKDTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS,
+			MAX_POINTS_UNTIL_SPLIT, MIN_POINTS_UNTIL_MERGE);
 		IndexStructureTester tester;
 		tester.testPointQueries(&structure);
 	}

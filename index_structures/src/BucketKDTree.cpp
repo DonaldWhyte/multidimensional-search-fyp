@@ -56,9 +56,12 @@ namespace mdsearch
 		delete rightChild;
 	}
 
-	BucketKDTree::BucketKDTree(unsigned int numDimensions) :
+	BucketKDTree::BucketKDTree(unsigned int numDimensions,
+		int maxPointsUntilSplit, int minPointsUntilMerge) :
 		IndexStructure(numDimensions),
-		root(new BucketKDNode(NULL))
+		root(new BucketKDNode(NULL)),
+		maxPointsUntilSplit(maxPointsUntilSplit),
+		minPointsUntilMerge(minPointsUntilMerge)
 	{
 	}
 
@@ -86,7 +89,7 @@ namespace mdsearch
 			// Not a duplicate, add to the structure
 			leaf->points.push_back(p);
 			// If bucket leaf has exceeded max capacity, split it into two nodes
-			if (leaf->points.size() > MAX_POINTS_PER_LEAF)
+			if (leaf->points.size() > maxPointsUntilSplit)
 			{
 				// Compute cutting dimension and value to use
 				int cuttingDim, cuttingVal;
@@ -139,7 +142,7 @@ namespace mdsearch
 				// contained in both leaf nodes is lower than minimum,
 				// merge the two nodes together!
 				BucketKDNode* sibling = getSibling(leaf);
-				if ((leaf->points.size() + sibling->points.size()) < MIN_POINTS_UNTIL_MERGE)
+				if ((leaf->points.size() + sibling->points.size()) < minPointsUntilMerge)
 					mergeSiblingLeaves(leaf, sibling);
 			}
 
