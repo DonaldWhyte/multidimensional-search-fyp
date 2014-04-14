@@ -29,12 +29,8 @@ namespace mdsearch
 		// Ensure boundaries are NEVER ZERO SIZED and the maximum
 		// values are always larger than the minimum
 		for (unsigned int d = 0; (d < numDimensions); d++)
-		{
 			if (boundary[d].max <= boundary[d].min)
-			{
 				boundary[d].max = boundary[d].min + 1;
-			}
-		}
 		// Construct min-max points for SSE hashing function
 		for (unsigned int i = 0; (i < boundary.numDimensions()); i++)
 		{
@@ -189,6 +185,24 @@ namespace mdsearch
 		ss << "\tStandard deviation of points per bucket: " << stdevPointsPerBucket() << "\n";
 		ss << "\tMin points per bucket: " << minPointsPerBucket() << "\n";
 		ss << "\tMax points per bucket: " << maxPointsPerBucket() << "\n";
+		// Find bucket with largest points and print out the first 30 points
+		int maxCount = 0;
+		const PointList* maxBucket = NULL;
+		for (OneDMap::const_iterator it = hashMap.begin(); (it != hashMap.end()); it++)
+		{
+			if (maxCount < it->second.points.size())
+			{
+				maxBucket = &(it->second.points);
+				maxCount = maxBucket->size();
+			}
+		}
+		unsigned int pointsToPrint = std::min(100, maxCount);
+		for (unsigned int i = 0; (i < pointsToPrint); i++)
+		{
+			std::cout << computePyramidValue(numDimensions, (*maxBucket)[i], minPoint, maxPoint, bucketInterval)
+				<< (*maxBucket)[i] << std::endl;
+		}
+
 		return ss.str();
 	}
 

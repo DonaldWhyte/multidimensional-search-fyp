@@ -9,15 +9,36 @@
 
 using namespace mdsearch;
 
+/* If this is greater than 0, then the tight boundary around a
+ * dataset's points is expanded slightly to prevent some points
+ * being on the structure boundary.
+ * EXAMPLE: A value of 0.1 means that the MIN boundary values
+ * are 0.9 times the original value and the MAX boundary
+ * values are 1.1 times the original. */
+static const Real TIGHT_BOUNDARY_PADDING_FACTOR = 0.0f;
+
 Region computeOpListBoundary(const TestOperationList& opList)
 {
 	if (!opList.empty())
 	{
 		unsigned int numDimensions = opList[0].operand1.numDimensions();
+		// Initialise boundary with values from first point
 		Region boundary(numDimensions);
+		for (unsigned int d = 0; (d < numDimensions); d++)
+		{
+			boundary[d].min = opList[0].operand1[d];
+			boundary[d].max = opList[0].operand1[d];
+			if (opList[0].type == TestOperation::OPERATION_TYPE_UPDATE) // if there is a second operand
+			{
+				if (opList[0].operand2[d] < boundary[d].min)
+					boundary[d].min = opList[0].operand2[d];
+				else if (opList[0].operand2[d] > boundary[d].max)
+					boundary[d].max = opList[0].operand2[d];
+			}
+		}
 		// Now search through all points in this operation list to find
 		// minimum and maximum values for each dimension
-		for (unsigned int i = 0; (i < opList.size()); i++)
+		for (unsigned int i = 1; (i < opList.size()); i++)
 		{
 			const TestOperation& op = opList[i];
 			for (unsigned int d = 0; (d < numDimensions); d++)
@@ -26,7 +47,7 @@ Region computeOpListBoundary(const TestOperationList& opList)
 					boundary[d].min = op.operand1[d];
 				else if (op.operand1[d] > boundary[d].max)
 					boundary[d].max = op.operand1[d];
-				if (op.operand2.numDimensions() > 0) // if there is a second operand
+				if (op.type == TestOperation::OPERATION_TYPE_UPDATE) // if there is a second operand
 				{
 					if (op.operand2[d] < boundary[d].min)
 						boundary[d].min = op.operand2[d];
@@ -34,6 +55,13 @@ Region computeOpListBoundary(const TestOperationList& opList)
 						boundary[d].max = op.operand2[d];
 				}
 			}
+		}
+		// Pad out the boundary to leave some space between the points
+		// at the boundaries of the dataset and the structures' boundaries
+		for (unsigned int d = 0; (d < numDimensions); d++)
+		{
+			boundary[d].min = (1.0f - TIGHT_BOUNDARY_PADDING_FACTOR) * boundary[d].min;
+			boundary[d].max = (1.0f + TIGHT_BOUNDARY_PADDING_FACTOR) * boundary[d].max;
 		}
 		return boundary;
 	}

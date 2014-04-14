@@ -32,6 +32,13 @@ namespace mdsearch
 	{
 		return (coord - min) / (max - min);
 	}
+	
+	/* Compute Pyramid height of a point, for a specific pair of
+	 * pyramid (that are both for the same dimension). */
+	inline Real pyramidHeight(Real coord, Real min, Real max)
+	{
+		return std::abs(0.5f - normaliseCoord(coord, min, max));
+	}
 
 	/* Compute pyramid value of the given point, using the original Pyramid-technique. */
 	inline Real computePyramidValue(unsigned int numDimensions,
@@ -40,14 +47,10 @@ namespace mdsearch
 	{
 		int index = 0;
 		int dMax = 0;
-		Real dMaxHeight = std::abs(
-			0.5f - normaliseCoord(p[0], minPoint[0], maxPoint[0])
-		);
+		Real dMaxHeight = pyramidHeight(p[0], minPoint[0], maxPoint[0]);
 		for (int d = 1; (d < numDimensions); d++)
 		{
-			Real currentHeight = std::abs(
-				0.5f - normaliseCoord(p[d], minPoint[d], maxPoint[d])
-			); 
+			Real currentHeight = pyramidHeight(p[d], minPoint[d], maxPoint[d]);
 			if (dMaxHeight < currentHeight)
 			{
 				dMax = d;
@@ -57,12 +60,9 @@ namespace mdsearch
 		if (normaliseCoord(p[dMax], minPoint[dMax], maxPoint[dMax]) < 0.5f)
 			index = dMax; // pyramid lower than central point
 		else 
-		{
 			index = dMax + numDimensions; // pyramid higher than central point
-		}
 
-		int otherIndex = index % numDimensions;
-		return index + std::abs(0.5f - normaliseCoord(p[otherIndex], minPoint[otherIndex], maxPoint[otherIndex]));
+		return index + dMaxHeight;
 	}
 
 	/* Compute pseudo-pyramid value (hash) of n-dimensional point.

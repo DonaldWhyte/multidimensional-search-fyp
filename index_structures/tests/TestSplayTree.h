@@ -102,7 +102,7 @@ namespace mdsearch { namespace tests
 			// still accessible
 			for (unsigned int j = 0; (j <= i); j++)
 			{
-				float* storedValue = tree.getValue(SPLAYTREE_TEST_KEYS[j]);
+				Real* storedValue = tree.getValue(SPLAYTREE_TEST_KEYS[j]);
 				ASSERT_FALSE(storedValue == NULL);
 				ASSERT_EQ(SPLAYTREE_TEST_VALUES[j], *storedValue);
 			}
@@ -118,7 +118,7 @@ namespace mdsearch { namespace tests
 			}
 			for (unsigned int j = i + 1; (j < SPLAYTREE_NUM_TEST_PAIRS); j++) //...but that the others can still be found
 			{
-				float* storedValue = tree.getValue(SPLAYTREE_TEST_KEYS[j]);
+				Real* storedValue = tree.getValue(SPLAYTREE_TEST_KEYS[j]);
 				ASSERT_FALSE(storedValue == NULL);			
 				ASSERT_EQ(SPLAYTREE_TEST_VALUES[j], *storedValue);
 			}
