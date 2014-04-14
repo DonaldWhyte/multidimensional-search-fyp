@@ -54,10 +54,15 @@ namespace mdsearch { namespace tests
 				ASSERT_FALSE(structure.pointExists(testPoints[j]));
 		}
 
+		std::cout << "FULL STRUCTURE:" << std::endl;
+		std::cout << structure.toString() << std::endl;
+
 		// Now do the same for remove()
 		for (unsigned int i = 0; (i < testPoints.size()); i++)
 		{
 			ASSERT_TRUE(structure.remove(testPoints[i]));
+			std::cout << "REMOVED" << testPoints[i] << std::endl;
+			std::cout << structure.toString() << std::endl;
 			for (unsigned int j = 0; (j <= i); j++)
 				ASSERT_FALSE(structure.pointExists(testPoints[j]));
 			for (unsigned int j = i + 1; (j < testPoints.size()); j++)

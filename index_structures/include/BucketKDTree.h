@@ -38,9 +38,12 @@ namespace mdsearch
 
 	public:
 		/* Maximum number of nodes allowed to be stored in a leaf node.
-		 * If the number of poiints in a leaf exceeds this number, the
+		 * If the number of points in a leaf exceeds this number, the
 		 * leaf is split. */
 		static const int MAX_POINTS_PER_LEAF = 4;
+		/* Minimum total number of points two LEAF children of a node can
+		 * store before merging the two children into a single leaf. */
+		static const int MIN_POINTS_UNTIL_MERGE = MAX_POINTS_PER_LEAF / 2;
 
 		BucketKDTree(unsigned int numDimensions);
 		virtual ~BucketKDTree();
@@ -58,11 +61,14 @@ namespace mdsearch
 	private:
 		BucketKDNode* findLeafForPoint(const Point& p) const;
 		bool containsPoint(const BucketKDNode* leaf, const Point& p) const;
+		void mergeSiblingLeaves(BucketKDNode* leaf, BucketKDNode* sibling);
 
 		std::string nodeToString(const std::string& title,
 			const BucketKDNode* node, unsigned int level = 0) const;
 
 		BucketKDNode* root;
+		int maxPointsPerleft;
+		int minPointsUntilMerge;
 
 
 	};

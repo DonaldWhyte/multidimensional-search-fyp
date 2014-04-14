@@ -1,4 +1,5 @@
 #include "BucketKDTree.h"
+#include "Util.h"
 #include <sstream>
 
 namespace mdsearch
@@ -23,6 +24,17 @@ namespace mdsearch
 		}
 		// Get midpoint of this range and use that as the cutting value
 		cuttingVal = minBox[cuttingDim].min + (cuttingDimRange / 2.0f);
+	}
+
+	/* Return pointer to node's sibling.
+	 * NOTE: Assumes node has a parent -- does not check if parent
+	 * pointer is NULL. */
+	inline BucketKDNode* getSibling(BucketKDNode* node)
+	{
+		if (node->parent->leftChild == node)
+			return node->parent->rightChild;
+		else
+			return node->parent->leftChild;
 	}
 
 	BucketKDNode::BucketKDNode(BucketKDNode* parent) : type(BucketKDNode::TYPE_LEAF),
@@ -117,8 +129,26 @@ namespace mdsearch
 
 	bool BucketKDTree::remove(const Point& p)
 	{
-		// TODO
-		return false;
+		BucketKDNode* leaf = findLeafForPoint(p);
+		// If element was present in leaf and was deleted
+		if (removeElementWithValue(leaf->points, p))
+		{
+			if (leaf->parent) // if not root node
+			{
+				// If sibling is also a leaf, and the total points
+				// contained in both leaf nodes is lower than minimum,
+				// merge the two nodes together!
+				BucketKDNode* sibling = getSibling(leaf);
+				if ((leaf->points.size() + sibling->points.size()) < MIN_POINTS_UNTIL_MERGE)
+					mergeSiblingLeaves(leaf, sibling);
+			}
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	bool BucketKDTree::update(const Point& oldPoint, const Point& newPoint)
@@ -174,7 +204,23 @@ namespace mdsearch
 				return true;
 		}
 		return false;
-	}	
+	}
+
+	void BucketKDTree::mergeSiblingLeaves(BucketKDNode* leaf, BucketKDNode* sibling)
+	{
+		// Transform parent node into a leaf and copy all points to it
+		leaf->parent->type = BucketKDNode::TYPE_LEAF;
+		leaf->parent->points.reserve(leaf->points.size() + sibling->points.size());
+		for (PointList::const_iterator it = leaf->points.begin(); (it != leaf->points.end()); it++)
+			leaf->parent->points.push_back(*it);
+		for (PointList::const_iterator it = sibling->points.begin(); (it != sibling->points.end()); it++)
+			leaf->parent->points.push_back(*it);
+		// Remove references to children and free memory used by two leaves
+		leaf->parent->leftChild = NULL;
+		leaf->parent->rightChild = NULL;
+		delete leaf;
+		delete sibling;
+	}
 
 	std::string BucketKDTree::toString() const
 	{

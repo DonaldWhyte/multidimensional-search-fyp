@@ -34,7 +34,20 @@ namespace mdsearch
 	{
 		std::iter_swap(it, vec.end() - 1);
 		vec.erase(vec.end() - 1);
-	}	
+	}
+	/* Same as removeElementAtIndex, but uses the given VALUE 
+	 * to determine the index to remove. Uses the index of the
+	 * FIRST found element with given value.
+	 * Return true if an element with the given value was found
+	 * and removed. Return false if no element is stored with the
+	 * given value. */
+	template <typename T>
+	inline bool removeElementWithValue(std::vector<T>& vec, const T& val)
+	{
+		size_t oldSize = vec.size();
+		vec.erase(std::remove(vec.begin(), vec.end(), val), vec.end());
+		return (oldSize != vec.size()); // if size has changed, element was removed!
+	}
 
 	/* Write generated points to a text file.
 	 * Format:
