@@ -17,7 +17,7 @@
 
 namespace mdsearch
 {
-	
+
 	Timing getTime()
 	{
 	#if defined(_WIN32)
@@ -43,16 +43,10 @@ namespace mdsearch
 		const std::vector<CommandLineArguments::IndexStructureSpecification>& structureSpecs,
 		unsigned int numDimensions, const Region& boundary) const
 	{
-		// Construct specified index structures
-		if (verbose)
-			std::cout << "Loading index structures" << std::endl;	
-		std::vector<IndexStructure*> structures = loadStructures(structureSpecs, numDimensions, boundary);
-
-		// NOTE: reserve() calls are done to minimise the amount of dynamic allocations as possible
 		if (verbose)
 		{
 			std::cout << "STARTING PERFORMANCE TESTS USING " << testOperationLists.size()
-				<< " OPERATION SETS FOR" << structures.size() << " INDEX STRUCTURES" << std::endl;
+				<< " OPERATION SETS FOR" << structureSpecs.size() << " INDEX STRUCTURES" << std::endl;
 		}
 
 		OperationListTimings testOpTimings;
@@ -64,46 +58,30 @@ namespace mdsearch
 
 			// Cycle through structures until all test runs are complete
 			std::vector<std::vector<Timing> > structureTimingsAll;
-			structureTimingsAll.resize(structures.size());
-			for (unsigned int s = 0; (s < structures.size()); s++)
+			structureTimingsAll.resize(structureSpecs.size());
+			for (unsigned int s = 0; (s < structureSpecs.size()); s++)
 				structureTimingsAll[s].resize(numTestRuns);
 
 			for (unsigned r = 0; (r < numTestRuns); r++)
 			{
 				if (verbose)
 					std::cout << "\t\tExecuting test run" << (r + 1) << "..." << std::endl;
-				for (unsigned int s = 0; (s < structures.size()); s++)
+				for (unsigned int s = 0; (s < structureSpecs.size()); s++)
 				{
-					if (verbose)
-						std::cout << "\tRunning operations on structure (" << s << ")..." << std::endl;
-					// Ensure structure is completely empty
-					structures[s]->clear();
-					// Pre-load specified points
-					if (dataToPreload.size() > 0)
-					{
-						if (verbose)
-							std::cout << "\t\tPre-loading " << dataToPreload.size() << " points into structure for run " << (r + 1) << std::endl;
-						structures[s]->loadPoints(dataToPreload);
-					}
 					// Run test operations on structure and store to compute average later
-					structureTimingsAll[s][r] = runOperations(structures[s],
+					structureTimingsAll[s][r] = runOperations(
+						structureSpecs[s], numDimensions, boundary,
+						dataToPreload,
 						testOperationLists[t],
 						generateCPUProfilerFilename(t, s),
 						generateHeapProfilerFilename(t, s)
 					);
-
-					PyramidTree* pt = dynamic_cast<PyramidTree*>(structures[s]);
-					if (pt)
-						std::cout << pt->toString() << std::endl << std::endl;
-					DuplicateHashTable* dht = dynamic_cast<DuplicateHashTable*>(structures[s]);
-					if (dht)
-						std::cout << dht->toString() << std::endl << std::endl;
 				}
 			}
 			// Now compute average times for each structure 
 			StructureTimings averageStructureTimings;
-			averageStructureTimings.reserve(structures.size());
-			for (unsigned int s = 0; (s < structures.size()); s++)
+			averageStructureTimings.reserve(structureSpecs.size());
+			for (unsigned int s = 0; (s < structureSpecs.size()); s++)
 			{
 				Timing sum = 0;
 				for (unsigned r = 0; (r < numTestRuns); r++)
@@ -190,11 +168,39 @@ namespace mdsearch
 		this->verbose = verbose;
 	}
 
-	Timing Evaluator::runOperations(IndexStructure* structure,
+	Timing Evaluator::runOperations(
+		const CommandLineArguments::IndexStructureSpecification& spec,
+		unsigned int numDimensions, const Region& initialBoundary,
+		const PointList& dataToPreload,
 		const TestOperationList& operations,
 		const std::string& cpuProfilerOutputFilename,
 		const std::string& heapProfilerOutputFilename) const
 	{
+		// Construct index structure here
+		IndexStructure* structure = structureFactory.constructIndexStructure(
+			spec.type, numDimensions, initialBoundary, spec.arguments);
+		// If structure could not be constructed, display error message and exit program
+		if (!structure)
+		{
+			std::cerr << "Could not load structure \"" << spec.type << "\" with arguments: [ ";
+			for (unsigned int j = 0; (j < spec.arguments.size()); j++)
+			{
+				std::cerr << "\"" << spec.arguments[j] << "\" ";
+			}
+			std::cerr << "]" << std::endl;
+			return 0;
+		}
+		// Pre-load specified points
+		if (dataToPreload.size() > 0)
+		{
+			if (verbose)
+				std::cout << "\t\tPre-loading " << dataToPreload.size() << " points into structure" << std::endl;
+			structure->loadPoints(dataToPreload);
+		}
+
+		if (verbose)
+			std::cout << "\tRunning operations on structure..." << std::endl;
+
 		// Start CPU and heap profilers (heap first so it doesn't affect timings)
 		if (profileHeap)
 		{
@@ -225,6 +231,10 @@ namespace mdsearch
 			case TestOperation::OPERATION_TYPE_POINTQUERY:
 				structure->pointExists(op->operand1);
 				break;
+			case TestOperation::OPERATION_TYPE_CLEAR:
+				structure =  structureFactory.constructIndexStructure(
+					spec.type, numDimensions, op->boundary, spec.arguments);
+				break;
 			}
 		}
 
@@ -244,6 +254,15 @@ namespace mdsearch
 			HeapProfilerStop();
 		}
 
+		// ---TODO: DEBUG OUTPUT TO REMOVE---
+		PyramidTree* pt = dynamic_cast<PyramidTree*>(structure);
+		if (pt)
+			std::cout << pt->toString() << std::endl << std::endl;
+		DuplicateHashTable* dht = dynamic_cast<DuplicateHashTable*>(structure);
+		if (dht)
+			std::cout << dht->toString() << std::endl << std::endl;
+
+		delete structure;
 		return elapsed;
 	}
 
@@ -267,7 +286,7 @@ namespace mdsearch
 					std::cout << "\"" << spec.arguments[j] << "\" ";
 				}
 				std::cout << "]" << std::endl;
-				return structures; // TODO: throw exception
+				return structures; // TODO: throw exception	
 			}
 			structures.push_back(structure);
 		}

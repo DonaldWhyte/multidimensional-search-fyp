@@ -21,38 +21,52 @@ Region computeOpListBoundary(const TestOperationList& opList)
 {
 	if (!opList.empty())
 	{
-		unsigned int numDimensions = opList[0].operand1.numDimensions();
+		// Find first non-clear operation and store it's index
+		unsigned int startIndex = 0;
+		const TestOperation* op = &opList[0];
+		startIndex++;
+		while (op->type == TestOperation::OPERATION_TYPE_CLEAR)
+		{
+			op = &opList[startIndex];
+			startIndex++;
+		}
+		// Use this operation to determine dimensionality of data
+		unsigned int numDimensions = op->operand1.numDimensions();
 		// Initialise boundary with values from first point
 		Region boundary(numDimensions);
 		for (unsigned int d = 0; (d < numDimensions); d++)
 		{
-			boundary[d].min = opList[0].operand1[d];
-			boundary[d].max = opList[0].operand1[d];
-			if (opList[0].type == TestOperation::OPERATION_TYPE_UPDATE) // if there is a second operand
+			boundary[d].min = op->operand1[d];
+			boundary[d].max = op->operand1[d];
+			if (op->type == TestOperation::OPERATION_TYPE_UPDATE) // if there is a second operand
 			{
-				if (opList[0].operand2[d] < boundary[d].min)
-					boundary[d].min = opList[0].operand2[d];
-				else if (opList[0].operand2[d] > boundary[d].max)
-					boundary[d].max = opList[0].operand2[d];
+				if (op->operand2[d] < boundary[d].min)
+					boundary[d].min = op->operand2[d];
+				else if (op->operand2[d] > boundary[d].max)
+					boundary[d].max = op->operand2[d];
 			}
 		}
 		// Now search through all points in this operation list to find
 		// minimum and maximum values for each dimension
-		for (unsigned int i = 1; (i < opList.size()); i++)
+		for (unsigned int i = startIndex; (i < opList.size()); i++)
 		{
-			const TestOperation& op = opList[i];
+			op = &opList[i];
+			// Skip clear operations
+			if (op->type == TestOperation::OPERATION_TYPE_CLEAR)
+				continue;
+
 			for (unsigned int d = 0; (d < numDimensions); d++)
 			{
-				if (op.operand1[d] < boundary[d].min)
-					boundary[d].min = op.operand1[d];
-				else if (op.operand1[d] > boundary[d].max)
-					boundary[d].max = op.operand1[d];
-				if (op.type == TestOperation::OPERATION_TYPE_UPDATE) // if there is a second operand
+				if (op->operand1[d] < boundary[d].min)
+					boundary[d].min = op->operand1[d];
+				else if (op->operand1[d] > boundary[d].max)
+					boundary[d].max = op->operand1[d];
+				if (op->type == TestOperation::OPERATION_TYPE_UPDATE) // if there is a second operand
 				{
-					if (op.operand2[d] < boundary[d].min)
-						boundary[d].min = op.operand2[d];
-					else if (op.operand2[d] > boundary[d].max)
-						boundary[d].max = op.operand2[d];
+					if (op->operand2[d] < boundary[d].min)
+						boundary[d].min = op->operand2[d];
+					else if (op->operand2[d] > boundary[d].max)
+						boundary[d].max = op->operand2[d];
 				}
 			}
 		}
@@ -181,7 +195,7 @@ int main(int argc, char* argv[])
 	// Determine point dimensionality and boundaries to use for index structures
 	// from first operation list if specified
 	if (args.isVerbose())
-		std::cout << "Finding dimensionality and minimum /maximum boundary of dataset used for first operation list" << std::endl;
+		std::cout << "Finding dimensionality and minimum/maximum boundary of dataset used for first operation list" << std::endl;
 
 	unsigned int globalNumDimensions = 0;
 	Region globalBoundary(0);
@@ -221,7 +235,7 @@ int main(int argc, char* argv[])
 			writeResultsToFile(args.resultFilename(), timings,
 				args, testOperationLists, datasetToPreload, globalNumDimensions);
 		}
-	}	
+	}
 	// If there are any datasets to test indiviudal point counts,
 	// run the tests and store the results
 	for (unsigned int i = 0; (i < datasetsForIndividualOpTests.size()); i++)

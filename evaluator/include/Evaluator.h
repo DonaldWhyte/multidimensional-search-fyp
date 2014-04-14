@@ -83,7 +83,12 @@ namespace mdsearch
 		void setVerbose(bool verbose);
 
 	private:
-		Timing runOperations(IndexStructure* structure,
+		/* NOTE: Index structure is passed as a REFERENCE to a pointer
+		 * since the structure may be rebult (and thus, be a different
+		 * object at a different address in the heap). */
+		Timing runOperations(const CommandLineArguments::IndexStructureSpecification& spec,
+			unsigned int numDimensions, const Region& initialBoundary,
+			const PointList& dataToPreload,
 			const TestOperationList& operations,
 			const std::string& cpuProfilerOutputFilename,
 			const std::string& heapProfilerOutputFilename) const;
