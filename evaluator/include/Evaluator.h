@@ -5,6 +5,8 @@
 #include <map>
 #include "IndexStructure.h"
 #include "TestOperation.h"
+#include "CommandLineArguments.h"
+#include "IndexStructureFactory.h"
 
 namespace mdsearch
 {
@@ -44,8 +46,7 @@ namespace mdsearch
 
 	public:
 		/* Construct an evaluator specifically for the given structures. */
-		Evaluator(const std::vector<IndexStructure*>& structures,
-			unsigned int numTestRuns, bool profileCPU = false,
+		Evaluator(unsigned int numTestRuns, bool profileCPU = false,
 			bool profileHeap = false, bool verbose = false);
 
 		/* Given a list of datasets and test operations, run each index
@@ -62,7 +63,9 @@ namespace mdsearch
 		 */
 		OperationListTimings timePerformance(
 			const std::vector<TestOperationList>& testOperationLists,
-			const PointList& dataToPreload = PointList()) const;
+			const PointList& dataToPreload,
+			const std::vector<CommandLineArguments::IndexStructureSpecification>& structureSpecs,
+			unsigned int numDimensions, const Region& boundary) const;
 		/* Given a dataset, time how long each individual insert(),
 		 * delete() and point query takes at the different structure
 		 * sizes specified in 'pointCountsToTime'.
@@ -71,8 +74,9 @@ namespace mdsearch
 		 * the individual operation timings at different structure
 		 * sizes for a SINGLE STRUCTURE TYPE. */
 		std::vector<StructureOperationTimings> timeIndividualOperations(
-			const PointList& dataset,
-			const std::vector<int>& pointCountsToTime) const;
+			const PointList& dataset, const std::vector<int>& pointCountsToTime,
+			const std::vector<CommandLineArguments::IndexStructureSpecification>& structureSpecs,
+			unsigned int numDimensions, const Region& boundary) const;
 
 		/* Accessors */
 		bool isVerbose() const;
@@ -84,13 +88,17 @@ namespace mdsearch
 			const std::string& cpuProfilerOutputFilename,
 			const std::string& heapProfilerOutputFilename) const;
 
+		std::vector<IndexStructure*> loadStructures(
+			const std::vector<CommandLineArguments::IndexStructureSpecification>& structureSpecs,
+			unsigned int numDimensions, const Region& boundary) const;
+
 		/* Return filenames for output of CPU and heap profilers,
 		 * which are generated based on current operation list
 		 * and index structure being tested. */
 		std::string generateCPUProfilerFilename(unsigned int testOpListIndex, unsigned int structureIndex) const;
 		std::string generateHeapProfilerFilename(unsigned int testOpListIndex, unsigned int structureIndex) const;
 
-		std::vector<IndexStructure*> structures;
+		IndexStructureFactory structureFactory; // used to construct index structures
 		bool profileCPU; // if true, the CPU is profiled for each test operation ruin
 		bool profileHeap; // if true, the heap is profiled for each test operation run
 		bool verbose; // if true, progress log is outputted as test operations are being executed

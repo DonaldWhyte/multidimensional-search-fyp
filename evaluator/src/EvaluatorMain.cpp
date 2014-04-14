@@ -203,45 +203,17 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 
-	// Construct specified index structures
-	if (args.isVerbose())
-		std::cout << "Loading index structures" << std::endl;	
-	std::vector<IndexStructure*> structures;
-
-	IndexStructureFactory structureFactory;
-	const std::vector<CommandLineArguments::IndexStructureSpecification> structureSpecs = args.indexStructures();
-	for (unsigned int i = 0; (i < structureSpecs.size()); i++)
-	{
-		// Use specification to load index structure
-		const CommandLineArguments::IndexStructureSpecification& spec = structureSpecs[i];
-		IndexStructure* structure = structureFactory.constructIndexStructure(
-			spec.type, globalNumDimensions, globalBoundary, spec.arguments);
-		// If structure could not be constructed, display error message and exist program
-		if (!structure)
-		{
-			std::cout << "Could not load structure \"" << spec.type << "\" with arguments: [ ";
-			for (unsigned int j = 0; (j < spec.arguments.size()); j++)
-			{
-				std::cout << "\"" << spec.arguments[j] << "\" ";
-			}
-			std::cout << "]" << std::endl;
-			return 1;
-		}
-		structures.push_back(structure);
-	}
-
-
-
 	// Create evaluator object and fill it with loaded structures
-	Evaluator evaluator(structures, args.testRunsToPerform(),
-		args.profileCPU(), args.profileHeap(), args.isVerbose());
+	Evaluator evaluator(args.testRunsToPerform(), args.profileCPU(),
+		args.profileHeap(), args.isVerbose());
 
 	// If there are any test operation lists
 	if (testOperationLists.size() > 0)
 	{
 		// Run evaluation on loaded datasets and operation lists
 		OperationListTimings timings = evaluator.timePerformance(
-			testOperationLists, datasetToPreload);
+			testOperationLists, datasetToPreload,
+			args.indexStructures(), globalNumDimensions, globalBoundary);
 		std::cout << generateTimingReport(timings) << std::endl;
 		// Write timing results to file if an output filename was given
 		if (!args.resultFilename().empty())
@@ -256,8 +228,8 @@ int main(int argc, char* argv[])
 	{
 		std::vector<StructureOperationTimings> individualOpTimings =
 			evaluator.timeIndividualOperations(
-				datasetsForIndividualOpTests[i],
-				args.pointCountsToSample());
+				datasetsForIndividualOpTests[i], args.pointCountsToSample(),
+				args.indexStructures(), globalNumDimensions, globalBoundary);
 		if (args.isVerbose())
 			std::cout << "WRTITING TIMINGS TO FILES" << std::endl;
 

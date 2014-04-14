@@ -17,7 +17,7 @@
 
 namespace mdsearch
 {
-
+	
 	Timing getTime()
 	{
 	#if defined(_WIN32)
@@ -31,17 +31,23 @@ namespace mdsearch
 	#endif
 	}
 
-	Evaluator::Evaluator(const std::vector<IndexStructure*>& structures,
-		unsigned int numTestRuns, bool profileCPU, bool profileHeap, bool verbose)
-		: structures(structures), numTestRuns(numTestRuns),
-		profileCPU(profileCPU), profileHeap(profileHeap), verbose(verbose)
+
+	Evaluator::Evaluator(unsigned int numTestRuns, bool profileCPU, bool profileHeap, bool verbose)
+		: numTestRuns(numTestRuns), profileCPU(profileCPU), profileHeap(profileHeap), verbose(verbose)
 	{
 	}
 
 	OperationListTimings Evaluator::timePerformance(
 		const std::vector<TestOperationList>& testOperationLists,
-		const PointList& dataToPreload) const
+		const PointList& dataToPreload,
+		const std::vector<CommandLineArguments::IndexStructureSpecification>& structureSpecs,
+		unsigned int numDimensions, const Region& boundary) const
 	{
+		// Construct specified index structures
+		if (verbose)
+			std::cout << "Loading index structures" << std::endl;	
+		std::vector<IndexStructure*> structures = loadStructures(structureSpecs, numDimensions, boundary);
+
 		// NOTE: reserve() calls are done to minimise the amount of dynamic allocations as possible
 		if (verbose)
 		{
@@ -51,7 +57,6 @@ namespace mdsearch
 
 		OperationListTimings testOpTimings;
 		testOpTimings.reserve(testOperationLists.size());
-
 		for (unsigned int t = 0; (t < testOperationLists.size()); t++)
 		{
 			if (verbose)
@@ -116,9 +121,11 @@ namespace mdsearch
 	}
 
 	std::vector<StructureOperationTimings> Evaluator::timeIndividualOperations(
-		const PointList& dataset,
-		const std::vector<int>& pointCountsToTime) const
+		const PointList& dataset, const std::vector<int>& pointCountsToTime,
+		const std::vector<CommandLineArguments::IndexStructureSpecification>& structureSpecs,
+		unsigned int numDimensions, const Region& boundary) const
 	{
+		std::vector<IndexStructure*> structures = loadStructures(structureSpecs, numDimensions, boundary);
 		if (verbose)
 		{
 			std::cout << "STARTING INDIVIDUAL OPERATION PERFORMANCE TESTS USING " << dataset.size()
@@ -209,9 +216,9 @@ namespace mdsearch
 			case TestOperation::OPERATION_TYPE_INSERT:
 				structure->insert(op->operand1);
 				break;
-			/*case TestOperation::OPERATION_TYPE_DELETE:
+			case TestOperation::OPERATION_TYPE_DELETE:
 				structure->remove(op->operand1);
-				break;*/
+				break;
 			case TestOperation::OPERATION_TYPE_UPDATE:
 				structure->update(op->operand1, op->operand2);
 				break;
@@ -240,6 +247,33 @@ namespace mdsearch
 		return elapsed;
 	}
 
+	std::vector<IndexStructure*> Evaluator::loadStructures(
+		const std::vector<CommandLineArguments::IndexStructureSpecification>& structureSpecs,
+		unsigned int numDimensions, const Region& boundary) const
+	{
+		std::vector<IndexStructure*> structures;
+		for (unsigned int i = 0; (i < structureSpecs.size()); i++)
+		{
+			// Use specification to load index structure
+			const CommandLineArguments::IndexStructureSpecification& spec = structureSpecs[i];
+			IndexStructure* structure = structureFactory.constructIndexStructure(
+				spec.type, numDimensions, boundary, spec.arguments);
+			// If structure could not be constructed, display error message and exit program
+			if (!structure)
+			{
+				std::cout << "Could not load structure \"" << spec.type << "\" with arguments: [ ";
+				for (unsigned int j = 0; (j < spec.arguments.size()); j++)
+				{
+					std::cout << "\"" << spec.arguments[j] << "\" ";
+				}
+				std::cout << "]" << std::endl;
+				return structures; // TODO: throw exception
+			}
+			structures.push_back(structure);
+		}
+		return structures;
+	}
+
 	std::string Evaluator::generateCPUProfilerFilename(unsigned int testOpListIndex,
 		unsigned int structureIndex) const
 	{
@@ -255,6 +289,8 @@ namespace mdsearch
 		ss << "HEAP_PROFILE_" << testOpListIndex << "_" << structureIndex << ".heap";
 		return ss.str();		
 	}
+
+
 
 	std::string generateTimingReport(const OperationListTimings& timings)
 	{
