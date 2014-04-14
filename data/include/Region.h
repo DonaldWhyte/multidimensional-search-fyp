@@ -73,6 +73,37 @@ namespace mdsearch
 				return minBox;
 			}
 		}
+		inline static Region minimumBoundingBox(const PointList& allPoints, const IndexList& indices)
+		{
+			if (indices.empty())
+			{
+				return Region(0);
+			}
+			else
+			{
+				// Get first point and use to initialise region
+				int firstIndex = indices[0];
+				int numDimensions = allPoints[firstIndex].numDimensions();
+				Region minBox(numDimensions);
+				for (unsigned int d = 0; (d < numDimensions); d++)
+				{
+					minBox[d].min = minBox[d].max = allPoints[firstIndex][d];
+				}
+				// Compute minimum and maximum values for each dimension
+				// using the remainign points
+				for (IndexList::const_iterator it = indices.begin() + 1; (it != indices.end()); it++)
+				{
+					for (unsigned int d = 0; (d < numDimensions); d++)
+					{
+						if (allPoints[*it][d] < minBox[d].min)
+							minBox[d].min = allPoints[*it][d];
+						else if (allPoints[*it][d] > minBox[d].max)
+							minBox[d].max = allPoints[*it][d];
+					}
+				}
+				return minBox;
+			}
+		}
 
 		/* Return minimum bounding region that contains the given region and point. */
 		inline static Region minimumBoundingBox(const Region& r, const Point& p)

@@ -17,7 +17,7 @@ namespace mdsearch
 		NodeType type;
 		BucketKDNode* parent;
 		// For leaves
-		PointList points;
+		IndexList points;
 		// For non-leaves
 		int cuttingDim;
 		Real cuttingVal;
@@ -52,12 +52,15 @@ namespace mdsearch
 
 	private:
 		BucketKDNode* findLeafForPoint(const Point& p) const;
+		int getPointIndexInBucket(const IndexList& bucketIndices, const Point& p) const;
 		bool containsPoint(const BucketKDNode* leaf, const Point& p) const;
 		void mergeSiblingLeaves(BucketKDNode* leaf, BucketKDNode* sibling);
 
 		std::string nodeToString(const std::string& title,
 			const BucketKDNode* node, unsigned int level = 0) const;
 
+		PointList allPoints;
+		RealList allPointSums;
 		BucketKDNode* root;
 		/* Maximum number of nodes allowed to be stored in a leaf node.
 		 * If the number of points in a leaf exceeds this number, the

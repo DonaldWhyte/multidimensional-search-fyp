@@ -10,7 +10,7 @@ namespace mdsearch { namespace tests
 
 	static const unsigned int NUM_BUCKETKDTREE_DIMENSIONS = 3;
 
-	class BucketBucketKDTreeTests : public ::testing::Test
+	class BucketKDTreeTests : public ::testing::Test
 	{
 
 	protected:
@@ -19,14 +19,14 @@ namespace mdsearch { namespace tests
 
 	};
 
-	TEST_F(BucketBucketKDTreeTests, Construction)
+	TEST_F(BucketKDTreeTests, Construction)
 	{
 		BucketKDTree structure(NUM_BUCKETKDTREE_DIMENSIONS,
 			MAX_POINTS_UNTIL_SPLIT, MIN_POINTS_UNTIL_MERGE);
 		ASSERT_EQ(NUM_PYRAMIDTREE_DIMENSIONS, structure.dimensionality());
 	}
 
-	TEST_F(BucketBucketKDTreeTests, Clear)
+	TEST_F(BucketKDTreeTests, Clear)
 	{
 		BucketKDTree structure(NUM_BUCKETKDTREE_DIMENSIONS,
 			MAX_POINTS_UNTIL_SPLIT, MIN_POINTS_UNTIL_MERGE);
@@ -43,7 +43,7 @@ namespace mdsearch { namespace tests
 			ASSERT_FALSE(structure.pointExists(testPoints[i]));
 	}
 
-	TEST_F(BucketBucketKDTreeTests, InsertionAndRemoval)
+	TEST_F(BucketKDTreeTests, InsertionAndRemoval)
 	{
 		BucketKDTree structure(NUM_BUCKETKDTREE_DIMENSIONS,
 			MAX_POINTS_UNTIL_SPLIT, MIN_POINTS_UNTIL_MERGE);
@@ -72,7 +72,7 @@ namespace mdsearch { namespace tests
 		}
 	}
 
-	TEST_F(BucketBucketKDTreeTests, Updating)
+	TEST_F(BucketKDTreeTests, Updating)
 	{
 		BucketKDTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS,
 			MAX_POINTS_UNTIL_SPLIT, MIN_POINTS_UNTIL_MERGE);
@@ -80,7 +80,7 @@ namespace mdsearch { namespace tests
 		tester.testUpdates(&structure);
 	}
 
-	TEST_F(BucketBucketKDTreeTests, PointQueries)
+	TEST_F(BucketKDTreeTests, PointQueries)
 	{
 		BucketKDTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS,
 			MAX_POINTS_UNTIL_SPLIT, MIN_POINTS_UNTIL_MERGE);

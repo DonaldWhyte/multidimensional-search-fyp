@@ -10,6 +10,7 @@
 #include "KDTree.h"
 #include "UniqueHashTable.h"
 #include "DuplicateHashTable.h"
+#include "BucketKDTree.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -106,6 +107,13 @@ namespace mdsearch
 		return new DuplicateHashTable(numDimensions);
 	}
 
+	IndexStructure* generateBucketKDTree(unsigned int numDimensions,
+		const Region& boundary, const std::vector<std::string>& args)
+	{
+		return new BucketKDTree(numDimensions, 2, 1);
+	}
+
+
 
 
 	IndexStructureFactory::IndexStructureFactory()
@@ -121,6 +129,7 @@ namespace mdsearch
 		addGenerator("kdtree", generateKDTree);
 		addGenerator("uht", generateUniqueHashTable);
 		addGenerator("dht", generateDuplicateHashTable);
+		addGenerator("bucket_kdtree", generateBucketKDTree);
 	}
 
 	void IndexStructureFactory::addGenerator(const std::string& structureType,
