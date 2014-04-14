@@ -11,6 +11,7 @@ add_library( index_structures
 	"src/KDTree.cpp"
 	"src/UniqueHashTable.cpp"
 	"src/DuplicateHashTable.cpp"
+	"src/BucketKDTree.cpp"
 	# Header files
 	"include/IndexStructure.h"
 	"include/SequentialScan.h"
@@ -24,6 +25,7 @@ add_library( index_structures
 	"include/KDTree.h"
 	"include/UniqueHashTable.h"
 	"include/DuplicateHashTable.h"
+	"include/BucketKDTree.h"
 )
 # Ensure include directory is in search path
 include_directories ("include")
@@ -44,6 +46,7 @@ add_executable ( structure_tests
 	"tests/TestKDTree.h"
 	"tests/TestUniqueHashTable.h"
 	"tests/TestDuplicateHashTable.h"
+	"tests/TestBucketKDTree.h"
 )
 # Ensure google-test library is linked and include files are in search path
 # NOTE: index_structures library is dependant on the 'data' library for the

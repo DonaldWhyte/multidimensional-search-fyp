@@ -13,6 +13,7 @@
 #include "TestKDTree.h"
 #include "TestUniqueHashTable.h"
 #include "TestDuplicateHashTable.h"
+#include "TestBucketKDTree.h"
 
 int main(int argc, char* argv[])
 {

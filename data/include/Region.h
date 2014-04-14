@@ -43,6 +43,37 @@ namespace mdsearch
 		Region(int n = 1, const Interval& initialInterval = Interval());
 		Region(int n, const Interval* initialIntervals);
 
+		/* Return minimum bounding region that contains all points. */
+		inline static Region minimumBoundingBox(const PointList& points)
+		{
+			if (points.empty())
+			{
+				return Region(0);
+			}
+			else
+			{
+				// Get first point and use to initialise region
+				Region minBox(points[0].numDimensions());
+				for (unsigned int d = 0; (d < points[0].numDimensions()); d++)
+				{
+					minBox[d].min = minBox[d].max = points[0][d];
+				}
+				// Compute minimum and maximum values for each dimension
+				// using the remainign points
+				for (PointList::const_iterator it = points.begin() + 1; (it != points.end()); it++)
+				{
+					for (unsigned int d = 0; (d < it->numDimensions()); d++)
+					{
+						if ((*it)[d] < minBox[d].min)
+							minBox[d].min = (*it)[d];
+						else if ((*it)[d] > minBox[d].max)
+							minBox[d].max = (*it)[d];
+					}
+				}
+				return minBox;
+			}
+		}
+
 		/* Return minimum bounding region that contains the given region and point. */
 		inline static Region minimumBoundingBox(const Region& r, const Point& p)
 		{
@@ -203,34 +234,6 @@ namespace mdsearch
 			}
 			return maxLength;
 		}
-
-		/* Split given region into two, by splitting across one dimension at the
-		 * given pivot value. 'lowRegion' and 'highRegion' are used to store
-		 * the two resultant regions.
-		 *
-		 * Return true if valid split was made and given regions were modified
-		 * and false otherwise.
-		 *
-		 * NOTE: Split will fail if pivot value lies outside of region's interval
-		 * for the specified dimension (i.e. value is out of region). */
-		inline bool split(int dimension, Real splitPivotValue, Region& lowRegion, Region& highRegion) const
-		{
-			// Ensure the pivot value is actually in the bounds
-			const Interval& interval = intervals[dimension];
-			if (splitPivotValue < interval.min || splitPivotValue > interval.max)
-			{
-				return false;
-			}
-			else
-			{
-				// TODO: do split a bit differently! (more efficient???)
-				lowRegion = *this;
-				lowRegion[dimension] = Interval(interval.min, splitPivotValue);
-				highRegion = *this;
-				highRegion[dimension] = Interval(splitPivotValue, interval.max);
-				return true;
-			}
-		}	
 
 		inline const Interval& operator[](int index) const
 		{
