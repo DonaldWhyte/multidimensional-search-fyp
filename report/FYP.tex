@@ -23,10 +23,25 @@
   % For graphic files
   \usepackage{graphics, graphicx}
   \usepackage{epstopdf}
-
-  \usepackage{algorithm}
-  \usepackage{algorithmic}
-
+	% For algorithms and code listings
+  \usepackage[boxed,ruled,vlined]{packages/algorithm2e}
+  \usepackage{listings}
+  \usepackage{courier}
+  \usepackage{color}
+  \lstset{basicstyle=\footnotesize\ttfamily,
+    breaklines=true,
+    numbers=left, 
+    numberstyle=\small,
+    numbersep=8pt, 
+    frame = single, 
+    language=C++, 
+    framexleftmargin=15pt,
+    directivestyle={\color{black}}
+    emph={int,char,double,float,unsigned},
+    emphstyle={\color{blue}},
+    captionpos=b
+  }
+  % For manipulating figures and images
   \usepackage{pdflscape}
   \usepackage{rotating}
   \usepackage{wrapfig}
