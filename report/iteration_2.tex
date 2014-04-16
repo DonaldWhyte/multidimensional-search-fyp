@@ -113,7 +113,7 @@ After inserting $500,000$ points from the astrophysics dataset into the Bucket P
 
 \subsection{Pyramid Tree}
 
-As described in Section \ref{sec:pyramid-tree}, the Pyramid tree reduces multi-dimensional points to one dimension, which can then be used in a one-dimensional index structure (a B${}^{+}$-tree in the original paper \cite{pyramid-tree}). This reduction to a one-dimensional value can be seen as a hashing function, which can be used to generate search keys for the underlying hash map in the Bucket Pseudo-Pyramid Tree.
+As described in Section \ref{sec:pyramid-tree}, the Pyramid tree reduces multi-dimensional points to one dimension, which can then be used in a one-dimensional index structure. This reduction to a one-dimensional value can be seen as a hashing function, which can be used to generate search keys for the underlying hash map in the Bucket Pseudo-Pyramid Tree.
 
 To elaborate on the reduction technique, the Pyramid tree partitions the data space into $2d$ Pyramids, where each is represented the $(d - 1)$ hyperplane corresponding to the Pyramid's base. Each pyramid is is segmented by splitting them along $(d-1)$ hyperplanes parallel to the base of the pyramid. The one-dimensional value of a point, called the \textit{pyramid value}, describes which Pyramid it is in and the height of that point in that Pyramid. The resultant spatial partition looks like Figure \ref{fig:pyramid-tree-buckets}, where each Pyramid segment has a corresponding bucket which stores the points.
 
@@ -158,6 +158,29 @@ Let $d$ be the number of dimensions and $x = (x_0, x_1, \dots, x_{d -1})$, $y = 
 Since $x_0 \leq 0.5$ and $y \leq 0.5$, both $x$ and $y$ are mapped to pyramid 0 ($i = 0$). It follows that $h_x = h_y = \lvert 0.5 - v_{0 \; MOD \; 3} \rvert = \lvert 0.5 - v_{0} \rvert = \lvert 0.5 - 0 \rvert = 0.5$. $pv_x = pv_y = 0 + 0.5 = 0.5$ and $x \neq y$, meaning two distinct points can have the same Pyramid value.
 
 \end{proof}
+
+\subsubsection{B${}^+$-Tree}
+
+Berchtold et al. originally used a B${}^{+}$-tree when developing the Pyramid Tree \cite{pyramid-tree}. It was decided that using the same underlying search structure would allow for a more fair comparison of the Pyramid tree data structure. Two B${}^{+}$-tree implementations, cpp-btree\cite{cpp-btree} and bpt\cite{bpt}, were plugged and tested into the Pyramid Tree. The first is a C++ implementation while the second is a pure C implementation.
+
+Table \ref{tab:hashtable-bplus-time-comparison} provides timings for a single synthetic dataset. There is a substantial difference between the speed of the hash table Pyramid tree and the B${}^{+}$-tree implementations. After profiling, it was discovered the main cause of the decrease in speed was simply the additional overhead incurred by splitting and merging nodes in the B${}^{+}$-tree. This matches the theoretical performance analyses of the two structures, where it is shown that hash tables and B${}^{+}$-trees have amortised $O(1)$ and $O(\log n)$ operations respectively (the former being dependant on the hashing function used).
+
+Based on these results, it has been decided to continue using the hash table and the underlying search structure, and not the B${}^{+}$-tree.
+
+\begin{table}
+	\centering
+	\begin{tabular}{|l|l|l|l|}
+		\hline
+		\textbf{Operation} & \texttt{boost::unordered\_map} & cpp-btree & bpt \\
+		\hline
+		\textbf{Insert} & TODO & TODO & TODO \\
+		\textbf{Delete} & TODO & TODO & TODO \\
+		\textbf{Point Query} & TODO & TODO & TODO \\
+		\hline
+	\end{tabular}
+	\caption{Total Execution Time (in Seconds) of Batch Pseudo-Pyramid Tree With Different Underlying 1D Index Structures (200D Randomly Uniform Dataset, 10,000 operations each)}
+	\label{tab:hashtable-bplus-time-comparison}
+\end{table}
 
 \subsection{Bucket Hash Table}
 
@@ -212,29 +235,12 @@ Therefore, the Bucket Hash Table may be unreliable for certain applications, esp
 
 TODO
 
-\subsection{New Baseline: $kd$-Tree}
-
-Since the Octree cannot be used with high-dimensional data, a new baseline for evaluation (other than Seuqential Scan) was desired. The $kd$-tree is a widely used structure for both low and high dimensional data. This structure is multi-dimensional binary tree, meaning it does not have the expontential memory requirements the Octree has. This is because it splits the data space in a single dimension per level of the tree (referred to as a \textit{cutting dimension}), instead of splitting by \textit{all} dimensions. $kd$-trees are typically used for \textit{approximate} queries in higher-dimensional space, as they tend to degenerate to Sequential Scan for exact range and nearest neighbour queries \cite{similarity-searching}.
-
-There are many variants of $kd$-trees \cite{kd-tree, bkd-tree, kdb-tree}. The variant implemented for this project contains one point per node and cycles through each dimension when choosing deciding which cutting dimension to use for each level of the tree. If $n$ is a $kd$-tree node, $i$ is the cutting dimension on that node's level and $p$ is the point stored in this node, then:
-\begin{enumerate}
-	\item $\forall q$ stored in the \textbf{left} subtree rooted at $n$: $p_i > q_i$ 
-	\item $\forall q$ stored in the \textbf{right} subtree rooted at $n$: $p_i \leq q_i$.
-\end{enumerate}
-When inserting or querying a point $p$, the tree is traversed top-down in a similar fashion to a standard binary tree, by comparing $p_i$ to $n_i$, where $n$ is the point stored in the current node and $i$ is the cutting dimension of the current level.
-
-% TODO: pseudo-code for this???
-The \texttt{remove} operation\footnote{Source of \texttt{remove} algorithm is: \url{https://www.cs.umd.edu/class/spring2008/cmsc420/L19.kd-trees.pdf‎}} is more involved because it has to maintain the $kd$-tree invariant. To remove a point $p$, first the node containing $p$ is found using the aforementioned top-down traversal approach. Let $n$ be this node and $i$ be the current level's cutting dimension. If $n$ is a leaf, then the node can simply be deleted. Otherwise, let $n_L$ and $n_R$ be the left and right children of $n$ respectively. If $n_R$ exists, a node $m$ containing a point with the \textit{minimum} value for dimension $i$ is found in the sub-tree rooted at $n_R$. The points stored in nodes $n$ and $m$ are swapped and \texttt{delete($p$)} is called recursively on the sub-tree rooted at $n_R$. If $n_R$ does not exist, node $m$ is found in the sub-tree rooted at $n_L$ instead. In this case, after \texttt{delete($p$)} has been recursively called on the sub-tree rooted at $n_L$, the $i$th value of all points stored in this sub-tree are greater than or equal to the $i$th value of the new point in $n$. Therefore, $n_L$ then becomes the \textit{right} child of $n$ to maintain the $kd$-tree invariant.
-
-TODO: figures showing example kd-tree, one insert and one remove (3 figures)
-
 \subsection{Performance Timings}
 
 TODO: four structures
 	Bucket Pseudo-Pyramid Tree
 	Bucket Pyramid Tree
 	Simple Hashing
-	kd-tree
 
 TODO: refer to plots and justify why only there's only two here (rest are in appendices)
 
