@@ -21,7 +21,7 @@ The existing point hashing function takes $O(d^2)$ time because of the inner loo
 	\label{eq:new-pseudo-pyramid-hash}
 \end{multline}
 
-Table \ref{tab:new-pseudo-pyramid-hash} shows operation execution time of the Batch Pyramid Tree using the original $O(d^2)$ hashing function and the new $O(d)$ function. The tes used the Insert-Query-Remove operation list on the uniform synthetic dataset with 200 dimensions. Figure \ref{fig:new-pseudo-pyramid-hash} plots the performance of the Pseudo-Pyramid tree with both hash functions alongside Sequential Scan, showing execution time against dimensionality. From the plot, it is clear that the new hashing function provides superior speed; the Pseudo-Pyramid Tree is now significantly faster than Sequential Scan, even for dimensions as high as 200.
+Table \ref{tab:new-pseudo-pyramid-hash} shows operation execution time of the Batch Pyramid Tree using the original $O(d^2)$ hashing function and the new $O(d)$ function. The test used the Insert-Query-Remove operation list on the uniform synthetic dataset with 200 dimensions. Figure \ref{fig:new-pseudo-pyramid-hash} plots the performance of the Pseudo-Pyramid tree with both hash functions alongside Sequential Scan, showing execution time against dimensionality. From the plot, it is clear that the new hashing function provides superior speed; the Pseudo-Pyramid Tree is now significantly faster than Sequential Scan, even for dimensions as high as 200.
 
 \begin{table}
 	\centering
@@ -233,7 +233,29 @@ Therefore, the Bucket Hash Table may be unreliable for certain applications, esp
 
 \subsection{Comparison of Bucket Sizes for Hash-Based Structures}
 
-TODO
+TODO: what this section does
+
+\begin{table}
+	\centering
+	\begin{tabular}{|l|l|l|l|l|}
+		\hline
+		\textbf{} & \multicolumn{4}{c|}{\textbf{Bucket Size Statistics}} \\
+		\hline
+		\textbf{Structure} & \textbf{Average} & \textbf{St. Dev} & \textbf{Min} & \textbf{Max} \\
+		\hline
+		\textbf{Pseudo-Pyramid Tree} & TODO & TODO & TODO & TODO \\
+		\textbf{Pyramid Tree} & TODO & TODO & TODO & TODO \\
+		\textbf{Bucket Hash Table} & TODO & TODO & TODO & TODO \\
+		\hline
+	\end{tabular}
+	\caption{Statistics on Bucket Size with Hash-Based Structures}
+	\label{tab:it2-bucket-stats}
+\end{table}
+
+TODO: synthetic data
+TODO: astrophysics data
+
+TODO: discussion of results and implications
 
 \subsection{Performance Timings}
 
