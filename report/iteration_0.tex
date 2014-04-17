@@ -1,10 +1,12 @@
 \section{Iteration \#0 -- Evaluation Framework and Baselines}
 
-TODO: summary of iteration
+This iteration constructed a framework to streamline the evaluation process and implemented the two evaluation baselines, Sequential Scan and Octree.
 
 \subsection{Evaluation Framework}
 
-The evaluation framework implemented in the first week of this iteration was created to define the standard data used across the index structures, provide a way of loading point datasets and operation lists and feeding them to index structures. There are three core modules of the framework:
+Evaluation is a major part of the project and is performed multiple times at different stages of the project. It was decided a framework should be used to streamline this process and reduce the overall time it took generating the required measurements to perform the evaluation. It appeared there did not exist a tool tailored for this particular task, so one was implemented as part of the first iteration.
+
+The evaluation framework defines the standard data used across the index structures, provide a way of loading point datasets and operation lists and feeding them to index structures. The framework executes the given operation lists on all specified structures, generating tables and plots containing the necessary performance measures described in Section \ref{sec:performance-measures}.
 
 \begin{wrapfigure}[12]{r}{0.5\textwidth}
 	\vspace{-40pt}
@@ -16,6 +18,7 @@ The evaluation framework implemented in the first week of this iteration was cre
 	\label{fig:evaluation-framework}
 \end{wrapfigure}
 
+There are three core modules of the framework:
 \begin{itemize}
 	\item \texttt{data} -- library that contains standard data types used throughout framework and index structures, as well as dataset and test operation generators/loaders
 	\item \texttt{index\_structure} -- library that contains all the index structures implemented throughout the project
