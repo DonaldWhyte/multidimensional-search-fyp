@@ -1,9 +1,13 @@
-\chapter{Chosen Index Structures and Hypotheses}
-\label{chap:design-and-implementation}
+\chapter{Chosen Index Structures and Hypothesis}
+\label{chap:chosen-structures-hypothesis}
 \centerline{\rule{149mm}{.02in}}
 \vspace{2cm}
 
 This section describes the structures which have been chosen to be implemented, in addition to the baselines described in Section \ref{sec:baselines}. The reasons for choosing these structures and the hypotheses that were made regarding their performance on the evaluation datasets will be discussed and defined.
+
+\section{Abandoned Structure -- Splay Quadtree}
+
+TODO: mention original plan of implementing the Splay quadtree???
 
 \section{Pyramid Tree}
 
@@ -129,8 +133,9 @@ Figure \ref{fig:kd-tree} illustrates the \texttt{insert} and \texttt{delete} ope
 \end{figure}
 
 \section{Main Hypothesis}
+\label{sec:main-hypothesis}
 
-Since there has been no published evaluations of the Pseudo-Pyramid Tree, I shall not be making any hypotheses about how well it performs. It is suspected that it will perform well on high-dimensional data, as it is a hash-based approach, but little is currently known about the structure's performance, so there is a little basis for such suspicion. Before starting implementation, the following hypothesis regarding the Pyrmid Tree and $kd-Tree$ was devised:
+Since there has been no published evaluations of the Pseudo-Pyramid Tree, no hypotheses will be made regarding the performance of the structure. It is suspected that the Pseudo-Pyramid Tree will perform well on high-dimensional data, because it is a hash-based method, but little is currently known about how well the structure's hashing function performs, so there is a little basis for such suspicion. Before starting implementation, the following hypothesis regarding the Pyrmid Tree and $kd-Tree$ was devised:
 
 \paragraph{\textbf{HYPOTHESIS:}} Pyramid Tree will be faster than the baselines and $kd$-Trees on all evaluation datasets containing high-dimensional data ($\geq 10$ dimensions).
 
