@@ -2,39 +2,11 @@
 
 TODO: iteration summary
 
-\subsection{Defragmented and Rebuild Pseudo-Pyramid Tree}
+\subsection{Initial Pseudo-Pyramid Tree Implementations}
 
-\begin{wrapfigure}[12]{r}{0.5\textwidth}
-	\vspace{-40pt}
-	\begin{center}
-		\includegraphics[scale=0.6]{figures/pseudo-pyramid_tree_point_boundary_distances.pdf}
-	\end{center}
-	\vspace{-20pt}
-	\caption{Computing Distance of Point Along Pseudo-Pyramid Tree Boundary Along Each Dimension}
-	\label{fig:point-boundary-distance}
-\end{wrapfigure}
+The Pseudo-Pyramid tree's reduction from $d$ dimensions to one can be seen as a hashing function, where the one-dimensional value acts as the hash to use when searching a hash table. The Initial implementation of the structure stores all the points in a single array, which hashes each point to an integer representation that acts as the key to a bucket stored in a hash map (specifically \texttt{boost::unordered\_map}, part of the Boost\footnote{\url{http://www.boost.org/}} library). A bucket is an array that contains indices to points in the single point array. Another array is used to store the sums of all stored points. This is used to speed up point queries, by comparing the sums (one comparison) of the input point to the points in a bucket. A full point comparison ($d$ comparisons) only needs to be performed if the sums match up.
 
-The School of Computing have an implementation of an index structure which is similar to the Pyramid tree, originally written by Zhao Geng\footnote{Z.Geng@leeds.ac.uk}. All the points are stored in a single \texttt{std::vector}. Each point is hashed to an integer representation which acts as the key to a bucket stored in a hash map (specifically \texttt{boost::unordered\_map}, part of the Boost\footnote{\url{http://www.boost.org/}} library). A bucket is a \texttt{std::vector} that contains indices to points in the large point array.
-
-To determine if a point $p$ is stored in the structure, $p$ is first hashed into its one-dimensional representation. The corresponding bucket is then sequentially scanned until the point is found or the end of the bucket is reached. To reduce the number of floating point comparisons, especially for large $d$, the \textit{sums} of each point are stored when they are inserted. This way, a $O(d)$ point comparison needs to be made if the $O(1)$ point sum comparison passes. Simple optimisations were initially made to the original implementation. The original implementation passed many heap allocated structures by-value, resulting in excessive copies and more time being spent allocating memory and copying data. These copies were not necessary and were removed where possible by passing the data by-reference.
-
-In this report, this implementation shall be called the \textbf{Pseudo-Pyramid Tree}. This is because the hashing function used is \textit{inspired} by the Pyramid tree, but is not the same. Let $min_i$ and $max_i$ define the minimum and maximum bounds for dimension $i$ and $p$ be a point. To hash $p$, how far along the boundary $p$ is in each dimension is computed using Equation \ref{eq:point-boundary-distance} first. See Figure \ref{fig:point-boundary-distance} for an illustration of what these values mean.
-
-\begin{equation}
-	h_i(p) = \frac{p_i - min_i}{max_i - min_i}
-	\label{eq:point-boundary-distance}
-\end{equation}
-
-Let $B$ be a parameter which controls how likely points will be in the same bucket and let $m$ be a point where $m_i = \ceil{B^{\frac{1}{d}}}$ for $0 \leq i \leq d$. The hashed value $h(p)$ of a point $p$ is then given by Equation \ref{eq:pseudo-pyramid-hash},  where \texttt{toInt} converts a real number to an integer by truncating the decimal part. Computing this is a $O(d^2)$ operation due to the inner loop to compute $\prod_{j=0}^{i}{\lbrack m_j \rbrack}$.
-
-\begin{equation}
-	h(p) = \sum_{i = 0}^{d} { \lbrack \texttt{toInt}( h_i(p) \times m_i ) \times \prod_{j=0}^{i}{\lbrack m_j \rbrack} \rbrack }
-	\label{eq:pseudo-pyramid-hash}
-\end{equation}
-
-Higher $B$ means higher $m$. This increases the magnitude of $h_i(p)$ before it is truncated to an integer, meaning less points will have the same hashed value, meaning less points in the same bucket on average. Lower $B$ will therefore mean more points will be in the same bucket on average.
-
-The original implementation of the Pseudo-Pyramid Tree did not provide \texttt{delete} and \texttt{update} operations, meaning a \texttt{delete} procedure had to be added. To delete a point $p$, the point is first hashed and the bucket containing the point is found. The index pointing to $p$ in the bucket is removed from the bucket, but the actual point itself is not removed the point array. In other words, the memory is never released until the whole structure is deleted. This makes the structure useful for batch computation because it can be discarded straight after a task, releasing all allocated memory then. However, if the structure is used as part of a long-running process then this is not suitable because there is the potential to run out of memory. This will be referred to as the \textbf{Batch Pseudo-Pyramid Tree} for the rest of this document.
+No \texttt{delete} operation was provided in the original implementation of the Pseudo-Pyramid Tree, so a \texttt{delete} procedure had to be added. To delete a point $p$, the point is first hashed and the bucket containing the point is found. The index pointing to $p$ in the bucket is removed from the bucket, but the actual point itself is not removed the point array. In other words, the memory is never released until the whole structure is deleted. This makes the structure useful for batch computation because it can be discarded straight after a task, releasing all allocated memory then. However, if the structure is used as part of a long-running process then this is not suitable because there is the potential to run out of memory. This will be referred to as the \textbf{Batch Pseudo-Pyramid Tree} for the rest of this document.
 
 Variants of this structure were implemented to provide a \texttt{delete} operation. The first is the \textbf{Defragmented Pseudo-Pyramid Tree}. When a point's index is deleted from a bucket, the element at the index is marked for deletion from the array at a later time (by adding the index of the point to another \texttt{std::vector}). If the number of marked elements exceeds a certain number $R$, then the $R + 1$ marked elements are erased from the vector (i.e. memory is released). The indices in each bucket are then updated to point to the correct element in the modified array. Even though \texttt{delete} is normally a constant time operation, the worst case is $O(n^2)$ because of this defragmentation procedure.
 

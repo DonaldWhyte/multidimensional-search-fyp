@@ -38,9 +38,9 @@ An advantage of PR quadtrees is that there is no overlap between the spatial reg
 	\label{fig:quadtree-kdtree-clustered}
 \end{wrapfigure}
 
-\subsubsection{kd-Trees}
+\subsubsection{$kd$-Trees}
 
-kd-trees are similar to quadtrees in that the data space is once again partitioned into disjoint regions \cite{kd-tree}. With point kd-trees, each split partitions a region into two sub-regions along a \textbf{single dimension} $d_i$. These sub-regions are represented as two nodes, with the original region's node as the parent. Some \textbf{pivot} value $p$ is chosen for $d_i$. The left and right children contain all the data items whose $d_i$th value is less than $p$ and greater than $p$ respectively. The way a kd-tree is built varies depends on how $d_i$ and $p$ are chosen, so there are many variations of this structure. A common way of choosing $d_i$ is to cycle through each dimension when repeatedly splitting. $p$ could be assigned the \textbf{median} of the $d_i$th value of each data item within the region being split.
+$kd$-trees are similar to quadtrees in that the data space is once again partitioned into disjoint regions \cite{kd-tree}. With point kd-trees, each split partitions a region into two sub-regions along a \textbf{single dimension} $d_i$. These sub-regions are represented as two nodes, with the original region's node as the parent. Some \textbf{pivot} value $p$ is chosen for $d_i$. The left and right children contain all the data items whose $d_i$th value is less than $p$ and greater than $p$ respectively. The way a kd-tree is built varies depends on how $d_i$ and $p$ are chosen, so there are many variations of this structure. A common way of choosing $d_i$ is to cycle through each dimension when repeatedly splitting. $p$ could be assigned the \textbf{median} of the $d_i$th value of each data item within the region being split.
 
 Unlike the PR quadtree, the size of partitions are non-uniform, meaning kd-trees can are better suited to skewed or clustered data. Figure \ref{fig:quadtree-kdtree-clustered} shows a PR quadtree and kd-tree partition of some clustered data. Notice how there are more (empty) regions in the quadtree than the kd-tree, thus having a less efficient partition of the data (resulting in slower queries).
 

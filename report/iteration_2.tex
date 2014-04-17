@@ -1,57 +1,10 @@
 \section{Iteration \#2 -- Pyramid Tree and Other Hash-Based Approaches}
 
-TODO
-\begin{itemize}
-	\item TODO
-\end{itemize}
+TODO: summary
 
 \subsection{Pyramid Tree}
 
-As described in Section \ref{sec:pyramid-tree}, the Pyramid tree reduces multi-dimensional points to one dimension, which can then be used in a one-dimensional index structure. This reduction to a one-dimensional value can be seen as a hashing function, which can be used to generate search keys for the underlying hash map in the Bucket Pseudo-Pyramid Tree.
-
-To elaborate on the reduction technique, the Pyramid tree partitions the data space into $2d$ Pyramids, where each is represented the $(d - 1)$ hyperplane corresponding to the Pyramid's base. Each pyramid is is segmented by splitting them along $(d-1)$ hyperplanes parallel to the base of the pyramid. The one-dimensional value of a point, called the \textit{pyramid value}, describes which Pyramid it is in and the height of that point in that Pyramid. The resultant spatial partition looks like Figure \ref{fig:pyramid-tree-buckets}, where each Pyramid segment has a corresponding bucket which stores the points.
-
-\begin{figure}
-		\begin{center}
-			\begin{subfloat}[$2d$ Pyramids in 2D Data Space\label{fig:pyramid-tree-pyramids}]{%
-				\includegraphics[scale=0.5]{figures/pyramid_tree_partition.pdf}
-			}
-			\end{subfloat}~
-			\begin{subfloat}[Segmented $2d$ Pyramids, Each Associated with a Bucket\label{fig:pyramid-tree-buckets}] {%
-				\includegraphics[scale=0.5]{figures/pyramid_tree_buckets.pdf}
-			}
-			\end{subfloat}
-		\end{center}
-
-		\label{fig:pyramid-tree-partition}
-\end{figure}
-
-More formally, the pyramid value $pv_v$ of a point $v$ is given by $pv_v = (i + h_v)$, where $i$ represents the pyramid $v$ is contained in and $h_v$ is height of $v$ in pyramid $i$. $i$ and $h_v$ are given in Equations \ref{eq:pyramid-value-index} and \ref{eq:pyramid-value-height} respectively, where $MOD$ refers to the modulo operator.
-
-\begin{multline}\\
-	i = \begin{cases}
-		j_{max},         & \text{if }v_{j_{max}} < 0.5\\
-		j_{max} + d,   & \text{if }v_{j_{max}} \geq 0.5\\
-	\end{cases} \\
-	j_{max} = \left( j \;|\; \forall k \; 0 \leq j,k \leq d, j \neq k: \;\; \lvert 0.5 - v_j \rvert \geq \lvert 0.5 - v_k \rvert \right) \\
-	\label{eq:pyramid-value-index}
-\end{multline}
-\begin{equation}
-	h_v = \lvert 0.5 - v_{i \; MOD \; d} \rvert
-	\label{eq:pyramid-value-height}
-\end{equation}
-
-The following lemma shows that two distinct points can be mapped to the same Pyramid value. It follows that the Pyramid-technique as a hashing function may cause points to be stored in the same bucket. As such, bucket size will be a key performance factor for the structure and will be measured to provide a comparison to other hash-based structures discussed in this iteration.
-
-\begin{proof}[\textbf{Lemma: } For $d \geq 2$, there exist two points $x$ and $y$, such that $x \neq y$, with the same pyramid value]\mbox{}\\*
-Let $d$ be the number of dimensions and $x = (x_0, x_1, \dots, x_{d -1})$, $y = (y_0, y_1, \dots, y_{d - 1})$ be two $d$-dimensional points. Without loss of generality, assume $0 \leq x_i \leq 1$ and $0 \leq y_i \leq 1$ for all $i = 1, 2, \dots, d$. Suppose $x_0 = y_0 = 0$, $x_{d - 1} = 0.1$, $y_{d - 1} = 0.2$ and $x_i = y_i = 0.1$ for all $i = 1, \dots, {d - 2}$. This means $x \neq y$. The following holds:
-\begin{enumerate}
-	\item $\forall k \; 0 \leq k \leq d, k \neq 0: \;\; \lvert 0.5 - x_0 \rvert \geq \lvert 0.5 - x_k \rvert$,
-	\item $\forall k \; 0 \leq k \leq d, k \neq 0: \;\; \lvert 0.5 - y_0 \rvert \geq \lvert 0.5 - y_k \rvert$.
-\end{enumerate}
-Since $x_0 \leq 0.5$ and $y \leq 0.5$, both $x$ and $y$ are mapped to pyramid 0 ($i = 0$). It follows that $h_x = h_y = \lvert 0.5 - v_{0 \; MOD \; 3} \rvert = \lvert 0.5 - v_{0} \rvert = \lvert 0.5 - 0 \rvert = 0.5$. $pv_x = pv_y = 0 + 0.5 = 0.5$ and $x \neq y$, meaning two distinct points can have the same Pyramid value.
-
-\end{proof}
+TODO: using same underlying implementation w/ optimisations as Pseudo-Pyramid Tree -- just hashing function that's changed!
 
 \subsubsection{B${}^+$-Tree as Underlying Structure}
 
