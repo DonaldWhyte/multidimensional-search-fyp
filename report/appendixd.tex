@@ -67,6 +67,33 @@ TODO: plots not in main report (7 plots)
 
 \section{Algortithms and Code Listings}
 
+\begin{algorithm}[H]
+	\SetAlgoLined
+	\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+	\SetKwFunction{hashPoint}{hashPoint} \SetKwFunction{hashFloat}{hashFloat}
+
+ 	\SetKwProg{funcHashPoint}{Algorithm}{}{}
+  	\funcHashPoint{\hashPoint{$d, p$}} {
+		\Input{$d$ = number of dimensions}
+		\Input{$p_0, p_1, \dots, p_{d-1}$ = coordinates of point}
+		\Output{$seed$ = integer representing hashed point}
+		\Begin {
+			$seed = 0$\;
+			\For{$i = 0$ to $d - 1$} {
+				$seed = seed \oplus \left(\hashFloat(p_i) + \texttt{0x9e3779b9} + (seed << 6) + (seed >> 2)\right)$
+			}
+			\KwRet{$seed$}
+		}
+	}
+
+	\caption{Hashing Multi-Dimensional Point in Bucket Hash Table}
+	\label{alg:point-hashing}
+\end{algorithm}
+
+\paragraph{\textbf{NOTE:}} \texttt{hashFloat} is a function which hashes an individual 32-bit floating point number and corresponds to the function \texttt{float\_hash\_impl2} in Listing \ref{lst:hash-float-function}.
+
+\paragraph{} 
+
 \begin{lstlisting}[label=lst:hash-float-function, caption=Code to Hash Single 32-bit Floating Point Value (Source code from file \texttt{boost/functional/hash/detail/hash\_float\_generic.hpp} in Boost Library 1.42.0)]
 // Copyright 2005-2009 Daniel James.
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
