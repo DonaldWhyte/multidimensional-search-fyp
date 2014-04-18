@@ -14,9 +14,176 @@ TODO
 
 TODO
 
+\begin{table}
+	\centering
+	\makebox[\textwidth][c]{%
+		\begin{tabular}{|r|r|l|l|l|l|l|l|l|l|}
+			\hline
+			\multicolumn{2}{|c}{} & \multicolumn{8}{|c|}{\textbf{Dimensionality}} \\
+			\hline
+			\textbf{Structure} & \textbf{Operation} & 1 & 2 & 3 & 5 & 10 & 50 & 100 & 200 \\
+			\hline
+			\multirow{3}{*}{Bucket PPT} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+			\hline			
+			\multirow{3}{*}{Bucket PT} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+			\hline			
+			\multirow{3}{*}{Bucket Hash Table} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+			\hline
+			\multirow{3}{*}{Point $kd$-Tree} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+			\hline
+			\multirow{3}{*}{Bucket $kd$-Tree} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+			\hline
+		\end{tabular}
+	}%
+
+	\caption{Total Execution Time (in seconds) of Each Operation for Varying Number of Dimensions in Uniformly Distributed Synthetic Dataset}
+	\label{tab:perf3-dimensionality}
+\end{table}
+
+\begin{figure}
+	\begin{center}
+		\begin{subfloat}[\texttt{insert}\label{fig:perf3-dimensionality-insert}]{%
+			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+		}
+		\end{subfloat}~
+		\begin{subfloat}[\texttt{remove}\label{fig:perf3-dimensionality-remove}]{%
+			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+		}
+		\end{subfloat}~
+	\end{center}
+
+	\caption{Index Structure Performance With Respect To Dimensionality (10,000 Points from Uniform Distribution Synthetic Dataset)}
+	\label{fig:perf3-dimensionality}
+\end{figure}
+
+\begin{table}
+	\centering
+	\makebox[\textwidth][c]{%
+		\begin{tabular}{|r|r|l|l|l|l|}
+			\hline
+			\multicolumn{2}{|c}{} & \multicolumn{4}{|c|}{\textbf{Points in Dataset}} \\
+			\hline
+			\textbf{Structure} & \textbf{Operation} & 10,000 & 100,000 & 500,000 & 1,000,000 \\
+			\hline
+			\multirow{3}{*}{Bucket PPT} & Insert & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO \\
+			\hline			
+			\multirow{3}{*}{Bucket PT} & Insert & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO \\
+			\hline			
+			\multirow{3}{*}{Bucket Hash Table} & Insert & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO \\
+			\hline
+			\multirow{3}{*}{Point $kd$-Tree} & Insert & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO \\
+			\hline
+			\multirow{3}{*}{Bucket $kd$-Tree} & Insert & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO \\
+			\hline
+		\end{tabular}
+	}%
+
+	\caption{Total Execution Time (in seconds) of Each Operation for Varying Number of Points in Uniformly Distributed Synthetic Dataset}
+	\label{tab:perf3-size}
+\end{table}
+
+\begin{figure}
+	\begin{center}
+		\begin{subfloat}[\texttt{insert}\label{fig:perf3-size-insert}]{%
+			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+		}
+		\end{subfloat}~
+		\begin{subfloat}[\texttt{remove}\label{fig:perf3-size-remove}]{%
+			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+		}
+		\end{subfloat}~
+	\end{center}
+
+	\caption{Index Structure Performance With Respect To Dataset Size (10,000 Points from Uniform Distribution Synthetic Dataset)}
+	\label{fig:perf3-size}
+\end{figure}
+
+
+\begin{table}
+	\centering
+	\makebox[\textwidth][c]{%
+		\begin{tabular}{|r|r|l|l|l|}
+			\hline
+			\multicolumn{2}{|c}{} & \multicolumn{3}{|c|}{\textbf{Dataset}} \\
+			\hline
+			\textbf{Structure} & \textbf{Operation} & \textbf{Astrophysics} & \textbf{Hurricane Isabel} & \textbf{Armadillo Mesh} \\
+			\hline
+			\multirow{4}{*}{Bucket PPT} & Insert & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO \\
+				& Random Operation List & TODO & TODO & TODO \\
+			\hline
+			\multirow{4}{*}{Bucket PT} & Insert & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO \\
+				& Random Operation List & TODO & TODO & TODO \\
+			\hline
+			\multirow{4}{*}{Bucket Hash Table} & Insert & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO \\
+				& Random Operation List & TODO & TODO & TODO \\
+			\hline
+			\multirow{4}{*}{Point $kd$-Tree} & Insert & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO \\
+				& Random Operation List & TODO & TODO & TODO \\
+			\hline
+			\multirow{4}{*}{Bucket $kd$-Tree} & Insert & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO \\
+				& Random Operation List & TODO & TODO & TODO \\
+			\hline
+		\end{tabular}
+	}%
+
+	\caption{Total Execution Time (in seconds) of Each Operation for 500,000 Points Sampled From Real Datasets}
+	\label{tab:perf3-real}
+\end{table}
+
+
 \subsection{Profiling Results}
 
 TODO
+
+\begin{table}
+	\centering
+	\makebox[\textwidth][c]{%
+		\begin{tabular}{|l|l|l|l|}
+			\hline
+			\textbf{Structure} & \textbf{Max Heap Memory (MB)} & \textbf{Cache Hit Rate (\%)} & \textbf{Dominant Function (\% Total Time Spent)} \\
+			\hline
+			Bucket PPT & TODO & TODO & TODO (TODO) \\
+			Bucket PT & TODO & TODO & TODO (TODO) \\
+			Bucket Hash Table & TODO & TODO & TODO (TODO) \\
+			Point $kd$-Tree  & TODO & TODO & TODO (TODO) \\
+			Bucket $kd$-Tree & TODO & TODO & TODO (TODO) \\
+			\hline
+		\end{tabular}
+	}%
+	\caption{CPU and Heap Profiling Statistics When Inserting 500,000 Points from 16D Synthetic Dataset into Index Structures}
+	\label{tab:perf3-profiling}
+\end{table}
+
 
 \subsection{Summary}
 

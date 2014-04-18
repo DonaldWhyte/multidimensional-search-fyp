@@ -10,6 +10,7 @@ This section describes the structures which have been chosen to be implemented, 
 TODO: mention original plan of implementing the Splay quadtree???
 
 \section{Pyramid Tree}
+\label{sec:pyramid-tree-detail}
 
 As described in Section \ref{sec:pyramid-tree}, the Pyramid tree reduces multi-dimensional points to one dimension, which can then be used in a one-dimensional index structure. The reason this structure has been chosen is because dimension reduction techniques have been found to perform well for high-dimensional data, compared to tree-based approaches \cite{md-structures-samet}. The original Pyramid-Tree paper showed good performance on uniformly distributed data and a real dataset (with the Extended Pyramid-Technique), when compared to Sequential Scan and the competitive X-tree \cite{pyramid-tree}. There are two fundamental differences between the focus of the paper's analysis and what this project is trying to achieve:
 \begin{enumerate}
