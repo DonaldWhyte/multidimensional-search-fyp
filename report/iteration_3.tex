@@ -4,11 +4,13 @@ This iteration explores a widely used index structure based on spatial decomposi
 
 \subsection{Point $kd$-Tree}
 
-TODO: implementation details
+The $kd$-Tree variant described in Section \ref{sec:kd-tree-chosen} was implemented, which shall be referred to as the \textbf{Point $kd$-Tree}. Each node is represented as a C-struct which stores a single point as well as pointers to its children. Every node is allocated using a call to \texttt{malloc()}, which allocates enough memory on the heap to store the node. This means each node may reside in different areas of the heap, resulting in fragmented memory.
 
 \subsection{Bucket $kd$-Tree}
 
-TODO
+Instead of storing a single point in every node of the tree, the \textbf{Bucket $kd$-Tree} stores multiple points (i.e. a bucket) in nodes, with the constraint that only leaf nodes store points. Non-leaf nodes serve to partition the data space, each cutting the space along a single dimension by some value (the cutting value). When the number of points in a leaf exceeds a certain number, say $M$, then a cutting dimension and value are determined and the node is split into two. The left and right children nodes are leaves that contain the points from the split node that lie on one of the sides of the cutting dimension.
+
+TODO: advantages of doing this
 
 \subsection{Performance Timings}
 
