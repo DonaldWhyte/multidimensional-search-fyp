@@ -6,7 +6,7 @@ TODO: summary
 
 TODO: using same underlying implementation w/ optimisations as Pseudo-Pyramid Tree -- just hashing function that's changed!
 
-\subsubsection{B${}^+$-Tree as Underlying Structure}
+\subsection{B${}^+$-Tree as Underlying Structure}
 
 Berchtold et al. originally used a B${}^{+}$-tree when developing the Pyramid Tree \cite{pyramid-tree}. It was decided that using the same underlying search structure would allow for a more fair comparison of the Pyramid tree data structure. Two B${}^{+}$-tree implementations, cpp-btree\cite{cpp-btree} and bpt\cite{bpt}, were plugged and tested into the Pyramid Tree. The first is a C++ implementation while the second is a pure C implementation.
 
@@ -78,45 +78,45 @@ Suppose the point to query was the output of a more complex computation, where r
 
 Therefore, the Bucket Hash Table may be unreliable for certain applications, especially ones where the input points are the result of computations involving many arithmetic operations.
 
+\subsection{Bucket Statistics}
+
+TODO:  why just doing bucket stats
+
+TODO: synthetic data
+TODO: astrophysics data
+
 \begin{table}
 	\centering
 	\begin{tabular}{|l|l|l|l|l|}
 		\hline
 		\textbf{} & \multicolumn{4}{c|}{\textbf{Bucket Size Statistics}} \\
 		\hline
-		\textbf{Structure} & \textbf{Average} & \textbf{St. Dev} & \textbf{Min} & \textbf{Max} \\
+		\textbf{Dataset} & \textbf{Average} & \textbf{St. Dev} & \textbf{Min} & \textbf{Max} \\
 		\hline
-		\textbf{Pseudo-Pyramid Tree} & TODO & TODO & TODO & TODO \\
-		\textbf{Pyramid Tree} & TODO & TODO & TODO & TODO \\
-		\textbf{Bucket Hash Table} & TODO & TODO & TODO & TODO \\
+		\textbf{Pseudo-Pyramid Tree} & & & & \\
+		500,000 16D Random Points & TODO & TODO & TODO & TODO \\
+		500,000 Astrophysics Points & TODO & TODO & TODO & TODO \\
+		500,000 Hurricane Isabel Points & TODO & TODO & TODO & TODO \\
+		435,544 3D Armadillo Mesh Points & TODO & TODO & TODO & TODO \\
+		\hline
+		\textbf{Pyramid Tree} & & & & \\
+		500,000 16D Random Points & TODO & TODO & TODO & TODO \\
+		500,000 Astrophysics Points & TODO & TODO & TODO & TODO \\
+		500,000 Hurricane Isabel Points & TODO & TODO & TODO & TODO \\
+		435,544 3D Armadillo Mesh Points & TODO & TODO & TODO & TODO \\
+		\hline
+		\textbf{Bucket Hash Table} & & & & \\
+		500,000 16D Random Points & TODO & TODO & TODO & TODO \\
+		500,000 Astrophysics Points & TODO & TODO & TODO & TODO \\
+		500,000 Hurricane Isabel Points & TODO & TODO & TODO & TODO \\
+		435,544 3D Armadillo Mesh Points & TODO & TODO & TODO & TODO \\
 		\hline
 	\end{tabular}
-	\caption{Statistics on Bucket Size with Hash-Based Structures}
-	\label{tab:it2-bucket-stats}
+	\caption{Statistics on Bucket Size, Based on Dataset, of All Hash-Based Structures}
+	\label{tab:perf1-bucket-stats}
 \end{table}
 
-TODO: synthetic data
-TODO: astrophysics data
-
 TODO: discussion of results and implications
-
-\subsection{Performance Timings}
-
-TODO: four structures
-	Bucket Pseudo-Pyramid Tree
-	Bucket Pyramid Tree
-	Simple Hashing
-
-TODO: refer to plots and justify why only there's only two here (rest are in appendices)
-
-TODO: table
-
-TODO: plot of insert() w/ skewed data
-TODO: plot of delete() w/ rand uniform data
-
-\subsection{Profiling Results}
-
-TODO: CPU/heap profiling
 
 \subsection{Summary}
 
