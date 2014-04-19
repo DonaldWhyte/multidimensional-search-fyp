@@ -11,6 +11,7 @@
 #include "UniqueHashTable.h"
 #include "DuplicateHashTable.h"
 #include "BucketKDTree.h"
+#include "IMinMax.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -113,6 +114,23 @@ namespace mdsearch
 		return new BucketKDTree(numDimensions, 2, 1);
 	}
 
+	IndexStructure* generateIMinMax(unsigned int numDimensions,
+		const Region& boundary, const std::vector<std::string>& args)
+	{
+		Real theta = 0.5f; // default value
+		if (args.size() >= 1) // if theta value was given
+		{
+			try
+			{
+				theta = boost::lexical_cast<Real>(args[0]);
+			}
+			catch (const boost::bad_lexical_cast& ex)
+			{
+				return NULL;
+			}
+		}
+		return new IMinMax(numDimensions, boundary, theta);
+	}
 
 
 
@@ -130,6 +148,7 @@ namespace mdsearch
 		addGenerator("uht", generateUniqueHashTable);
 		addGenerator("dht", generateDuplicateHashTable);
 		addGenerator("bucket_kdtree", generateBucketKDTree);
+		addGenerator("iminmax", generateIMinMax);
 	}
 
 	void IndexStructureFactory::addGenerator(const std::string& structureType,

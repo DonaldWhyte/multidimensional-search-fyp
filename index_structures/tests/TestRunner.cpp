@@ -14,6 +14,7 @@
 #include "TestUniqueHashTable.h"
 #include "TestDuplicateHashTable.h"
 #include "TestBucketKDTree.h"
+#include "TestIMinMax.h"
 
 int main(int argc, char* argv[])
 {
