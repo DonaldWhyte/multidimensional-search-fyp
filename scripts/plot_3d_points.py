@@ -2,14 +2,17 @@ import sys
 import random
 import time
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
+from mpl_toolkits.mplot3d import Axes3D
 
 from generate_dataset_operations import loadDataset
-from plot_2d_datasets import extract2DCoordinates, COLOURS, MARKERS
+from plot_2d_datasets import COLOURS, MARKERS
+
+def extract3DCoordinates(points):
+	return [ p[0] for p in points ], [ p[1] for p in points ], [ p[2] for p in points ]
 
 def plotScatter(plot, points, colour, marker):
-	xValues, yValues = extract2DCoordinates(points)
-	return plot.scatter(xValues, yValues, color=colour, marker=marker)
+	xValues, yValues, zValues = extract3DCoordinates(points)
+	return plot.scatter(xValues, yValues, zValues, color=colour, marker=marker)
 
 def removeAtRandom(dataset, numPointsToRemove):
 	for i in range(numPointsToRemove):
@@ -34,10 +37,10 @@ if __name__ == "__main__":
 		unitAxis = False
 
 	if len(sys.argv) < NUM_MANDATORY_ARGS:
-		sys.exit("python %s <outputFilename> <xAxisLabel> <yAxisLabel> <maxPoints> <dataset1> [<dataset2> ... <datasetN>] {--random-pick} {--unit-axis}" % sys.argv[0])
-	outputFilename = sys.argv[1]
-	xAxisLabel = sys.argv[2]
-	yAxisLabel = sys.argv[3]
+		sys.exit("python %s  <xAxisLabel> <yAxisLabel> <zAxisLabel> <maxPoints> <dataset1> [<dataset2> ... <datasetN>] {--random-pick} {--unit-axis}" % sys.argv[0])
+	xAxisLabel = sys.argv[1]
+	yAxisLabel = sys.argv[2]
+	zAxisLabel = sys.argv[3]
 	maxPoints = int(sys.argv[4])
 	datasetFilenames = sys.argv[5:]
 
@@ -52,18 +55,21 @@ if __name__ == "__main__":
 				dataset = dataset[:maxPoints]
 		datasets.append(dataset)
 
-	# Create scatter plots for each dataset
+	# Initialise 3D axes
+	fig = plt.figure(1)
+	fig.clf()
+	ax = Axes3D(fig)	
+	# Create scatter plot for each dataset
 	plotObjects = []
 	for i in range(len(datasets)):
 		plotObjects.append(plotScatter(
-			plt, datasets[i], COLOURS[i % len(COLOURS)], MARKERS[i % len(MARKERS)]
+			ax, datasets[i], COLOURS[i % len(COLOURS)], MARKERS[i % len(MARKERS)]
 		))
-	# Set labels
-	plt.xlabel(xAxisLabel)
-	plt.ylabel(yAxisLabel)
+	# Set axis labels
 	if unitAxis:
-		plt.axis([0, 1, 0, 1])
-	# Save plot to output file
-	pp = PdfPages(outputFilename)
-	plt.savefig(pp, format="pdf")
-	pp.close()
+		ax.set_zlim3d([0, 1])
+		ax.set_ylim3d([0, 1])
+		ax.set_xlim3d([0, 1])
+	# Display 3D plot
+	plt.draw()
+	plt.show()
