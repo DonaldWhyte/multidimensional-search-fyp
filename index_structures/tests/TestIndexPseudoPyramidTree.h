@@ -1,14 +1,14 @@
-#ifndef MDSEARCH_TEST_INDEXPYRAMIDTREE_H
-#define MDSEARCH_TEST_INDEXPYRAMIDTREE_H
+#ifndef MDSEARCH_TEST_INDEXPSEUDOPYRAMIDTREE_H
+#define MDSEARCH_TEST_INDEXPSEUDOPYRAMIDTREE_H
 
 #include <gtest/gtest.h>
 #include "Common.h"
-#include "IndexPyramidTree.h"
+#include "IndexPseudoPyramidTree.h"
 
 namespace mdsearch { namespace tests
 {
 
-	class IndexPyramidTreeTests : public ::testing::Test
+	class IndexPseudoPyramidTreeTests : public ::testing::Test
 	{
 
 	protected:
@@ -18,7 +18,7 @@ namespace mdsearch { namespace tests
 			initialBoundary = Region(3, initialBoundaryIntervals);			
 		}
 
-		void testCleanupProcedure(IndexPyramidTree& structure)
+		void testCleanupProcedure(IndexPseudoPyramidTree& structure)
 		{
 			IndexStructureTester tester;
 			const PointList& testPoints = tester.getTestPoints();
@@ -56,9 +56,9 @@ namespace mdsearch { namespace tests
 
 	};
 
-	TEST_F(IndexPyramidTreeTests, Construction)
+	TEST_F(IndexPseudoPyramidTreeTests, Construction)
 	{
-		IndexPyramidTree structure(NUM_DIMENSIONS, initialBoundary);
+		IndexPseudoPyramidTree structure(NUM_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();		
 
@@ -71,9 +71,9 @@ namespace mdsearch { namespace tests
 		ASSERT_EQ(testPoints, structure.allPoints());
 	}
 
-	TEST_F(IndexPyramidTreeTests, Clear)
+	TEST_F(IndexPseudoPyramidTreeTests, Clear)
 	{
-		IndexPyramidTree structure(NUM_DIMENSIONS, initialBoundary);
+		IndexPseudoPyramidTree structure(NUM_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();
 
@@ -88,9 +88,9 @@ namespace mdsearch { namespace tests
 		ASSERT_EQ(PointList(), structure.allPoints());
 	}
 
-	TEST_F(IndexPyramidTreeTests, Insertion)
+	TEST_F(IndexPseudoPyramidTreeTests, Insertion)
 	{
-		IndexPyramidTree structure(NUM_DIMENSIONS, initialBoundary);
+		IndexPseudoPyramidTree structure(NUM_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();
 
@@ -112,9 +112,9 @@ namespace mdsearch { namespace tests
 		ASSERT_EQ(expectedPoints, structure.allPoints());
 	}
 
-	TEST_F(IndexPyramidTreeTests, Removal)
+	TEST_F(IndexPseudoPyramidTreeTests, Removal)
 	{
-		IndexPyramidTree structure(NUM_DIMENSIONS, initialBoundary);
+		IndexPseudoPyramidTree structure(NUM_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();
 
@@ -138,34 +138,34 @@ namespace mdsearch { namespace tests
 		EXPECT_FALSE(structure.pointExists(testPoints[1])); // ensure point has been removed!
 	}
 
-	TEST_F(IndexPyramidTreeTests, Updating)
+	TEST_F(IndexPseudoPyramidTreeTests, Updating)
 	{
-		IndexPyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
+		IndexPseudoPyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		tester.testUpdates(&structure);
 	}
 
-	TEST_F(IndexPyramidTreeTests, PointQueries)
+	TEST_F(IndexPseudoPyramidTreeTests, PointQueries)
 	{
-		IndexPyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
+		IndexPseudoPyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		tester.testPointQueries(&structure);
 	}
 
-	TEST_F(IndexPyramidTreeTests, Defragment)
+	TEST_F(IndexPseudoPyramidTreeTests, Defragment)
 	{
 		// Make max empty elements 2 for testing purposes
-		IndexPyramidTree defragStructure(IndexStructureTester::NUM_TEST_DIMENSIONS,
-			initialBoundary, 2, IndexPyramidTree::CLEANUP_PROC_DEFRAGMENT);
+		IndexPseudoPyramidTree defragStructure(IndexStructureTester::NUM_TEST_DIMENSIONS,
+			initialBoundary, 2, IndexPseudoPyramidTree::CLEANUP_PROC_DEFRAGMENT);
 		testCleanupProcedure(defragStructure);
 		
 	}
 
-	TEST_F(IndexPyramidTreeTests, Rebuild)
+	TEST_F(IndexPseudoPyramidTreeTests, Rebuild)
 	{
 		// Make max empty elements 2 for testing purposes
-		IndexPyramidTree rebuildStructure(IndexStructureTester::NUM_TEST_DIMENSIONS,
-			initialBoundary, 2, IndexPyramidTree::CLEANUP_PROC_REBUILD);
+		IndexPseudoPyramidTree rebuildStructure(IndexStructureTester::NUM_TEST_DIMENSIONS,
+			initialBoundary, 2, IndexPseudoPyramidTree::CLEANUP_PROC_REBUILD);
 		testCleanupProcedure(rebuildStructure);		
 	}
 

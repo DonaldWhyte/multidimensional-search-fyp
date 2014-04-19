@@ -1,5 +1,5 @@
-#ifndef MDSEARCH_INDEXPYRAMIDTREE_H
-#define MDSEARCH_INDEXPYRAMIDTREE_H
+#ifndef MDSEARCH_INDEXPSEUDOPYRAMIDTREE_H
+#define MDSEARCH_INDEXPSEUDOPYRAMIDTREE_H
 
 #include <vector>
 #include <boost/unordered_map.hpp>
@@ -9,7 +9,7 @@
 namespace mdsearch
 {
 
-	class IndexPyramidTree : public IndexStructure
+	class IndexPseudoPyramidTree : public IndexStructure
 	{
 
 	public:
@@ -19,7 +19,7 @@ namespace mdsearch
 			CLEANUP_PROC_REBUILD
 		};
 
-		IndexPyramidTree(unsigned int numDimensions, const Region& boundary,
+		IndexPseudoPyramidTree(unsigned int numDimensions, const Region& boundary,
 			int maxEmptyElements = DEFAULT_MAX_EMPTY_ELEMENTS,
 			CleanupProcedure cleanupProcedure = CLEANUP_PROC_DEFRAGMENT);
 
@@ -96,8 +96,9 @@ namespace mdsearch
 		Point maxPoint;
 		// Interval between buckets
 		unsigned int bucketInterval;
-		// Median values of the data set.
-		Point medianPoint;
+
+		std::vector<int> scaleFactors;
+		std::vector<int> cumulativeSFProducts;		
 
 	};
 

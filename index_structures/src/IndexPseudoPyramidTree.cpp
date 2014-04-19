@@ -1,23 +1,21 @@
-#include "IndexPyramidTree.h"
+#include "IndexPseudoPyramidTree.h"
 #include "Hashing.h"
 #include "Util.h"
 
 namespace mdsearch
 {
 
-	IndexPyramidTree::IndexPyramidTree(unsigned int nDimensions, const Region& treeBoundary,
+	IndexPseudoPyramidTree::IndexPseudoPyramidTree(unsigned int nDimensions, const Region& treeBoundary,
 		int maxEmptyElements, CleanupProcedure cleanupProcedure) :
 		IndexStructure(nDimensions),
 		maxEmptyElements(maxEmptyElements), cleanupProcedure(cleanupProcedure),
-		boundary(treeBoundary), minPoint(nDimensions), maxPoint(nDimensions),
-		medianPoint(nDimensions), bucketInterval(1)
+		boundary(treeBoundary), minPoint(nDimensions), maxPoint(nDimensions)
 	{
 		// Compute the interval between buckets 
 		bucketInterval = static_cast<Real>(
 			MAX_BUCKET_NUMBER / (numDimensions * 2)
 		);
 		bucketInterval = floor(bucketInterval);
-		medianPoint = computeInitialMedianPoint(MAX_BUCKET_NUMBER, numDimensions);
 		
 		// Ensure boundaries are NEVER ZERO SIZED and the maximum
 		// values are always larger than the minimum
@@ -34,9 +32,22 @@ namespace mdsearch
 			minPoint[i] = boundary[i].min;
 			maxPoint[i] = boundary[i].max;
 		}	
+
+		// Compute scale factors
+		Real m = static_cast<Real>(1.0 / numDimensions);
+		int div = ceil(pow(MAX_BUCKET_NUMBER, m));
+		scaleFactors = std::vector<int>(numDimensions, div);
+		// Pre-compute the cumlative products of the scale factors to
+		// speed up hashing function
+		cumulativeSFProducts.resize(numDimensions);
+		cumulativeSFProducts[0] = 1;
+		for (unsigned int d = 1; (d < numDimensions); d++)
+		{
+			cumulativeSFProducts[d] = scaleFactors[d - 1] * cumulativeSFProducts[d - 1];
+		}
 	}
 
-	void IndexPyramidTree::clear()
+	void IndexPseudoPyramidTree::clear()
 	{
 		// NOTE: Using assigment not clear() to ensure memory is de-allocated
 		// (through destructors of containers)
@@ -46,7 +57,7 @@ namespace mdsearch
 		emptyElementIndices = IndexList();
 	}
 
-	bool IndexPyramidTree::insert(const Point& point)
+	bool IndexPseudoPyramidTree::insert(const Point& point)
 	{
 		// TODO: add boundary check w/ point here???
 		
@@ -63,10 +74,11 @@ namespace mdsearch
 		}
 	}
 
-	bool IndexPyramidTree::remove(const Point& point)
+	bool IndexPseudoPyramidTree::remove(const Point& point)
 	{
 		// Find bucket the point would belong to
-		int searchKey = computePyramidValue(numDimensions, point, minPoint, maxPoint, bucketInterval);
+		int searchKey = computePseudoPyramidValue(numDimensions, point,
+			minPoint, maxPoint, scaleFactors, cumulativeSFProducts);
 		OneDMap::iterator keyValue = hashMap.find(searchKey);
 		// Bucket has been found, point MIGHT be stored in structure
 		if (keyValue != hashMap.end())
@@ -118,7 +130,7 @@ namespace mdsearch
 		}
 	}
 
-	bool IndexPyramidTree::update(const Point& oldPoint, const Point& newPoint)
+	bool IndexPseudoPyramidTree::update(const Point& oldPoint, const Point& newPoint)
 	{
 		if (remove(oldPoint)) // if point was removed successfully (i.e. it existed)
 		{
@@ -131,33 +143,34 @@ namespace mdsearch
 		}
 	}
 
-	bool IndexPyramidTree::pointExists(const Point& point)
+	bool IndexPseudoPyramidTree::pointExists(const Point& point)
 	{
 		return (getPointIndex(point) >= 0);
 	}
 
-	const PointList& IndexPyramidTree::allPoints() const
+	const PointList& IndexPseudoPyramidTree::allPoints() const
 	{
 		return points;
 	}
 
-	const IndexList& IndexPyramidTree::emptyIndices() const
+	const IndexList& IndexPseudoPyramidTree::emptyIndices() const
 	{
 		return emptyElementIndices;
 	}
 
-	const Region& IndexPyramidTree::getBoundary() const
+	const Region& IndexPseudoPyramidTree::getBoundary() const
 	{
 		return boundary;
 	}
 
-	void IndexPyramidTree::insertToStructure(const Point& point, bool searchKeyExists)
+	void IndexPseudoPyramidTree::insertToStructure(const Point& point, bool searchKeyExists)
 	{
 		// Add raw point adn the sum of all its elements to the vectors
 		points.push_back(point);
 		pointSums.push_back(point.sum());
 
-		int searchKey = computePyramidValue(numDimensions, point, minPoint, maxPoint, bucketInterval);
+		int searchKey = computePseudoPyramidValue(numDimensions, point,
+			minPoint, maxPoint, scaleFactors, cumulativeSFProducts);
 		int currentIndex = points.size() - 1;
 		if (searchKeyExists)
 		{
@@ -177,10 +190,11 @@ namespace mdsearch
 		}
 	}
 
-	int IndexPyramidTree::getPointIndex(const Point& point)
+	int IndexPseudoPyramidTree::getPointIndex(const Point& point)
 	{
 		// First check if this point's bucket exists
-		int searchKey = computePyramidValue(numDimensions, point, minPoint, maxPoint, bucketInterval);
+		int searchKey = computePseudoPyramidValue(numDimensions, point,
+			minPoint, maxPoint, scaleFactors, cumulativeSFProducts);
 		OneDMap::const_iterator keyValue = hashMap.find(searchKey);
 		if (keyValue != hashMap.end())
 		{
@@ -219,7 +233,7 @@ namespace mdsearch
 		return (i > j);	
 	}
 
-	void IndexPyramidTree::defragment()
+	void IndexPseudoPyramidTree::defragment()
 	{
 		// Sort indices list in DESCENDING ORDER
 		// Done so indices aren't changed by previously removed elements
@@ -238,7 +252,7 @@ namespace mdsearch
 		emptyElementIndices.clear();
 	}
 
-	void IndexPyramidTree::updatePointIndices(unsigned int removedIndex)
+	void IndexPseudoPyramidTree::updatePointIndices(unsigned int removedIndex)
 	{
 		for (OneDMap::iterator entry = hashMap.begin(); (entry != hashMap.end()); entry++)
 		{
@@ -253,7 +267,7 @@ namespace mdsearch
 		}
 	}
 
-	void IndexPyramidTree::rebuild()
+	void IndexPseudoPyramidTree::rebuild()
 	{
 		// Store old points to re-insert into structure
 		PointList oldPoints = points;

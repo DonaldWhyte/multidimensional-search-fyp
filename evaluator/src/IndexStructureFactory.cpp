@@ -3,8 +3,8 @@
 #include "SequentialScan.h"
 #include "Octree.h"
 #include "PyramidTree.h"
-#include "IndexPyramidTree.h"
-#include "SplayPyramidTree.h"
+#include "IndexPseudoPyramidTree.h"
+#include "SplayPseudoPyramidTree.h"
 #include "PseudoPyramidTree.h"
 #include "BoundaryDistanceHashing.h"
 #include "KDTree.h"
@@ -36,7 +36,7 @@ namespace mdsearch
 		return new PyramidTree(numDimensions, boundary);		
 	}		
 
-	IndexStructure* generateIndexPyramidTree(unsigned int numDimensions,
+	IndexStructure* generateIndexPseudoPyramidTree(unsigned int numDimensions,
 		const Region& boundary, const std::vector<std::string>& args)
 	{
 		try
@@ -53,17 +53,17 @@ namespace mdsearch
 					return NULL;
 			}
 			// Parse optional 'CLEANUP PROCEDURE' ARGUMENT
-			IndexPyramidTree::CleanupProcedure cleanupProc = IndexPyramidTree::CLEANUP_PROC_DEFRAGMENT; // default is defragmentation
+			IndexPseudoPyramidTree::CleanupProcedure cleanupProc = IndexPseudoPyramidTree::CLEANUP_PROC_DEFRAGMENT; // default is defragmentation
 			if (args.size() >= 2)
 			{
 				const std::string& procStr = args[1];
 				if (procStr == "defragment")
-					cleanupProc = IndexPyramidTree::CLEANUP_PROC_DEFRAGMENT;
+					cleanupProc = IndexPseudoPyramidTree::CLEANUP_PROC_DEFRAGMENT;
 				else if (procStr == "rebuild")
-					cleanupProc = IndexPyramidTree::CLEANUP_PROC_REBUILD;
+					cleanupProc = IndexPseudoPyramidTree::CLEANUP_PROC_REBUILD;
 			}
 
-			return new IndexPyramidTree(numDimensions, boundary, maxEmptyElements, cleanupProc);
+			return new IndexPseudoPyramidTree(numDimensions, boundary, maxEmptyElements, cleanupProc);
 		}	
 		catch (const boost::bad_lexical_cast& ex)
 		{
@@ -71,10 +71,10 @@ namespace mdsearch
 		}
 	}
 
-	IndexStructure* generateSplayPyramidTree(unsigned int numDimensions,
+	IndexStructure* generateSplayPseudoPyramidTree(unsigned int numDimensions,
 		const Region& boundary, const std::vector<std::string>& args)
 	{
-		return new SplayPyramidTree(numDimensions, boundary);
+		return new SplayPseudoPyramidTree(numDimensions, boundary);
 	}
 
 	IndexStructure* generatePseudoPyramidTree(unsigned int numDimensions,
@@ -122,8 +122,8 @@ namespace mdsearch
 		addGenerator("sequential_scan", generateSequentialScan);
 		addGenerator("octree", generateOctree);
 		addGenerator("pyramid_tree", generatePyramidTree);
-		addGenerator("index_pyramid_tree", generateIndexPyramidTree);
-		addGenerator("splay_pyramid_tree", generateSplayPyramidTree);
+		addGenerator("index_pseudo_pyramid_tree", generateIndexPseudoPyramidTree);
+		addGenerator("splay_pseudo_pyramid_tree", generateSplayPseudoPyramidTree);
 		addGenerator("pseudo_pyramid_tree", generatePseudoPyramidTree);
 		addGenerator("bdh", generateBoundaryDistanceHashing);
 		addGenerator("kdtree", generateKDTree);

@@ -1,5 +1,5 @@
-#ifndef MDSEARCH_SPLAYPYRAMIDTREE_H
-#define MDSEARCH_SPLAYPYRAMIDTREE_H
+#ifndef MDSEARCH_SPLAYPSEUDOPYRAMIDTREE_H
+#define MDSEARCH_SPLAYPSEUDOPYRAMIDTREE_H
 
 #include <vector>
 #include "IndexStructure.h"
@@ -9,11 +9,11 @@
 namespace mdsearch
 {
 
-	class SplayPyramidTree : public IndexStructure
+	class SplayPseudoPyramidTree : public IndexStructure
 	{
 
 	public:
-		SplayPyramidTree(unsigned int numDimensions, const Region& boundary);
+		SplayPseudoPyramidTree(unsigned int numDimensions, const Region& boundary);
 
 		/* Clear all points currently stored in the structure. */
 		virtual void clear();
@@ -52,8 +52,9 @@ namespace mdsearch
 		Point maxPoint;
 		// Interval between buckets
 		unsigned int bucketInterval;
-		// Median values of the data set.
-		Point medianPoint;
+
+		std::vector<int> scaleFactors;
+		std::vector<int> cumulativeSFProducts;		
 
 	};
 

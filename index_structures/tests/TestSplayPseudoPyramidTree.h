@@ -1,16 +1,16 @@
-#ifndef MDSEARCH_TEST_SPLAYPYRAMIDTREE_H
-#define MDSEARCH_TEST_SPLAYPYRAMIDTREE_H
+#ifndef MDSEARCH_TEST_SPLAYPSEUDOPYRAMIDTREE_H
+#define MDSEARCH_TEST_SPLAYPSEUDOPYRAMIDTREE_H
 
 #include <gtest/gtest.h>
 #include "Common.h"
-#include "SplayPyramidTree.h"
+#include "SplayPseudoPyramidTree.h"
 
 namespace mdsearch { namespace tests
 {
 
 	static const unsigned int NUM_SPLAYPYRAMIDTREE_DIMENSIONS = 3;
 
-	class SplayPyramidTreeTests : public ::testing::Test
+	class SplayPseudoPyramidTreeTests : public ::testing::Test
 	{
 
 	protected:
@@ -24,16 +24,16 @@ namespace mdsearch { namespace tests
 
 	};
 
-	TEST_F(SplayPyramidTreeTests, Construction)
+	TEST_F(SplayPseudoPyramidTreeTests, Construction)
 	{
-		SplayPyramidTree structure(NUM_SPLAYPYRAMIDTREE_DIMENSIONS, initialBoundary);
+		SplayPseudoPyramidTree structure(NUM_SPLAYPYRAMIDTREE_DIMENSIONS, initialBoundary);
 		ASSERT_EQ(NUM_SPLAYPYRAMIDTREE_DIMENSIONS, structure.dimensionality());
 		ASSERT_EQ(initialBoundary, structure.getBoundary());
 	}
 
-	TEST_F(SplayPyramidTreeTests, Clear)
+	TEST_F(SplayPseudoPyramidTreeTests, Clear)
 	{
-		SplayPyramidTree structure(NUM_SPLAYPYRAMIDTREE_DIMENSIONS, initialBoundary);
+		SplayPseudoPyramidTree structure(NUM_SPLAYPYRAMIDTREE_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();
 		structure.loadPoints(testPoints);
@@ -47,9 +47,9 @@ namespace mdsearch { namespace tests
 			ASSERT_FALSE(structure.pointExists(testPoints[i]));
 	}
 
-	TEST_F(SplayPyramidTreeTests, InsertionAndRemoval)
+	TEST_F(SplayPseudoPyramidTreeTests, InsertionAndRemoval)
 	{
-		SplayPyramidTree structure(NUM_SPLAYPYRAMIDTREE_DIMENSIONS, initialBoundary);
+		SplayPseudoPyramidTree structure(NUM_SPLAYPYRAMIDTREE_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		const PointList& testPoints = tester.getTestPoints();
 
@@ -75,16 +75,16 @@ namespace mdsearch { namespace tests
 		}
 	}
 
-	TEST_F(SplayPyramidTreeTests, Updating)
+	TEST_F(SplayPseudoPyramidTreeTests, Updating)
 	{
-		SplayPyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
+		SplayPseudoPyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		tester.testUpdates(&structure);
 	}
 
-	TEST_F(SplayPyramidTreeTests, PointQueries)
+	TEST_F(SplayPseudoPyramidTreeTests, PointQueries)
 	{
-		SplayPyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
+		SplayPseudoPyramidTree structure(IndexStructureTester::NUM_TEST_DIMENSIONS, initialBoundary);
 		IndexStructureTester tester;
 		tester.testPointQueries(&structure);
 	}

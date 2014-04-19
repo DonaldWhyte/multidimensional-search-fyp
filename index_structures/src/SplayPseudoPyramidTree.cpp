@@ -1,21 +1,19 @@
-#include "SplayPyramidTree.h"
+#include "SplayPseudoPyramidTree.h"
 #include "Hashing.h"
 #include "Util.h"
 
 namespace mdsearch
 {
 
-	SplayPyramidTree::SplayPyramidTree(unsigned int nDimensions,
+	SplayPseudoPyramidTree::SplayPseudoPyramidTree(unsigned int nDimensions,
 		const Region& treeBoundary) : IndexStructure(nDimensions),
-		boundary(treeBoundary), minPoint(nDimensions), maxPoint(nDimensions),
-		medianPoint(nDimensions), bucketInterval(1)
+		boundary(treeBoundary), minPoint(nDimensions), maxPoint(nDimensions)
 	{
 		// Compute the interval between buckets 
 		bucketInterval = static_cast<Real>(
 			MAX_BUCKET_NUMBER / (numDimensions * 2)
 		);
 		bucketInterval = floor(bucketInterval);
-		medianPoint = computeInitialMedianPoint(MAX_BUCKET_NUMBER, numDimensions);
 
 		// Ensure boundaries are NEVER ZERO SIZED and the maximum
 		// values are always larger than the minimum
@@ -31,18 +29,32 @@ namespace mdsearch
 		{
 			minPoint[i] = boundary[i].min;
 			maxPoint[i] = boundary[i].max;
-		}			
+		}	
+
+		// Compute scale factors
+		Real m = static_cast<Real>(1.0 / numDimensions);
+		int div = ceil(pow(MAX_BUCKET_NUMBER, m));
+		scaleFactors = std::vector<int>(numDimensions, div);
+		// Pre-compute the cumlative products of the scale factors to
+		// speed up hashing function
+		cumulativeSFProducts.resize(numDimensions);
+		cumulativeSFProducts[0] = 1;
+		for (unsigned int d = 1; (d < numDimensions); d++)
+		{
+			cumulativeSFProducts[d] = scaleFactors[d - 1] * cumulativeSFProducts[d - 1];
+		}
 	}
 
-	void SplayPyramidTree::clear()
+	void SplayPseudoPyramidTree::clear()
 	{
 		splayTree.clear();
 	}
 
-	bool SplayPyramidTree::insert(const Point& point)
+	bool SplayPseudoPyramidTree::insert(const Point& point)
 	{
 		// Retrieve containing bucket by hashing point into key
-		int searchKey = computePyramidValue(numDimensions, point, minPoint, maxPoint, bucketInterval);
+		int searchKey = computePseudoPyramidValue(numDimensions, point,
+			minPoint, maxPoint, scaleFactors, cumulativeSFProducts);
 		// Search underlying 1D structure to find point's bucket
 		PTBucket* bucket = splayTree.getValue(searchKey);
 
@@ -70,7 +82,7 @@ namespace mdsearch
 		}
 	}
 
-	bool SplayPyramidTree::remove(const Point& point)
+	bool SplayPseudoPyramidTree::remove(const Point& point)
 	{
 		PTBucket* bucket = getContainingBucket(point);
 		// PTBucket has been found, point MIGHT be stored in structure
@@ -97,7 +109,7 @@ namespace mdsearch
 		}
 	}
 
-	bool SplayPyramidTree::update(const Point& oldPoint, const Point& newPoint)
+	bool SplayPseudoPyramidTree::update(const Point& oldPoint, const Point& newPoint)
 	{
 		if (remove(oldPoint)) // if point was removed successfully (i.e. it existed)
 		{
@@ -110,26 +122,27 @@ namespace mdsearch
 		}
 	}
 
-	bool SplayPyramidTree::pointExists(const Point& point)
+	bool SplayPseudoPyramidTree::pointExists(const Point& point)
 	{
 		PTBucket* bucket = getContainingBucket(point);
 		return (bucket && (getPointIndexInBucket(point, bucket) != -1));
 	}
 
-	const Region& SplayPyramidTree::getBoundary() const
+	const Region& SplayPseudoPyramidTree::getBoundary() const
 	{
 		return boundary;
 	}
 
-	PTBucket* SplayPyramidTree::getContainingBucket(const Point& point)
+	PTBucket* SplayPseudoPyramidTree::getContainingBucket(const Point& point)
 	{
 		// Hash point into one-dimensional key
-		int searchKey = computePyramidValue(numDimensions, point, minPoint, maxPoint, bucketInterval);
+		int searchKey = computePseudoPyramidValue(numDimensions, point,
+			minPoint, maxPoint, scaleFactors, cumulativeSFProducts);
 		// Search underlying splay tree to find point's bucket
 		return splayTree.getValue(searchKey);
 	}
 
-	int SplayPyramidTree::getPointIndexInBucket(const Point& point, const PTBucket* bucket) const
+	int SplayPseudoPyramidTree::getPointIndexInBucket(const Point& point, const PTBucket* bucket) const
 	{
 		// Search through points in bucket to see if it contains the given point
 		Real pSum = point.sum();
