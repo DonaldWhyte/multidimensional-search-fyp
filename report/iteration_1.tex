@@ -299,7 +299,7 @@ CPU and heap profiling was performed on each structure to determine where the pe
 			\hline
 		\end{tabular}
 	}%
-	\caption{CPU and Heap Profiling Statistics When Inserting 500,000 Points from 16D Synthetic Dataset into Index Structures}
+	\caption{CPU and Heap Profiling Statistics for Insert-Query Delete Operation List with 500,000 Points from 16D Synthetic Dataset}
 	\label{tab:perf1-profiling}
 \end{table}
 
@@ -315,16 +315,16 @@ The mean, standard deviation, minimum and maximum bucket size has been used to d
 
 \begin{table}
 	\centering
-	\begin{tabular}{|l|l|l|l|l|}
+	\begin{tabular}{|l|l|l|l|l|l|}
 		\hline
-		\textbf{} & \multicolumn{4}{c|}{\textbf{Bucket Size Statistics}} \\
+		& & \multicolumn{4}{c|}{\textbf{Bucket Size Statistics}} \\
 		\hline
-		\textbf{Dataset} & \textbf{Average} & \textbf{St. Dev} & \textbf{Min} & \textbf{Max} \\
+		\textbf{Dataset} & \textbf{Time to Insert (sec)} & \textbf{Average} & \textbf{St. Dev} & \textbf{Min} & \textbf{Max} \\
 		\hline
-		500,000 16D Random Points & TODO & TODO & TODO & TODO \\
-		500,000 Astrophysics Points & TODO & TODO & TODO & TODO \\
-		500,000 Hurricane Isabel Points & TODO & TODO & TODO & TODO \\
-		435,544 3D Armadillo Mesh Points & TODO & TODO & TODO & TODO \\
+		500,000 16D Random Points & TODO & 1.0312 & 0.115177 & 1 & 4 \\
+		500,000 Astrophysics Points & TODO & 3586.57 & 24,528 & 1 & 235,260 \\
+		500,000 Hurricane Isabel Points & TODO & 17,323.66 & 83,533 & 1 & 293,949 \\
+		435,544 3D Armadillo Mesh Points & TODO & 19.1465 & 14.9386 & 1 & 187 \\
 		\hline
 	\end{tabular}
 	\caption{Statistics on Bucket Size with Pseudo-Pyramid Tree Based on Dataset}
