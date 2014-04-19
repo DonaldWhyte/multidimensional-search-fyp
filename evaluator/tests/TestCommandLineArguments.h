@@ -10,7 +10,7 @@ namespace mdsearch { namespace tests
 	{
 
 	protected:
-		typedef std::vector<CommandLineArguments::IndexStructureSpecification> StructureSpecList;
+		typedef std::vector<IndexStructureSpecification> StructureSpecList;
 
 	};
 

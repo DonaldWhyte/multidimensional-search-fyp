@@ -95,10 +95,10 @@ void writeResultsToFile(const std::string& filename,
 	std::ofstream file(filename.c_str());
 	// Write structures used
 	file << "===STRUCTURES===\n";
-	const std::vector<CommandLineArguments::IndexStructureSpecification> structureSpecs = args.indexStructures();
+	const std::vector<IndexStructureSpecification> structureSpecs = args.indexStructures();
 	for (unsigned int i = 0; (i < structureSpecs.size()); i++)
 	{
-		const CommandLineArguments::IndexStructureSpecification& spec = structureSpecs[i];
+		const IndexStructureSpecification& spec = structureSpecs[i];
 		file << "Structure (" << i << "):\n\tType: " << spec.type << "\n\tDimensionality: " << globalNumDimensions << "\n\t";
 		file << "Arguments: ";
 		if (spec.arguments.size() > 0)

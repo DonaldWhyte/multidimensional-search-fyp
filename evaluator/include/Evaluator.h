@@ -64,7 +64,7 @@ namespace mdsearch
 		OperationListTimings timePerformance(
 			const std::vector<TestOperationList>& testOperationLists,
 			const PointList& dataToPreload,
-			const std::vector<CommandLineArguments::IndexStructureSpecification>& structureSpecs,
+			const std::vector<IndexStructureSpecification>& structureSpecs,
 			unsigned int numDimensions, const Region& boundary) const;
 		/* Given a dataset, time how long each individual insert(),
 		 * delete() and point query takes at the different structure
@@ -75,7 +75,7 @@ namespace mdsearch
 		 * sizes for a SINGLE STRUCTURE TYPE. */
 		std::vector<StructureOperationTimings> timeIndividualOperations(
 			const PointList& dataset, const std::vector<int>& pointCountsToTime,
-			const std::vector<CommandLineArguments::IndexStructureSpecification>& structureSpecs,
+			const std::vector<IndexStructureSpecification>& structureSpecs,
 			unsigned int numDimensions, const Region& boundary) const;
 
 		/* Accessors */
@@ -86,7 +86,7 @@ namespace mdsearch
 		/* NOTE: Index structure is passed as a REFERENCE to a pointer
 		 * since the structure may be rebult (and thus, be a different
 		 * object at a different address in the heap). */
-		Timing runOperations(const CommandLineArguments::IndexStructureSpecification& spec,
+		Timing runOperations(const IndexStructureSpecification& spec,
 			unsigned int numDimensions, const Region& initialBoundary,
 			const PointList& dataToPreload,
 			const TestOperationList& operations,
@@ -94,7 +94,7 @@ namespace mdsearch
 			const std::string& heapProfilerOutputFilename) const;
 
 		std::vector<IndexStructure*> loadStructures(
-			const std::vector<CommandLineArguments::IndexStructureSpecification>& structureSpecs,
+			const std::vector<IndexStructureSpecification>& structureSpecs,
 			unsigned int numDimensions, const Region& boundary) const;
 
 		/* Return filenames for output of CPU and heap profilers,
