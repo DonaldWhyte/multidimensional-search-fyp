@@ -40,7 +40,7 @@ namespace mdsearch
 	OperationListTimings Evaluator::timePerformance(
 		const std::vector<TestOperationList>& testOperationLists,
 		const PointList& dataToPreload,
-		const std::vector<CommandLineArguments::IndexStructureSpecification>& structureSpecs,
+		const std::vector<IndexStructureSpecification>& structureSpecs,
 		unsigned int numDimensions, const Region& boundary) const
 	{
 		if (verbose)
@@ -100,7 +100,7 @@ namespace mdsearch
 
 	std::vector<StructureOperationTimings> Evaluator::timeIndividualOperations(
 		const PointList& dataset, const std::vector<int>& pointCountsToTime,
-		const std::vector<CommandLineArguments::IndexStructureSpecification>& structureSpecs,
+		const std::vector<IndexStructureSpecification>& structureSpecs,
 		unsigned int numDimensions, const Region& boundary) const
 	{
 		std::vector<IndexStructure*> structures = loadStructures(structureSpecs, numDimensions, boundary);
@@ -169,7 +169,7 @@ namespace mdsearch
 	}
 
 	Timing Evaluator::runOperations(
-		const CommandLineArguments::IndexStructureSpecification& spec,
+		const IndexStructureSpecification& spec,
 		unsigned int numDimensions, const Region& initialBoundary,
 		const PointList& dataToPreload,
 		const TestOperationList& operations,
@@ -267,14 +267,14 @@ namespace mdsearch
 	}
 
 	std::vector<IndexStructure*> Evaluator::loadStructures(
-		const std::vector<CommandLineArguments::IndexStructureSpecification>& structureSpecs,
+		const std::vector<IndexStructureSpecification>& structureSpecs,
 		unsigned int numDimensions, const Region& boundary) const
 	{
 		std::vector<IndexStructure*> structures;
 		for (unsigned int i = 0; (i < structureSpecs.size()); i++)
 		{
 			// Use specification to load index structure
-			const CommandLineArguments::IndexStructureSpecification& spec = structureSpecs[i];
+			const IndexStructureSpecification& spec = structureSpecs[i];
 			IndexStructure* structure = structureFactory.constructIndexStructure(
 				spec.type, numDimensions, boundary, spec.arguments);
 			// If structure could not be constructed, display error message and exit program

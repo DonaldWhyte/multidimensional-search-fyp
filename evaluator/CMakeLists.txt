@@ -2,6 +2,7 @@
 set (EVALUATOR_SRC 
 	# Source files
 	"src/CommandLineArguments.cpp"
+	"src/TestSuite.cpp"
 	"src/IndexStructureFactory.cpp"
 	"src/TestOperation.cpp"
 	"src/TestOperationLoader.cpp"
@@ -9,6 +10,7 @@ set (EVALUATOR_SRC
 	# Header files
 	"include/IndexStructureFactory.h"
 	"include/CommandLineArguments.h"
+	"include/TestSuite.h"
 	"include/TestOperation.h"
 	"include/TestOperationLoader.h"
 	"include/Evaluator.h"
@@ -28,11 +30,12 @@ include_directories(${PROJECT_ROOT}/index_structures/include)
 add_executable ( evaluator_tests
 	"tests/TestRunner.cpp"
 	"tests/TestCommandLineArguments.h"
+	"tests/TestTestSuite.h"
 	"tests/TestTestOperationLoader.h"
 	${EVALUATOR_SRC}
 )
 # Ensure google-test library is linked and include files are in search path
-# NOTE: index_structures library is dependant on the 'data' library for the
+# NOTE: index_structures library is dependent on the 'data' library for the
 # necessary types
 target_link_libraries ( evaluator_tests index_structures data ${LIBS} )
 include_directories ({DEPENDENCIES})

@@ -165,7 +165,7 @@ namespace mdsearch
 		return runs;
 	}	
 
-	const std::vector<CommandLineArguments::IndexStructureSpecification>& CommandLineArguments::indexStructures() const
+	const std::vector<IndexStructureSpecification>& CommandLineArguments::indexStructures() const
 	{
 		return specifiedIndexStructures;
 	}

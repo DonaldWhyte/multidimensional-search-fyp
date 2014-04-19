@@ -1,14 +1,11 @@
 #ifndef MDSEARCH_COMMANDLINEARGUMENTS_H
 #define MDSEARCH_COMMANDLINEARGUMENTS_H
 
-#include <vector>
-#include <string>
+#include "Specifications.h"
 #include "Region.h"
 
 namespace mdsearch
 {
-
-	typedef std::vector<std::string> StringList;
 
 	class CommandLineArguments
 	{
@@ -16,12 +13,6 @@ namespace mdsearch
 	public:
 		/* Default number of test runs to perform. */
 		static const unsigned int DEFAULT_TEST_RUNS;
-
-		struct IndexStructureSpecification
-		{
-			std::string type;
-			StringList arguments;
-		};
 
 		CommandLineArguments(int argc, char* argv[]);
 

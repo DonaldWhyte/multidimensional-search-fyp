@@ -283,19 +283,20 @@ TODO: remarks on it
 
 CPU and heap profiling was performed on each structure to determine where the performance bottlenecks are and how much memory each structure uses. Table \ref{fig:perf1-profiling} shows which functions took the majority of the execution time for each structure, as well as how much heap memory the structure consumed when storing all of the input dataset's points. The dataset used contained 10,000 10D uniformly random points and the CPU profiling was performed over the Insert-Query-Delete operation list.
 
+TODO: explain cache
+
 \begin{table}
 	\centering
 	\makebox[\textwidth][c]{%
 		\begin{tabular}{|l|l|l|l|}
 			\hline
-			\textbf{Structure} & \textbf{Max Heap Memory (MB)} & \textbf{Cache Hit Rate (\%)} & \textbf{Dominant Function (\% Total Time Spent)} \\
+			\textbf{Structure} & \textbf{Peak Heap Memory (MB)} & \textbf{Cache Hit Rate (\%)} & \textbf{Dominant Function (\% Total Time Spent)} \\
 			\hline
-			Sequential Scan & TODO & TODO & TODO (TODO) \\
-			Octree & TODO & TODO & TODO (TODO) \\
-			Defragmented PPT & TODO & TODO & TODO (TODO) \\
-			Rebuild PPT & TODO & TODO & TODO (TODO) \\
-			Bucket PPT & TODO & TODO & TODO (TODO) \\
-			Splay PPT & TODO & TODO & TODO (TODO) \\
+			Sequential Scan & 4.1 & 5.3 & \texttt{pointExists()} (34.4\%) \\
+			Defragmented PPT & 10.9 & 7.4 & \texttt{defragment()} (76.6\%)\\
+			Rebuild PPT & 16.8 & 0.25 & \texttt{rebuild()} (60.7\%)\\
+			Bucket PPT & 11.2 & 0.1 & \texttt{remove()} (19.2\%) \\
+			Splay PPT & 11.8 & 0.25 & \texttt{insert()} (47.2\%) \\
 			\hline
 		\end{tabular}
 	}%
