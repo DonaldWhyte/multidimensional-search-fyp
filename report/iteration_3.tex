@@ -8,9 +8,13 @@ The $kd$-Tree variant described in Section \ref{sec:kd-tree-chosen} was implemen
 
 \subsection{Bucket $kd$-Tree}
 
-Instead of storing a single point in every node of the tree, the \textbf{Bucket $kd$-Tree} stores multiple points (i.e. a bucket) in nodes, with the constraint that only leaf nodes store points. Non-leaf nodes serve to partition the data space, each cutting the space along a single dimension by some value (the cutting value). When the number of points in a leaf exceeds a certain number, say $M$, then a cutting dimension and value are determined and the node is split into two. The left and right children nodes are leaves that contain the points from the split node that lie on one of the sides of the cutting dimension.
+Instead of storing a single point in every node of the tree, the \textbf{Bucket $kd$-Tree} stores multiple points (i.e. a bucket) in nodes, with the constraint that only leaf nodes store points. Non-leaf nodes serve to partition the data space, each cutting the space along a single dimension by some value (the cutting value). When the number of points in a leaf exceeds a certain number, say $M$, then a cutting dimension and value are determined and the node is \textit{split} into two. The left and right children nodes are leaves that contain the points from the split node that lie on one of the sides of the cutting dimension. This process is illustrated in Figure \ref{fig:kd-split}.
 
-TODO: advantages of doing this
+To query or deleting a point, the leaf containing the point is found, which is sequentially scanned to find the point. After removing a point, the total number of points being stored in the modified leaf node and its sibling is less than $\frac{M}{4}$, then the two leaf nodes are \textit{merged} into their parent. The parent becomes a leaf node (see \ref{fig:kd-merge}) containing all the points from the two leaves.
+
+With this approach, the tree has more knowledge about the distribution of the points to determine a more effective way partition the data which ensures the search tree is balanced. With the Point $kd$-Tree, only one point at a time is used to determine the cutting dimension. There is also less heap fragmentation because the points stored in leaves are stored contiguously.
+
+TODO: two figures
 
 \subsection{Performance Timings}
 
