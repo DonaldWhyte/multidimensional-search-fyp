@@ -5,28 +5,62 @@
 
 TODO: intro to section
 
-\begin{landscape}
+\section{Schedule}
 
+TODO: intro
+
+\begin{figure}[h]
+	\centering
+	\makebox[\textwidth][c]{
+		\includegraphics[scale=0.45]{figures/schedule/initial_project_schedule.pdf}
+	}%
+	\caption{Initial Project Schedule Created on 31/01/14}
+	\label{fig:initial-schedule}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\makebox[\textwidth][c]{
+		\includegraphics[scale=0.45]{figures/schedule/revised_project_schedule.pdf}
+	}%
+	\caption{Revised Project Schedule Created on 20/02/14}
+	\label{fig:revised-schedule}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\makebox[\textwidth][c]{
+		\includegraphics[scale=0.6]{figures/schedule/full-project-process.pdf}
+	}%
+	\caption{Flow Chart of Full Project Schedule}
+	\label{fig:full-project-process}
+\end{figure}
+
+\begin{landscape}	
+	\begin{figure}
+		\centering
+		\centerline{ \includegraphics[scale=0.475]{figures/schedule/initial_schedule_timeline.pdf} }
+		\caption{Initial Milestone Timeline Created on 20/02/14}
+		\label{fig:initial-milestone-timeline}
+	\end{figure}
+
+	\begin{figure}
+		\centering
+		\centerline{ \includegraphics[scale=0.475]{figures/schedule/revised_schedule_timeline.pdf} }
+		\caption{Revised Milestone Timeline Created on 20/02/14}
+		\label{fig:revised-milestone-timeline}
+	\end{figure}	
+\end{landscape}
+
+
+
+
+\begin{landscape}
 	\section{Multi-dimensional Search Structures}
 
-	\null  % Empty line
-	\nointerlineskip  % No skip for prev line
-	\vfill
-	\let\snewpage \newpage
-	\let\newpage \relax
-		\begin{figure}[H]
-			\centering
-			\includegraphics[scale=0.35]{figures/md_structure_taxonomy.png}
-			\caption{Multi-dimensional Search Structure Taxonomy}
-			\label{fig:structure-taxonomy}
-		\end{figure}
-	\let \newpage \snewpage
-	\vfill 
-	\break % page break
+	TODO: intro
 
-	\newpage
-
-	\begin{table}
+	\begin{table}[h]
 		\centering
 		\begin{tabular}{|p{2.8cm}|p{5cm}|p{5cm}|p{5cm}|p{2cm}|}
 			\hline
@@ -51,21 +85,71 @@ TODO: intro to section
 		\label{tab:comparison}
 	\end{table}
 
+	\null  % Empty line
+	\nointerlineskip  % No skip for prev line
+	\vfill
+	\let\snewpage \newpage
+	\let\newpage \relax
+		\begin{figure}[H]
+			\centering
+			\includegraphics[scale=0.35]{figures/md_structure_taxonomy.png}
+			\caption{Multi-dimensional Search Structure Taxonomy}
+			\label{fig:structure-taxonomy}
+		\end{figure}
+	\let \newpage \snewpage
+	\vfill 
+	\break % page break
+
+	\newpage
+
 \end{landscape}
 
+
+
+
 \section{Performance Timings}
+
+TODO: intro
 
 =ITERATION 1=
 TODO: tables showing times for three operations w/ synthetic and clustered data (two tables)
 
-TODO: plots for three operations w/ synthetic and clustered data (6 plots)
-
-=ITERATION 2=
+=ITERATION 3=
 TODO: tables showing times for three operations w/ synthetic and clustered data (two tables)
 
-TODO: plots not in main report (7 plots)
 
-\section{Algortithms and Code Listings}
+
+
+\section{Algorithms and Code Listings}
+
+TODO: intro
+
+\begin{algorithm}[H]
+	\SetAlgoLined
+	\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+	\SetKwFunction{hashPoint}{hashPoint} \SetKwFunction{hashFloat}{hashFloat}
+
+ 	\SetKwProg{funcHashPoint}{Algorithm}{}{}
+  	\funcHashPoint{\hashPoint{$d, p$}} {
+		\Input{$d$ = number of dimensions}
+		\Input{$p_0, p_1, \dots, p_{d-1}$ = coordinates of point}
+		\Output{$seed$ = integer representing hashed point}
+		\Begin {
+			$seed = 0$\;
+			\For{$i = 0$ to $d - 1$} {
+				$seed = seed \oplus \left(\hashFloat(p_i) + \texttt{0x9e3779b9} + (seed << 6) + (seed >> 2)\right)$
+			}
+			\KwRet{$seed$}
+		}
+	}
+
+	\caption{Hashing Multi-Dimensional Point in Bucket Hash Table}
+	\label{alg:point-hashing}
+\end{algorithm}
+
+\paragraph{\textbf{NOTE:}} \texttt{hashFloat} is a function which hashes an individual 32-bit floating point number and corresponds to the function \texttt{float\_hash\_impl2} in Listing \ref{lst:hash-float-function}.
+
+\paragraph{} 
 
 \begin{lstlisting}[label=lst:hash-float-function, caption=Code to Hash Single 32-bit Floating Point Value (Source code from file \texttt{boost/functional/hash/detail/hash\_float\_generic.hpp} in Boost Library 1.42.0)]
 // Copyright 2005-2009 Daniel James.

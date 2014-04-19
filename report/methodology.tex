@@ -7,29 +7,70 @@ This section gives information on how the project will be tackled, describing th
 
 \section{Schedule}
 
-TODO
+The original schedule was devised near the end of the first week of the project, on 31/01/14. The schedule was broken down into the individual tasks required to complete the defined milestones. These tasks were then grouped into different \textbf{phases}, which ran sequentially with some in parallel. Milestones were associated with these phases, each corresponding to the completion of some deliverable.
 
-\subsection{Phases}
+The phases of the project and their milestones are:
+\begin{enumerate}
+	\item \textbf{Project Definition}
+	\begin{itemize}
+		\item \textbf{Project Outline Defined} -- outline of project's aims and objects is defined 
+	\end{itemize}
+	\item \textbf{Literature Review and Data Collection}
+	\begin{itemize}	
+		\item \textbf{Literature Review Complete} -- a literature review has been produced for the field of multi-dimensional search
+		\item \textbf{Test Data Collected} -- any non-synthetic external test data sets have been decided and collected
+	\end{itemize}
+	\item \textbf{Mid-project Presentation and Report}
+	\begin{itemize}	
+		\item \textbf{Mid-project Presentation Delivered} -- preparation and delivery of mid-project presentation performed to relevant research group
+		\item \textbf{Mid-project Report Finished} --  mid-project report submitted
+	\end{itemize}	
+	\item \textbf{Design and Implementation} -- iterative process that involves designing, implementing and optimising index structures as well as evaluating them to determine which perform the best
+	\begin{itemize}
+		\item \textbf{Software Deliverables Finished} -- final, optimised implementations of the index structures have been produced, which are ready for a final evaluation
+	\end{itemize}
+	\item \textbf{Final Report Write-up}
+	\begin{itemize}
+		\item \textbf{Final Report Finished} -- write-up of the final report, the core deliverable of the project, is submitted
+	\end{itemize}
+	\item \textbf{Student Symposium}
+	\begin{itemize}
+		\item \textbf{Final Presentation Delivered} -- preparation and delivery of final project presentation as part of the School's Student Symposium	
+	\end{itemize}
+\end{enumerate}
 
-TODO
+Figures \ref{fig:revised-schedule} and \ref{fig:revised-milestone-timeline} in Appendic \ref{chap:supp-material} show a Gantt chart of the project phases and a timeline marked with every milestone. The Gantt chart marks the dates each phase starts and ends. Notice how some phases are running in parallel, with one phase being the primary focus and other being a secondary focus where less is spent. The latest completion date of a milestone is where the corresponding milestone resides on the timeline.
 
-TODO: gantt chart here???
+\subsection{Iterative Design and Implementation}
+\label{sec:iterative-d-and-i}
 
-\subsection{Milestones}
+The performance tests and evaluation of the implementations could produce unexpected results, showing that it may be beneficial to implement an entirely different index structure or use a different technology. Therefore, deciding on a \textit{fixed} set of index structures to implement and their technologies before starting the implementations at all would be unwise. With such an approach, there is no way to go backwards and revision the project plan if performance tests highlight a poor index structure or technology.
 
-TODO
+A decision has been made on a \textit{single, initial} index structure to implement. This will be evaluated and based on that evaluation, it will be optimised or it will be discarded in favour of another index structure. This will be repeated in iterations, where each iteration contains the following sub-phases:
+\begin{enumerate}
+	\item \textbf{Design} -- plan exactly what needs to be done in the iteration and the architectural design of the system/implementation
+	\item \textbf{Build} -- implement an index structure or perform one or more optimisations
+	\item \textbf{Test} -- perform correctness tests on index structure to ensure it (still) works
+	\item \textbf{Performance Analysis} -- perform performance analysis on index structure developed/optimised
+	\item \textbf{Evaluation} -- evaluate the produced results and use it to decide what to implement or optimise in the next iteration
+\end{enumerate}
+When enough iterations have passed or there is no time left to spend on the Design and Implementation phase, the iterations will stop, with the evaluation of the optimised structure(s) in last phase being the final evaluation that is used in the Final Report Write-up phase. This iterative approach is illustrated in the full project process diagram shown in Figure \ref{fig:full-project-process} in Appendix \ref{chap:supp-material}.
 
-\subsection{Iteration Summary}
+\subsection{Original Plan}
 
-TODO: summary of each iteration and what was achieved/worked on in that iteration
+The plan has changed since its initial conception. The original plan stated that the initial, unoptimised implementations of the index structures should be finished before the mid-project presentation or report. The idea behind this decision was that having implementations of index structures finished before the presentation, an initial evaluation of the index structures could be performed. The results from this evaluation could then used in the presentation and report as justification for project decisions. However, due to the scope of the research field, the literature take one more week than expected. This meant that there was little time between the end of the literature review and the start of the mid-project presentation and report.
+
+Furthermore, additional time was required to become fully informed about the field of multi-dimensional search and the nature of the data that will be used for evaluation. This knowledge informs the decisions on which index structures to implement, so it was felt that rushing into an initial implementation may result in a poor decision being made on which structures to implement. Therefore, any implementation was pushed back until after the submission of the mid-project report. By doing this, there was more time to consolidate the research findings and make a more informed decision on the index structure(s) to implement.
+
+For completeness, the Gantt chart and milestone timeline for the original plan has been provided in Appendix \ref{chap:supp-material}, in Figures \ref{fig:initial-schedule} and \ref{fig:initial-milestone-timeline}.
 
 \section{Technology}
 
-TODO: fill this in
+This section compares some of the potential technologies to use when implementing the index structures and analyse their performance. Justifications are given for the chosen technologies, referring to the project's goals and the experience of the project developer.
 
 \subsection{Programming Language}
 
-There exist many programming languages, all developed for specific purposes. Three programming languages have been considered for this project, with each having different properties. This section will describe these languaes, discuss their differences and state which will be used for this project and why.
+There exist many programming languages, all developed for specific purposes. Three programming languages have been considered for this project, with each having different properties. This section will describe these languages, discuss their differences and state which will be used for this project and why.
 
 \textbf{Python} is a high-level interpreted language built for general-purpose computing, which has a large standard library and many third-party libraries \cite{python}. \textbf{C++} is a middle-level, compiled systems programming language, combining low-level features (e.g. manual memory management) and high-level features (e.g. object-orientated programming) \cite{cpp}. C++ applications are compiled straight to the native machine's CPU instruction set, meaning less time is spent translating the code to instructions the hardware can directly execute. \textbf{Haskell} is a purely functional general-purpose programming language which compiles to a native executable, similar to C++ \cite{haskell}. Being purely functional means that applications written in Haskell have no mutable state. This is unlike Python and C++, whose applications have mutable state (since both languages are imperative).
 
@@ -45,6 +86,10 @@ Executing a Python statement often has more overhead than it would for C++ or Ha
 Haskell's pure functional nature makes it fundamentally different than most popular languages and I also have little experience writing programs in a purely functional style. It is predicted this will increase the time it takes to develop the structures, as there is more overhead in learning about functional programming. However, if it is decided that the index structures will be parallelised, then the lack of state and built-in support for parallelisation \cite{parallel-haskell} would make Haskell a powerful choice.
 
 Despite speed of development being important, the primary aim of the project is the acceleration of search. Haskell can be used to write highly optimised code, especially when implementing parallel algorithms to utilise multiple CPU cores. C++ gives the developer more control over the computation and management of memory, allowing for low-level performance tuning. The trade-off for this control is the added complexity of the language \cite{cpp-hard}, leading to an increased amount of code to write and the decrease in development speed that follows. However, C++ is also a mature language with a large set of tools and resources to aid development. Additionally, I have significantly more experience developing in C++ than Haskell. It is unlikely I would be able to produce well-written, optimised Haskell code to fine-tune performance in such a short time. Therefore, C++ has been chosen as the language to use for developing the initial implementation of the index structure.
+
+\subsection{Why Not C?}
+
+TODO
 
 \subsection{Development Tools}
 \label{sec:development-tools}

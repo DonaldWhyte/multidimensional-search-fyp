@@ -1,163 +1,33 @@
-\section{Iteration \#2 -- Pyramid Tree and the Limitations with Hash-Based Approaches}
+\section{Iteration \#2 -- Pyramid Tree and Other Hash-Based Approaches}
 
-TODO
-\begin{itemize}
-	\item TODO
-\end{itemize}
-
-\subsection{Pseudo-Pyramid Tree Optimisations}
-
-The Pseudo-Pyramid Tree performed better than Sequential Scan for point queries in high-dimensional data, up until a certain number of dimensions were reached. This section discusses the different optimisations and variants of this structure that were developed to increase its speed further and make it usable with a higher number of dimensions.
-
-\subsubsection{Accelerating Hash Function}
-
-It was shown in the last iteration that the Pseudo-Pyramid tree eventually becomes slower than Sequential Scan as $d$ increases. Since the plots showed the increase in the Pseudo-Pyramid Tree's execution time is roughly quadratic, and the structure spend most of that time in the $O(d^2)$ hashing function (Equation \ref{eq:pseudo-pyramid-hash}), it follows that speeding up the hashing function would provide large speed gains.
-
-The existing point hashing function takes $O(d^2)$ time because of the inner loop that computes $\prod_{j=0}^{i}{\lbrack m_j \rbrack}$. If $m$ is changed during the structure's lifetime. otherwise the hash value of a point could change and stored points can become inaccessible. Therefore, $m$ is constant and the hashing function can computed in $O(d)$ time by \textit{pre-computing} $\prod_{j=0}^{i}{\lbrack m_j \rbrack}$. This pre-computation happens when the Pseudo-Pyramid tree is initialised. The new hashing function is given in Equation \ref{eq:new-pseudo-pyramid-hash}.
-
-\begin{multline}\\
-	h(p) = \sum_{i = 0}^{d} { \lbrack \texttt{toInt}( h_i(p) \times m_i ) \times M_i \rbrack } \\
-	\text{where } M_i = \prod_{j=0}^{i}{\lbrack m_j \rbrack} \;\;\; \text{for} \; 0 \leq i \leq d \\
-	\label{eq:new-pseudo-pyramid-hash}
-\end{multline}
-
-Table \ref{tab:new-pseudo-pyramid-hash} shows operation execution time of the Batch Pyramid Tree using the original $O(d^2)$ hashing function and the new $O(d)$ function. The tes used the Insert-Query-Remove operation list on the uniform synthetic dataset with 200 dimensions. Figure \ref{fig:new-pseudo-pyramid-hash} plots the performance of the Pseudo-Pyramid tree with both hash functions alongside Sequential Scan, showing execution time against dimensionality. From the plot, it is clear that the new hashing function provides superior speed; the Pseudo-Pyramid Tree is now significantly faster than Sequential Scan, even for dimensions as high as 200.
-
-\begin{table}
-	\centering
-	\begin{tabular}{|l|l|l|}
-		\hline
-		\textbf{Operation} & \textbf{$O(d^2)$ Function} & \textbf{$O(d)$ Function} \\
-		\hline
-		\textbf{Insert} & 1.46412 & 0.0112199 \\
-		\textbf{Delete} & 0.730777 & 0.00625336 \\
-		\textbf{Point Query} & 0.731469 & 0.0076015 \\
-		\hline
-	\end{tabular}
-	\caption{Total Execution Time (in Seconds) of Batch Pseudo-Pyramid Tree Using $O(d^2)$ and $O(d)$ Hash Function (200D Randomly Uniform Dataset, 10,000 operations each)}
-	\label{tab:new-pseudo-pyramid-hash}
-\end{table}
-
-\begin{figure}
-	\centering
-	\includegraphics[scale=0.5]{figures/performance_analysis/iteration_2/new_pseudo-pyramid_hash_performance.pdf}
-	\caption{\texttt{insert} Performance on Random Uniformly Distributed Datasets of Varying Dimensions}
-	\label{fig:new-pseudo-pyramid-hash}
-\end{figure}
-
-\subsubsection{Bucket Pseudo-Pyramid Tree}
-
-The Bucket Pseudo-Pyramid Tree implementation does not use a single array to store the points. Instead of buckets containing an array of point indices, it has an array of actual points. No clenaup procedure is necessary because the memory for a point is released immediately afer it's removed, by simply erasing it from the corresponding bucket's array. The goal of this is to increase \textbf{cache coherency} when searhcing a bucket, since the point array can be searched sequentially. The index-based variants cause random accesses in the single point array (causing more cache misses) since a bucket's store indices may point to distant parts of the point array, which may become very large.
-
-% TODO: further explanation of cache misses?
-
-Array deletion is a $O(n)$ operation since the case where a single bucket stores all $n$ points is possible, making \texttt{delete} $O(n)$ in the worst case. Since the order the points are stored in a bucket do not matter, the C++ \textit{erase-remove} idiom has been used to delete elements from the bucket arrays, which swaps the element to delete with the last element in the array, removing the desired element when it's at the end of the array. This prevents the required $O(n)$ shift operation which tightly pack the elements after a deletion. From this point in the document onwards, all \texttt{std::vector} deletions where order does not matter will be performed using the erase-remove idiom.
-
-\subsubsection{Splay Pseudo-Pyramid Tree}
-
-Unlile the other implementations, the Splay Pseudo-Pyramid Tree does not use a hash map as the underyling one-dimensional index structure, but a splay tree. The splay tree is a self-adjusting variant of the binary search tree that uses a \textit{splaying} operation (a heuristic) to allow faster access to recently accessed elements. \cite{splay-tree}. The splaying operation achieves this by performing a series of tree rotations that move a given node up to the root of the tree. Through amortised analysis and empirical experiments, it has been shown splay trees can be more efficient than standard binary trees for a series of non-random operations \cite{splay-tree}, despite the asymptotic worst case bound being worse than binary search trees.
-
-TODO: more detail about the splay tree, including in-depth algorithms??
-
-Nodes in the Splay Pseudo-Pyramid Tree correspond to individual buckets in the Bucket Pseudo-Pyramid Tree, meaning each node can store multiple points. Since the splay tree is implemented as a collection of heap-allocated nodes with pointers to link them, deletions are cheap as a low amount of memory needs to be de-allocated per \texttt{delete} operation. The aim is that this, combined with the self-adjusting nature of the splay tree, will produce a Pseudo-Pyramid Tree implementation that is more efficient for non-random operations used in real applications.
-
-\subsubsection {Best Pseudo-Pyramid Tree Variant}
-
-All variants of the Pseudo-Pyramid Tree hash $d$-dimensional points to a one-dimensional value, which is used as a key to search for a given point in a one-dimensional structure. What varies is how points are deleted and which underyling one-dimensional structure is used. The Defragmented Pseudo-Pyramid Tree is clearly inferior to the Rebuild Pseudo-Pyramid Tree from the last iteration and the Batch Pseudo-Pyramid Tree never releases memory after points are removed. For dynamic data which changes frequently, this may cause the machine to run out of memory. As such, both of these structures will not be explored further.
-
-% TODO: create new plot
-\begin{wrapfigure}[12]{r}{0.5\textwidth}
-	\vspace{-40pt}
-	\begin{center}
-		\includegraphics[scale=0.5]{figures/performance_analysis/iteration_1/all_pquery_sizevary_average.pdf}
-	\end{center}
-	\vspace{-20pt}
-	\caption{Total Execution Time (in Seconds) of \texttt{delete} Operation for Different Sample Sizes of Astrophysics Dataset}
-	\label{fig:perf2-astrophysics-delete}
-\end{wrapfigure}
-
-The Rebuild Pseudo-Pyramid Tree, Bucket Pyramid-Tree and the Splay Pseudo-Pyramid Tree were timed with the full collection of synthetic and real datasets. The results were consistent throughout the different datasets. For brevity, only the times for the astrophysics dataset with the Insert-Query-Delete operation list will be provided. Table \ref{tab:perf2-astrophysic} shows the total execution times of each structure operation and Figure \ref{fig:perf2-astrophysics-delete} shows execution time of the \texttt{delete} operation as the number of points are increased.
-
-The results show that storing separate point arrays for each bucket drastically reduces the speed of \texttt{delete} operations, with the Rebuuild Pseudo-Pyramid tree being slowest. The differences in speed between the bucket and splay variants is small, but the Bucket Pseudo-Pyramid Tree outperforms the Splay Tree with most datasets. With severely skewed synthetic data, the splay variant is \texttt{slightly} faster, but the speed increase is neglible. This could be an indication that self-adjusting structures are useful for heavily skewed data however, highlighting an area for further study. Based on these results, it was decided that any future variants of the tree will be based on the Bucket Pseudo-Pyramid Tree.
-
-\begin{table}
-	\centering
-	\begin{tabular}{|r|l|l|l|l|}
-		\hline
-		\textbf{Structure} & \textbf{Operation List} & $n = 10,000$ & $n = 100,000$ & $n = 500,000$ \\
-		\hline
-		\multirow{ 4}{*}{\textbf{Rebuild Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.0698843 & 5.99686 & 156.281 \\
-		 & \textbf{Delete} & 0.481668 & 59.3513 & 1328.2 \\
-		 & \textbf{Point Queries} & 0.0656809 & 5.96501 & 158.955 \\
-		\hline
-		\multirow{ 4}{*}{\textbf{Bucket Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.0508634 & 4.5737 & 101.581 \\
-		 & \textbf{Delete} & 0.318228 & 29.4124 & 672.372 \\
-		 & \textbf{Point Queries} & 0.0495212 & 4.43291 & 96.1636 \\
-		\hline
-		\multirow{ 4}{*}{\textbf{Splay Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.0509274 & 4.64242 & 101.245 \\
-		 & \textbf{Delete} & 0.318251 & 29.6108 & 675.695 \\
-		 & \textbf{Point Queries} & 0.0507686 & 4.59311 & 99.1579 \\
-		\hline
-	\end{tabular}
-	\caption{Total Execution Time (in Seconds) for Different Sample Sizes of Astrophysics Dataset using the Insert-Query-Delete Operation List}
-	\label{tab:perf2-astrophysics}
-\end{table}
-
-\subsubsection{Impact of Bucket Size}
-
-Despite the work gone into increasing the speed of the Pseudo-Pyramid Tree, the speedup when compared to Sequential Scan seemed to be quite low. For example, $500,000$ insertion operations with the astrophysics dataset takes 445.716 seconds with Sequential Scan and 101.581 seconds with the Bucket Pseudo-Pyramid Tree, meaning a speed of $445.716/101.581 \approx 4.388$ has been achieved. Considering there exist algorithms which can perform search in $O(log_2 n)$ time, this raised the question of why the speedup is so low.
-
-Despite hashing a point taking $O(d)$ time, point queries will take much longer if there are large numbers of points in buckets. If each bucket contains exactly one point, then the complexity approaches $O(d)$. On the other extreme, where a single bucket contains all points, the complexity becomes $O(n)$. The number of points in a bucket, or \textit{bucket size}, is one of the most important factors to consider when analysing the performance of hash-based index structures. The \textit{mean} and \textit{standard deviation} of bucket size has been used to determine why the structures are working so slowly.
-
-After inserting $500,000$ points from the astrophysics dataset into the Bucket Pseudo-Pyramid Tree, the average and standard deviation of bucket size is TODO and TODO respectively. Therefore, on average, a point query will linearly scan through TODO points. To determine whether or not hash-based index structures can provice fast point queries, more research has been performed in decreasing bucket size by using different hashing functions. This research is discussed in the following secions.
+This iteration explores other hashing functions to find a hash-based index structure which performs well on the two scientific datasets.
 
 \subsection{Pyramid Tree}
 
-As described in Section \ref{sec:pyramid-tree}, the Pyramid tree reduces multi-dimensional points to one dimension, which can then be used in a one-dimensional index structure (a B${}^{+}$-tree in the original paper \cite{pyramid-tree}). This reduction to a one-dimensional value can be seen as a hashing function, which can be used to generate search keys for the underlying hash map in the Bucket Pseudo-Pyramid Tree.
+The Pyramid Tree implementation is identical to the Pseudo-Pyramid Tree implementation, except points are now hashed to their pyramid value as described in Section \ref{sec:pyramid-tree-detail}.
 
-To elaborate on the reduction technique, the Pyramid tree partitions the data space into $2d$ Pyramids, where each is represented the $(d - 1)$ hyperplane corresponding to the Pyramid's base. Each pyramid is is segmented by splitting them along $(d-1)$ hyperplanes parallel to the base of the pyramid. The one-dimensional value of a point, called the \textit{pyramid value}, describes which Pyramid it is in and the height of that point in that Pyramid. The resultant spatial partition looks like Figure \ref{fig:pyramid-tree-buckets}, where each Pyramid segment has a corresponding bucket which stores the points.
+\subsection{B${}^+$-Tree as Underlying Structure}
 
-\begin{figure}
-		\begin{center}
-			\begin{subfloat}[$2d$ Pyramids in 2D Data Space\label{fig:pyramid-tree-pyramids}]{%
-				\includegraphics[scale=0.5]{figures/pyramid_tree_partition.pdf}
-			}
-			\end{subfloat}~
-			\begin{subfloat}[Segmented $2d$ Pyramids, Each Associated with a Bucket\label{fig:pyramid-tree-buckets}] {%
-				\includegraphics[scale=0.5]{figures/pyramid_tree_buckets.pdf}
-			}
-			\end{subfloat}
-		\end{center}
+Berchtold et al. originally used a B${}^{+}$-tree when developing the Pyramid Tree \cite{pyramid-tree}. It was decided that using the same underlying search structure would allow for a more fair comparison of the Pyramid tree data structure. Two B${}^{+}$-tree implementations, cpp-btree\cite{cpp-btree} and bpt\cite{bpt}, were plugged and tested into the Pyramid Tree. The first is a C++ implementation while the second is a pure C implementation.
 
-		\label{fig:pyramid-tree-partition}
-\end{figure}
+Table \ref{tab:hashtable-bplus-time-comparison} provides timings for a single synthetic dataset. There is a substantial difference between the speed of the hash table Pyramid tree and the B${}^{+}$-tree implementations. After profiling, it was discovered the main cause of the decrease in speed was simply the additional overhead incurred by splitting and merging nodes in the B${}^{+}$-tree. This matches the theoretical performance analyses of the two structures, where it is shown that hash tables and B${}^{+}$-trees have amortised $O(1)$ and $O(\log n)$ operations respectively (the former being dependant on the hashing function used).
 
-More formally, the pyramid value $pv_v$ of a point $v$ is given by $pv_v = (i + h_v)$, where $i$ represents the pyramid $v$ is contained in and $h_v$ is height of $v$ in pyramid $i$. $i$ and $h_v$ are given in Equations \ref{eq:pyramid-value-index} and \ref{eq:pyramid-value-height} respectively, where $MOD$ refers to the modulo operator.
+Based on these results, it has been decided to continue using the hash table and the underlying search structure, and not the B${}^{+}$-tree.
 
-\begin{multline}\\
-	i = \begin{cases}
-		j_{max},         & \text{if }v_{j_{max}} < 0.5\\
-		j_{max} + d,   & \text{if }v_{j_{max}} \geq 0.5\\
-	\end{cases} \\
-	j_{max} = \left( j \;|\; \forall k \; 0 \leq j,k \leq d, j \neq k: \;\; \lvert 0.5 - v_j \rvert \geq \lvert 0.5 - v_k \rvert \right) \\
-	\label{eq:pyramid-value-index}
-\end{multline}
-\begin{equation}
-	h_v = \lvert 0.5 - v_{i \; MOD \; d} \rvert
-	\label{eq:pyramid-value-height}
-\end{equation}
-
-The following lemma shows that two distinct points can be mapped to the same Pyramid value. It follows that the Pyramid-technique as a hashing function may cause points to be stored in the same bucket. As such, bucket size will be a key performance factor for the structure and will be measured to provide a comparison to other hash-based structures discussed in this iteration.
-
-\begin{proof}[\textbf{Lemma: } For $d \geq 2$, there exist two points $x$ and $y$, such that $x \neq y$, with the same pyramid value]\mbox{}\\*
-Let $d$ be the number of dimensions and $x = (x_0, x_1, \dots, x_{d -1})$, $y = (y_0, y_1, \dots, y_{d - 1})$ be two $d$-dimensional points. Without loss of generality, assume $0 \leq x_i \leq 1$ and $0 \leq y_i \leq 1$ for all $i = 1, 2, \dots, d$. Suppose $x_0 = y_0 = 0$, $x_{d - 1} = 0.1$, $y_{d - 1} = 0.2$ and $x_i = y_i = 0.1$ for all $i = 1, \dots, {d - 2}$. This means $x \neq y$. The following holds:
-\begin{enumerate}
-	\item $\forall k \; 0 \leq k \leq d, k \neq 0: \;\; \lvert 0.5 - x_0 \rvert \geq \lvert 0.5 - x_k \rvert$,
-	\item $\forall k \; 0 \leq k \leq d, k \neq 0: \;\; \lvert 0.5 - y_0 \rvert \geq \lvert 0.5 - y_k \rvert$.
-\end{enumerate}
-Since $x_0 \leq 0.5$ and $y \leq 0.5$, both $x$ and $y$ are mapped to pyramid 0 ($i = 0$). It follows that $h_x = h_y = \lvert 0.5 - v_{0 \; MOD \; 3} \rvert = \lvert 0.5 - v_{0} \rvert = \lvert 0.5 - 0 \rvert = 0.5$. $pv_x = pv_y = 0 + 0.5 = 0.5$ and $x \neq y$, meaning two distinct points can have the same Pyramid value.
-
-\end{proof}
+\begin{table}
+	\centering
+	\begin{tabular}{|l|l|l|l|}
+		\hline
+		\textbf{Operation} & \texttt{boost::unordered\_map} & cpp-btree & bpt \\
+		\hline
+		\textbf{Insert} & TODO & TODO & TODO \\
+		\textbf{Delete} & TODO & TODO & TODO \\
+		\textbf{Point Query} & TODO & TODO & TODO \\
+		\hline
+	\end{tabular}
+	\caption{Total Execution Time (in Seconds) of Batch Pseudo-Pyramid Tree With Different Underlying 1D Index Structures (200D Randomly Uniform Dataset, 10,000 operations each)}
+	\label{tab:hashtable-bplus-time-comparison}
+\end{table}
 
 \subsection{Bucket Hash Table}
 
@@ -171,81 +41,52 @@ If larger bucket sizes mean more point comparisons are performed on average, the
 
 The Bucket Hash Table also uses a \texttt{boost::unordered\_map} in the back-end, but instead of trying to exploit the spatial properties of points directly to provide good bucket size, a different, more general-purpose hashing function provided in the Boost library is used. Like the other hash-based structures discussed in this section, it is possible for two points to be hashed to the same value. However, from empirical performance tests, it has been shown that the average bucket size is almost always near one (bucket size measurements are provided in the next section), meaning most operations are performed in $O(d)$ time.
 
-A high-level algorithm describing the hashing function is given in Algorithm \ref{alg:point-hashing}, which hashes each individual coordinate (floating point value) and combines them using exclusive-or ($\oplus$) and bitshifting operations. \texttt{0x9e3779b9} is a magic number which represents the reciprocal of the golden ratio $\phi = \frac{1 + \sqrt{5}}{2}$. That is, $\frac{2^{32}}{\phi} = \texttt{0x9e3779b9}$. The choice to use the golden ratio was inspired by Jenkins' hash function\cite{hash-combine}, and is used to ensure consecutive floating point values will be mapped to integers with large distances between them, to ensure they are mapped to different buckets. This allows the hashing function to map points within a small numerical range to distinct buckets, despite the points being so similar.
+A high-level algorithm describing the hashing function is given in Algorithm \ref{alg:point-hashing} in Appendix \ref{chap:supp-material}. This function hashes each individual coordinate (floating point value) and combines them using exclusive-or ($\oplus$) and bitshifting operations. A magic number representing the reciprocal of the golden ratio, $\phi = \frac{1 + \sqrt{5}}{2}$, is used when combining the hash values of individual coordinates. The choice to use the golden ratio was inspired by Jenkins' hash function\cite{hash-combine}, where it is used to ensure consecutive floating point values will be mapped to integers with large distances between them. This increases the likelihood of having points distributed more uniformly across buckets when points are clustered within a small numerical range (like they are in the astrophysics dataset).
 
-\texttt{hashFloat} is a function which hashes an individual 32-bit floating point number and corresponds to the function \texttt{float\_hash\_impl2} in Listing \ref{lst:hash-float-function} in the appendices.
-
-\paragraph{}
-
-\begin{algorithm}[H]
-	\SetAlgoLined
-	\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
-	\SetKwFunction{hashPoint}{hashPoint} \SetKwFunction{hashFloat}{hashFloat}
-
- 	\SetKwProg{funcHashPoint}{Algorithm}{}{}
-  	\funcHashPoint{\hashPoint{$d, p$}} {
-		\Input{$d$ = number of dimensions}
-		\Input{$p_0, p_1, \dots, p_{d-1}$ = coordinates of point}
-		\Output{$seed$ = integer representing hashed point}
-		\Begin {
-			$seed = 0$\;
-			\For{$i = 0$ to $d - 1$} {
-				$seed = seed \oplus \left(\hashFloat(p_i) + \texttt{0x9e3779b9} + (seed << 6) + (seed >> 2)\right)$
-			}
-			\KwRet{$seed$}
-		}
-	}
-
-	\caption{Hashing Multi-Dimensional Point}
-	\label{alg:point-hashing}
-\end{algorithm}
-
-\paragraph{}
-
-One major issue with this approach is the potential for floating-point inaccuracy to give incorrect results. On the controlled performance tests excecuted in this project, a point is queried using the exact same floating point values for the coordinates as when it was inserted. This means the two points have the same identical bit patterns. 
+One major issue with this approach is the potential for floating-point inaccuracy to give incorrect results. On the controlled performance tests executed in this project, a point is queried using the exact same floating point values for the coordinates as when it was inserted. This means the two points have the same identical bit patterns. 
 
 Suppose the point to query was the output of a more complex computation, where rounding errors may come into play. Even if an equal point conceptually is being stored in the structure, rounding errors may cause the two points to have different bit patterns, potentially resulting in different hashed values. The output point, while being stored in the structure, will appear as if it is not. This is a common issue when using floating point values in hashing functions.
 
 Therefore, the Bucket Hash Table may be unreliable for certain applications, especially ones where the input points are the result of computations involving many arithmetic operations.
 
-\subsection{Comparison of Bucket Sizes for Hash-Based Structures}
+\subsection{Bucket Statistics}
 
-TODO
+The same underlying implementation is used for the Pseudo-Pyramid Tree, Pyramid Tree and Bucket Hash Table; only the hashing function varies. Pyramid Tree's and Bucket Hash Table's hash functions have also been parallelised using SSE, which has made the difference between execution times between the hash functions of the three structures very small. The core factor which determines the performance of each structure is still bucket size. Therefore, statistics on the bucket size will be used to determine which structure is superior. As in iteration one, one synthetic dataset and all three real datasets will be used for bucket size measurement.
 
-\subsection{New Baseline: $kd$-Tree}
+\begin{table}
+	\centering
+	\makebox[\textwidth][c]{%
+		\begin{tabular}{|l|l|l|l|l|l|}
+			\hline
+			& & \multicolumn{4}{c|}{\textbf{Bucket Size Statistics}} \\
+			\hline
+			\textbf{Dataset} & \textbf{Time To Insert (sec)} & \textbf{Average} & \textbf{St. Dev} & \textbf{Min} & \textbf{Max} \\
+			\hline
+			\textbf{Pseudo-Pyramid Tree} & & & & & \\
+			500,000 16D Random Points & TODO & 1.0312 & 0.115177 & 1 & 4 \\
+			500,000 Astrophysics Points & TODO & 3586.57 & 24,528 & 1 & 235,260 \\
+			500,000 Hurricane Isabel Points & TODO & 17,323.66 & 83,533 & 1 & 293,949 \\
+			435,544 3D Armadillo Mesh Points & TODO & 19.1465 & 14.9386 & 1 & 187 \\
+			\hline
+			\textbf{Pyramid Tree} & & & & & \\
+			500,000 16D Random Points & TODO & 1.16285 & 0.444827 & 1 & 7 \\
+			500,000 Astrophysics Points & TODO & 358,645.7 & 54,145.2 & 1 & 143,496 \\
+			500,000 Hurricane Isabel Points & TODO & 248,977 & 248,976 & 1 & 497,953 \\
+			435,544 3D Armadillo Mesh Points & TODO & 2.45933 & 24.3335 & 1 & 1173 \\
+			\hline
+			\textbf{Bucket Hash Table} & & & & & \\
+			500,000 16D Random Points & TODO & 1.01004 & 0.100054 & 1 & 3 \\
+			500,000 Astrophysics Points & TODO & 1.01057 & 0.104108 & 1 & 4 \\
+			500,000 Hurricane Isabel Points & TODO & 1.00987 & 0.0993287 & 1 & 3 \\
+			435,544 3D Armadillo Mesh Points & TODO & 1.00857 & 0.0928895 & 1 & 3 \\
+			\hline
+		\end{tabular}
+	}%
+	\caption{Statistics on Bucket Size, Based on Dataset, of All Hash-Based Structures}
+	\label{tab:perf2-bucket-stats}
+\end{table}
 
-Since the Octree cannot be used with high-dimensional data, a new baseline for evaluation (other than Seuqential Scan) was desired. The $kd$-tree is a widely used structure for both low and high dimensional data. This structure is multi-dimensional binary tree, meaning it does not have the expontential memory requirements the Octree has. This is because it splits the data space in a single dimension per level of the tree (referred to as a \textit{cutting dimension}), instead of splitting by \textit{all} dimensions. $kd$-trees are typically used for \textit{approximate} queries in higher-dimensional space, as they tend to degenerate to Sequential Scan for exact range and nearest neighbour queries \cite{similarity-searching}.
-
-There are many variants of $kd$-trees \cite{kd-tree, bkd-tree, kdb-tree}. The variant implemented for this project contains one point per node and cycles through each dimension when choosing deciding which cutting dimension to use for each level of the tree. If $n$ is a $kd$-tree node, $i$ is the cutting dimension on that node's level and $p$ is the point stored in this node, then:
-\begin{enumerate}
-	\item $\forall q$ stored in the \textbf{left} subtree rooted at $n$: $p_i > q_i$ 
-	\item $\forall q$ stored in the \textbf{right} subtree rooted at $n$: $p_i \leq q_i$.
-\end{enumerate}
-When inserting or querying a point $p$, the tree is traversed top-down in a similar fashion to a standard binary tree, by comparing $p_i$ to $n_i$, where $n$ is the point stored in the current node and $i$ is the cutting dimension of the current level.
-
-% TODO: pseudo-code for this???
-The \texttt{remove} operation\footnote{Source of \texttt{remove} algorithm is: \url{https://www.cs.umd.edu/class/spring2008/cmsc420/L19.kd-trees.pdf‎}} is more involved because it has to maintain the $kd$-tree invariant. To remove a point $p$, first the node containing $p$ is found using the aforementioned top-down traversal approach. Let $n$ be this node and $i$ be the current level's cutting dimension. If $n$ is a leaf, then the node can simply be deleted. Otherwise, let $n_L$ and $n_R$ be the left and right children of $n$ respectively. If $n_R$ exists, a node $m$ containing a point with the \textit{minimum} value for dimension $i$ is found in the sub-tree rooted at $n_R$. The points stored in nodes $n$ and $m$ are swapped and \texttt{delete($p$)} is called recursively on the sub-tree rooted at $n_R$. If $n_R$ does not exist, node $m$ is found in the sub-tree rooted at $n_L$ instead. In this case, after \texttt{delete($p$)} has been recursively called on the sub-tree rooted at $n_L$, the $i$th value of all points stored in this sub-tree are greater than or equal to the $i$th value of the new point in $n$. Therefore, $n_L$ then becomes the \textit{right} child of $n$ to maintain the $kd$-tree invariant.
-
-TODO: figures showing example kd-tree, one insert and one remove (3 figures)
-
-\subsection{Performance Timings}
-
-TODO: four structures
-	Bucket Pseudo-Pyramid Tree
-	Bucket Pyramid Tree
-	Simple Hashing
-	kd-tree
-
-TODO: refer to plots and justify why only there's only two here (rest are in appendices)
-
-TODO: table
-
-TODO: plot of insert() w/ skewed data
-TODO: plot of delete() w/ rand uniform data
-
-\subsection{Profiling Results}
-
-TODO: CPU/heap profiling
+Table \ref{tab:perf2-bucket-stats} contains statistics on bucket size for all three hashing functions. TODO: discussion of results and implications
 
 \subsection{Summary}
 

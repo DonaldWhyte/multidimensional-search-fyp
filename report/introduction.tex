@@ -21,7 +21,6 @@ The objectives of the project are:
 	\item Evaluate and compare performance of final structures to pre-defined baselines, unoptimised structures and their reported performance in the literature
 \end{itemize}
 
-
 \section{Requirements}
 
 The minimum requirements are closely related to the objectives of the project. They are:
@@ -30,12 +29,6 @@ The minimum requirements are closely related to the objectives of the project. T
 	\item Implement at least one index structure and perform performance analysis of the implementation
 	\item Perform one set of modifications to the implemented structure in an attempt to optimise its performance
 	\item Evaluate and compare performance of final implementations to pre-defined baselines, unoptimised structures and their reported performance in the literature
-\end{enumerate}
-
-Possible extensions of the project include:
-\begin{enumerate}
-	\item Parallelising implementations using technologies such as Haskell, CUDA (GPGPU) or MPI
-	\item Developing an entirely new index structure, which is also implemented and evaluated
 \end{enumerate}
 
 \section{Deliverables}
@@ -58,6 +51,5 @@ Throughout the project, some assumptions have been made. These are used to narro
 	\item Datasets are dynamic, meaning points may be inserted, deleted or updated at any time.
 	\item Structures only store \textit{unique} points, meaning a structure cannot store two points with identical coordinates
 \end{enumerate}
-Furthermore, the project is focused on the \textit{geometric} applications of multi-dimensional search and not databases. This is the primary reason assumption (2) has been made.
 
-No assumptions have been made about the distribution of data. This means the implementations' performance will be evaluated using a variety of distributions.
+Furthermore, the project is focused on the \textbf{geometric and scientific visualisation} applications of multi-dimensional search, and not database indexing. Therefore, the performance of the implemented index structures will be evaluated primarily using scientific datasets with continuous domains, instead of discrete datasets pulled from databases.

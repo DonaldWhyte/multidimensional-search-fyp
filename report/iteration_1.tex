@@ -1,263 +1,283 @@
-\section{Iteration \#1 -- Evaluation Framework, Baselines and the Pseudo-Pyramid Tree}
+\section{Iteration \#1 -- Pseudo-Pyramid Tree}
 
-The first iteration was chosen to be two weeks long, instead of just one. This was to accommodate the extra work that would need to be done initially to lay the foundations that would be used to implement and evaluate the implementations. The objectives for this iteration were:
-\begin{itemize}
-	\item Design and implement a standard framework for evaluating index structures in C++
-	\item Implement evaluation baselines (Sequential Scan and Octree)
-	\item Incorporate the School's implementation of the Pyramid Tree into framework (the Pseudo-Pyramid Tree)
-	\item Analyse performance of two baselines and the Pseudo-Pyramid Tree, evaluating their performance
-\end{itemize}
+This iteration deals with the low-level implementation details of the Pseudo-Pyramid Tree index structure. Different optimisation techniques are applied to the structure and  multiple implementations of the Pseudo-Pyramid Tree are analysed to determine which is the fastest.
 
-% TODO: mention original plan of implementing the Splay quadtree???
+\subsection{Initial Pseudo-Pyramid Tree Implementations}
 
-\subsection{Evaluation Framework}
+The Pseudo-Pyramid tree's reduction from $d$ dimensions to one can be seen as a hashing function, where the one-dimensional value acts as the hash to use when searching a hash table. The Initial implementation of the structure stores all the points in a single array, which hashes each point to an integer representation that acts as the key to a bucket stored in a hash map (specifically \texttt{boost::unordered\_map}, part of the Boost\footnote{\url{http://www.boost.org/}} library). A bucket is an array that contains indices to points in the single point array. Another array is used to store the sums of all stored points. This is used to speed up point queries, by comparing the sums (one comparison) of the input point to the points in a bucket. A full point comparison ($d$ comparisons) only needs to be performed if the sums match up.
 
-The evaluation framework implemented in the first week of this iteration was created to define the standard data used across the index structures, provide a way of loading point datasets and operation lists and feeding them to index structures. There are three core modules of the framework:
+No \texttt{delete} operation was provided in the original implementation of the Pseudo-Pyramid Tree, so a \texttt{delete} procedure had to be added. To delete a point $p$, the point is first hashed and the bucket containing the point is found. The index pointing to $p$ in the bucket is removed from the bucket, but the actual point itself is not removed the point array. In other words, the memory is never released until the whole structure is deleted. This makes the structure useful for batch computation because it can be discarded straight after a task, releasing all allocated memory then. However, if the structure is used as part of a long-running process then this is not suitable because there is the potential to run out of memory. This implementation shall be referred to as the \textbf{Batch Pseudo-Pyramid Tree}.
 
-\begin{wrapfigure}[12]{r}{0.5\textwidth}
-	\vspace{-40pt}
-	\begin{center}
-		\includegraphics[scale=0.4]{figures/evaluation_framework.pdf}
-	\end{center}
-	\vspace{-20pt}
-	\caption{Modules of Evaluation Framework}
-	\label{fig:evaluation-framework}
-\end{wrapfigure}
+Variants of this structure were implemented to provide a \texttt{delete} operation which releases memory. The first is the \textbf{Defragmented Pseudo-Pyramid Tree}. When a point's index is deleted from a bucket, the element at the index is marked for deletion from the array at a later time (by adding the index of the point to another \texttt{std::vector}). If the number of marked elements exceeds a certain number $R$, then the $R + 1$ marked elements are erased from the vector (i.e. memory is released). The indices in each bucket are then updated to point to the correct element in the modified array. Even though \texttt{delete} is normally a constant time operation, the worst case is $O(n^2)$ because of this defragmentation procedure.
 
-\begin{itemize}
-	\item \texttt{data} -- library that contains standard data types used throughout framework and index structures, as well as dataset and test operation generators/loaders
-	\item \texttt{index\_structure} -- library that contains all the index structures implemented throughout the project
-	\item \texttt{evaluator} -- executable program that takes the index structures, operation lists and other options from the command line and runs a set of automated performance tests that produces timings and profiling (CPU and heap) information
-\end{itemize}
+The \textbf{Rebuild Pseudo-Pyramid Tree} uses a different strategy for releasing memory for unused points. Instead of defragmenting the array by peforming a sequence of array deletions when $R + 1$ elements are marked for deletion, the entire structure is rebuilt. This new cleanup procedure starts by clearing the structure and incrementally building the new structure by only adding points \textit{not} marked for deletion. $n - R$ points will be re-inserted and insertion in the worst case is $O(n)$, meaning the worst case complexity of \texttt{delete} is $O((n - R)n)$. The larger $R$ is, the less time it takes to perform this procedure but a larger amount of allocated memory goes unused at a time.
 
-The \texttt{evaluator} executable facilitates fast evaluation by allowing multiple index structures to be tested at once, using multiple tests operation lists (as described in Chapter \ref{chap:evaluation-outline}) at once. It stores timings in text files which are fed into bash and Gnuplot scripts to generate plots, which can be understood and incorporated into the report with ease. Figure \ref{fig:evaluation-framework} illustrates the modules of the framework, showing how user performing the performance evaluation only directly interacts with the \texttt{evaluator} executable.
+\subsection{Accelerating Hash Function}
 
-The framework was created because performance analysis would be done very frequently, multiple times per iteration. Manually timing and profiling the code each time is time-consuming and error-prone. Putting more effort initially into creating a system that allows large sets of operations and index structures to be tested at once may save a significant amount of time , especially as many of these performance test are long and must be run multiple times to get averages.
+The existing Pseudo-Pyramid tree hash function is an $O(d^2)$ operation because of the inner loop that computes $\prod_{j=0}^{i}{\lbrack m_j \rbrack}$. If $m$ is changed during the structure's lifetime, the structure must be rebuilt. Otherwise the one-dimensional value of a point could change and stored points can become inaccessible. Therefore, $m$ is constant in the Pseudo-Pyramid Tree. This allows the hash function to be executed in $O(d)$ time by \textit{pre-computing} $\prod_{j=0}^{i}{\lbrack m_j \rbrack}$. This pre-computation happens when the Pseudo-Pyramid Tree is initialised. The new hash function is given in Equation \ref{eq:new-pseudo-pyramid-hash}.
 
-Every index structure defined in the \texttt{index\_structures} module implement the \texttt{IndexStructure} interface, which has the following methods:
-\begin{itemize}
-	\item \texttt{loadPoints} -- bulk load a collection of points into structure
-	\item \texttt{clear} -- remove all points from structure
-	\item \texttt{insert} -- insert point into structure (if it's not already stored, see assumption (4) in Section \ref{sec:core-assumptions})
-	\item \texttt{remove} -- remove point from structure
-	\item \texttt{update} -- modify value of a specific point stored in the structure
-	\item \texttt{pointExists} -- equivalent to a point query
-\end{itemize}
+\begin{multline}\\
+	h(p) = \sum_{i = 0}^{d} { \lbrack \texttt{toInt}( h_i(p) \times m_i ) \times M_i \rbrack } \\
+	\text{where } M_i = \prod_{j=0}^{i}{\lbrack m_j \rbrack} \;\;\; \text{for} \; 0 \leq i \leq d \\
+	\label{eq:new-pseudo-pyramid-hash}
+\end{multline}
 
-\subsection{Baseline Implementations}
- 
-Sequential scan was implemented using the C++ container \texttt{std::vector}, a dynamically resizeable array.  Point queries are performed in $O(n)$ time, as the query iterates through the array sequentially until the given point is found or the end of the array is reached. Inserting a point is $O(1)$ as it is added to the end of the vector. However, Core Assumption (4) from Section \ref{sec:core-assumptions} states all points must be unique in a structure, meaning Sequential Scan must check if a given point exists before inserting it. This is a point query, meaning \texttt{insert} $\in O(n)$. \texttt{delete} is a standard array deletion, making it an $O(n)$ operation.
-
-The octree variant implemented as a baseline is a bucket PR octree. This means the structure partitions the underlying data space into uniformly sized boxes, without using the points as pivots (unlike point quadtrees or kd-trees). It is a bucket octree because \textit{multiple} points can be stored in a single leaf node. The octree dynamically decomposes and composes spatial regions based on its current contents. When the number of points in a leaf node exceeds a certain number, say $M$, then the region represented by the leaf is sub-divided, creating $2^d$ children. The $M + 1$ points are then scattered across the children. Therefore, regions of space that contain more points are decomposed more and sparse regions of space have less granularity, meaning less nodes and memory overhead.
-
-When a point is deleted from a leaf, the contents of the leaf and all of its siblings are checked. If all of these nodes are empty, they are removed and the sub-regions are combined into the original region again. If the now collapsed parent and all of its siblings are empty, then they are collapsed into their parent. This is repeatedly recursively until a parent is reached whose children contain at least one point.
-
-\subsection{Pseudo-Pyramid Tree}
-
-\begin{wrapfigure}[12]{r}{0.5\textwidth}
-	\vspace{-40pt}
-	\begin{center}
-		\includegraphics[scale=0.6]{figures/pseudo-pyramid_tree_point_boundary_distances.pdf}
-	\end{center}
-	\vspace{-20pt}
-	\caption{Computing Distance of Point Along Pseudo-Pyramid Tree Boundary Along Each Dimension}
-	\label{fig:point-boundary-distance}
-\end{wrapfigure}
-
-The School of Computing have an implementation of an index structure which is similar to the Pyramid tree, originally written by Zhao Geng\footnote{Z.Geng@leeds.ac.uk}. All the points are stored in a single \texttt{std::vector}. Each point is hashed to an integer representation which acts as the key to a bucket stored in a hash map (specifically \texttt{boost::unordered\_map}, part of the Boost\footnote{\url{http://www.boost.org/}} library). A bucket is a \texttt{std::vector} that contains indices to points in the large point array.
-
-To determine if a point $p$ is stored in the structure, $p$ is first hashed into its one-dimensional representation. The corresponding bucket is then sequentially scanned until the point is found or the end of the bucket is reached. To reduce the number of floating point comparisons, especially for large $d$, the \textit{sums} of each point are stored when they are inserted. This way, a $O(d)$ point comparison needs to be made if the $O(1)$ point sum comparison passes. Simple optimisations were initially made to the original implementation. The original implementation passed many heap allocated structures by-value, resulting in excessive copies and more time being spent allocating memory and copying data. These copies were not necessary and were removed where possible by passing the data by-reference.
-
-In this report, this implementation shall be called the \textbf{Pseudo-Pyramid Tree}. This is because the hashing function used is \textit{inspired} by the Pyramid tree, but is not the same\footnote{There is code to compute the pyramid value of a point in the original code, but curiously it is not used when inserting or querying points. An alternative hashing function was used instead.}. Let $min_i$ and $max_i$ define the minimum and maximum bounds for dimension $i$ and $p$ be a point. To hash $p$, how far along the boundary $p$ is in each dimension is computed using Equation \ref{eq:point-boundary-distance} first. See Figure \ref{fig:point-boundary-distance} for an illustration of what these values mean.
-
-\begin{equation}
-	h_i(p) = \frac{p_i - min_i}{max_i - min_i}
-	\label{eq:point-boundary-distance}
-\end{equation}
-
-Let $B$ be a parameter which controls how likely points will be in the same bucket and let $m$ be a point where $m_i = \ceil{B^{\frac{1}{d}}}$ for $0 \leq i \leq d$. The hashed value $h(p)$ of a point $p$ is then given by Equation \ref{eq:pseudo-pyramid-hash},  where \texttt{toInt} converts a real number to an integer by truncating the decimal part. Computing this is a $O(d^2)$ operation due to the inner loop to compute $\prod_{j=0}^{i}{\lbrack m_j \rbrack}$.
-
-\begin{equation}
-	h(p) = \sum_{i = 0}^{d} { \lbrack \texttt{toInt}( h_i(p) \times m_i ) \times \prod_{j=0}^{i}{\lbrack m_j \rbrack} \rbrack }
-	\label{eq:pseudo-pyramid-hash}
-\end{equation}
-
-Higher $B$ means higher $m$. This increases the magnitude of $h_i(p)$ before it is truncated to an integer, meaning less points will have the same hashed value, meaning less points in the same bucket on average. Lower $B$ will therefore mean more points will be in the same bucket on average.
-
-The original implementation of the Pseudo-Pyramid Tree did not provide \texttt{delete} and \texttt{update} operations, meaning a \texttt{delete} procedure had to be added. To delete a point $p$, the point is first hashed and the bucket containing the point is found. The index pointing to $p$ in the bucket is removed from the bucket, but the actual point itself is not removed the point array. In other words, the memory is never released until the whole structure is deleted. This makes the structure useful for batch computation because it can be discarded straight after a task, releasing all allocated memory then. However, if the structure is used as part of a long-running process then this is not suitable because there is the potential to run out of memory. This will be referred to as the \textbf{Batch Pseudo-Pyramid Tree} for the rest of this document.
-
-Variants of this structure were implemented to provide a \texttt{delete} operation. The first is the \textbf{Defragmented Pseudo-Pyramid Tree}. When a point's index is deleted from a bucket, the element at the index is marked for deletion from the array at a later time (by adding the index of the point to another \texttt{std::vector}). If the number of marked elements exceeds a certain number $R$, then the $R + 1$ marked elements are erased from the vector (i.e. memory is released). The indices in each bucket are then updated to point to the correct element in the modified array. Even though \texttt{delete} is normally a constant time operation, the worst case is $O(n^2)$ because of this defragmentation procedure.
-
-The \textbf{Rebuild Pseudo-Pyramid Tree} uses a different strategy for releasing memory for unused points. Instead of defragmenting the array by peforming a sequence of array deletions when $R + 1$ elements are marked for deletion, the entire structure is rebuilt. This new cleanup procedure starts by clearing the structure and incrementally building the new structure by only adding points \textit{not} marked for deletion. $n - R$ points will be re-instered and insertion in the worst case is $O(n)$, meaning the worst case complexity of \texttt{delete} is $O((n - R)n)$. The larger $R$ is, the less time it takes to perform this procedure but a larger amount of allocated memory goes unused at a time.
-
-\subsection{Compiler Optimisation}
-
-GCC\footnote{GCC, the GNU Compiler Collection -- \url{http://gcc.gnu.org/}} was the C++ compiler used throughout development and analysis. GCC provides options to automatically modify the source code to make it more efficient on the target platform. There are multiple levels of optimisations, specifying using command line flags, going from 0 (\texttt{-O0} flag, no optimisation) to 3 (\texttt{-O3} flag, maximum optimisation). The default optimisation level is 0. In order to make the structures as fast as possible, level 3 optimisation was used to compile the structures. Table \ref{tab:compiler-optimisation} shows the average execution times for the three operations for each structure, using a 10D random uniformly distributed dataset with 10,000 points. The potential speed gains are huge. For example, the octree's point queries are approximately $6.5$ times faster, just by enabling level 3 optimisation.
+Table \ref{tab:new-pseudo-pyramid-hash} shows operation execution time of the Batch Pyramid Tree using the original $O(d^2)$ hashing function and the new $O(d)$ function on a 200D dataset. Figure \ref{fig:new-pseudo-pyramid-hash} plots the performance of the Pseudo-Pyramid Tree with both hash functions alongside Sequential Scan, showing execution time against dimensionality. From the plot, it is clear that the new hashing function is superior. The old hash function caused the Pseudo-Pyramid Tree to be slower than Sequential Scan when the dimensionality exceeded a certain number ($\approx 57$). The new hash function makes the structure significantly faster than Sequential Scan, even for dimensions as high as 200.
 
 \begin{table}
 	\centering
-	\begin{tabular}{|l|l|l|l|}
+	\begin{tabular}{|l|l|l|}
 		\hline
-		\textbf{Structure} & \textbf{Operation} & \texttt{-O0} & \texttt{-O3} \\
+		\textbf{Operation} & \textbf{$O(d^2)$ Function} & \textbf{$O(d)$ Function} \\
 		\hline
-		\multirow{ 4}{*}{\textbf{Sequential Scan}} & \textbf{Insert} & 1.33509 & 0.111372 \\
-		 & \textbf{Delete} & 5.29548 & 0.623759 \\
-		 & \textbf{Point Query} & 1.33468 & 0.111909 \\
+		Insert & 1.46412 & 0.0112199 \\
+		Delete & 0.730777 & 0.00625336 \\
+		Point Query & 0.731469 & 0.0076015 \\
 		\hline
-		\multirow{ 4}{*}{\textbf{Octree}} & \textbf{Insert} & 1.23108 & 0.243256 \\
-		 & \textbf{Delete} & 0.73156 & 0.13589 \\
-		 & \textbf{Point Query} & 0.559736 & 0.0860926 \\
-		\hline
-		\multirow{ 4}{*}{\textbf{Batch Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.0240852 & 0.00549841 \\
-		 & \textbf{Delete} & 0.0108411 & 0.0023433 \\
-		 & \textbf{Point Query} & 0.0103358 &  0.00242341 \\
-		\hline
-		\multirow{ 4}{*}{\textbf{Defragmented Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.0236123 & 0.00558329 \\
-		 & \textbf{Delete} & 13.3113 & 1.49306 \\
-		 & \textbf{Point Query} & 0.0106464 & 0.00298434 \\
-		\hline
-		\multirow{ 4}{*}{\textbf{Rebuild Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.0236123 & 0.00558329 \\
-		 & \textbf{Delete} & 7.7183 & 0.94745 \\
-		 & \textbf{Point Query} & 0.0103173 & 0.00235689 \\
-		 \hline
 	\end{tabular}
-	\caption{Total Execution Time (in Seconds) of Structure Operations With and Without Compiler Optimisations (10D Randomly Uniform  Dataset, 10,000 points used)}
-	\label{tab:compiler-optimisation}
+	\caption{Total Execution Time (in seconds) of Batch Pseudo-Pyramid Tree Using $O(d^2)$ and $O(d)$ Hash Function (200D Randomly Uniform Dataset, 10,000 operations each)}
+	\label{tab:new-pseudo-pyramid-hash}
 \end{table}
 
-While the potential performance boost can be high, there are some downsides to compiler optimisation. Using full optimisaiton can increase the size of the program binaries and it makes the program harder to debug, because the code is restructred and managed, making it difficult to get a method call trace \cite{gcc}. This also makes applications harder to profile. One could profile an application using no optimisation to avoid this issue, but there is no guarantee that functions/methods which are bottlenecks in the non-optimised binary are still bottlenecks in the fully optimised binary. Therefore, optimising the code to remove particular bottlenecks in the non-optimised version may have little, if no, impact on the fully optimised binary (that potentially still performs faster).
+\begin{figure}
+	\centering
+	\includegraphics[scale=0.5]{figures/performance_analysis/iteration_2/new_pseudo-pyramid_hash_performance.pdf}
+	\caption{\texttt{insert} Performance on Random Uniformly Distributed Datasets of Varying Dimensions}
+	\label{fig:new-pseudo-pyramid-hash}
+\end{figure}
 
-To summarise, full compiler optimisation will be used during performance analysis of the structures as the speed gains can be huge. Despite CPU profiling potentially being harder to understand and less useful on fully optimised binaries, this shall still be done over profiling the non-optimised binary because of the aforementioned reasons.
+\subsection{SSE Optimisation}
+
+Since optimising the hashing function resulted in a massive speed increase, it was decided that the function would be parallelised using SSE. Considering point equality is used throughout all the index structures and will be executed many times if there are large buckets in the Pseudo-Pyramid Tree, it is worth optimising to see if there is any major speed-up. Point equality, like the hashing function, is an $O(d)$ operation. In both operations, there is loop which iterates once for each dimension, where each iteration is independent of the others. If 32-bit floating point numbers are used, then four dimensions can be processed at once using 128 bit SSE registers. Since each operation does not spend their entire time hashing or comparing points, it is not expected that a speedup of four can be achieved.
+
+Table \ref{tab:pseudo-pyramid-sse} shows the execution times of the Pseudo-Pyramid Tree with and without SSE optimisation for the hash function and point equality. Across all three operations, the speedup averages to approximately $1.97$ when there are 200 dimensions. Note that if the number of dimensions is less than four, there is little benefit using the 128-bit SSE registers, so the structure uses the sequential hashing function and point equality check.
+
+\begin{table}
+	\centering
+	\begin{tabular}{|l|l|l|}
+		\hline
+		\textbf{Operation} & \textbf{Without SSE} & \textbf{With SSE} \\
+		\hline
+		Insert & 0.0112199 & 0.00674333 \\
+		Delete & 0.00625336 & 0.00313489 \\
+		Point Query & 0.0076015 & 0.00298432 \\
+		\hline
+	\end{tabular}
+	\caption{Total Execution Time (in seconds) of Batch Pseudo-Pyramid Tree With and Without SSE Optimisation (200D Randomly Uniform Dataset, 10,000 operations each)}
+	\label{tab:pseudo-pyramid-sse}
+\end{table}
+
+\subsection{Bucket Pseudo-Pyramid Tree}
+
+The index-based variants require the CPU has to fetch two elements from main memory for each point in a bucket -- the index of a point and the point itself. This also results in more random accesses in the single point array, potentially causing more cache misses, because a bucket's indices may point to distant parts of the large point array. Furthermore, having a large point array makes \texttt{delete} operations difficult to perform cheaply.
+
+The Bucket Pseudo-Pyramid Tree implementation does not use a single array to store the points. Instead of buckets containing an array of point indices, it has an array of actual points. The goal of this variant is to increase \textbf{cache coherency} when searching a bucket, since the point array can be searched sequentially and only one memory read is required. No cleanup procedure is necessary because the memory for a point is released immediately after it's removed, by simply erasing it from the corresponding bucket's array (which is much smaller than an array containing \textit{all} the points). However, \texttt{delete} is still an $O(n)$ operation since the worst case is when a single bucket stores all $n$ points.
+
+The order the points are stored in a bucket do not matter, the C++ \textit{erase-remove} idiom has been used to delete elements from the bucket arrays. This idiom swaps the element to delete with the last element in the array, removing the desired element when it's at the end of the array. This means there is no need to move any elements in the array to fill the gap created by removing an element, since the element removed is always at the end of the array.
+
+\subsection{Splay Pseudo-Pyramid Tree}
+
+Unlike the other implementations, the Splay Pseudo-Pyramid Tree does not use a hash map as the underlying one-dimensional index structure, but a splay tree. The splay tree is a self-adjusting variant of the binary search tree that uses a \textit{splaying} operation (a heuristic) to allow faster access to recently accessed elements. \cite{splay-tree}. The splaying operation achieves this by performing a series of tree rotations that move a given node up to the root of the tree. Through amortised analysis and empirical experiments, it has been shown splay trees can be more efficient than standard binary trees for a series of non-random operations \cite{splay-tree}, despite the asymptotic worst case bound being worse than binary search trees.
+
+Nodes in the Splay Pseudo-Pyramid Tree correspond to individual buckets in the Bucket Pseudo-Pyramid Tree, meaning each node can store multiple points. Since the splay tree is implemented as a collection of heap-allocated nodes with pointers to link them, deletions are cheap as a low amount of memory needs to be de-allocated per \texttt{delete} operation. The aim is that this, combined with the self-adjusting nature of the splay tree, will produce a Pseudo-Pyramid Tree implementation that is more efficient for non-random operations used in real applications.
 
 \subsection{Performance Timings}
 
-The structures being analysed in this iteration are sequential scan, octree and the pseudo-pyramid trees (batch and defragmented). $B = 300000$ and $R=3000$ was used as parameters for the Pseudo-Pyramid Trees. This means the Defagmented Pseudo-Pyramid Tree defragments when 3001 elements have been marked for deletion. Table \ref{tab:perf1-randuniform} contains the \textit{total} runtime of \texttt{insert}, \texttt{delete} and point query for uniformly randomly generated points for the analysed structures. When ``-" is shown instead of the number of seconds, it means that the performance test could not finish due to the machine running out of memory. Plots with dimension against execution time are shown for the three operations in Figures \ref{fig:perf1-allinsert-d}, \ref{fig:perf1-alldelete-d} and \ref{fig:perf1-allpquery-d}. The execution times for skewed and clustered data was almost identical to the uniformly random datasets; for the sake of brevity, the tables and plots for these datasets have been placed in Appendix \ref{chap:supp-material}. 
+All variants of the Pseudo-Pyramid Tree hash $d$-dimensional points to a one-dimensional value, which is used as a key to search for a given point in a one-dimensional structure. What varies is how points are deleted and which underlying one-dimensional structure is used. The Batch Pseudo-Pyramid Tree never releases memory after points are removed. For dynamic data which changes frequently, this may cause the machine to run out of memory, so this variant will not be explored any further.
 
-The three plots show that dimensionality has little effect on \textit{insert} and point queries for Sequential Scan. \texttt{delete}'s exeuction time increases as $d$ does, most likely because higher $d$ means more data has to be moved when a point is deleted from the undelying array. As expected, the Octree takes exponentially longer as $d$ increases, due to the exponential increase in nodes at each level ($2^d$ children per node). After $d = 10$ the number of excessive nodes was so high that the performance tests crashed due to there being no more memory to allocate.
+The remaining variants of the Pseudo-Pyramid and the two baselines, Sequential Scan and Octree, were timed with the full collection of synthetic and real datasets. $B = 300000$ and $R=3000$ was used as parameters for the Pseudo-Pyramid Trees. This means the Defragmented and Rebuild Pseudo-Pyramid Tree defragment and rebuild respectively when 3001 elements have been marked for deletion.
 
-All Pseudo-Pyramid Tree variants have similar speeds for \texttt{insert} and point queries, which significant outperfoms Sequential Scan and Octree. However, the performance of the trees decreases as $d$ increases and eventually the structure is slower than Sequential Scan (in this case, Sequential Scan starts being faster when $d \approx 57$). This is most likely due to the hashing function, which is currently a $O(d^2)$ operation. The $O(n^2)$ defragmentation procedure used by the Defragmented Pseudo-Pyramid Tree causes it to be the slowest structure for deleting points, taking almost twice as long as Squential Scan. Rebuild Pseudo-Pyramid tree is better, but still much sloeer than the Batch Pseudo-Pyramid Tree which has the fastest deletion speed. This is because the structure only removes the point's index and not the point itself, so no time is spent de-allocating memory.
-
-Execution times for the 16 dimension dataset of varying size are displayed in Table \ref{tab:perf1-sizevary} and Figures \ref{fig:perf1-allinsert-n}, \ref{fig:perf1-alldelete-n} and \ref{fig:perf1-allpquery-n}. From the plots, it appears the average time it takes to perform a point query and the other operations for Sequential Scan roughly grows linearly with $n$. This is to be expected, due to the complexity of its operations being $O(n)$. The average time for both operations in the Batch Pseudo-Pyramid Tree grows very slowly as $n$ increases. This is likely because an operation's average complexity is $O(d^2)$ and dataset size only affects the performance of these operations if the tree's buckets become crowded with many points (as the buckets have to be searched to find the point). \texttt{delete} in the Defragmented and Rebuild Pseudo-Pyramid Trees grow rapidly as $n$ is increased. Despite the defragmentation procedure being $O(n^2)$, the operation's execution appears to have linear growth (albeit with a higher constant factor than Sequential Scan). Perhaps this worst case bound was simply not reached in the tests, or there is some compiler optimisation at work which reduces this complexity. Considering how inefficient the structure is at deleting points however, the reason will not explored further and focus will be spent on other structures.
-
-Table \ref{tab:perf1-astrophysics} shows the total runtime of different sized samples of the astrophysics dataset, using both operation lists described in Section \ref{sec:timing-operations}. The results are consistent with the synthetic datasets, with the Batch Pseudo-Pyramid Tree outperforming the other structures. Due to having 1024 children per non-leaf node, the Octree ran out of memory before even $10,000$ points were added, making it unusable for this particular dataset.
-
-\begin{landscape}
-
-	\begin{table}
-		\centering
-		\begin{tabular}{|p{2cm}|l|l|l|l|l|l|l|l|l|l|l|}
-			\hline
-			\textbf{Structure} & \textbf{Operation} & \textbf{1D} & \textbf{2D} & \textbf{3D} & \textbf{5D} & \textbf{8D} & \textbf{10D} & \textbf{30D} & \textbf{50D} & \textbf{100D} & \textbf{200D} \\
-			\hline
-			\multirow{ 4}{*}{\textbf{Sequential Scan}} & \textbf{Insert} & 0.083928 & 0.0856602 & 0.0858041 & 0.0970701 & 0.0960585 & 0.11025 & 0.13113 & 0.135196 & 0.142939 & 0.142896 \\ & \textbf{Delete} & 0.46229 & 0.577141 & 0.696159 & 0.688754 & 0.634093 & 0.623097 & 0.71913 & 0.882381 & 1.50442 & 3.29082 \\ & \textbf{Point Query} & 0.0834135 & 0.0842911 & 0.0849031 & 0.095202 & 0.0950359 & 0.110287 & 0.130051 & 0.134541 & 0.140541 & 0.142191 \\
-			\hline
-			\multirow{ 4}{*}{\textbf{Batch Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.00182509 & 0.00201285 & 0.00209451 & 0.00268757 & 0.0040772 & 0.00534821 & 0.0345241 & 0.0927804 & 0.365613 & 1.45883 \\ & \textbf{Delete} & 0.000421524 & 0.000508428 & 0.000604391 & 0.000930548 & 0.00166643 & 0.0023284 & 0.0171595 & 0.0467448 & 0.183702 & 0.728678 \\ & \textbf{Point Query} & 0.000406027 & 0.00050652 & 0.000588536 & 0.00090754 & 0.00173366 & 0.00235772 & 0.0171422 & 0.046788 & 0.183745 & 0.729757 \\
-			\hline
-			\multirow{ 4}{*}{\textbf{Defragmented Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.00182939 & 0.0019474 & 0.0020951 & 0.00262773 & 0.00407147 & 0.00530696 & 0.0345504 & 0.0927966 & 0.36549 & 1.45541 \\ & \textbf{Delete} & 1.31443 & 1.40514 & 1.48344 & 1.49642 & 1.43011 & 1.48568 & 1.52637 & 1.66116 & 2.21606 & 3.94223 \\ & \textbf{Point Query} & 0.00040555 & 0.000497341 & 0.000604749 & 0.000905514 & 0.00168335 & 0.00233459 & 0.0172749 & 0.046602 & 0.183578 & 0.729738 \\
-			\hline
-			\multirow{ 4}{*}{\textbf{Rebuild Pseudo-Pyramid Tree}}
-			& \textbf{Insert} & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-			& \textbf{Delete} & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-			& \textbf{Point Query} & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-			\hline
-		\end{tabular}
-		\caption{Total Execution Time (in Seconds) of 10,0000 Structure Operations for Uniformly Random Points}
-		\label{tab:perf1-randuniform}
-	\end{table}
-
-	% TODO: make totoal
-	\begin{table}
-		\centering
-		\begin{tabular}{|p{2cm}|l|l|l|l|l|l|l|l|l|}
-			\hline
-			\textbf{Structure} & \textbf{Operation} & $n = 10$ & $n = 100$ & $n = 1000$ & $n = 5000$ & $n = 10000$ & $n = 50000$ & $n = 100000$ & $n = 500000$ \\
-			\hline
-			\multirow{ 4}{*}{\textbf{Sequential Scan}} & \textbf{Insert} & 2.38419e-08 & 4.33922e-07 & 9.543899999999999e-07 & 5.56716e-06 & 1.2479999999999999e-05 & 6.64334e-05 & 0.000155559 & 0.001254338 \\ & \textbf{Delete} & 4.0531199999999997e-07 & 1.62601e-06 & 6.87075e-06 & 3.3840599999999996e-05 & 6.77672e-05 & 0.00035017200000000005 & 0.000689738 & 0.00357128 \\ & \textbf{Point Query} & 1.1920899999999999e-07 & 2.5987599999999996e-07 & 8.80718e-07 & 5.5340199999999996e-06 & 1.23303e-05 & 6.42734e-05 & 0.000147421 & 0.001188232 \\
-			\hline
-			\multirow{ 4}{*}{\textbf{Batch Pseudo-Pyramid Tree}} & \textbf{Insert} & 2.38419e-08 & 2.85149e-06 & 1.24717e-06 & 1.219464e-06 & 1.2071800000000001e-06 & 1.260868e-06 & 1.29801e-06 & 1.4031279999999999e-06 \\ & \textbf{Delete} & 1.3113e-06 & 1.15395e-06 & 5.15223e-07 & 5.222799999999999e-07 & 5.23591e-07 & 6.0327e-07 & 5.8435e-07 & 6.416659999999999e-07 \\ & \textbf{Point Query} & 8.82149e-07 & 1.14202e-06 & 5.06878e-07 & 5.14412e-07 & 5.16725e-07 & 5.48616e-07 & 5.76677e-07 & 6.1645e-07 \\
-			\hline
-			\multirow{ 4}{*}{\textbf{Defragmented Pseudo-Pyramid Tree}} & \textbf{Insert} & 0.0 & 2.7227399999999996e-06 & 1.23382e-06 & 1.28684e-06 & 1.21651e-06 & 1.290904e-06 & 1.32141e-06 & 1.43266e-06 \\ & \textbf{Delete} & 1.23978e-06 & 1.14918e-06 & 5.09501e-07 & 4.47486e-05 & 0.000149966 & 0.0011255899999999999 & 0.0030419099999999997 & 0.01620092 \\ & \textbf{Point Query} & 7.86781e-07 & 1.14202e-06 & 5.09501e-07 & 5.14174e-07 & 5.17821e-07 & 5.48516e-07 & 5.71394e-07 & 6.18058e-07 \\
-			\hline
-			\multirow{ 4}{*}{\textbf{Rebuild Pseudo-Pyramid Tree}}
-			& \textbf{Insert} & 2.4e-09 & 2.7299e-06 & 1.2047e-06 & 1.1852e-06 & 1.1761e-06 & 1.1957e-06 & 1.2407e-06 & 0.0640399 \\
-			& \textbf{Delete} & 1.359e-07 & 1.154e-07 & 1.066e-07 & 2.20697e-05 & 2.96598e-05 & 0.000517846 & 24.9221 & 82.4918 \\
-			& \textbf{Point Query} & 6.4e-09 & 2.32e-08 & 5.13e-08 & 5.13e-08 & 5.22e-08 & 2.4e-09 & 2.7299e-06 & 1.2047e-06 \\
-			\hline
-		\end{tabular}
-		\caption{Total Execution Time (in Seconds) of $n$ Operations on an $n$-Sized Structure}
-		\label{tab:perf1-sizevary}
-	\end{table}
-
-\end{landscape}
+Table \ref{tab:perf1-dimensionality} contains the \textit{total} runtime of \texttt{insert}, \texttt{delete} and point query for uniformly randomly generated points for the analysed structures. When ``-" is shown instead of the number of seconds, it means that the performance test could not finish due to the machine running out of memory. Plots with dimension against execution time are shown for \texttt{insert} and \texttt{remove} in Figure \ref{fig:perf1-dimensionality}. The execution times for skewed and clustered data was almost identical to the uniformly random datasets; for the sake of brevity, the tables and plots for these datasets have been placed in Appendix \ref{chap:supp-material}.
 
 \begin{table}
 	\centering
-	\begin{tabular}{|r|l|l|l|l|}
+	\makebox[\textwidth][c]{%
+		\begin{tabular}{|r|r|l|l|l|l|l|l|l|l|}
+			\hline
+			\multicolumn{2}{|c}{} & \multicolumn{8}{|c|}{\textbf{Dimensionality}} \\
+			\hline
+			\textbf{Structure} & \textbf{Operation} & 1 & 2 & 3 & 5 & 10 & 50 & 100 & 200 \\
+			\hline
+			\multirow{3}{*}{Sequential Scan} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+			\hline			
+			\multirow{3}{*}{Octree} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+			\hline			
+			\multirow{3}{*}{Defragmented PPT} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+			\hline
+			\multirow{3}{*}{Rebuild PPT} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+			\hline
+			\multirow{3}{*}{Bucket PPT} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+			\hline
+			\multirow{3}{*}{Splay PPT} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+			\hline
+		\end{tabular}
+	}%
+
+	\caption{Total Execution Time (in seconds) of Each Operation for Varying Number of Dimensions in Uniformly Distributed Synthetic Dataset}
+	\label{tab:perf1-dimensionality}
+\end{table}
+
+\begin{figure}
+	\begin{center}
+		\begin{subfloat}[\texttt{insert}\label{fig:perf1-dimensionality-insert}]{%
+			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+		}
+		\end{subfloat}~
+		\begin{subfloat}[\texttt{remove}\label{fig:perf1-dimensionality-remove}]{%
+			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+		}
+		\end{subfloat}~
+	\end{center}
+
+	\caption{Index Structure Performance With Respect To Dimensionality (10,000 Points from Uniform Distribution Synthetic Dataset)}
+	\label{fig:perf1-dimensionality}
+\end{figure}
+
+The three plots show that dimensionality has little effect on \textit{insert} and point queries for Sequential Scan. \texttt{delete}'s execution time increases as $d$ does, most likely because higher $d$ means more data has to be moved when a point is deleted from the underlying array. As expected, the Octree takes exponentially longer as $d$ increases, due to the exponential increase in nodes at each level ($2^d$ children per node). After 10 the number of excessive nodes was so high that the performance tests crashed due to there being no more memory to allocate.
+
+All Pseudo-Pyramid Tree variants have similar speeds for \texttt{insert} and point queries, which significant outperforms Sequential Scan and Octree. However, the performance of the trees decreases as $d$ increases. The $O(n^2)$ defragmentation procedure used by the Defragmented Pseudo-Pyramid Tree causes it to be the slowest structure for deleting points, taking almost twice as long as Sequential Scan. Rebuild Pseudo-Pyramid tree is better, but still much slower than the Bucket or Splay Pseudo-Pyramid Tree variants, which have the fastest deletion speed. This is because TODO.
+
+\begin{table}
+	\centering
+	\makebox[\textwidth][c]{%
+		\begin{tabular}{|r|r|l|l|l|l|}
+			\hline
+			\multicolumn{2}{|c}{} & \multicolumn{4}{|c|}{\textbf{Points in Dataset}} \\
+			\hline
+			\textbf{Structure} & \textbf{Operation} & 10,000 & 100,000 & 500,000 & 1,000,000 \\
+			\hline
+			\multirow{3}{*}{Sequential Scan} & Insert & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO \\
+			\hline
+			\multirow{3}{*}{Octree} & Insert & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO \\
+			\hline
+			\multirow{3}{*}{Defragmented PPT} & Insert & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO \\
+			\hline
+			\multirow{3}{*}{Rebuild PPT} & Insert & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO \\
+			\hline
+			\multirow{3}{*}{Bucket PPT} & Insert & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO \\
+			\hline
+			\multirow{3}{*}{Splay PPT} & Insert & TODO & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO & TODO \\
+			\hline
+		\end{tabular}
+	}%
+
+	\caption{Total Execution Time (in seconds) of Each Operation for Varying Number of Points in Uniformly Distributed Synthetic Dataset}
+	\label{tab:perf1-size}
+\end{table}
+
+\begin{figure}
+	\begin{center}
+		\begin{subfloat}[\texttt{insert}\label{fig:perf1-size-insert}]{%
+			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+		}
+		\end{subfloat}~
+		\begin{subfloat}[\texttt{remove}\label{fig:perf1-size-remove}]{%
+			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+		}
+		\end{subfloat}~
+	\end{center}
+
+	\caption{Index Structure Performance With Respect To Dataset Size (10,000 Points from Uniform Distribution Synthetic Dataset)}
+	\label{fig:perf1-size}
+\end{figure}
+
+Execution times for the 16 dimension dataset of varying size are displayed in Table \ref{tab:perf1-size} and Figure \ref{fig:perf1-size}. From the plots, it appears the average time it takes to perform a point query and the other operations for Sequential Scan roughly grows linearly with $n$. This is to be expected, due to the complexity of its operations being $O(n)$. The average time for both operations with the Pseudo-Pyramid Tree variants grow very slowly as $n$ increases. This is likely because an operation's average complexity is $O(d)$ and dataset size only affects the performance of these operations if the tree's buckets become crowded with many points (as the buckets have to be searched to find the point).
+
+\texttt{delete} in the Defragmented and Rebuild Pseudo-Pyramid Trees grow rapidly as $n$ is increased. Despite the defragmentation procedure being $O(n^2)$, the operation's execution appears to have linear growth (albeit with a higher constant factor than Sequential Scan). Perhaps this worst case bound was simply not reached in the tests, or there is some compiler optimisation at work which reduces this complexity.
+
+Storing separate point arrays for each bucket, instead of using one large array to store all the points, can increase performance. This is shown by the bucket and splay variants providing faster \texttt{insert} and point query operations than the index-based variants. As expected, this is due to an increased cache hit rate. Table \ref{tab:perf1-cache-hit-rate} displays the cache hit rate for all Pseudo-Pyramid Tree variants. TODO: remarks on results of table
+
+\begin{table}
+	\centering
+	\begin{tabular}{|l|l|}
 		\hline
-		\textbf{Structure} & \textbf{Operation List} & $n = 10,000$ & $n = 100,000$ & $n = 500,000$ \\
+		\textbf{Structure} & \textbf{Cache Hit Rate (\%)} \\
 		\hline
-		\multirow{ 3}{*}{\textbf{Sequential Scan}} & \textbf{Insert-Query-Delete} & TODO & TODO & TODO \\
-		 & \textbf{Random Operations} & TODO & TODO & TODO \\
+		Defragmented Pseudo-Pyramid Tree & TODO \\
+		Rebuild Pseudo-Pyramid Tree & TODO \\
+		Bucket Pseudo-Pyramid Tree & TODO \\
+		Splay Pseudo-Pyramid Tree & TODO \\
 		\hline
-		\multirow{ 3}{*}{\textbf{Octree}} & \textbf{Insert-Query-Delete} & TODO & TODO & TODO \\
-		 & \textbf{Random Operations} & TODO & TODO & TODO \\
-		\hline
-		\multirow{ 3}{*}{\textbf{Batch Pseudo-Pyramid Tree}} & \textbf{Insert-Query-Delete} & TODO & TODO & TODO \\
-		 & \textbf{Random Operations} & TODO & TODO & TODO \\
-		\hline
-		\multirow{ 3}{*}{\textbf{Defragmented Pseudo-Pyramid Tree}} & \textbf{Insert-Query-Delete} & TODO & TODO & TODO \\
-		 & \textbf{Random Operations} & TODO & TODO & TODO \\
-		\hline
-		\multirow{ 3}{*}{\textbf{Rebuild Pseudo-Pyramid Tree}} & \textbf{Insert-Query-Delete} &  0.571668 & 74.535 & 2104.63 \\
-		 & \textbf{Random Operations} & 0.0218163 & 2.79053 & 72.4116 \\
-		\hline		
 	\end{tabular}
-	\caption{Total Execution Time (in Seconds) for Different Sample Sizes of Astrophysics Dataset}
-	\label{tab:perf1-astrophysics}
-	\end{table}	
+	\caption{Cache Hit Rate for \texttt{insert} Operations with Pseudo-Pyramid Variants (200D Randomly Uniform Dataset, 10,000 operations each)}
+	\label{tab:perf1-cache-hit-rate}
+\end{table}
 
-\begin{figure}
-		\begin{center}
-			\begin{subfloat}[\texttt{insert}\label{fig:perf1-allinsert-d}]{%
-				\includegraphics[scale=0.5]{figures/performance_analysis/iteration_1/all_insert_randuniform.pdf}
-			}
-			\end{subfloat}~
-			\begin{subfloat}[\texttt{delete}\label{fig:perf1-alldelete-d}] {%
-				\includegraphics[scale=0.5]{figures/performance_analysis/iteration_1/all_delete_randuniform.pdf}
-			}
-			\end{subfloat}
-			\begin{subfloat}[Point Query\label{fig:perf1-allpquery-d}] {%
-				\includegraphics[scale=0.5]{figures/performance_analysis/iteration_1/all_pquery_randuniform.pdf}
-			}
-			\end{subfloat}  
-		\end{center}
+The differences in speed between the bucket and splay variants is small, but the Bucket Pseudo-Pyramid Tree outperforms the Splay Tree with most datasets. With severely skewed synthetic data, the splay variant is \textit{slightly} faster, but the speed increase is negligible. This could be an indication that self-adjusting structures are useful for heavily skewed data however, highlighting an area for further study. TODO: refer to table
 
-		\caption{Performance of 10,000 Operations on Random Uniformly Distributed Datasets of Varying Dimensions}
+\begin{table}
+	\centering
+	\makebox[\textwidth][c]{%
+		\begin{tabular}{|r|r|l|l|l|}
+			\hline
+			\multicolumn{2}{|c}{} & \multicolumn{3}{|c|}{\textbf{Dataset}} \\
+			\hline
+			\textbf{Structure} & \textbf{Operation} & \textbf{Astrophysics} & \textbf{Hurricane Isabel} & \textbf{Armadillo Mesh} \\
+			\hline
+			\multirow{4}{*}{Sequential Scan} & Insert & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO \\
+				& Random Operation List & TODO & TODO & TODO \\
+			\hline
+			\multirow{4}{*}{Octree} & Insert & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO \\
+				& Random Operation List & TODO & TODO & TODO \\
+			\hline
+			\multirow{4}{*}{Defragmented PPT} & Insert & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO \\
+				& Random Operation List & TODO & TODO & TODO \\
+			\hline
+			\multirow{4}{*}{Rebuild PPT} & Insert & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO \\
+				& Random Operation List & TODO & TODO & TODO \\
+			\hline
+			\multirow{4}{*}{Bucket PPT} & Insert & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO \\
+				& Random Operation List & TODO & TODO & TODO \\
+			\hline
+			\multirow{4}{*}{Splay PPT} & Insert & TODO & TODO & TODO \\
+				& Delete & TODO & TODO & TODO \\
+				& PQuery & TODO & TODO & TODO \\
+				& Random Operation List & TODO & TODO & TODO \\
+			\hline
+		\end{tabular}
+	}%
 
-		\label{fig:perf1-dimensionality}
-\end{figure}
+	\caption{Total Execution Time (in seconds) of Each Operation for 500,000 Points Sampled From Real Datasets}
+	\label{tab:perf1-real}
+\end{table}
 
-% TODO: change plots to total
-\begin{figure}
-		\begin{center}
-			\begin{subfloat}[\texttt{insert}\label{fig:perf1-allinsert-n}]{%
-				\includegraphics[scale=0.5]{figures/performance_analysis/iteration_1/all_insert_sizevary_average.pdf}
-			}
-			\end{subfloat}~
-			\begin{subfloat}[\texttt{delete}\label{fig:perf1-alldelete-n}] {%
-				\includegraphics[scale=0.5]{figures/performance_analysis/iteration_1/all_delete_sizevary_average.pdf}
-			}
-			\end{subfloat}
-			\begin{subfloat}[Point Query\label{fig:perf1-allpquery-n}] {%
-				\includegraphics[scale=0.5]{figures/performance_analysis/iteration_1/all_pquery_sizevary_average.pdf}
-			}
-			\end{subfloat}  
-		\end{center}
+Table \ref{tab:perf1-real} shows the runtime of each operation on the real evaluation datasets, measured using the Insert-Query-Delete operation list. The total execution time of 500,000 randomly generated operations (as described in Section \ref{sec:timing-operations}) has also been provided for each structure (TODO: have??).
 
-		\caption{Average Operation Performance on Random Uniformly Distributed Datasets of Varying Dimensions}
-
-		\label{fig:perf1-size}
-\end{figure}
+TODO: remarks on it
 
 \subsection{Profiling Results}
 
@@ -265,36 +285,58 @@ CPU and heap profiling was performed on each structure to determine where the pe
 
 \begin{table}
 	\centering
-	\begin{tabular}{|p{6cm}|p{6cm}|p{2.5cm}|}
-		\hline
-		\textbf{Structure} &
-			\textbf{Dominant Functions (\% time spent on average)}
-		& \textbf{Peak Heap Memory Used} \\
-		\hline
-		\textbf{Sequential Scan} & 
-			\begin{tabular}{l} \texttt{Point::operator==()} (63.3\%) \\ \texttt{std::vector::remove()} (21.6\%)
-			\end{tabular}
-			& 0.9 MB \\
-		\textbf{Octree} & \texttt{subdivide()} (34.4\%) & 291.3 MB \\
-		\textbf{Batch Pseudo-Pyramid Tree} & \texttt{hashPoint()} (99.7\%) & 1.5 MB \\
-		\textbf{Defragmented Pseudo-Pyramid Tree} & \texttt{defragment()} (72.7\%) & 2.2 MB \\
-		\textbf{Rebuild Pseudo-Pyramid Tree} & \texttt{rebuild()} (52.49\%) & 3.5 MB \\
-		\hline
-	\end{tabular}
-	\caption{Function Bottlebecks and Peak Heap Memory Used for 10,000 10D Points}
-	\label{fig:perf1-profiling}
+	\makebox[\textwidth][c]{%
+		\begin{tabular}{|l|l|l|l|}
+			\hline
+			\textbf{Structure} & \textbf{Max Heap Memory (MB)} & \textbf{Cache Hit Rate (\%)} & \textbf{Dominant Function (\% Total Time Spent)} \\
+			\hline
+			Sequential Scan & TODO & TODO & TODO (TODO) \\
+			Octree & TODO & TODO & TODO (TODO) \\
+			Defragmented PPT & TODO & TODO & TODO (TODO) \\
+			Rebuild PPT & TODO & TODO & TODO (TODO) \\
+			Bucket PPT & TODO & TODO & TODO (TODO) \\
+			Splay PPT & TODO & TODO & TODO (TODO) \\
+			\hline
+		\end{tabular}
+	}%
+	\caption{CPU and Heap Profiling Statistics When Inserting 500,000 Points from 16D Synthetic Dataset into Index Structures}
+	\label{tab:perf1-profiling}
 \end{table}
 
-Sequential Scan's core bottleneck was the point equality checking function, taking approximately 63.3\% of the structure's total execution time. This is unsurprising, considering the algorithm. To check a given point exists, the structure iterates through the stored points and compares them with the given one. In the worst case, $n$ point comparisons are made for each operation, where $n$ is the number of points stored. Therefore, frequency of these comparisons is high, meaning the sum of the individual comparisons times consume most of the execution time. Octree performs multiple heap allocations and region checks when sub-dividing leaf nodes, which is biggest cause of slowdown.
+TODO: analysis
 
-Since hash table operations are $O(1)$ on average, the Batch Pseudo-Pyramid Tree spends very little time searching the underlying hash table structure. The vast majority of the structure's time is spent hashing $d$-dimensional points to an integer value. The slowest of the four structures, the Defragmented Pseudo-Pyramid Tree, spends most of its time defragmenting the underyling point array. The expensive $O(n^2)$ defragmentation steps means \texttt{delete} dominates the other operations. This is also the case with the rebuild variant, to a lesser extend. The Rebuild Pseudo-Pyramid Tree has the highest peak heap memory usage, caused by the rebuild procedure which keeps a partial copy of the structure in memory.
+\subsection{Impact of Bucket Size}
 
-Sequential Scan uses the least heap memory, because it only stores the points and contains no overhead. The Pseudo-Pyramid Tree stores buckets and point sums to accelerate search, which is the reason it uses more heap memory than Sequential Scan. Even though only 10,000 10D points are stored in the octree, almost 300 MB of memory is used. A non-leaf octree node has $2^d$, which means the memory overhead increases exponentially as $d$ does. When $d = 10$, each non-leaf has 1024 children. Due to the curse of dimensionality and data sparseness \cite{data-sparseness}, it is likely the majority of these nodes will be empty, meaning a significant number of excessive nodes and memory is being used.
+Work gone into increasing the speed of the Pseudo-Pyramid Tree by exploring different variants of the structure's implementation. This has worked to greatly accelerate the structure for most of the evaluation datasets. However, when testing on the astrophysics dataset, the speedup when compared to Sequential Scan seemed to be quite low. For example, $500,000$ insertion operations with the astrophysics dataset takes TODO seconds with Sequential Scan and TODO seconds with the Bucket Pseudo-Pyramid Tree, meaning a speedup of $\frac{TODO}{TODO} \approx TODO$ has been achieved. Considering there exist algorithms which can perform search in $O(log_2 n)$ time, this raised the question of why the speedup is so low for the astrophysics dataset.
+
+Despite hashing a point taking $O(d)$ time, point queries will take much longer if there are large numbers of points in buckets. If each bucket contains exactly one point, then the complexity approaches $O(d)$. On the other extreme, where a single bucket contains all points, the complexity becomes $O(n)$. The number of points in a bucket, or \textit{bucket size}, is one of the most important factors to consider when analysing the performance of hash-based index structures. A ``good" hashing function tries to achieve an amortised running time of $O(1)$ by ensuring only one or two points are mapped to the same hash value.
+
+The mean, standard deviation, minimum and maximum bucket size has been used to determine if bucket size is the reason the Pseudo-Pyramid Tree is so slow for the astrophysics dataset. Table \ref{tab:perf1-bucket-stats} shows these statistics when the Pseudo-Pyramid Tree is storing points from one synthetic dataset and all the real datasets.
+
+\begin{table}
+	\centering
+	\begin{tabular}{|l|l|l|l|l|}
+		\hline
+		\textbf{} & \multicolumn{4}{c|}{\textbf{Bucket Size Statistics}} \\
+		\hline
+		\textbf{Dataset} & \textbf{Average} & \textbf{St. Dev} & \textbf{Min} & \textbf{Max} \\
+		\hline
+		500,000 16D Random Points & TODO & TODO & TODO & TODO \\
+		500,000 Astrophysics Points & TODO & TODO & TODO & TODO \\
+		500,000 Hurricane Isabel Points & TODO & TODO & TODO & TODO \\
+		435,544 3D Armadillo Mesh Points & TODO & TODO & TODO & TODO \\
+		\hline
+	\end{tabular}
+	\caption{Statistics on Bucket Size with Pseudo-Pyramid Tree Based on Dataset}
+	\label{tab:perf1-bucket-stats}
+\end{table}
+
+TODO: remarks on stats in above table
+
+TODO: why is bucket size so high????????????
 
 \subsection{Summary}
 
-This iteration implemented the two baselines, Sequential Scan and Octree, as well as a hash table based Pyramid Tree. These structures have been timed to determine how the structures' performance behaves as the dimensionality and dataset size increases. Sequential Scan is highly inefficient for large $n$, but mostly remains unaffected by high $d$. The Octree is essentially unusable for high dimensions because of the $O(2^d)$ spatial complexity, which causes the machine to run out of memory almost immediately. Furthermore, the plots show that execution time of the operations also increases exponentially as $d$ increases.
+All Pseudo-Pyramid tree invariants greatly outperform the two baselines, with the Octree failing to store large numbers of points or points with more than 10 dimensions due to exponential memory requirements. The defragmented and rebuild variants of the Pseudo-Pyramid are clearly inferior to batch and splay, being slower for all three operations. While the Splay Pseudo-Pyramid Tree performs the fastest for some datasets, the Bucket Pseudo-Pyramid Tree performs the fastest on the majority of the datasets. Therefore, the Bucket Pseudo-Pyramid Tree will be used for any future evaluations.
 
-The Batch Pseudo-Pyramid Tree provides very fast performance on all operations, but becomes slower when a certain number of dimensions is reached ($\approx 57$). CPU profiling has shown that this is most likely to do with the $O(d^2)$ hash function, where the majority of the structure's execution time is spent. Furthermore, the Batch pyramid tree does not release the memory of deleted points. The Defragmented Pseudo-Pyramid Tree is a variant of the Batch Pseudo-Pyramid Tree which occasionally performs an $O(n^2)$ defragmentation procedure to release memory. Tests have shown this to be inefficent, being even slower than Sequential Scan's \texttt{delete}.
-
-Despite difficulties releasing memory and a troublesome hashing function, the Pseudo-Pyramid Tree shows great promise as a structure capable of dealing with high-dimensional data. It was decided that focus of the next iteration would be modifying the Pyramid tree implementation to provide two things: a more efficient \texttt{delete} that also releases memory and a faster hashing function to provide further speedup and allow the structure to be used for even higher dimensions.
+With both scientific datasets, all Pseudo-Pyramid Tree variants performed incredibly slowly, due to the nature of the hash function. The next iteration performed more research into decreasing bucket size by using different hashing functions, to determine whether or not hash-based index structures can provide fast point queries for scientific datasets with TODO(nature of data).

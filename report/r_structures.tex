@@ -38,9 +38,9 @@ An advantage of PR quadtrees is that there is no overlap between the spatial reg
 	\label{fig:quadtree-kdtree-clustered}
 \end{wrapfigure}
 
-\subsubsection{kd-Trees}
+\subsubsection{$kd$-Trees}
 
-kd-trees are similar to quadtrees in that the data space is once again partitioned into disjoint regions \cite{kd-tree}. With point kd-trees, each split partitions a region into two sub-regions along a \textbf{single dimension} $d_i$. These sub-regions are represented as two nodes, with the original region's node as the parent. Some \textbf{pivot} value $p$ is chosen for $d_i$. The left and right children contain all the data items whose $d_i$th value is less than $p$ and greater than $p$ respectively. The way a kd-tree is built varies depends on how $d_i$ and $p$ are chosen, so there are many variations of this structure. A common way of choosing $d_i$ is to cycle through each dimension when repeatedly splitting. $p$ could be assigned the \textbf{median} of the $d_i$th value of each data item within the region being split.
+$kd$-trees are similar to quadtrees in that the data space is once again partitioned into disjoint regions \cite{kd-tree}. With point kd-trees, each split partitions a region into two sub-regions along a \textbf{single dimension} $d_i$. These sub-regions are represented as two nodes, with the original region's node as the parent. Some \textbf{pivot} value $p$ is chosen for $d_i$. The left and right children contain all the data items whose $d_i$th value is less than $p$ and greater than $p$ respectively. The way a kd-tree is built varies depends on how $d_i$ and $p$ are chosen, so there are many variations of this structure. A common way of choosing $d_i$ is to cycle through each dimension when repeatedly splitting. $p$ could be assigned the \textbf{median} of the $d_i$th value of each data item within the region being split.
 
 Unlike the PR quadtree, the size of partitions are non-uniform, meaning kd-trees can are better suited to skewed or clustered data. Figure \ref{fig:quadtree-kdtree-clustered} shows a PR quadtree and kd-tree partition of some clustered data. Notice how there are more (empty) regions in the quadtree than the kd-tree, thus having a less efficient partition of the data (resulting in slower queries).
 
@@ -153,9 +153,10 @@ A treap is a randomised search tree used to store one-dimensional keys, which co
 A quadtreap is a combination of a compressed quadtree and a treap \cite{quadtreap}. In order to maintain a balanced height $h \approx \log n$ when the tree is modified, tree rotations are used. The times for inserting and deleting points are $O(h)$ and $O(h^2)$ respectively, meaning the \textit{expected} times are $O(\log n)$ and $O(\log^2 n)$. Under certain conditions, approximate range and nearest neighbour queries can be achieved in $O(h + \frac{1}{\epsilon}^{d - 1})$, where $\epsilon$ is the approximation factor that controls the accuracy.
 
 \subsubsection{Splay Quadtree}
-
-% ENTROPY-REF =  Ihara, Shunsuke (1993). Information theory for continuous systems. World Scientific. p. 2. ISBN 978-981-02-0985-8.
+\label{sec:splay-quadtree}
 
 Splay trees are one-dimensional index structures which make use of a splaying operation to achieve fast dynamic operations \cite{introduction-to-algorithms}. A Splay tree is \textbf{self-adjusting}, which means it is ``a data structure that reorganises itself to fit the pattern of access." \cite{splay-quadtree} This is achieved with the splaying operation, which performs a series of $O(1)$ tree rotations to maintain a balanced tree with low height.
+
+TODO: more detail about the splay tree, including in-depth algorithms??
 
 Park and Mount, the creators of the quadtreap \cite{quadtreap}, stated ``there is no comparable self-adjusting data structure for storing multi-dimensional point sets" with regard to splay trees \cite{splay-quadtree}. Hence, they developed the splay quadtree, which combines BBD-trees (box decomposition trees) with quadtrees by making use of an equivalent splaying operation on quadtrees. Using entropy, Park and Mount proved good bounds on the running time of dynamic operations and queries. Splay quadtrees are also relatively simple to implement and store little internal balancing information, meaning they have low memory overhead. This makes splay quadtrees a potentially powerful modern index structure. No papers discussing its performance with high-dimensional data appear to have been published, however, so it is not known how well the structure performs in a high dimensional setting.
