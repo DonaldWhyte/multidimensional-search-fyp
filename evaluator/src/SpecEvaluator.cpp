@@ -105,8 +105,21 @@ namespace mdsearch
 				// For each structure, perform Insert-Query-Delete operation list and time each operation type
 				for (std::vector<IndexStructureSpecification>::const_iterator structSpec = structSpecs.begin();
 					(structSpec != structSpecs.end()); structSpec++)
-				{
+				{					
 					OperationTimings totalOpTimings = { 0 }; // initialise all elements to 0
+
+					// HACK FOR OCTREE:
+					// If this structure is an Octree, and either the dimensionalityof the points is > 10
+					// or the number of points in the dataset is > 10000, then DON'T RUN THE TEST!
+					// Simply assign -1 to all execution times and move onto next strucutre.
+					// This is to avoid out-of-memory errors
+					if (structSpec->type == "octree" && (boundary.numDimensions() > 10 || dataset.size() > 10000))
+					{
+						dsTimings[structSpec->type + " insert"][subSpec->name] = -1;
+						dsTimings[structSpec->type + " delete"][subSpec->name] = -1;
+						dsTimings[structSpec->type + " pquery"][subSpec->name] = -1;
+						continue; // go to next structure
+					}
 
 					for (unsigned int i = 0; (i < suite.numRunsPerTiming()); i++)
 					{
