@@ -5,6 +5,12 @@
 namespace mdsearch
 {
 
+	std::string joinPath(const std::string& a, const std::string& b)
+	{
+		// TODO: make more cross-platform
+		return a + "/" + b;
+	}
+
 	/* If this is greater than 0, then the tight boundary around a
 	 * dataset's points is expanded slightly to prevent some points
 	 * being on the structure boundary.
@@ -54,13 +60,6 @@ namespace mdsearch
 		}
 	}
 
-	std::string joinPath(const std::string& a, const std::string& b)
-	{
-		// TODO: make more cross-platform
-		return a + "/" + b;
-	}
-
-
 	DatasetTimings SpecEvaluator::evaluatePerformance(const TestSuite& suite) const
 	{
 		DatasetFileLoader datasetLoader;
@@ -103,8 +102,20 @@ namespace mdsearch
 					OperationTimings opTimings;
 
 					// TIME INSERT
+					Timing startTime = getTime();
+					for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)
+						structure->insert(*p);
+					opTimings.insert = getTime() - startTime;
 					// TIME PQUERY
+					startTime = getTime();
+					for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)
+						structure->pointExists(*p);
+					opTimings.pointQuery = getTime() - startTime;
 					// TIME DELETE
+					startTime = getTime();
+					for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)
+						structure->remove(*p);
+					opTimings.remove = getTime() - startTime;			
 
 					dsTimings[structSpec->type + " insert"][subSpec->name] = opTimings.insert;
 					dsTimings[structSpec->type + " delete"][subSpec->name] = opTimings.remove;
@@ -112,7 +123,6 @@ namespace mdsearch
 				
 					delete structure;
 				}
-
 			}
 
 			allTimings[dsSpec->name] = dsTimings;

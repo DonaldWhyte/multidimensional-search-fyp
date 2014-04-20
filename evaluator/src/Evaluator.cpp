@@ -4,32 +4,11 @@
 #include <gperftools/profiler.h>
 #include <gperftools/heap-profiler.h>
 
-#if defined(_WIN32)
-	#include <time.h>
-#elif defined(__unix__)
-	#include <sys/time.h>
-#else
-	#error No timing mechanism supported for this platform
-#endif
-
 #include "PyramidTree.h"
 #include "DuplicateHashTable.h"
 
 namespace mdsearch
 {
-
-	Timing getTime()
-	{
-	#if defined(_WIN32)
-		return static_cast<Timing>(time(NULL)); // in seconds already
-	#elif defined(__unix__)
-		timespec ts;
-		clock_gettime(CLOCK_REALTIME, &ts); 
-		return static_cast<Timing>(ts.tv_sec) + (static_cast<Timing>(ts.tv_nsec) / 1000000000.0);
-	#else
-		return 0.0;
-	#endif
-	}
 
 
 	Evaluator::Evaluator(unsigned int numTestRuns, bool profileCPU, bool profileHeap, bool verbose)

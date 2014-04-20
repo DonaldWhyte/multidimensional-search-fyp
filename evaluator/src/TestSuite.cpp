@@ -33,8 +33,6 @@ namespace mdsearch
 			// Split line unto fields using ' ' as delimiter
 			std::vector<std::string> fields;
 			boost::split(fields, line, boost::is_any_of(" "));
-			if (fields.size() < 1)
-				continue;
 			// Use first field as structure type and the rest as the structure's arguments
 			IndexStructureSpecification spec;
 			spec.type = fields[0];
@@ -50,16 +48,20 @@ namespace mdsearch
 		std::getline(file, line);
 		while (!file.eof())
 		{
-			// Treat line as dataset name
+			// Parse line, treating first field as dataset name and 
+			// second field as varying parameter (X axis label)
+			std::vector<std::string> fields;
+			boost::split(fields, line, boost::is_any_of(" "));
 			DatasetSpecification dsSpec;
-			dsSpec.name = line;
+			dsSpec.name = fields[0];
+			if (fields.size() >= 2)
+				dsSpec.varyingParameter = fields[1];
 			// Parse remaining lines as sub DBs until line with tab added
 			std::getline(file, line);
 			while (boost::starts_with(line, "\t"))
 			{
 				SubDatasetSpecification subSpec;
 				// Split line to get name and filename
-				std::vector<std::string> fields;
 				boost::split(fields, line, boost::is_any_of(" "));
 				if (fields.size() >= 2) // ignore line if not enough fields
 				{

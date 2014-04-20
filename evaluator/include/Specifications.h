@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include<sstream>
+#include <sstream>
 
 namespace mdsearch
 {
@@ -25,24 +25,9 @@ namespace mdsearch
 	struct DatasetSpecification
 	{ 
 		std::string name;
+		// empty string if no parameter is varied -- determines label of X axis!
+		std::string varyingParameter;
 		std::vector<SubDatasetSpecification> subDatasets;
-
-		StringList outputFilenames(const std::string& suiteName)
-		{
-			StringList filenames;
-
-			std::stringstream ss;
-			for (std::vector<SubDatasetSpecification>::const_iterator it = subDatasets.begin();
-				(it != subDatasets.end()); it++)
-			{
-				ss << suiteName << "_" << name << "_" << it->name << ".times";
-				filenames.push_back(ss.str());
-				ss.str(""); // clear stream
-			}
-
-			return filenames;
-		}
-
 	};
 
 }

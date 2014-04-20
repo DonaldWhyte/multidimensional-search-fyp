@@ -27,9 +27,6 @@ namespace mdsearch
 
 	typedef std::map<int, Timing> SizeTimingTable;
 
-	/* Return current time. */
-	Timing getTime();
-
 	/* Generate string that contains human-readable report of
 	 * recorded dataset timings. */
 	std::string generateTimingReport(const OperationListTimings& timings);

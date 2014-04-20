@@ -33,6 +33,7 @@ namespace mdsearch { namespace tests
 		const std::vector<DatasetSpecification>& dsSpecs = suite.datasetSpecs();
 		ASSERT_EQ(2, dsSpecs.size());
 		EXPECT_EQ("randuniform", dsSpecs[0].name);
+		EXPECT_EQ("Dimensions", dsSpecs[0].varyingParameter);
 		ASSERT_EQ(3, dsSpecs[0].subDatasets.size());
 		EXPECT_EQ("1", dsSpecs[0].subDatasets[0].name);
 		EXPECT_EQ("something.dat", dsSpecs[0].subDatasets[0].filename);
@@ -41,6 +42,7 @@ namespace mdsearch { namespace tests
 		EXPECT_EQ("10", dsSpecs[0].subDatasets[2].name);
 		EXPECT_EQ("something.dat", dsSpecs[0].subDatasets[2].filename);
 		EXPECT_EQ("astrophysics", dsSpecs[1].name);
+		EXPECT_EQ("", dsSpecs[1].varyingParameter);
 		ASSERT_EQ(3, dsSpecs[1].subDatasets.size());
 		EXPECT_EQ("10000", dsSpecs[1].subDatasets[0].name);
 		EXPECT_EQ("astrophysics_10000.dat", dsSpecs[1].subDatasets[0].filename);

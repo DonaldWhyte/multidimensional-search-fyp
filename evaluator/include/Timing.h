@@ -12,6 +12,9 @@ namespace mdsearch
 	typedef std::map<std::string, Timing> TimingMap;
 	typedef std::map<std::string, TimingMap> TimingCollection;
 
+	/* Return current time. */
+	Timing getTime();
+
 	class TimingWriter
 	{
 

@@ -7,6 +7,8 @@
 namespace mdsearch
 {
 
+	std::string joinPath(const std::string& a, const std::string& b);
+
 	// Key = dataset name, value = timing collection containing
 	// times for each structure-subdataset combination (plus 3 ops)
 	typedef std::map<std::string, TimingCollection> DatasetTimings;
@@ -23,9 +25,7 @@ namespace mdsearch
 	{
 
 	public:
-		SpecEvaluator();
-
-		DatasetTimings evaluatePerformance(const TestSuite& suit) const;
+		DatasetTimings evaluatePerformance(const TestSuite& suite) const;
 
 	};
 
