@@ -1,0 +1,19 @@
+ExampleSuite
+/media/Maxtor/DonaldFYP/test_data/datasets/
+./results/
+3
+
+kdtree
+pyramid_tree
+pseudo_pyramid_tree
+
+randuniform Dimensions
+	1 randuniform_1d.dat
+	2 randuniform_2d.dat
+	3 randuniform_3d.dat
+skewed Dimensions
+	1 skewed_1d.dat
+	2 skewed_2d.dat
+	3 skewed_3d.dat
+astrophysics Points
+	10000 astrophysics_10000.dat

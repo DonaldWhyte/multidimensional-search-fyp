@@ -1,0 +1,50 @@
+Iteration1
+/usr/not-backed-up/DonaldFYP/test_data/datasets
+/usr/not-backed-up/DonaldFYP/timings/iteration1/
+3
+
+sequential_scan
+octree
+index_pseudo_pyramid_tree,9000,defragment
+index_pseudo_pyramid_tree,9000,rebuild
+pseudo_pyramid_tree
+splay_pseudo_pyramid_tree
+
+randuniform Dimensions
+	1 randuniform_1d.dat
+	2 randuniform_2d.dat
+	3 randuniform_3d.dat
+	5 randuniform_5d.dat
+	10 randuniform_10d.dat
+	50 randuniform_50d.dat
+	100 randuniform_100d.dat
+	200 randuniform_200d.dat
+skewed Dimensions
+	1 skewed_1d.dat
+	2 skewed_2d.dat
+	3 skewed_3d.dat
+	5 skewed_5d.dat
+	10 skewed_10d.dat
+	50 skewed_50d.dat
+	100 skewed_100d.dat
+	200 skewed_200d.dat
+clustered Dimensions
+	1 clustered_1d.dat
+	2 clustered_2d.dat
+	3 clustered_3d.dat
+	5 clustered_5d.dat
+	10 clustered_10d.dat
+	50 clustered_50d.dat
+	100 clustered_100d.dat
+	200 clustered_200d.dat
+sizevary #Points
+	10000 sizevary_n10000.dat
+	100000 sizevary_n100000.dat
+	500000 sizevary_n500000.dat
+	1000000 sizevary_n1000000.dat
+astrophysics
+	0 astrophysics_500000.dat
+hurricane
+	0 hurricane_500000.dat
+armadillo
+	0 armadillo.dat
