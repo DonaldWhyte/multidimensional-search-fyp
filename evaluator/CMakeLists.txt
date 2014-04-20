@@ -7,7 +7,6 @@ set (EVALUATOR_SRC
 	"src/IndexStructureFactory.cpp"
 	"src/TestOperation.cpp"
 	"src/TestOperationLoader.cpp"
-	"src/Evaluator.cpp"
 	"src/SpecEvaluator.cpp"
 	# Header files
 	"include/IndexStructureFactory.h"
@@ -16,7 +15,6 @@ set (EVALUATOR_SRC
 	"include/Timing.h"
 	"include/TestOperation.h"
 	"include/TestOperationLoader.h"
-	"include/Evaluator.h"
 	"include/SpecEvaluator.h"
 )
 add_executable( evaluator
