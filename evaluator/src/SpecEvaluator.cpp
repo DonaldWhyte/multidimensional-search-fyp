@@ -98,6 +98,7 @@ namespace mdsearch
 			{
 				// Load sub-dataset into main memory
 				std::string fullPath = joinPath(suite.inputDirectory(), subSpec->filename);
+				std::cout << "TESTING: " << fullPath << std::endl;
 				PointList dataset = datasetLoader.load(fullPath);
 				// Determine dimensionality and bounding box of points
 				Region boundary = computeDatasetBoundary(dataset);
@@ -107,6 +108,8 @@ namespace mdsearch
 					(structSpec != structSpecs.end()); structSpec++)
 				{					
 					OperationTimings totalOpTimings = { 0 }; // initialise all elements to 0
+
+					std::cout << "\tSTRUCTURE: " << structSpec->type << std::endl;
 
 					// HACK FOR OCTREE:
 					// If this structure is an Octree, and either the dimensionalityof the points is > 10

@@ -5,8 +5,8 @@ Iteration1
 
 sequential_scan
 octree
-index_pseudo_pyramid_tree,9000,defragment
-index_pseudo_pyramid_tree,9000,rebuild
+index_pseudo_pyramid_tree 9000 defragment
+index_pseudo_pyramid_tree 9000 rebuild
 pseudo_pyramid_tree
 splay_pseudo_pyramid_tree
 
