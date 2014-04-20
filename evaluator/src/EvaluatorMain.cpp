@@ -3,6 +3,8 @@
 
 using namespace mdsearch;
 
+static const std::string Y_AXIS_LABEL = "Execution Time (in seconds)";
+
 std::string timingFilename(const TestSuite& suite, const std::string& datasetName)
 {
 	std::string filename = suite.name() + "_" + datasetName + ".times";
@@ -36,7 +38,6 @@ int main(int argc, char* argv[])
 		for (DatasetTimings::const_iterator ds = timings.begin(); (ds != timings.end()); ds++)
 		{
 			std::string filename = timingFilename(suite, ds->first);
-			std::string title = ds->first + " Timings";
 			// Find varying parameter of dataset and use as X-axis label
 			std::string xAxis;
 			for (std::vector<DatasetSpecification>::const_iterator it = datasetSpecs.begin();
@@ -48,7 +49,7 @@ int main(int argc, char* argv[])
 					break;
 				}
 			}
-			writer.timesToFile(filename, title, xAxis, "Execution Time (in seconds)", ds->second);
+			writer.timesToFile(filename, ds->first, xAxis, Y_AXIS_LABEL, ds->second);
 		}
 	}
 	else

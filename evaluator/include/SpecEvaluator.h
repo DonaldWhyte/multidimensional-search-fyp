@@ -12,15 +12,7 @@ namespace mdsearch
 	// Key = dataset name, value = timing collection containing
 	// times for each structure-subdataset combination (plus 3 ops)
 	typedef std::map<std::string, TimingCollection> DatasetTimings;
-	// Contains timings for each operation, typically using
-	// INnert-Query-Delete operation list, for one structure-subdataset pair
-	struct OperationTimings
-	{
-		Timing insert;
-		Timing remove;
-		Timing pointQuery;
-	};
-
+	
 	class SpecEvaluator
 	{
 

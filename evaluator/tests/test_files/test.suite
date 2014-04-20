@@ -1,6 +1,7 @@
 testsuite
 /tmp/inputData/
 /var/log/
+3
 
 kdtree
 pyramid_tree

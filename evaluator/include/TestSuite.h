@@ -11,7 +11,7 @@ namespace mdsearch
 
 	public:
 		TestSuite(const std::string& suiteName, const std::string& suiteInputDir,
-			const std::string& suiteOutputDir);
+			const std::string& suiteOutputDir, unsigned int numRuns);
 		static TestSuite fromFile(const std::string& filename);
 
 		void addStructure(const IndexStructureSpecification& spec);
@@ -20,6 +20,7 @@ namespace mdsearch
 		const std::string& name() const;
 		const std::string& inputDirectory() const;
 		const std::string& outputDirectory() const;
+		unsigned int numRunsPerTiming() const;
 		const std::vector<IndexStructureSpecification>& structureSpecs() const;
 		const std::vector<DatasetSpecification>& datasetSpecs() const;
 
@@ -27,6 +28,8 @@ namespace mdsearch
 		std::string suiteName;
 		std::string suiteInputDir;
 		std::string suiteOutputDir;
+		unsigned int numRuns;
+
 		std::vector<IndexStructureSpecification> structures;
 		std::vector<DatasetSpecification> datasets;
 

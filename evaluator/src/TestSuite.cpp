@@ -7,8 +7,9 @@ namespace mdsearch
 {
 
 	TestSuite::TestSuite(const std::string& suiteName, const std::string& suiteInputDir,
-		const std::string& suiteOutputDir) :
-		suiteName(suiteName), suiteInputDir(suiteInputDir), suiteOutputDir(suiteOutputDir)
+		const std::string& suiteOutputDir, unsigned int numRuns) :
+		suiteName(suiteName), suiteInputDir(suiteInputDir), suiteOutputDir(suiteOutputDir),
+		numRuns(numRuns)
 	{
 	}
 
@@ -16,12 +17,14 @@ namespace mdsearch
 	{
 		std::ifstream file(filename.c_str());
 
-		// Use first and second line as name and output direc tory for the suite
-		std::string name, inputDir, outputDir;
+		// Use first and second line as name and output directory for the suite
+		std::string name, inputDir, outputDir, numRunsStr;
 		std::getline(file, name);
 		std::getline(file, inputDir);
 		std::getline(file, outputDir);
-		TestSuite suite(name, inputDir, outputDir);
+		std::getline(file, numRunsStr);
+		unsigned int numRuns = boost::lexical_cast<unsigned int>(numRunsStr);
+		TestSuite suite(name, inputDir, outputDir, numRuns);
 
 		// Now parse structures, treating each line as a structure
 		// until a blank line is reached
@@ -91,6 +94,11 @@ namespace mdsearch
 	void TestSuite::addDataset(const DatasetSpecification& spec)
 	{
 		datasets.push_back(spec);
+	}
+
+	unsigned int TestSuite::numRunsPerTiming() const
+	{
+		return numRuns;
 	}
 
 	const std::string& TestSuite::name() const

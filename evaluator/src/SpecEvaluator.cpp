@@ -11,6 +11,15 @@ namespace mdsearch
 		return a + "/" + b;
 	}
 
+	// Contains timings for each operation, typically using
+	// Insert-Query-Delete operation list, for one structure-subdataset pair
+	struct OperationTimings
+	{
+		Timing insert;
+		Timing remove;
+		Timing pointQuery;
+	};	
+
 	/* If this is greater than 0, then the tight boundary around a
 	 * dataset's points is expanded slightly to prevent some points
 	 * being on the structure boundary.
@@ -93,35 +102,41 @@ namespace mdsearch
 				// Determine dimensionality and bounding box of points
 				Region boundary = computeDatasetBoundary(dataset);
 				
-				// For each structure, perform Insert-Query-Delete and time each
+				// For each structure, perform Insert-Query-Delete operation list and time each operation type
 				for (std::vector<IndexStructureSpecification>::const_iterator structSpec = structSpecs.begin();
 					(structSpec != structSpecs.end()); structSpec++)
 				{
-					IndexStructure* structure = structureFactory.constructIndexStructure(
-						structSpec->type, boundary.numDimensions(), boundary, structSpec->arguments);
-					OperationTimings opTimings;
+					OperationTimings totalOpTimings = { 0 }; // initialise all elements to 0
 
-					// TIME INSERT
-					Timing startTime = getTime();
-					for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)
-						structure->insert(*p);
-					opTimings.insert = getTime() - startTime;
-					// TIME PQUERY
-					startTime = getTime();
-					for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)
-						structure->pointExists(*p);
-					opTimings.pointQuery = getTime() - startTime;
-					// TIME DELETE
-					startTime = getTime();
-					for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)
-						structure->remove(*p);
-					opTimings.remove = getTime() - startTime;			
+					for (unsigned int i = 0; (i < suite.numRunsPerTiming()); i++)
+					{
+						IndexStructure* structure = structureFactory.constructIndexStructure(
+							structSpec->type, boundary.numDimensions(), boundary, structSpec->arguments);
 
-					dsTimings[structSpec->type + " insert"][subSpec->name] = opTimings.insert;
-					dsTimings[structSpec->type + " delete"][subSpec->name] = opTimings.remove;
-					dsTimings[structSpec->type + " pquery"][subSpec->name] = opTimings.pointQuery;
-				
-					delete structure;
+						// TIME INSERT
+						Timing startTime = getTime();
+						for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)
+							structure->insert(*p);
+						totalOpTimings.insert += getTime() - startTime;
+						// TIME PQUERY
+						startTime = getTime();
+						for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)
+							structure->pointExists(*p);
+						totalOpTimings.pointQuery += getTime() - startTime;
+						// TIME DELETE
+						startTime = getTime();
+						for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)
+							structure->remove(*p);
+						totalOpTimings.remove += getTime() - startTime;
+
+						delete structure;
+					}
+					// Compute and store AVERAGE of all runs
+					dsTimings[structSpec->type + " insert"][subSpec->name] = totalOpTimings.insert / suite.numRunsPerTiming();
+					dsTimings[structSpec->type + " delete"][subSpec->name] = totalOpTimings.remove / suite.numRunsPerTiming();
+					dsTimings[structSpec->type + " pquery"][subSpec->name] = totalOpTimings.pointQuery / suite.numRunsPerTiming();
+					
+					
 				}
 			}
 

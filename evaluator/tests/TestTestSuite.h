@@ -18,6 +18,7 @@ namespace mdsearch { namespace tests
 		EXPECT_EQ("testsuite", suite.name());
 		EXPECT_EQ("/tmp/inputData/", suite.inputDirectory());
 		EXPECT_EQ("/var/log/", suite.outputDirectory());
+		EXPECT_EQ(3, suite.numRunsPerTiming());
 		
 		const std::vector<IndexStructureSpecification>& structureSpecs = suite.structureSpecs();
 		ASSERT_EQ(3, structureSpecs.size());
