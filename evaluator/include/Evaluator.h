@@ -7,12 +7,12 @@
 #include "TestOperation.h"
 #include "CommandLineArguments.h"
 #include "IndexStructureFactory.h"
+#include "Timing.h"
 
 namespace mdsearch
 {
 
 	// Types used for timing information
-	typedef double Timing;
 	typedef std::vector<Timing> StructureTimings;
 	typedef std::vector<StructureTimings> OperationListTimings;
 

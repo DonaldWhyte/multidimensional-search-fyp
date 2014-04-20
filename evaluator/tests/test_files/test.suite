@@ -1,0 +1,16 @@
+testsuite
+/tmp/inputData/
+/var/log/
+
+kdtree
+pyramid_tree
+index_pseudo_pyramid_tree 9000 defragment
+
+randuniform
+	1 something.dat
+	5 something.dat
+	10 something.dat
+astrophysics
+	10000 astrophysics_10000.dat
+	50000 astrophysics_50000.dat
+	100000 astrophysics_100000.dat

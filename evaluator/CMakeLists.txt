@@ -3,6 +3,7 @@ set (EVALUATOR_SRC
 	# Source files
 	"src/CommandLineArguments.cpp"
 	"src/TestSuite.cpp"
+	"src/Timing.cpp"
 	"src/IndexStructureFactory.cpp"
 	"src/TestOperation.cpp"
 	"src/TestOperationLoader.cpp"
@@ -11,6 +12,7 @@ set (EVALUATOR_SRC
 	"include/IndexStructureFactory.h"
 	"include/CommandLineArguments.h"
 	"include/TestSuite.h"
+	"include/Timing.h"
 	"include/TestOperation.h"
 	"include/TestOperationLoader.h"
 	"include/Evaluator.h"
@@ -31,6 +33,7 @@ add_executable ( evaluator_tests
 	"tests/TestRunner.cpp"
 	"tests/TestCommandLineArguments.h"
 	"tests/TestTestSuite.h"
+	"tests/TestTiming.h"
 	"tests/TestTestOperationLoader.h"
 	${EVALUATOR_SRC}
 )
