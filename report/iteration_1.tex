@@ -275,15 +275,11 @@ The differences in speed between the bucket and splay variants is small, but the
 	\label{tab:perf1-real}
 \end{table}
 
-Table \ref{tab:perf1-real} shows the runtime of each operation on the real evaluation datasets, measured using the Insert-Query-Delete operation list. The total execution time of 500,000 randomly generated operations (as described in Section \ref{sec:timing-operations}) has also been provided for each structure (TODO: have??).
-
-TODO: remarks on it
+Table \ref{tab:perf1-real} shows the runtime of each operation on the real evaluation datasets, measured using the Insert-Query-Delete operation list.TODO: remarks on it
 
 \subsection{Profiling Results}
 
 CPU and heap profiling was performed on each structure to determine where the performance bottlenecks are and how much memory each structure uses. Table \ref{fig:perf1-profiling} shows which functions took the majority of the execution time for each structure, as well as how much heap memory the structure consumed when storing all of the input dataset's points. The dataset used contained 10,000 10D uniformly random points and the CPU profiling was performed over the Insert-Query-Delete operation list.
-
-TODO: explain cache
 
 \begin{table}
 	\centering
@@ -340,4 +336,4 @@ TODO: why is bucket size so high????????????
 
 All Pseudo-Pyramid tree invariants greatly outperform the two baselines, with the Octree failing to store large numbers of points or points with more than 10 dimensions due to exponential memory requirements. The defragmented and rebuild variants of the Pseudo-Pyramid are clearly inferior to batch and splay, being slower for all three operations. While the Splay Pseudo-Pyramid Tree performs the fastest for some datasets, the Bucket Pseudo-Pyramid Tree performs the fastest on the majority of the datasets. Therefore, the Bucket Pseudo-Pyramid Tree will be used for any future evaluations.
 
-With both scientific datasets, all Pseudo-Pyramid Tree variants performed incredibly slowly, due to the nature of the hash function. The next iteration performed more research into decreasing bucket size by using different hashing functions, to determine whether or not hash-based index structures can provide fast point queries for scientific datasets with TODO(nature of data).
+With both scientific datasets, all Pseudo-Pyramid Tree variants degenerated to semi-sequential scan because of the dataset's point distribution. To determine whether or not hash-based index structures can provide fast point queries for scientific datasets such as the astrophysics and hurricane Isabel simulations, more research into decreasing bucket size by using different hashing functions should be performed, which is the focus of the next iteration.
