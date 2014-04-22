@@ -1,0 +1,90 @@
+\chapter{Algorithms and Code Listings}
+\label{chap:algs-and-code}
+\centerline{\rule{149mm}{.02in}}
+\vspace{2cm}
+
+TODO: intro
+
+\begin{algorithm}[H]
+	\SetAlgoLined
+	\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+	\SetKwFunction{hashPoint}{hashPoint} \SetKwFunction{hashFloat}{hashFloat}
+
+ 	\SetKwProg{funcHashPoint}{Algorithm}{}{}
+  	\funcHashPoint{\hashPoint{$d, p$}} {
+		\Input{$d$ = number of dimensions}
+		\Input{$p_0, p_1, \dots, p_{d-1}$ = coordinates of point}
+		\Output{$seed$ = integer representing hashed point}
+		\Begin {
+			$seed = 0$\;
+			\For{$i = 0$ to $d - 1$} {
+				$seed = seed \oplus \left(\hashFloat(p_i) + \texttt{0x9e3779b9} + (seed << 6) + (seed >> 2)\right)$
+			}
+			\KwRet{$seed$}
+		}
+	}
+
+	\caption{Hashing Multi-Dimensional Point in Bucket Hash Table}
+	\label{alg:point-hashing}
+\end{algorithm}
+
+\paragraph{\textbf{NOTE:}} \texttt{hashFloat} is a function which hashes an individual 32-bit floating point number and corresponds to the function \texttt{float\_hash\_impl2} in Listing \ref{lst:hash-float-function}.
+
+\paragraph{} 
+
+\begin{lstlisting}[label=lst:hash-float-function, caption=Code to Hash Single 32-bit Floating Point Value (Source code from file \texttt{boost/functional/hash/detail/hash\_float\_generic.hpp} in Boost Library 1.42.0)]
+// Copyright 2005-2009 Daniel James.
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+// A general purpose hash function for non-zero floating point values.
+
+inline void hash_float_combine(std::size_t& seed, std::size_t value)
+{
+    seed ^= value + (seed<<6) + (seed>>2);
+}
+
+template <class T>
+inline std::size_t float_hash_impl2(T v)
+{
+    boost::hash_detail::call_frexp<T> frexp;
+    boost::hash_detail::call_ldexp<T> ldexp;
+
+    int exp = 0;
+
+    v = frexp(v, &exp);
+
+    // A postive value is easier to hash, so combine the
+    // sign with the exponent and use the absolute value.
+    if(v < 0) {
+        v = -v;
+        exp += limits<T>::max_exponent -
+            limits<T>::min_exponent;
+    }
+
+    // The result of frexp is always between 0.5 and 1, so its
+    // top bit will always be 1. Subtract by 0.5 to remove that.
+    v -= T(0.5);
+    v = ldexp(v, limits<std::size_t>::digits + 1);
+    std::size_t seed = static_cast<std::size_t>(v);
+    v -= seed;
+
+    // ceiling(digits(T) * log2(radix(T))/ digits(size_t)) - 1;
+    std::size_t const length
+        = (limits<T>::digits *
+                boost::static_log2<limits<T>::radix>::value - 1)
+        / limits<std::size_t>::digits;
+
+    for(std::size_t i = 0; i != length; ++i)
+    {
+        v = ldexp(v, limits<std::size_t>::digits);
+        std::size_t part = static_cast<std::size_t>(v);
+        v -= part;
+        hash_float_combine(seed, part);
+    }
+
+    hash_float_combine(seed, exp);
+
+    return seed;
+}
+\end{lstlisting}
