@@ -15,6 +15,7 @@
 #include "TestDuplicateHashTable.h"
 #include "TestBucketKDTree.h"
 #include "TestIMinMax.h"
+#include "TestRecursivePyramidTree.h"
 
 int main(int argc, char* argv[])
 {

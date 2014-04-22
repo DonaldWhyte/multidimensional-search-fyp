@@ -1,33 +1,10 @@
 ExampleSuite
-/usr/not-backed-up/DonaldFYP/test_data/datasets/
+/media/Maxtor/DonaldFYP/test_data/datasets/
 ./results/
-3
+1
 
 kdtree
-pyramid_tree
-pseudo_pyramid_tree
+rec_pyramid_tree
 
-randuniform Dimensions
-	1 randuniform_1d.dat
-	2 randuniform_2d.dat
-	3 randuniform_3d.dat
-	5 randuniform_5d.dat
-	8 randuniform_8d.dat
-	10 randuniform_10d.dat
-	30 randuniform_30d.dat
-	50 randuniform_50d.dat
-	100 randuniform_100d.dat
-	200 randuniform_200d.dat
-skewed Dimensions
-	1 skewed_1d.dat
-	2 skewed_2d.dat
-	3 skewed_3d.dat
-	5 skewed_5d.dat
-	8 skewed_8d.dat
-	10 skewed_10d.dat
-	30 skewed_30d.dat
-	50 skewed_50d.dat
-	100 skewed_100d.dat
-	200 skewed_200d.dat
 astrophysics Points
 	10000 astrophysics_10000.dat
