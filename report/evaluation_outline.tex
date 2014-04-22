@@ -74,26 +74,28 @@ Multiple synthetic datasets with 10,000 points have been generated for each dist
 
 \subsection{Real Datasets}
 
-Three real datasets will also be used for the evaluation. The first is the result of an \textbf{astrophysics turbulence simulation}, where a $600 \times 248 \times 248$ regular mesh was used to simulate ``three-dimensional radiation hydrodynamical calculations of ionization front instabilities" \cite{astrophysics-dataset}. Figure \ref{astrophysics} shows an example of a visualisation generated using a 2D slice of the data. Each point of the mesh has ten scalar fields, which include particle density, temperature and eight chemical species. 200 timesteps were recorded, each being approximately 126 to 128 years apart \cite{astrophysics-dataset}. For each evaluation, only \textbf{one timestep} of the simulation will be used at a time. Since some of the timesteps have different distributions, multiple tests with different timesteps may be performed.
+Three real datasets will also be used for the evaluation. The first is the result of an \textbf{astrophysics turbulence simulation}, where a $600 \times 248 \times 248$ regular mesh was used to simulate ``three-dimensional radiation hydrodynamical calculations of ionization front instabilities" \cite{astrophysics-dataset}. 200 timesteps were recorded, each being approximately 126 to 128 years apart \cite{astrophysics-dataset}. For each evaluation, only \textbf{one timestep} of the simulation will be used at a time. Since some of the timesteps have different distributions, multiple tests with different timesteps may be performed. Each point of the mesh has ten scalar fields, which include particle density, temperature and eight chemical species. Figure \ref{fig:astrophysics} shows an example of a visualisation generated using a 2D Z-slice of the data, where $z = 124$ and timestep $t = 30$.
 
-The second real dataset contains 13 scalar fields for every point on a $500 \times 100 \times 100$ mesh, over 48 timesteps. It is the result of a simulation of hurricane Isabel from 2003 \cite{hurricane-isabel-dataset}. Figure \ref{fig:hurricane-isabel} is a visualisation produced using this dataset.
+The second real dataset contains 13 scalar fields for every point on a $500 \times 100 \times 100$ mesh, over 48 timesteps. It is the result of a simulation of hurricane Isabel from 2003 \cite{hurricane-isabel-dataset} (see Figure \ref{fig:hurricane-isabel} for a visualisation of this dataset).
 
 The final real dataset is a point cloud of a 3D armadillo mesh from The Stanford 3D Scanning Repository \cite{armadillo-mesh}, which contains 435,544 points. This mesh has been used by other researchers to evaluate index structure performance \cite{kd-tree-gpu, accelerating-kdtree-nn}.
 
-% TODO: make real figures nicer
-
 \begin{figure}
 		\begin{center}
-			\begin{subfloat}[Shadow Instability Forming in One 2D Slice Through the Astrophysics Dataset Over Time \cite{astrophysics-dataset}\label{fig:astrophysics}]{%
-				\includegraphics[scale=0.25]{figures/ionisation_front_instabilities.pdf}
+			\begin{subfloat}[Z-Slice of Timestep 30 of Astrophysics Dataset, Displayed Using Blackbody Radiation Spectrum \cite{astrophysics-dataset}\label{fig:astrophysics}]{%
+				{%
+					\setlength{\fboxsep}{0.5pt}%
+					\setlength{\fboxrule}{0.5pt}%
+					\fbox{ \includegraphics[scale=0.3]{figures/ionisation_front_instabilities.pdf} }%
+				}%
 			}
 			\end{subfloat}~
 			\begin{subfloat}[Hurricane Isabel Simulation\label{fig:hurricane-isabel}]{%
-				\includegraphics[scale=0.25]{figures/hurricane_isabel.pdf}
+				\includegraphics[scale=0.175]{figures/hurricane_isabel.pdf}
 			}
 			\end{subfloat}~
 			\begin{subfloat}[3D Armadillo Mesh\label{fig:armadillo-mesh}] {%
-				\includegraphics[scale=0.15]{figures/armadillo.pdf}
+				\includegraphics[scale=1.5]{figures/armadillo.pdf}
 			}
 			\end{subfloat}			  
 		\end{center}
