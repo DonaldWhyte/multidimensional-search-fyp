@@ -3,11 +3,7 @@ import glob
 import re
 from timing_file_parser import parseTimingFile
 
-STRUCTURE_TEMPLATE = r"""
-			\multirow{$NUM_OPERATIONS$}{*}{$STRUCTURE$} & $OPERATION$ & $X_VALUES$ \\
-				& $OPERATION$ & $X_VALUES$ \\
-			\hline
-"""
+STRUCTURE_TEMPLATE = r"""\multirow{$NUM_OPERATIONS$}{*}{$STRUCTURE$} & $OPERATION$ & $X_VALUES$ \\\\"""
 
 TABLE_TEMPLATE = r"""
 \begin{table}
@@ -32,6 +28,18 @@ def replaceValue(string, varToReplace, replacement):
 	pattern = re.compile(r"\$" + varToReplace + r"\$")
 	return pattern.sub(replacement, string)
 
+def replaceUnderlines(string):
+	return string.replace("_", "\\_")
+
+def extractValues(data, operation, structure):
+	values = []
+	for x, y in data[operation][structure]:
+		if y < 0:
+			values.append("-")
+		else:
+			values.append(y)
+	return values
+
 def generateLatexTable(timingData):
 	tableStr = TABLE_TEMPLATE
 	tableStr = replaceValue(tableStr, "X_AXIS", timingData.xAxis)
@@ -51,7 +59,6 @@ def generateLatexTable(timingData):
 	tableStr = replaceValue(tableStr, "X_VALUES", xValuesStr)
 	xColumnsStr = "|".join( [ "l" for x in xValues ] )
 	tableStr = replaceValue(tableStr, "X_COLUMNS", xColumnsStr)
-	print(xValuesStr)
 
 	# Create template for each structure and combine in string separated by newlines
 	# Construct list of all structures and SORT IT APLHABETICALLY
@@ -59,27 +66,31 @@ def generateLatexTable(timingData):
 	for operation in timingData.data:
 		structureNames = sorted(timingData.data[operation].keys())
 		break
+	print structureNames
 	operationNames = sorted(timingData.data.keys())
 	# For each structure, construct entry
 	structureEntries = []
 	for struct in structureNames:
-
 		structStr = STRUCTURE_TEMPLATE
 		# Fill in first line of structure string
 		structStr = replaceValue(structStr, "NUM_OPERATIONS", str(len(timingData.data)))
-		structStr = replaceValue(structStr, "STRUCTURE", struct)
+		structStr = replaceValue(structStr, "STRUCTURE", replaceUnderlines(struct))
 		structStr = replaceValue(structStr, "OPERATION", operationNames[0])
-		# TODO: construct x values
-		structStr = replaceValue(structStr, "X_VALUES", [
-			str(x) for x in timingData.data[operationNames[0]][struct][0][1]
-		])
+		# Construct list containing all actual values (Y))
+		values = extractValues(timingData.data, operationNames[0], struct)
+		valueStr =  "& ".join([ str(x) for x in values ])
+		structStr = replaceValue(structStr, "X_VALUES", valueStr)
 		structStr += "\n"
 		# Add line for each other operation
 		for i in range(1, len(operationNames)):
 			opName = operationNames[i]
-			structStr = "& {} & {} \\\\\n".format(opName, timingData.data[opName][struct][0][1])
+			values = values = extractValues(timingData.data, opName, struct)
+			valueStr = " & ".join([ str(x) for x in values ])
+			structStr += "& {} & {} \\\\\\\\ \n".format(opName, valueStr)
 		# Finish with a hline
-		structStr += "\\hline\n"
+		structStr += "\\hline"
+
+		structureEntries.append(structStr)
 
 	allStructureEntries = "\n".join(structureEntries)
 	tableStr = replaceValue(tableStr, "STRUCTURES", allStructureEntries)
