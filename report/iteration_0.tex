@@ -4,6 +4,35 @@ This iteration describes the framework built for the project, which streamlines 
 
 \subsection{Evaluation Framework}
 
+\begin{table}
+	\centering
+	\makebox[\textwidth][c]{%
+		\begin{tabular}{|r|r|l|l|l|l|l|l|l|l|l|l|}
+			\hline
+			\multicolumn{2}{|c}{} & \multicolumn{10}{|c|}{\textbf{Dimensions}} \\
+			\hline
+			\textbf{Structure} & \textbf{Operation} & 1 & 2 & 3 & 5 & 8 & 10 & 30 & 50 & 100 & 200 \\
+			\hline
+			\multirow{3}{*}{kdtree} & delete & 7.94729e-08& 7.94729e-08& 1.58946e-07& 1.58946e-07& 7.94729e-08& 0.0& 7.94729e-08& 7.94729e-08& 7.94729e-08& 7.94729e-08 \\
+& insert & 7.94729e-08 & 1.58946e-07 & 1.58946e-07 & 7.94729e-08 & 7.94729e-08 & 1.58946e-07 & 7.94729e-08 & 7.94729e-08 & 1.58946e-07 & 7.94729e-08 \\ 
+& pquery & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 1.58946e-07 & 1.58946e-07 & 7.94729e-08 & 1.58946e-07 \\ 
+\hline
+\multirow{3}{*}{pseudo\_pyramid\_tree} & delete & 7.94729e-08& 7.94729e-08& 7.94729e-08& 7.94729e-08& 1.58946e-07& 7.94729e-08& 7.94729e-08& 7.94729e-08& 7.94729e-08& 7.94729e-08 \\
+& insert & 1.58946e-07 & 7.94729e-08 & 1.58946e-07 & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 \\ 
+& pquery & 7.94729e-08 & 1.58946e-07 & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 1.58946e-07 & 1.58946e-07 & 1.58946e-07 & 1.58946e-07 & 1.58946e-07 \\ 
+\hline
+\multirow{3}{*}{pyramid\_tree} & delete & 7.94729e-08& 7.94729e-08& 7.94729e-08& 7.94729e-08& 1.58946e-07& 7.94729e-08& 1.58946e-07& 7.94729e-08& 7.94729e-08& 1.58946e-07 \\
+& insert & 7.94729e-08 & 7.94729e-08 & 1.58946e-07 & 7.94729e-08 & 1.58946e-07 & 1.58946e-07 & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 1.58946e-07 \\ 
+& pquery & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 7.94729e-08 & 1.58946e-07 & 7.94729e-08 \\ 
+\hline
+		\end{tabular}
+	}%
+
+	\caption{TODO}
+	\label{TODO}
+\end{table}
+
+
 Evaluation is a major part of the project and is performed multiple times at different stages of the project. It was decided a framework should be used to streamline this process and reduce the overall time it took generating the required measurements to perform the evaluation. It appeared there did not exist a tool tailored for this particular task, so one was implemented as part of the first iteration.
 
 The evaluation framework defines the standard data used across the index structures, provide a way of loading point datasets and operation lists and feeding them to index structures. The framework executes the given operation lists on all specified structures, generating tables and plots containing the necessary performance measures described in Section \ref{sec:performance-measures}.

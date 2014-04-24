@@ -12,6 +12,7 @@
 #include "DuplicateHashTable.h"
 #include "BucketKDTree.h"
 #include "IMinMax.h"
+#include "RecursivePyramidTree.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -34,7 +35,7 @@ namespace mdsearch
 	IndexStructure* generatePyramidTree(unsigned int numDimensions,
 		const Region& boundary, const std::vector<std::string>& args)
 	{
-		return new PyramidTree(numDimensions, boundary);		
+		return new PyramidTree(numDimensions, boundary);
 	}		
 
 	IndexStructure* generateIndexPseudoPyramidTree(unsigned int numDimensions,
@@ -132,6 +133,12 @@ namespace mdsearch
 		return new IMinMax(numDimensions, boundary, theta);
 	}
 
+	IndexStructure* generateRecursivePyramidTree(unsigned int numDimensions,
+		const Region& boundary, const std::vector<std::string>& args)
+	{
+		return new RecursivePyramidTree(numDimensions, boundary);
+	}
+
 
 
 	IndexStructureFactory::IndexStructureFactory()
@@ -149,6 +156,7 @@ namespace mdsearch
 		addGenerator("dht", generateDuplicateHashTable);
 		addGenerator("bucket_kdtree", generateBucketKDTree);
 		addGenerator("iminmax", generateIMinMax);
+		addGenerator("rec_pyramid_tree", generateRecursivePyramidTree);
 	}
 
 	void IndexStructureFactory::addGenerator(const std::string& structureType,

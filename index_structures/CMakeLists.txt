@@ -13,6 +13,7 @@ add_library( index_structures
 	"src/DuplicateHashTable.cpp"
 	"src/BucketKDTree.cpp"
 	"src/IMinMax.cpp"
+	"src/RecursivePyramidTree.cpp"
 	# Header files
 	"include/IndexStructure.h"
 	"include/SequentialScan.h"
@@ -28,6 +29,7 @@ add_library( index_structures
 	"include/DuplicateHashTable.h"
 	"include/BucketKDTree.h"
 	"include/IMinMax.h"
+	"include/RecursivePyramidTree.h"
 )
 # Ensure include directory is in search path
 include_directories ("include")
@@ -51,6 +53,7 @@ add_executable ( structure_tests
 	"tests/TestDuplicateHashTable.h"
 	"tests/TestBucketKDTree.h"
 	"tests/TestIMinMax.h"
+	"tests/TestRecursivePyramidTree.h"
 )
 # Ensure google-test library is linked and include files are in search path
 # NOTE: index_structures library is dependant on the 'data' library for the
