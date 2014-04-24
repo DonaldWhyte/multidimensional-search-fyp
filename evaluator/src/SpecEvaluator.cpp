@@ -43,7 +43,6 @@ namespace mdsearch
 			}
 			// Now search through rest of points in dataset to find
 			// minimum and maximum values for each dimension
-			for (unsigned int i = 1; (i < dataset.size()); i++)
 			for (PointList::const_iterator p = dataset.begin() + 1; (p != dataset.end()); p++)
 			{
 				for (unsigned int d = 0; (d < numDimensions); d++)
