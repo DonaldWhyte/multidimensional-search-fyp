@@ -73,11 +73,11 @@ This section contains diagrams which illustrate the project's schedule, mileston
 			B${}^{+}$-Tree & Low & Yes & One-dimensional & Low \\
 			R-Tree & Moderate & Yes & Poor for $d > 10$ \cite{pyramid-tree} & Moderate \\
 			Quadtree & Low with uniformly distributed data, high for skewed data due to unnecessary nodes caused by splitting sparse regions of data space & No & Poor because it tries to use balanced splits \cite{pyramid-tree} & Low \\
-			Pyramid Tree & Low & Yes (based on B${}^{+}$-tree) & Good & High \\
+			Pyramid Tree & Low & Yes (based on B${}^{+}$-tree) & Good & Moderate \\
 			PK-Tree & Moderate & No (but uses similar method to reduce I/O operations) & Good & High \\
 			Skip Quadtree & Moderate & No & Untested & Moderate \\
-			Quadtreap & Low & No & Untested & Moderate \\
-			Splay Quadtree & Moderate & No & Untested & Moderate \\
+			Quadtreap & Low & No & Untested & High \\
+			Splay Quadtree & Moderate & No & Untested & High \\
 			\hline
 		\end{tabular}
 		\caption{Comparison of Dynamic Multi-Dimensional Structures}
