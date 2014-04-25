@@ -236,7 +236,6 @@ namespace mdsearch
 		return node;		
 	}
 
-
 	std::string KDTree::toString() const
 	{
 		return nodeToString("ROOT:", root, 0);
