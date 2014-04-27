@@ -5,6 +5,9 @@ ExampleSuite
 
 kdtree
 rec_pyramid_tree
+pyramid_tree
 
 astrophysics Points
 	10000 astrophysics_10000.dat
+	100000 astrophysics_100000.dat
+	500000 astrophysics_500000.dat

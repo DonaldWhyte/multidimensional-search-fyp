@@ -26,6 +26,11 @@ namespace mdsearch
 		bucketInterval = floor(bucketInterval);
 		medianPoint = computeInitialMedianPoint(MAX_BUCKET_NUMBER, numDimensions);
 
+		for (unsigned int d = 0; (d < numDimensions); d++)
+		{
+			medianPoint[d] = treeBoundary[d].min + ((treeBoundary[d].max - treeBoundary[d].min) / 2.0f);
+		}
+
 		// Ensure boundaries are NEVER ZERO SIZED and the maximum
 		// values are always larger than the minimum
 		for (unsigned int d = 0; (d < numDimensions); d++)
