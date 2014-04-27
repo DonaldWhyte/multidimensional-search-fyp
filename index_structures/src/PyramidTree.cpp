@@ -46,7 +46,7 @@ namespace mdsearch
 
 	void PyramidTree::clear()
 	{
-		// NOTE: Using assigment not clear() to ensure memory is de-allocated
+		// NOTE: Using assignment not clear() to ensure memory is de-allocated
 		// (through destructors of containers)
 		hashMap = OneDMap();
 	}

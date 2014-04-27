@@ -106,6 +106,52 @@ namespace mdsearch { namespace tests
 			|| testPoints[9] == *returnedPoint);
 	}
 
+	#ifdef TRACK_OPERATION_COSTS
+	TEST_F(KDTreeTests, OpCostComputation)
+	{
+		KDTree structure(NUM_KDTREE_DIMENSIONS);
+		IndexStructureTester tester;
+		const PointList& testPoints = tester.getTestPoints();
+
+		// Insertion count
+		EXPECT_EQ(0.0, structure.averageInsertionCost()); // test initialisation
+		EXPECT_EQ(0, structure.totalInsertionOps());
+		structure.insert(testPoints[0]);
+		EXPECT_EQ(0.0, structure.averageInsertionCost());
+		EXPECT_EQ(1, structure.totalInsertionOps());
+		structure.insert(testPoints[1]);
+		EXPECT_EQ(0.5, structure.averageInsertionCost());
+		EXPECT_EQ(2, structure.totalInsertionOps());
+		structure.insert(testPoints[2]); // point will be left child of left child of root
+		EXPECT_EQ(1.0, structure.averageInsertionCost());
+		EXPECT_EQ(3.0, structure.totalInsertionOps());
+
+		// Query count
+		EXPECT_EQ(0.0, structure.averageQueryCost());
+		EXPECT_EQ(0, structure.totalQueryOps());
+		structure.pointExists(testPoints[2]);
+		EXPECT_EQ(3.0, structure.averageQueryCost());
+		EXPECT_EQ(1, structure.totalQueryOps());
+		structure.pointExists(testPoints[3]);
+		EXPECT_EQ(3.0, structure.averageQueryCost());
+		EXPECT_EQ(2, structure.totalQueryOps());
+		structure.pointExists(testPoints[0]);
+		EXPECT_EQ((3.0 + 3.0 + 1.0) / 3.0, structure.averageQueryCost());
+		EXPECT_EQ(3, structure.totalQueryOps());
+
+		// Delete count
+		EXPECT_EQ(0.0, structure.averageDeletionCost());
+		EXPECT_EQ(0, structure.totalDeletionOps());
+		structure.remove(testPoints[0]);
+		EXPECT_EQ(6.0, structure.averageDeletionCost());
+		EXPECT_EQ(1, structure.totalDeletionOps());
+		structure.remove(testPoints[0]);
+		EXPECT_EQ(4.0, structure.averageDeletionCost());
+		EXPECT_EQ(2, structure.totalDeletionOps());
+
+	}
+	#endif
+
 } }
 
 #endif
