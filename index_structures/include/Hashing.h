@@ -12,6 +12,10 @@
 // Only define this is index structures should use SSE-enabled hashing
 // (done to potentially increase speed of structures)
 #define MDSEARCH_USE_SSE_HASHING 1
+// Only define if you want a hack which causes the Pyramid Tree hasher
+// to ignore dimensions when a point is at the min or max boundaries
+// for that dimension
+#define BOUNDARY_VALUE_HACK 1
 
 namespace mdsearch
 {
@@ -50,6 +54,11 @@ namespace mdsearch
 		Real dMaxHeight = pyramidHeight(p[0], minPoint[0], maxPoint[0]);
 		for (int d = 1; (d < numDimensions); d++)
 		{
+			#ifdef BOUNDARY_VALUE_HACK
+				if (p[d] == minPoint[d] || p[d] == maxPoint[d])
+					continue;
+			#endif
+
 			Real currentHeight = pyramidHeight(p[d], minPoint[d], maxPoint[d]);
 			if (dMaxHeight < currentHeight)
 			{

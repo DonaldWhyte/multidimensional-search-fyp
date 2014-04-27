@@ -3,6 +3,7 @@
 #include "Util.h"
 #include <algorithm>
 #include <sstream>
+#include <fstream>
 
 namespace mdsearch
 {
@@ -26,6 +27,11 @@ namespace mdsearch
 		bucketInterval = floor(bucketInterval);
 		medianPoint = computeInitialMedianPoint(MAX_BUCKET_NUMBER, numDimensions);
 
+		for (unsigned int d = 0; (d < numDimensions); d++)
+		{
+			medianPoint[d] = treeBoundary[d].min + ((treeBoundary[d].max - treeBoundary[d].min) / 2.0f);
+		}
+
 		// Ensure boundaries are NEVER ZERO SIZED and the maximum
 		// values are always larger than the minimum
 		for (unsigned int d = 0; (d < numDimensions); d++)
@@ -41,7 +47,7 @@ namespace mdsearch
 
 	void PyramidTree::clear()
 	{
-		// NOTE: Using assigment not clear() to ensure memory is de-allocated
+		// NOTE: Using assignment not clear() to ensure memory is de-allocated
 		// (through destructors of containers)
 		hashMap = OneDMap();
 	}
@@ -204,6 +210,20 @@ namespace mdsearch
 		}
 
 		return ss.str();
+	}
+
+	void PyramidTree::toHistogramFile(const std::string& filename) const
+	{
+		std::ofstream file(filename.c_str());
+		file << "1D Value Distribution\n";
+		// Write each 2D value to the file, in the same number o
+		for (OneDMap::const_iterator it = hashMap.begin(); (it != hashMap.end()); it++)
+		{
+			for (unsigned int i = 0; (i < it->second.points.size()); i++)
+			{
+				file << it->first << "\n";
+			}
+		}
 	}
 
 	PTBucket* PyramidTree::getContainingBucket(const Point& point)

@@ -1,9 +1,21 @@
 #include "BucketKDTree.h"
 #include "Util.h"
 #include <sstream>
+#include <stack>
+#include <map>
 
 namespace mdsearch
 {
+
+	struct DFSEntry
+	{
+		BucketKDNode* node;
+		unsigned int level; // level in tree the node is
+
+		DFSEntry(BucketKDNode* node, unsigned int level) : node(node), level(level)
+		{
+		}
+	};
 
 	typedef void (*SplittingFunction)(const PointList&, const IndexList&, int&, int&);
 
@@ -124,7 +136,8 @@ namespace mdsearch
 
 	bool BucketKDTree::insert(const Point& p)
 	{
-		BucketKDNode* leaf = findLeafForPoint(p);
+		int level;
+		BucketKDNode* leaf = findLeafForPoint(p, level);
 		// NOTE: Assuming a non-NULL value is ALWAYS returned, so no pointer check!
 		if (containsPoint(leaf, p))
 		{
@@ -139,9 +152,20 @@ namespace mdsearch
 			// If bucket leaf has exceeded max capacity, split it into two nodes
 			if (leaf->points.size() > maxPointsUntilSplit)
 			{
-				// Compute cutting dimension and value to use
-				int cuttingDim, cuttingVal;
-				meanSplit(allPoints, leaf->points, cuttingDim, cuttingVal);
+				// Compute range in chosen dimension and split by half
+				int cuttingDim = level % numDimensions;
+				Real min, max;
+				min = max = allPoints[leaf->points[0]][cuttingDim];
+				for (IndexList::const_iterator it = leaf->points.begin();
+					(it != leaf->points.end()); it++)
+				{
+					if (allPoints[*it][cuttingDim] < min)
+						min = allPoints[*it][cuttingDim];
+					else if (allPoints[*it][cuttingDim] > max)
+						max = allPoints[*it][cuttingDim];
+				}
+				Real cuttingVal = (min + (max - min)) / 2.0f;
+
 				// Construct empty left and right children and fill them
 				// with the points from this node
 				BucketKDNode* leftChild = new BucketKDNode(NULL);
@@ -247,6 +271,28 @@ namespace mdsearch
 		return NULL; // shouldn't happen, since a leaf node should always be found		
 	}
 
+	BucketKDNode* BucketKDTree::findLeafForPoint(const Point& p, int& level) const
+	{
+		level = 0;
+		BucketKDNode* current = root;
+		while (current)
+		{
+			if (current->type == BucketKDNode::TYPE_SPLIT)
+			{
+				if (p[current->cuttingDim] < current->cuttingVal)
+					current = current->leftChild;
+				else
+					current = current->rightChild;
+			}
+			else
+			{
+				return current;
+			}
+			++level;
+		}
+		return NULL;
+	}
+
 	int BucketKDTree::getPointIndexInBucket(const IndexList& bucketIndices, const Point& p) const
 	{
 		for (unsigned int i = 0; (i < bucketIndices.size()); i++)
@@ -284,6 +330,36 @@ namespace mdsearch
 		leaf->parent->rightChild = NULL;
 		delete leaf;
 		delete sibling;
+	}
+
+	double BucketKDTree::computeBalanceFactor() const
+	{
+		unsigned int levelSum = 0.0; // sum of each leaf's level
+		unsigned int numLeaves = 0; // number of leaves in tree
+
+		// Perform DFS to get to each leaf, counting edges traversed along the way
+		std::stack<DFSEntry> unvisitedNodes;
+		unvisitedNodes.push( DFSEntry(root, 0) );
+		while (!unvisitedNodes.empty())
+		{
+			DFSEntry entry = unvisitedNodes.top();
+			unvisitedNodes.pop();
+			if (entry.node != NULL) // ignore NULL nodes
+			{
+				if (entry.node->leftChild == NULL && entry.node->rightChild == NULL) // if node is leaf
+				{
+					levelSum += entry.level;
+					numLeaves += 1;
+				}
+				else
+				{
+					unvisitedNodes.push( DFSEntry(entry.node->leftChild, entry.level + 1) );
+					unvisitedNodes.push( DFSEntry(entry.node->rightChild, entry.level + 1) );
+				}
+			}
+		}
+
+		return static_cast<double>(levelSum) / static_cast<double>(std::max(1u, numLeaves));
 	}
 
 	std::string BucketKDTree::toString() const

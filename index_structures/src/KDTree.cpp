@@ -1,8 +1,21 @@
 #include "KDTree.h"
 #include <sstream>
+#include <fstream>
+#include <stack>
+#include <map>
 
 namespace mdsearch
 {
+
+	struct DFSEntry
+	{
+		KDNode* node;
+		unsigned int level; // level in tree the node is
+
+		DFSEntry(KDNode* node, unsigned int level) : node(node), level(level)
+		{
+		}
+	};
 
 	inline unsigned int nextCuttingDimension(unsigned int cuttingDim, unsigned int numDimensions)
 	{
@@ -19,7 +32,10 @@ namespace mdsearch
 		delete rightChild;
 	}
 
-	KDTree::KDTree(unsigned int numDimensions) : IndexStructure(numDimensions), root(NULL)
+	KDTree::KDTree(unsigned int numDimensions) :
+		IndexStructure(numDimensions), root(NULL), totalPoints(0),
+		avgInsertionCost(0), insertionOpCount(0), avgDeletionCost(0),
+		deletionOpCount(0), avgQueryCost(0), queryOpCount(0)
 	{
 	}
 
@@ -32,10 +48,15 @@ namespace mdsearch
 	{
 		delete root;
 		root = NULL;
+		totalPoints = 0;
 	}
 
 	bool KDTree::insert(const Point& p)
 	{
+		#ifdef TRACK_OPERATION_COSTS  
+			nodesVisitedInOp = 0;
+		#endif
+
 		KDNode* previous = NULL; // previous node traversed
 		bool leftChildOfPrevious = false; // set to true if 'current' is left child of 'previous'
 		KDNode* current = root;
@@ -57,33 +78,65 @@ namespace mdsearch
 				{
 					root = current;
 				}
+				totalPoints++;
+
+				#ifdef TRACK_OPERATION_COSTS
+					// Use number of nodes visited to update average cost
+					avgInsertionCost = ((avgInsertionCost * static_cast<double>(insertionOpCount)) + nodesVisitedInOp) / (insertionOpCount + 1);
+					insertionOpCount++;
+				#endif
+
 				return true;
-			}
-			// Duplicate point, it already exists! Cannot insert point
-			else if (p == current->point)
-			{
-				return false;
-			}
-			else if (p[cuttingDim] < current->point[cuttingDim])
-			{
-				previous = current;
-				current = current->leftChild;
-				leftChildOfPrevious = true;
 			}
 			else
 			{
-				previous = current;
-				current = current->rightChild;
-				leftChildOfPrevious = false;
+				#ifdef TRACK_OPERATION_COSTS 
+					nodesVisitedInOp++;
+				#endif
+
+				// Duplicate point, it already exists! Cannot insert point
+				if (p == current->point)
+				{
+					#ifdef TRACK_OPERATION_COSTS
+						// Use number of nodes visited to update average cost
+						avgInsertionCost = ((avgInsertionCost * static_cast<double>(insertionOpCount)) + nodesVisitedInOp) / (insertionOpCount + 1);
+						insertionOpCount++;
+					#endif
+
+					return false;
+				}
+				else if (p[cuttingDim] < current->point[cuttingDim])
+				{
+					previous = current;
+					current = current->leftChild;
+					leftChildOfPrevious = true;
+				}
+				else
+				{
+					previous = current;
+					current = current->rightChild;
+					leftChildOfPrevious = false;
+				}
+				cuttingDim = nextCuttingDimension(cuttingDim, numDimensions);
 			}
-			cuttingDim = nextCuttingDimension(cuttingDim, numDimensions);
 		}
 	}
 
 	bool KDTree::remove(const Point& p)
 	{
+		#ifdef TRACK_OPERATION_COSTS  
+			nodesVisitedInOp = 0;
+		#endif
+
 		bool removed = false;
 		root = recursiveRemove(root, p, 0, &removed);
+
+		#ifdef TRACK_OPERATION_COSTS
+			// Use number of nodes visited to update average cost
+			avgDeletionCost = ((avgDeletionCost * static_cast<double>(deletionOpCount)) + nodesVisitedInOp) / (deletionOpCount + 1);
+			deletionOpCount++;
+		#endif
+
 		return removed;
 	}
 
@@ -102,12 +155,25 @@ namespace mdsearch
 
 	bool KDTree::pointExists(const Point& p)
 	{
+		#ifdef TRACK_OPERATION_COSTS  
+			nodesVisitedInOp = 0;
+		#endif
+
 		KDNode* current = root;
 		unsigned int cuttingDim = 0;
 		while (current) // until end of tree is reached
 		{
+			#ifdef TRACK_OPERATION_COSTS
+				nodesVisitedInOp += 1;
+			#endif
+
 			if (p == current->point)
 			{
+				#ifdef TRACK_OPERATION_COSTS
+					avgQueryCost = ((avgQueryCost * static_cast<double>(queryOpCount)) + nodesVisitedInOp) / (queryOpCount + 1);
+					queryOpCount++;
+				#endif
+
 				return true;
 			}
 			else if (p[cuttingDim] < current->point[cuttingDim])
@@ -120,12 +186,123 @@ namespace mdsearch
 			}
 			cuttingDim = nextCuttingDimension(cuttingDim, numDimensions);
 		}
+
+		#ifdef TRACK_OPERATION_COSTS
+			avgQueryCost = ((avgQueryCost * static_cast<double>(queryOpCount)) + nodesVisitedInOp) / (queryOpCount + 1);
+			queryOpCount++;
+		#endif
+
 		return false;
 	}
 
 	KDNode* KDTree::rootNode() const
 	{
 		return root;
+	}
+
+	unsigned int KDTree::numPointsStored() const
+	{
+		return totalPoints;
+	}
+
+	double KDTree::averageInsertionCost() const
+	{
+		return avgInsertionCost;
+		}
+
+	double KDTree::averageDeletionCost() const
+	{
+		return avgDeletionCost;
+	}
+
+	double KDTree::averageQueryCost() const
+	{
+		return avgQueryCost;
+	}
+
+	unsigned int KDTree::totalInsertionOps() const
+	{
+		return insertionOpCount;
+	}
+
+	unsigned int KDTree::totalDeletionOps() const
+	{
+		return deletionOpCount;
+	}
+
+	unsigned int KDTree::totalQueryOps() const
+	{
+		return queryOpCount;
+	}
+
+	double KDTree::computeBalanceFactor() const
+	{
+		unsigned int levelSum = 0.0; // sum of each leaf's level
+		unsigned int numLeaves = 0; // number of leaves in tree
+
+		// Perform DFS to get to each leaf, counting edges traversed along the way
+		std::stack<DFSEntry> unvisitedNodes;
+		unvisitedNodes.push( DFSEntry(root, 0) );
+		while (!unvisitedNodes.empty())
+		{
+			DFSEntry entry = unvisitedNodes.top();
+			unvisitedNodes.pop();
+			if (entry.node != NULL) // ignore NULL nodes
+			{
+				if (entry.node->leftChild == NULL && entry.node->rightChild == NULL) // if node is leaf
+				{
+					levelSum += entry.level;
+					numLeaves += 1;
+				}
+				else
+				{
+					unvisitedNodes.push( DFSEntry(entry.node->leftChild, entry.level + 1) );
+					unvisitedNodes.push( DFSEntry(entry.node->rightChild, entry.level + 1) );
+				}
+			}
+		}
+
+		return static_cast<double>(levelSum) / static_cast<double>(std::max(1u, numLeaves));
+	}
+
+	void KDTree::toHistogramFile(const std::string& filename) const
+	{
+		// Perform DFS to get to each leaf, counting edges traversed along the way
+		std::map<unsigned int, unsigned int> lengthMap;
+		std::stack<DFSEntry> unvisitedNodes;
+		unvisitedNodes.push( DFSEntry(root, 0) );
+		while (!unvisitedNodes.empty())
+		{
+			DFSEntry entry = unvisitedNodes.top();
+			unvisitedNodes.pop();
+			if (entry.node != NULL) // ignore NULL nodes
+			{
+				if (entry.node->leftChild == NULL && entry.node->rightChild == NULL) // if node is leaf
+				{
+					if (lengthMap.find(entry.level) != lengthMap.end())
+						lengthMap[entry.level] += 1;
+					else // if this key has not been created yet, initialise to 1
+						lengthMap[entry.level] = 1;
+				}
+				else
+				{
+					unvisitedNodes.push( DFSEntry(entry.node->leftChild, entry.level + 1) );
+					unvisitedNodes.push( DFSEntry(entry.node->rightChild, entry.level + 1) );
+				}
+			}
+		}
+
+		std::ofstream file(filename.c_str());
+		file << "Root-Leaf Path Length Distribution\n";
+		// Write each 2D value to the file, in the same number o
+		for (std::map<unsigned int, unsigned int>::const_iterator it = lengthMap.begin();
+			(it != lengthMap.end()); it++)
+		{
+			for (unsigned int i = 0; (i < it->second); i++)
+			{
+				file << it->first << "\n";
+			}
+		}
 	}
 
 	const Point* KDTree::findMinimum(KDNode* node, unsigned int dimension, unsigned int cuttingDim)
@@ -138,16 +315,27 @@ namespace mdsearch
 		// If cutting dimension is dimension we're looking for minimum in, just search left child!
 		else if (dimension == cuttingDim)
 		{
+			#ifdef TRACK_OPERATION_COSTS
+				nodesVisitedInOp++;
+			#endif
+
 			if (node->leftChild == NULL) // if no more 
 				return &node->point;
 			else
+			{
 				return findMinimum(node->leftChild, dimension, nextCuttingDimension(cuttingDim, numDimensions));
+			}
 		}
 		// Otherwise, we have to search BOTH children
 		else
 		{
+			#ifdef TRACK_OPERATION_COSTS
+				nodesVisitedInOp++;
+			#endif
+
 			const Point* a = findMinimum(node->leftChild, dimension, nextCuttingDimension(cuttingDim, numDimensions));
 			const Point* b = findMinimum(node->rightChild, dimension, nextCuttingDimension(cuttingDim, numDimensions));
+
 			if (a && b) // if minimums were returned from both children
 			{
 				Real minVal = std::min(node->point[dimension], std::min((*a)[dimension], (*b)[dimension]));
@@ -185,35 +373,36 @@ namespace mdsearch
 	}
 
 	KDNode* KDTree::recursiveRemove(KDNode* node, const Point& p, unsigned int cuttingDim, bool* removed)
-	{
+	{		
 		if (node == NULL)
 		{
 			return NULL;
 		}
-		else if (p[cuttingDim] < node->point[cuttingDim])
+		else
 		{
-			node->leftChild = recursiveRemove(node->leftChild, p,
-				nextCuttingDimension(cuttingDim, numDimensions), removed);
-		}
-		else if (p[cuttingDim] > node->point[cuttingDim])
-		{
-			node->rightChild = recursiveRemove(node->rightChild, p,
-				nextCuttingDimension(cuttingDim, numDimensions), removed);
-		}
-		else // found node that stores given point
-		{
-			// If node with point is leaf node, simply delete it!
-			if (node->leftChild == NULL && node->rightChild == NULL)
+			#ifdef TRACK_OPERATION_COSTS
+				nodesVisitedInOp++;
+			#endif
+	
+			if (p[cuttingDim] < node->point[cuttingDim])
 			{
-				*removed = true; // now we can set the 'removed' flag to true as removal has been successful
-				delete node;
-				return NULL; // to remove reference to node in parent
+				node->leftChild = recursiveRemove(node->leftChild, p,
+					nextCuttingDimension(cuttingDim, numDimensions), removed);
 			}
-			else
+			else if (p == node->point) // may have found node that stores given point (TODO: wrong w/o/ equality)
 			{
-				// Find minimum point for cutting dimension and REPLACE node's point with it
-				if (node->rightChild)
+
+				// If node with point is leaf node, simply delete it!
+				if (node->leftChild == NULL && node->rightChild == NULL)
 				{
+					*removed = true; // now we can set the 'removed' flag to true as removal has been successful
+					totalPoints--;
+					delete node;
+					return NULL; // to remove reference to node in parent
+				}
+				else if (node->rightChild)
+				{
+					// Find minimum point for cutting dimension and REPLACE node's point with it
 					node->point = *findMinimum(node->rightChild, cuttingDim,
 						nextCuttingDimension(cuttingDim, numDimensions));
 					node->rightChild = recursiveRemove(node->rightChild, node->point,
@@ -229,11 +418,16 @@ namespace mdsearch
 					node->rightChild = node->leftChild;
 					node->leftChild = NULL;
 				}
+			}	
+			else // right child!
+			{
+				node->rightChild = recursiveRemove(node->rightChild, p,
+					nextCuttingDimension(cuttingDim, numDimensions), removed);
 			}
+
+			// If this point is reached, node should not be removed so we just return the node
+			return node;
 		}
-		// If this point is reached, node should not be removed so we
-		// just return the node
-		return node;		
 	}
 
 	std::string KDTree::toString() const

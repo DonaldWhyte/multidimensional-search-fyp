@@ -3,6 +3,12 @@
 
 #include "IndexStructure.h"
 
+/* Only define this if you want the kd-tree to internally keep
+ * track of the average cost of each operation performed on it.
+ * This adds a small amount of overhead, so only enable this
+ * feature when necessary. */
+#define TRACK_OPERATION_COSTS 1
+
 namespace mdsearch
 {
 
@@ -30,6 +36,16 @@ namespace mdsearch
 		virtual bool pointExists(const Point& p);
 
 		KDNode* rootNode() const;
+		unsigned int numPointsStored() const;
+		double averageInsertionCost() const;
+		double averageDeletionCost() const;
+		double averageQueryCost() const;
+		unsigned int totalInsertionOps() const;
+		unsigned int totalDeletionOps() const;
+		unsigned int totalQueryOps() const;
+
+		double computeBalanceFactor() const;
+		void toHistogramFile(const std::string& filename) const;
 
 		/* Find point with minimum value of a specific dimension in subtree
 		 * rooted at given node. */
@@ -45,6 +61,17 @@ namespace mdsearch
 			unsigned int cuttingDim, unsigned int level = 0) const;
 
 		KDNode* root;
+		unsigned int totalPoints; // also means total nodes in tree
+		// Average costs of the three supported operations
+		double avgInsertionCost;
+		unsigned int insertionOpCount;
+		double avgDeletionCost;
+		unsigned int deletionOpCount;
+		double avgQueryCost;
+		unsigned int queryOpCount;
+		// Temporary field used to compute cost of single operation
+		// as it is executing
+		unsigned int nodesVisitedInOp;
 
 
 	};

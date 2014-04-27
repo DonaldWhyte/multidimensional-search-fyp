@@ -2,6 +2,10 @@
 #include "IndexStructureFactory.h"
 #include "DatasetFileLoader.h"
 
+#include "KDTree.h"
+#include "BucketKDTree.h"
+#include "PyramidTree.h"
+
 namespace mdsearch
 {
 
@@ -127,12 +131,32 @@ namespace mdsearch
 					{
 						IndexStructure* structure = structureFactory.constructIndexStructure(
 							structSpec->type, boundary.numDimensions(), boundary, structSpec->arguments);
+						KDTree* kdTree = dynamic_cast<KDTree*>(structure);
+						PyramidTree* pyramidTree = dynamic_cast<PyramidTree*>(structure);
+						BucketKDTree* bucketKDTree = dynamic_cast<BucketKDTree*>(structure);
 
 						// TIME INSERT
 						Timing startTime = getTime();
 						for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)
 							structure->insert(*p);
 						totalOpTimings.insert += getTime() - startTime;
+
+						if (bucketKDTree)
+						{
+							std::cout << "Balance Factor: " << bucketKDTree->computeBalanceFactor() << std::endl;
+						}
+						else if (kdTree)
+						{
+							std::cout << "Balance Factor: " << kdTree->computeBalanceFactor() << std::endl;
+							std::string outputFilename = "kdtree_" + dsSpec->name + "_" + subSpec->name + ".hist";
+							kdTree->toHistogramFile(outputFilename);
+						}
+						else if (pyramidTree)
+						{
+							std::string outputFilename = "pyramidtree_" + dsSpec->name + "_" + subSpec->name + ".hist";
+							pyramidTree->toHistogramFile(outputFilename);
+						}
+
 						// TIME PQUERY
 						startTime = getTime();
 						for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)
@@ -150,8 +174,6 @@ namespace mdsearch
 					dsTimings[structSpec->type + " insert"][subSpec->name] = totalOpTimings.insert / suite.numRunsPerTiming();
 					dsTimings[structSpec->type + " delete"][subSpec->name] = totalOpTimings.remove / suite.numRunsPerTiming();
 					dsTimings[structSpec->type + " pquery"][subSpec->name] = totalOpTimings.pointQuery / suite.numRunsPerTiming();
-					
-					
 				}
 			}
 
