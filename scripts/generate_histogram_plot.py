@@ -13,9 +13,15 @@ class Histogram:
 		self.title = title
 		self.dataColumns = data
 
-	def plotColumnToFile(self, filename, colNumber, plt, title=True):
+	def plotColumnToFile(self, filename, colNumber, plt, title=True, numBins=None, minVal=None, maxVal=None):
+		if not numBins:
+			numBins = Histogram.DEFAULT_NUM_BINS
+		useCustomRange = ((minVal != None) and (maxVal != None))
 		# Plot the histogram, setting the labels appropriately
-		plt.hist(self.dataColumns[colNumber], bins=Histogram.DEFAULT_NUM_BINS)
+		if useCustomRange:
+			plt.hist(self.dataColumns[colNumber], bins=numBins, range=[minVal, maxVal])
+		else:
+			plt.hist(self.dataColumns[colNumber], bins=numBins)
 		if title:
 			plt.title(self.title)
 		else:
@@ -60,14 +66,23 @@ def parseDataset(filename):
 
 if __name__ == "__main__":
 	# Parse command line options
-	if len(sys.argv) < 2:
-		sys.exit("python %s \"<timingFilenameGlob>\" {--no-title}" % sys.argv[0])
 	if "--no-title" in sys.argv:
 		title = False
 		sys.argv.remove("--no-title")
 	else:
 		title = False
+	if len(sys.argv) < 3:
+		sys.exit("python %s \"<timingFilenameGlob>\" <numBins> {<minVal> <maxVal>} {--no-title}" % sys.argv[0])
 	timingFilenameGlob = sys.argv[1]
+	numBins = int(sys.argv[2])
+	if len(sys.argv) >= 4:
+		minVal = float(sys.argv[3])
+	else:
+		minVal = None
+	if len(sys.argv) >= 5:
+		maxVal = float(sys.argv[4])
+	else:
+		maxVal = None
 
 	# Use glob to find all desired files
 	filenames = glob.glob(timingFilenameGlob)
@@ -80,5 +95,6 @@ if __name__ == "__main__":
 			data = parseHistogramFile(fname)
 		for i in range(len(data.dataColumns)):
 			outputFilename = "%s_%d.pdf" % (data.title, i)
-			print(outputFilename)
-			data.plotColumnToFile(outputFilename, i, plt, title=title)
+			print(outputFilename, numBins, minVal, maxVal)
+			data.plotColumnToFile(outputFilename, i, plt, title=title,
+				numBins=numBins, minVal=minVal, maxVal=maxVal)

@@ -11,8 +11,10 @@ randuniform Dimensions
 	10 randuniform_10d.dat
 	100 randuniform_100d.dat
 sizevary Points
-	100000 sizevary_n500000.dat
+	500000 sizevary_n500000.dat
 astrophysics Points
-	100000 astrophysics_10000.dat
+	100000 astrophysics_100000.dat
 armadillo Points
 	0 armadillo_unique.dat
+hurricane Points
+	0 hurricane_100000.dat
