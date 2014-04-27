@@ -46,12 +46,14 @@ namespace mdsearch
 		virtual bool update(const Point& oldPoint, const Point& newPoint);
 		virtual bool pointExists(const Point& p);
 
+		double computeBalanceFactor() const;
 		BucketKDNode* rootNode() const;
 
 		virtual std::string toString() const;
 
 	private:
 		BucketKDNode* findLeafForPoint(const Point& p) const;
+		BucketKDNode* findLeafForPoint(const Point& p, int& level) const; // returns level of tree leaf is on too
 		int getPointIndexInBucket(const IndexList& bucketIndices, const Point& p) const;
 		bool containsPoint(const BucketKDNode* leaf, const Point& p) const;
 		void mergeSiblingLeaves(BucketKDNode* leaf, BucketKDNode* sibling);

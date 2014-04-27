@@ -3,8 +3,8 @@
 #include "DatasetFileLoader.h"
 
 #include "KDTree.h"
+#include "BucketKDTree.h"
 #include "PyramidTree.h"
-
 
 namespace mdsearch
 {
@@ -133,6 +133,7 @@ namespace mdsearch
 							structSpec->type, boundary.numDimensions(), boundary, structSpec->arguments);
 						KDTree* kdTree = dynamic_cast<KDTree*>(structure);
 						PyramidTree* pyramidTree = dynamic_cast<PyramidTree*>(structure);
+						BucketKDTree* bucketKDTree = dynamic_cast<BucketKDTree*>(structure);
 
 						// TIME INSERT
 						Timing startTime = getTime();
@@ -140,7 +141,11 @@ namespace mdsearch
 							structure->insert(*p);
 						totalOpTimings.insert += getTime() - startTime;
 
-						if (kdTree)
+						if (bucketKDTree)
+						{
+							std::cout << "Balance Factor: " << bucketKDTree->computeBalanceFactor() << std::endl;
+						}
+						else if (kdTree)
 						{
 							std::cout << "Balance Factor: " << kdTree->computeBalanceFactor() << std::endl;
 							std::string outputFilename = "kdtree_" + dsSpec->name + "_" + subSpec->name + ".hist";
@@ -162,14 +167,6 @@ namespace mdsearch
 						for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)
 							structure->remove(*p);
 						totalOpTimings.remove += getTime() - startTime;
-
-				
-						if (kdTree)
-						{
-							std::cout << "Avg. Insertion Cost: " << kdTree->averageInsertionCost() << std::endl;
-							std::cout << "Avg. Deletion Cost: " << kdTree->averageDeletionCost() << std::endl;
-							std::cout << "Avg. Query Cost: " << kdTree->averageQueryCost() << std::endl;
-						}
 
 						delete structure;
 					}
