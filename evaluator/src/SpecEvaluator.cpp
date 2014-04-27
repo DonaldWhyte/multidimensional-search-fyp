@@ -2,6 +2,10 @@
 #include "IndexStructureFactory.h"
 #include "DatasetFileLoader.h"
 
+#include "KDTree.h"
+#include "PyramidTree.h"
+
+
 namespace mdsearch
 {
 
@@ -127,12 +131,27 @@ namespace mdsearch
 					{
 						IndexStructure* structure = structureFactory.constructIndexStructure(
 							structSpec->type, boundary.numDimensions(), boundary, structSpec->arguments);
+						KDTree* kdTree = dynamic_cast<KDTree*>(structure);
+						PyramidTree* pyramidTree = dynamic_cast<PyramidTree*>(structure);
 
 						// TIME INSERT
 						Timing startTime = getTime();
 						for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)
 							structure->insert(*p);
 						totalOpTimings.insert += getTime() - startTime;
+
+						if (kdTree)
+						{
+							std::cout << "Balance Factor: " << kdTree->computeBalanceFactor() << std::endl;
+							std::string outputFilename = "kdtree_" + dsSpec->name + "_" + subSpec->name + ".hist";
+							kdTree->toHistogramFile(outputFilename);
+						}
+						else if (pyramidTree)
+						{
+							std::string outputFilename = "pyramidtree_" + dsSpec->name + "_" + subSpec->name + ".hist";
+							pyramidTree->toHistogramFile(outputFilename);
+						}
+
 						// TIME PQUERY
 						startTime = getTime();
 						for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)
@@ -144,14 +163,20 @@ namespace mdsearch
 							structure->remove(*p);
 						totalOpTimings.remove += getTime() - startTime;
 
+				
+						if (kdTree)
+						{
+							std::cout << "Avg. Insertion Cost: " << kdTree->averageInsertionCost() << std::endl;
+							std::cout << "Avg. Deletion Cost: " << kdTree->averageDeletionCost() << std::endl;
+							std::cout << "Avg. Query Cost: " << kdTree->averageQueryCost() << std::endl;
+						}
+
 						delete structure;
 					}
 					// Compute and store AVERAGE of all runs
 					dsTimings[structSpec->type + " insert"][subSpec->name] = totalOpTimings.insert / suite.numRunsPerTiming();
 					dsTimings[structSpec->type + " delete"][subSpec->name] = totalOpTimings.remove / suite.numRunsPerTiming();
 					dsTimings[structSpec->type + " pquery"][subSpec->name] = totalOpTimings.pointQuery / suite.numRunsPerTiming();
-					
-					
 				}
 			}
 

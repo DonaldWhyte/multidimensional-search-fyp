@@ -1,6 +1,8 @@
 #include "KDTree.h"
 #include <sstream>
+#include <fstream>
 #include <stack>
+#include <map>
 
 namespace mdsearch
 {
@@ -238,7 +240,7 @@ namespace mdsearch
 		unsigned int levelSum = 0.0; // sum of each leaf's level
 		unsigned int numLeaves = 0; // number of leaves in tree
 
-		// Perform DFS 
+		// Perform DFS to get to each leaf, counting edges traversed along the way
 		std::stack<DFSEntry> unvisitedNodes;
 		unvisitedNodes.push( DFSEntry(root, 0) );
 		while (!unvisitedNodes.empty())
@@ -261,6 +263,46 @@ namespace mdsearch
 		}
 
 		return static_cast<double>(levelSum) / static_cast<double>(std::max(1u, numLeaves));
+	}
+
+	void KDTree::toHistogramFile(const std::string& filename) const
+	{
+		// Perform DFS to get to each leaf, counting edges traversed along the way
+		std::map<unsigned int, unsigned int> lengthMap;
+		std::stack<DFSEntry> unvisitedNodes;
+		unvisitedNodes.push( DFSEntry(root, 0) );
+		while (!unvisitedNodes.empty())
+		{
+			DFSEntry entry = unvisitedNodes.top();
+			unvisitedNodes.pop();
+			if (entry.node != NULL) // ignore NULL nodes
+			{
+				if (entry.node->leftChild == NULL && entry.node->rightChild == NULL) // if node is leaf
+				{
+					if (lengthMap.find(entry.level) != lengthMap.end())
+						lengthMap[entry.level] += 1;
+					else // if this key has not been created yet, initialise to 1
+						lengthMap[entry.level] = 1;
+				}
+				else
+				{
+					unvisitedNodes.push( DFSEntry(entry.node->leftChild, entry.level + 1) );
+					unvisitedNodes.push( DFSEntry(entry.node->rightChild, entry.level + 1) );
+				}
+			}
+		}
+
+		std::ofstream file(filename.c_str());
+		file << "Root-Leaf Path Length Distribution\n";
+		// Write each 2D value to the file, in the same number o
+		for (std::map<unsigned int, unsigned int>::const_iterator it = lengthMap.begin();
+			(it != lengthMap.end()); it++)
+		{
+			for (unsigned int i = 0; (i < it->second); i++)
+			{
+				file << it->first << "\n";
+			}
+		}
 	}
 
 	const Point* KDTree::findMinimum(KDNode* node, unsigned int dimension, unsigned int cuttingDim)

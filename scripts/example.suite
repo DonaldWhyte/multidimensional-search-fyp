@@ -1,13 +1,18 @@
 ExampleSuite
-/media/Maxtor/DonaldFYP/test_data/datasets/
+/usr/not-backed-up/DonaldFYP/test_data/datasets/
 ./results/
 1
 
 kdtree
-rec_pyramid_tree
 pyramid_tree
 
+randuniform Dimensions
+	1 randuniform_1d.dat
+	10 randuniform_10d.dat
+	100 randuniform_100d.dat
+sizevary Points
+	100000 sizevary_n500000.dat
 astrophysics Points
-	10000 astrophysics_10000.dat
-	100000 astrophysics_100000.dat
-	500000 astrophysics_500000.dat
+	100000 astrophysics_10000.dat
+armadillo Points
+	0 armadillo_unique.dat

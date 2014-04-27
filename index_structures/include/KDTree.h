@@ -45,6 +45,7 @@ namespace mdsearch
 		unsigned int totalQueryOps() const;
 
 		double computeBalanceFactor() const;
+		void toHistogramFile(const std::string& filename) const;
 
 		/* Find point with minimum value of a specific dimension in subtree
 		 * rooted at given node. */

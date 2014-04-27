@@ -50,13 +50,19 @@ namespace mdsearch
 		unsigned int numPointsStored() const;
 		/* Return average number of points stored in a bucket. */
 		Real averagePointsPerBucket() const;
-		/* Return satdnard deviation of points in buckets. */
+		/* Return standard deviation of points in buckets. */
 		Real stdevPointsPerBucket() const;
-		/* Return mimimum and maximum number of points stored in a single bucket. */
+		/* Return minimum and maximum number of points stored in a single bucket. */
 		unsigned int minPointsPerBucket() const;
 		unsigned int maxPointsPerBucket() const;
-		/* Return string reprensetation of Pyrmaid tree. */
+
+		/* Return string representation of Pyramid tree. */
 		std::string toString() const;
+		/* Write the pyramid value of each point stored to a histogram file
+		 * (this means duplicates are possible). */
+		void toHistogramFile(const std::string& filename) const;
+
+
 
 	protected:
 		static const unsigned int MAX_BUCKET_NUMBER = 300000;

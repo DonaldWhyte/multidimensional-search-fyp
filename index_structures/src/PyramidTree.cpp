@@ -3,6 +3,7 @@
 #include "Util.h"
 #include <algorithm>
 #include <sstream>
+#include <fstream>
 
 namespace mdsearch
 {
@@ -209,6 +210,20 @@ namespace mdsearch
 		}
 
 		return ss.str();
+	}
+
+	void PyramidTree::toHistogramFile(const std::string& filename) const
+	{
+		std::ofstream file(filename.c_str());
+		file << "1D Value Distribution\n";
+		// Write each 2D value to the file, in the same number o
+		for (OneDMap::const_iterator it = hashMap.begin(); (it != hashMap.end()); it++)
+		{
+			for (unsigned int i = 0; (i < it->second.points.size()); i++)
+			{
+				file << it->first << "\n";
+			}
+		}
 	}
 
 	PTBucket* PyramidTree::getContainingBucket(const Point& point)
