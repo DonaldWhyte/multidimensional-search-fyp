@@ -44,6 +44,8 @@ namespace mdsearch
 		unsigned int totalDeletionOps() const;
 		unsigned int totalQueryOps() const;
 
+		double computeBalanceFactor() const;
+
 		/* Find point with minimum value of a specific dimension in subtree
 		 * rooted at given node. */
 		const Point* findMinimum(KDNode* node, unsigned int dimension, unsigned int cuttingDim = 0);

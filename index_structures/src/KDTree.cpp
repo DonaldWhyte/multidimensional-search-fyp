@@ -1,8 +1,19 @@
 #include "KDTree.h"
 #include <sstream>
+#include <stack>
 
 namespace mdsearch
 {
+
+	struct DFSEntry
+	{
+		KDNode* node;
+		unsigned int level; // level in tree the node is
+
+		DFSEntry(KDNode* node, unsigned int level) : node(node), level(level)
+		{
+		}
+	};
 
 	inline unsigned int nextCuttingDimension(unsigned int cuttingDim, unsigned int numDimensions)
 	{
@@ -220,6 +231,36 @@ namespace mdsearch
 	unsigned int KDTree::totalQueryOps() const
 	{
 		return queryOpCount;
+	}
+
+	double KDTree::computeBalanceFactor() const
+	{
+		unsigned int levelSum = 0.0; // sum of each leaf's level
+		unsigned int numLeaves = 0; // number of leaves in tree
+
+		// Perform DFS 
+		std::stack<DFSEntry> unvisitedNodes;
+		unvisitedNodes.push( DFSEntry(root, 0) );
+		while (!unvisitedNodes.empty())
+		{
+			DFSEntry entry = unvisitedNodes.top();
+			unvisitedNodes.pop();
+			if (entry.node != NULL) // ignore NULL nodes
+			{
+				if (entry.node->leftChild == NULL && entry.node->rightChild == NULL) // if node is leaf
+				{
+					levelSum += entry.level;
+					numLeaves += 1;
+				}
+				else
+				{
+					unvisitedNodes.push( DFSEntry(entry.node->leftChild, entry.level + 1) );
+					unvisitedNodes.push( DFSEntry(entry.node->rightChild, entry.level + 1) );
+				}
+			}
+		}
+
+		return static_cast<double>(levelSum) / static_cast<double>(std::max(1u, numLeaves));
 	}
 
 	const Point* KDTree::findMinimum(KDNode* node, unsigned int dimension, unsigned int cuttingDim)

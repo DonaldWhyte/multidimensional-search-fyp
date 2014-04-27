@@ -152,6 +152,21 @@ namespace mdsearch { namespace tests
 	}
 	#endif
 
+	TEST_F(KDTreeTests, BalanceFactor)
+	{
+		KDTree structure(NUM_KDTREE_DIMENSIONS);
+		IndexStructureTester tester;
+		const PointList& testPoints = tester.getTestPoints();
+		structure.loadPoints(testPoints);
+
+		EXPECT_EQ(4.0, structure.computeBalanceFactor());
+
+		const Real vals[] = { 6, 5.5, 2 };
+		Point newPoint(3, vals);
+		ASSERT_TRUE(structure.insert(newPoint));
+		EXPECT_EQ(((5.0 + 4.0 + 4.0) / 3.0), structure.computeBalanceFactor()); // 4.33r
+	}
+
 } }
 
 #endif
