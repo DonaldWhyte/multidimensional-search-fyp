@@ -147,7 +147,11 @@ namespace mdsearch
 						}
 						else if (kdTree)
 						{
-							std::cout << "Balance Factor: " << kdTree->computeBalanceFactor() << std::endl;
+							KDTreeStats stats = kdTree->computeStats();
+							std::cout << "Balance Factor: " << stats.balanceFactor << std::endl;
+							std::cout << "Max Path Length: " << stats.maxPathLength << std::endl;
+							std::cout << "Number of Points Stored: " << kdTree->numPointsStored() << std::endl;
+
 							std::string outputFilename = "kdtree_" + dsSpec->name + "_" + subSpec->name + ".hist";
 							kdTree->toHistogramFile(outputFilename);
 						}
@@ -162,6 +166,10 @@ namespace mdsearch
 						for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)
 							structure->pointExists(*p);
 						totalOpTimings.pointQuery += getTime() - startTime;
+						if (kdTree)
+						{
+							std::cout << "Avg. Query Cost: " << kdTree->averageQueryCost() << std::endl;
+						}
 						// TIME DELETE
 						startTime = getTime();
 						for (PointList::const_iterator p = dataset.begin(); (p != dataset.end()); p++)

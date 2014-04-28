@@ -12,7 +12,7 @@ static const unsigned int DIMENSIONS[] = {
 };
 static const unsigned int NUM_DIMENSIONALITIES = 10;
 
-static const unsigned int NUM_POINTS_PER_DATASET = 10000;
+static const unsigned int NUM_POINTS_PER_DATASET = 500000;
 static const Real MIN_VALUE = 0.0f;
 static const Real MAX_VALUE = 1.0f;
 
@@ -33,8 +33,8 @@ static const unsigned int POINT_COUNTS[] = {
 static const unsigned int NUM_POINT_COUNTS = 9;
 
 static const std::string RANDOM_UNIFORM_DATASET_PREFIX = "randuniform";
-static const std::string SKEWED_DATASET_PREFIX = "skewed";
-static const std::string CLUSTERED_DATASET_PREFIX = "clustered";
+static const std::string SKEWED_DATASET_PREFIX = "skewed_500000";
+static const std::string CLUSTERED_DATASET_PREFIX = "clustered_500000";
 static const std::string N_VARYING_DATASET_PREFIX = "sizevary";
 static const std::string EXTENSION = "dat";
 
@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
 		dataset.clear();
 
 		std::cout << "\tGenerated " << d << "D dataset" << std::endl;
-	}
+	}/*
 
 	// Generate uniformly random datasets
 	std::cout << "Generating uniformly random datasets..." << std::endl;
@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
 		PointList dataset(allPoints.begin(), allPoints.begin() + n);
 		std::cout << "\t\t" << dataset.size() << std::endl;
 		writePointsToFile(filename, N_VARYING_DIMENSIONALITY, dataset);
-	}
+	}*/
 
 	return 0;
 }

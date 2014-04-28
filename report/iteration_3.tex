@@ -4,7 +4,7 @@ This iteration explores a widely used index structure based on spatial decomposi
 
 \subsection{Point $kd$-Tree}
 
-The $kd$-Tree variant described in Section \ref{sec:kd-tree-chosen} was implemented, which shall be referred to as the \textbf{Point $kd$-Tree}. Each node is represented as a C-struct which stores a single point as well as pointers to its children. Every node is allocated using a call to \texttt{malloc()}, which allocates enough memory on the heap to store the node. This means each node may reside in different areas of the heap, resulting in fragmented memory.
+The $kd$-Tree variant described in Section \ref{sec:kd-tree-chosen} was implemented, which shall be referred to as the \textbf{Point $kd$-Tree}. Each node is represented as a C-struct which stores a single point as well as pointers to its children. Every node is allocated using a call to \texttt{malloc()}, which allocates enough memory on the heap to store the node. This means each node may reside in different areas of the heap, resulting in fragmented memory.=
 
 \subsection{Performance Timings}
 
@@ -143,7 +143,36 @@ TODO
 	\label{tab:perf3-real}
 \end{table}
 
+\subsection{$kd$-Tree Balance}
+
+The performance timings in the previous section show that the $kd$-tree becomes slower with particular datasets. Despite the $kd$-Tree storing the same number of points in each of the real datasets, the performance is different. The speed of processing 500,000 points from the astrophysics or hurricane Isabel datasets is much slower than the armadillo mesh or the synthetic datasets. 
+
+The cause of this is most likely the \textit{balance} of the tree. Skewed datasets are known to affect the balance of spatial decomposition trees, resulting in longer paths from the root node to the leaves. To investigate this further, the \textit{balance factor} of the point $kd$-tree, when storing 500,000 points from three synthetic and three real datasets has been measured. The balance factor is defined as the \textit{average} length of a path from the root to a leaf. A lower balance factor means the $kd$-Tree has to visit less nodes on average when performing a point query, so queries will generally be faster. A $kd$-Tree is balanced when its balance factor is $\log_2 n$. When $n = 500,000$, the best possible balance factor is $\log_2 (500,000) \approx 19$. 
+
+\begin{table}
+	\centering
+	\begin{tabular}{|l|l|l|l|}
+		\hline
+		\textbf{Dataset} & \textbf{Balance Factor} & \textbf{Max Path Length} & \textbf{Time to Query All Points (seconds)} \\
+		\hline
+		Random 10D Points (Uniform Distribution) & 24.8285 & 47 & 0.591447 \\
+		Random 10D Points (Skewed Distribution) & 24.9092 & 44 & 0.602856 \\
+		Random 10D Points (Clustered Distribution) & 30.3362 & 57 & 0.479269 \\
+		Astrophysics & 32.405 & 120 & 0.65575 \\
+		Hurricane Isabel & 47.7236 & 123 & 0.466654 \\
+		\hline
+	\end{tabular}
+	\caption{Point $kd$-Tree Balance Factor with 500,000 Points from Various Datasets}
+	\label{tab:kdtree-balance-factor}
+\end{table}
+
+The balance factor clearly increases as $n$ is increased, so the concern here is how its affected by data distribution. Table \ref{tab:kdtree-balance-factor} contains the balance factor and maximum path length from the root to a leaf when the point $kd$-Tree is storing 500,000 points from different datasets. Here we see there appears to be little correlation between balance factor and query execution time. 
+
+Despite the hurricane Isabel dataset introducing a higher balance factor and having three more dimensions than the astrophysics dataset, execution time 
+so point comparisons take longer)
+
+TODO: comment on results
 
 \subsection{Summary}
 
-TODO: state how $kd$-tree BLASTS PT OUT OF WATER
+This iteration showed that the point $kd$-tree, even with no attempts to further optimise the structure, significantly outperformed the Pseudo-Pyramid Tree and Pyramid Tree. The point $kd$-Tree is slightly slower than the Bucket Hash Table, but is more resilient to floating point inaccuracy as it does not rely on a potentially inaccurate hashing function. TODO: findings from skd-tree balance section

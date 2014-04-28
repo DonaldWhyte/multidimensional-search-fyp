@@ -22,6 +22,13 @@ namespace mdsearch
 		virtual ~KDNode();
 	};
 
+	/* Stores statistics on a kd-tree. */
+	struct KDTreeStats
+	{
+		double balanceFactor;
+		unsigned int maxPathLength;
+	};
+
 	class KDTree : public IndexStructure
 	{
 
@@ -44,7 +51,7 @@ namespace mdsearch
 		unsigned int totalDeletionOps() const;
 		unsigned int totalQueryOps() const;
 
-		double computeBalanceFactor() const;
+		KDTreeStats computeStats() const;
 		void toHistogramFile(const std::string& filename) const;
 
 		/* Find point with minimum value of a specific dimension in subtree

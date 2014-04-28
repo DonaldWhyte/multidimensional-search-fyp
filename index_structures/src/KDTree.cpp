@@ -235,10 +235,11 @@ namespace mdsearch
 		return queryOpCount;
 	}
 
-	double KDTree::computeBalanceFactor() const
+	KDTreeStats KDTree::computeStats() const
 	{
 		unsigned int levelSum = 0.0; // sum of each leaf's level
 		unsigned int numLeaves = 0; // number of leaves in tree
+		unsigned int maxPathLength = 0;
 
 		// Perform DFS to get to each leaf, counting edges traversed along the way
 		std::stack<DFSEntry> unvisitedNodes;
@@ -253,6 +254,8 @@ namespace mdsearch
 				{
 					levelSum += entry.level;
 					numLeaves += 1;
+					if (entry.level > maxPathLength)
+						maxPathLength = entry.level;
 				}
 				else
 				{
@@ -262,7 +265,10 @@ namespace mdsearch
 			}
 		}
 
-		return static_cast<double>(levelSum) / static_cast<double>(std::max(1u, numLeaves));
+		KDTreeStats stats;
+		stats.balanceFactor = static_cast<double>(levelSum) / static_cast<double>(std::max(1u, numLeaves));
+		stats.maxPathLength = maxPathLength;
+		return stats;
 	}
 
 	void KDTree::toHistogramFile(const std::string& filename) const
