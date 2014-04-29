@@ -47,9 +47,9 @@ TODO
 	\makebox[\textwidth][c]{%
 		\begin{tabular}{|r|r|l|l|l|}
 			\hline
-			\multicolumn{2}{|c}{} & \multicolumn{3}{|c|}{\textbf{Dataset}} \\
+			\multicolumn{2}{|c}{} & \multicolumn{3}{|c|}{\textbf{Dataset (Points)}} \\
 			\hline
-			\textbf{Structure} & \textbf{Operation} & \textbf{Astrophysics} & \textbf{Hurricane Isabel} & \textbf{Armadillo Mesh} \\
+			\textbf{Structure} & \textbf{Operation} & \textbf{Astrophysics (500,000)} & \textbf{Hurricane Isabel (500,000)} & \textbf{Armadillo Mesh (435,544)} \\
 			\hline
 			\multirow{4}{*}{Bucket Hash Table} & Delete & 0.191339 & 0.248544 & 0.102674 \\
 				& Insert & 0.360452 & 0.419106 & 0.2828 \\
@@ -59,9 +59,9 @@ TODO
 				& Insert & 0.663231 & 0.434781 & 0.384241 \\
 				& Point Query & 0.639265 & 0.408527 &  0.374425 \\
 			\hline
-			\multirow{4}{*}{Bucket PPT} & Delete & 41.8115 & 34.8281 & TODO \\
-				& Insert & 81.231 & 69.401 & TODO \\
-				& Point Query & 70.4391 & 69.3368 & TODO \\
+			\multirow{4}{*}{Bucket PPT} & Delete & 82.908 & 71.006 & 0.160532 \\
+				& Insert & 81.231 & 69.401 & 0.126938 \\
+				& Point Query & 70.4391 & 69.3368 & 0.0956872 \\
 			\hline
 			\multirow{4}{*}{Pyramid Tree} & Delete & 33.7258 & 34.9182 & 0.164531 \\
 				& Insert & 65.0126 & 69.5751 & 0.192165 \\
@@ -69,7 +69,6 @@ TODO
 			\hline
 		\end{tabular}
 	}%
-
 	\caption{Total Execution Time (in seconds) of Each Operation on Sampled Real Datasets}
 	\label{tab:perf3-real}
 \end{table}
