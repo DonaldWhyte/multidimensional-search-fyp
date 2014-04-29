@@ -13,7 +13,7 @@ class TimingData:
 			self.data[operation] = {}
 		self.data[operation][structure] = orderedTuples
 
-def parseTimingFile(timingFilename):
+def parseTimingFile(timingFilename, ignoreNegativeValues):
 	with open(timingFilename, "r") as f:
 		# Read header information and construct container for data
 		title = f.readline()[:-1]
@@ -43,6 +43,9 @@ def parseTimingFile(timingFilename):
 			groupFields = [ x.split() for x in group ]
 			structure, operation = groupFields[0]
 			timingTuples = [ (int(x[0]), float(x[1])) for x in groupFields[1:] ]
+			# Remove all "-1" values from tuples if appropriate flag is set
+			if ignoreNegativeValues:
+				timingTuples = filter(lambda x : x[1] != -1.0, timingTuples)
 			timingTuples.sort(key = lambda x : x[0])
 			data.addTimingData(operation, structure, timingTuples)
 

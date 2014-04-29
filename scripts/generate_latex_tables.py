@@ -2,6 +2,7 @@ import sys
 import glob
 import re
 from timing_file_parser import parseTimingFile
+from maps import *
 
 STRUCTURE_TEMPLATE = r"""\multirow{$NUM_OPERATIONS$}{*}{$STRUCTURE$} & $OPERATION$ & $X_VALUES$ \\\\"""
 
@@ -40,6 +41,12 @@ def extractValues(data, operation, structure):
 			values.append(y)
 	return values
 
+def roundValue(value):
+	if value == "-":
+		return value
+	else:
+		return "%06.8f" % float(value)
+
 def generateLatexTable(timingData):
 	tableStr = TABLE_TEMPLATE
 	tableStr = replaceValue(tableStr, "X_AXIS", timingData.xAxis)
@@ -66,7 +73,6 @@ def generateLatexTable(timingData):
 	for operation in timingData.data:
 		structureNames = sorted(timingData.data[operation].keys())
 		break
-	print structureNames
 	operationNames = sorted(timingData.data.keys())
 	# For each structure, construct entry
 	structureEntries = []
@@ -74,19 +80,19 @@ def generateLatexTable(timingData):
 		structStr = STRUCTURE_TEMPLATE
 		# Fill in first line of structure string
 		structStr = replaceValue(structStr, "NUM_OPERATIONS", str(len(timingData.data)))
-		structStr = replaceValue(structStr, "STRUCTURE", replaceUnderlines(struct))
-		structStr = replaceValue(structStr, "OPERATION", operationNames[0])
+		structStr = replaceValue(structStr, "STRUCTURE", STRUCTURE_NAME_MAP[struct])
+		structStr = replaceValue(structStr, "OPERATION", OPERATION_NAME_MAP[operationNames[0]])
 		# Construct list containing all actual values (Y))
 		values = extractValues(timingData.data, operationNames[0], struct)
-		valueStr =  "& ".join([ str(x) for x in values ])
+		valueStr =  " & ".join([ roundValue(x) for x in values ])
 		structStr = replaceValue(structStr, "X_VALUES", valueStr)
 		structStr += "\n"
 		# Add line for each other operation
 		for i in range(1, len(operationNames)):
 			opName = operationNames[i]
 			values = values = extractValues(timingData.data, opName, struct)
-			valueStr = " & ".join([ str(x) for x in values ])
-			structStr += "& {} & {} \\\\\\\\ \n".format(opName, valueStr)
+			valueStr = " & ".join([ roundValue(x)  for x in values ])
+			structStr += "& %s & %s \\\\\\\\ \n" % (OPERATION_NAME_MAP[opName], valueStr)
 		# Finish with a hline
 		structStr += "\\hline"
 
@@ -107,7 +113,7 @@ if __name__ == "__main__":
 	# Process each timing file in turn
 	for fname in filenames:
 		# Retrieve contents of timing file
-		data = parseTimingFile(fname)
+		data = parseTimingFile(fname, False)
 		# TODO
 		tableStr = generateLatexTable(data)
 		print(tableStr)

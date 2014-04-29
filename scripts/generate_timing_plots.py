@@ -1,6 +1,7 @@
 import sys
 import glob
 from timing_file_parser import parseTimingFile
+from maps import *
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
@@ -24,6 +25,12 @@ class Dataset:
 		xValues, yValues = extract2DCoordinates(self.points)
 		return plot.plot(xValues, yValues, color=self.colour, marker=self.marker)
 
+	def maxXValue(self):
+		if len(self.points) > 0:
+			return max([ p[0] for p in self.points ])
+		else:
+			return 0
+
 def generatePlot(filename, xAxisLabel, yAxisLabel, operation, structures):
 	# Maintain sorted list of structures and generate dataset object
 	# for each structure
@@ -35,14 +42,19 @@ def generatePlot(filename, xAxisLabel, yAxisLabel, operation, structures):
 			structureNames[i], "line", structures[structureNames[i]],
 			COLOURS[i % len(COLOURS)], MARKERS[i % len(MARKERS)]
 		))
+	# Determine maximum X value across all datasets
+	maxXValue = max([ ds.maxXValue() for ds in datasets ])
 	# Plot each dataset object
 	plotObjects = []
 	for ds in datasets:
 		plotObjects.append( ds.plot(plt) )
 	# Configure plot
-	plt.legend(plotObjects, structureNames, "upper right", ncol=1, prop={'size':12})
+	# Make sure to replace 
+	presentStructureNames = [ STRUCTURE_NAME_MAP[name] for name in structureNames ]
+	plt.legend(plotObjects, presentStructureNames, "upper right", ncol=1, prop={'size':12})
 	plt.xlabel(xAxisLabel)
 	plt.ylabel(yAxisLabel)
+	plt.xlim([1, maxXValue])
 	# Save plot to output file
 	pp = PdfPages(filename)
 	plt.savefig(pp, format="pdf")
@@ -61,7 +73,20 @@ if __name__ == "__main__":
 	# Process each timing file in turn
 	for fname in filenames:
 		# Retrieve contents of timing file
-		data = parseTimingFile(fname)
+		data = parseTimingFile(fname, True)
+		# Ignore file if it does not contain at least two data items
+		# for AT LEAST ONE op
+		skipFile = True
+		for operation, structures in data.data.items():
+			for struct, dataItems in structures.items():
+				if len(dataItems) >= 2:
+					skipFile = False
+					break
+			if not skipFile:
+				break
+		if skipFile:
+			continue
+
 		# Generate a plot for each operation
 		for operation, structures in data.data.items():
 			outputFilename = "%s_%s.pdf" % (data.title, operation)
