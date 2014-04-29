@@ -8,9 +8,11 @@ The Pseudo-Pyramid tree's reduction from $d$ dimensions to one can be seen as a 
 
 No \texttt{delete} operation was provided in the original implementation of the Pseudo-Pyramid Tree, so a \texttt{delete} procedure had to be added. To delete a point $p$, the point is first hashed and the bucket containing the point is found. The index pointing to $p$ in the bucket is removed from the bucket, but the actual point itself is not removed the point array. In other words, the memory is never released until the whole structure is deleted. This makes the structure useful for batch computation because it can be discarded straight after a task, releasing all allocated memory then. However, if the structure is used as part of a long-running process then this is not suitable because there is the potential to run out of memory. This implementation shall be referred to as the \textbf{Batch Pseudo-Pyramid Tree}.
 
-Variants of this structure were implemented to provide a \texttt{delete} operation which releases memory. The first is the \textbf{Defragmented Pseudo-Pyramid Tree}. When a point's index is deleted from a bucket, the element at the index is marked for deletion from the array at a later time (by adding the index of the point to another \texttt{std::vector}). If the number of marked elements exceeds a certain number $R$, then the $R + 1$ marked elements are erased from the vector (i.e. memory is released). The indices in each bucket are then updated to point to the correct element in the modified array. Even though \texttt{delete} is normally a constant time operation, the worst case is $O(n^2)$ because of this defragmentation procedure.
+Two variants of this structure were implemented to provide a \texttt{delete} operation which releases memory. The first is the \textbf{Defragmented Pseudo-Pyramid Tree}. When a point's index is deleted from a bucket, the element at the index is marked for deletion from the array at a later time. If the number of marked elements exceeds a certain number $R$, then the $R + 1$ marked elements are erased from the vector (i.e. memory is released). The indices in each bucket are then updated to point to the correct element in the modified array. This defragmentation procedure causes \texttt{delete} operation's complexity to become $O(n^2)$.
 
-The \textbf{Rebuild Pseudo-Pyramid Tree} uses a different strategy for releasing memory for unused points. Instead of defragmenting the array by peforming a sequence of array deletions when $R + 1$ elements are marked for deletion, the entire structure is rebuilt. This new cleanup procedure starts by clearing the structure and incrementally building the new structure by only adding points \textit{not} marked for deletion. $n - R$ points will be re-inserted and insertion in the worst case is $O(n)$, meaning the worst case complexity of \texttt{delete} is $O((n - R)n)$. The larger $R$ is, the less time it takes to perform this procedure but a larger amount of allocated memory goes unused at a time.
+The \textbf{Rebuild Pseudo-Pyramid Tree} uses a different strategy for releasing memory for unused points. Instead of defragmenting the array by performing a sequence of array deletions when $R + 1$ elements are marked for deletion, the entire structure is rebuilt. This new cleanup procedure starts by clearing the structure and incrementally building the new structure by only adding points \textit{not} marked for deletion. $n - R$ points will be re-inserted and insertion in the worst case is $O(n)$, meaning the worst case complexity of \texttt{delete} is $O((n - R)n)$. The larger $R$ is, the less time it takes to perform this procedure but a larger amount of allocated memory goes unused at a time.
+
+TODO: say not using defragmented!!
 
 \subsection{Accelerating Hash Function}
 
@@ -41,7 +43,7 @@ Table \ref{tab:new-pseudo-pyramid-hash} shows operation execution time of the Ba
 
 \begin{figure}
 	\centering
-	\includegraphics[scale=0.5]{figures/performance_analysis/iteration_2/new_pseudo-pyramid_hash_performance.pdf}
+	\includegraphics[scale=0.5]{figures/performance_analysis/iteration_1/new_pseudo-pyramid_hash_performance.pdf}
 	\caption{\texttt{insert} Performance on Random Uniformly Distributed Datasets of Varying Dimensions}
 	\label{fig:new-pseudo-pyramid-hash}
 \end{figure}
@@ -89,57 +91,17 @@ The remaining variants of the Pseudo-Pyramid and the two baselines, Sequential S
 
 Table \ref{tab:perf1-dimensionality} contains the \textit{total} runtime of \texttt{insert}, \texttt{delete} and point query for uniformly randomly generated points for the analysed structures. When ``-" is shown instead of the number of seconds, it means that the performance test could not finish due to the machine running out of memory. Plots with dimension against execution time are shown for \texttt{insert} and \texttt{remove} in Figure \ref{fig:perf1-dimensionality}. The execution times for skewed and clustered data was almost identical to the uniformly random datasets; for the sake of brevity, the tables and plots for these datasets have been placed in Appendix \ref{chap:supp-material}.
 
-\begin{table}
-	\centering
-	\makebox[\textwidth][c]{%
-		\begin{tabular}{|r|r|l|l|l|l|l|l|l|l|}
-			\hline
-			\multicolumn{2}{|c}{} & \multicolumn{8}{|c|}{\textbf{Dimensionality}} \\
-			\hline
-			\textbf{Structure} & \textbf{Operation} & 1 & 2 & 3 & 5 & 10 & 50 & 100 & 200 \\
-			\hline
-			\multirow{3}{*}{Sequential Scan} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-			\hline			
-			\multirow{3}{*}{Octree} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-			\hline			
-			\multirow{3}{*}{Defragmented PPT} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-			\hline
-			\multirow{3}{*}{Rebuild PPT} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-			\hline
-			\multirow{3}{*}{Bucket PPT} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-			\hline
-			\multirow{3}{*}{Splay PPT} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-			\hline
-		\end{tabular}
-	}%
-
-	\caption{Total Execution Time (in seconds) of Each Operation for Varying Number of Dimensions in Uniformly Distributed Synthetic Dataset}
-	\label{tab:perf1-dimensionality}
-\end{table}
-
 \begin{figure}
-	\begin{center}
+	\makebox[\textwidth][c]{%
 		\begin{subfloat}[\texttt{insert}\label{fig:perf1-dimensionality-insert}]{%
-			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+			\includegraphics[scale=0.5]{figures/performance_analysis/iteration_1/randuniform_insert.pdf}
 		}
-		\end{subfloat}~
-		\begin{subfloat}[\texttt{remove}\label{fig:perf1-dimensionality-remove}]{%
-			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+		\end{subfloat}
+		\begin{subfloat}[\texttt{delete}\label{fig:perf1-dimensionality-remove}]{%
+			\includegraphics[scale=0.5]{figures/performance_analysis/iteration_1/randuniform_delete.pdf}
 		}
-		\end{subfloat}~
-	\end{center}
+		\end{subfloat}
+	}%
 
 	\caption{Index Structure Performance With Respect To Dimensionality (10,000 Points from Uniform Distribution Synthetic Dataset)}
 	\label{fig:perf1-dimensionality}
@@ -149,57 +111,24 @@ The three plots show that dimensionality has little effect on \textit{insert} an
 
 All Pseudo-Pyramid Tree variants have similar speeds for \texttt{insert} and point queries, which significant outperforms Sequential Scan and Octree. However, the performance of the trees decreases as $d$ increases. The $O(n^2)$ defragmentation procedure used by the Defragmented Pseudo-Pyramid Tree causes it to be the slowest structure for deleting points, taking almost twice as long as Sequential Scan. Rebuild Pseudo-Pyramid tree is better, but still much slower than the Bucket or Splay Pseudo-Pyramid Tree variants, which have the fastest deletion speed. This is because TODO.
 
-\begin{table}
-	\centering
-	\makebox[\textwidth][c]{%
-		\begin{tabular}{|r|r|l|l|l|l|}
-			\hline
-			\multicolumn{2}{|c}{} & \multicolumn{4}{|c|}{\textbf{Points in Dataset}} \\
-			\hline
-			\textbf{Structure} & \textbf{Operation} & 10,000 & 100,000 & 500,000 & 1,000,000 \\
-			\hline
-			\multirow{3}{*}{Sequential Scan} & Insert & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO \\
-			\hline
-			\multirow{3}{*}{Octree} & Insert & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO \\
-			\hline
-			\multirow{3}{*}{Defragmented PPT} & Insert & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO \\
-			\hline
-			\multirow{3}{*}{Rebuild PPT} & Insert & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO \\
-			\hline
-			\multirow{3}{*}{Bucket PPT} & Insert & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO \\
-			\hline
-			\multirow{3}{*}{Splay PPT} & Insert & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO \\
-			\hline
-		\end{tabular}
-	}%
-
-	\caption{Total Execution Time (in seconds) of Each Operation for Varying Number of Points in Uniformly Distributed Synthetic Dataset}
-	\label{tab:perf1-size}
-\end{table}
-
 \begin{figure}
-	\begin{center}
+	\makebox[\textwidth][c]{%
 		\begin{subfloat}[\texttt{insert}\label{fig:perf1-size-insert}]{%
-			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+			\begin{overpic}[scale=0.5]{figures/performance_analysis/iteration_1/sizevary_insert.pdf}
+				\put(13,33){\includegraphics[scale=0.22]{figures/performance_analysis/iteration_1/sizevary_insert_zoomed.pdf}}
+				\put(24,31){\textbf{\sans{Zoomed View}}}
+			\end{overpic}
 		}
-		\end{subfloat}~
-		\begin{subfloat}[\texttt{remove}\label{fig:perf1-size-remove}]{%
-			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+		\end{subfloat}
+		\begin{subfloat}[\texttt{delete}\label{fig:perf1-size-remove}]{%
+			\begin{overpic}[scale=0.5]{figures/performance_analysis/iteration_1/sizevary_delete.pdf}
+				\put(13,35){\includegraphics[scale=0.21]{figures/performance_analysis/iteration_1/sizevary_delete_zoomed.pdf}}
+				\put(23,33){\textbf{\sans{Zoomed View}}}
+			\end{overpic}
 		}
-		\end{subfloat}~
-	\end{center}
+
+		\end{subfloat}
+	}%
 
 	\caption{Index Structure Performance With Respect To Dataset Size (10,000 Points from Uniform Distribution Synthetic Dataset)}
 	\label{fig:perf1-size}
@@ -217,7 +146,6 @@ Storing separate point arrays for each bucket, instead of using one large array 
 		\hline
 		\textbf{Structure} & \textbf{Cache Miss Rate (\%)} \\
 		\hline
-		Defragmented Pseudo-Pyramid Tree & 7.52 \\
 		Rebuild Pseudo-Pyramid Tree & 4.65 \\
 		Bucket Pseudo-Pyramid Tree & 0.13 \\
 		Splay Pseudo-Pyramid Tree & 0.29 \\
@@ -240,38 +168,24 @@ The differences in speed between the bucket and splay variants is small, but the
 			\hline
 			\multirow{4}{*}{Sequential Scan} & Insert & TODO & TODO & TODO \\
 				& Delete & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO \\
-				& Random Operation List & TODO & TODO & TODO \\
-			\hline
-			\multirow{4}{*}{Octree} & Insert & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO \\
-				& Random Operation List & TODO & TODO & TODO \\
-			\hline
-			\multirow{4}{*}{Defragmented PPT} & Insert & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO \\
-				& Random Operation List & TODO & TODO & TODO \\
+				& Point Query & TODO & TODO & TODO \\
 			\hline
 			\multirow{4}{*}{Rebuild PPT} & Insert & TODO & TODO & TODO \\
 				& Delete & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO \\
-				& Random Operation List & TODO & TODO & TODO \\
+				& Point Query & TODO & TODO & TODO \\
 			\hline
 			\multirow{4}{*}{Bucket PPT} & Insert & TODO & TODO & TODO \\
 				& Delete & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO \\
-				& Random Operation List & TODO & TODO & TODO \\
+				& Point Query & TODO & TODO & TODO \\
 			\hline
 			\multirow{4}{*}{Splay PPT} & Insert & TODO & TODO & TODO \\
 				& Delete & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO \\
-				& Random Operation List & TODO & TODO & TODO \\
+				& Point Query & TODO & TODO & TODO \\
 			\hline
 		\end{tabular}
 	}%
 
-	\caption{Total Execution Time (in seconds) of Each Operation for 500,000 Points Sampled From Real Datasets}
+	\caption{Total Execution Time (in seconds) of Each Operation on Sampled Real Datasets}
 	\label{tab:perf1-real}
 \end{table}
 

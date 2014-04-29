@@ -20,7 +20,7 @@ TABLE_TEMPLATE = r"""
 		\end{tabular}
 	}%
 
-	\caption{TODO}
+	\caption{$CAPTION$}
 	\label{TODO}
 \end{table}
 """
@@ -41,13 +41,14 @@ def extractValues(data, operation, structure):
 			values.append(y)
 	return values
 
-def roundValue(value):
+def roundValue(value, precision):
 	if value == "-":
 		return value
 	else:
-		return "%06.8f" % float(value)
+		formatStr = "%06." + str(precision) + "f"
+		return formatStr % float(value)
 
-def generateLatexTable(timingData):
+def generateLatexTable(timingData, fpPrecision):
 	tableStr = TABLE_TEMPLATE
 	tableStr = replaceValue(tableStr, "X_AXIS", timingData.xAxis)
 	# Determine all x values in total (should already be sorted)
@@ -66,6 +67,8 @@ def generateLatexTable(timingData):
 	tableStr = replaceValue(tableStr, "X_VALUES", xValuesStr)
 	xColumnsStr = "|".join( [ "l" for x in xValues ] )
 	tableStr = replaceValue(tableStr, "X_COLUMNS", xColumnsStr)
+	# Make dataset name the caption
+	tableStr = replaceValue(tableStr, "CAPTION", data.title)
 
 	# Create template for each structure and combine in string separated by newlines
 	# Construct list of all structures and SORT IT APLHABETICALLY
@@ -84,14 +87,14 @@ def generateLatexTable(timingData):
 		structStr = replaceValue(structStr, "OPERATION", OPERATION_NAME_MAP[operationNames[0]])
 		# Construct list containing all actual values (Y))
 		values = extractValues(timingData.data, operationNames[0], struct)
-		valueStr =  " & ".join([ roundValue(x) for x in values ])
+		valueStr =  " & ".join([ roundValue(x, fpPrecision) for x in values ])
 		structStr = replaceValue(structStr, "X_VALUES", valueStr)
 		structStr += "\n"
 		# Add line for each other operation
 		for i in range(1, len(operationNames)):
 			opName = operationNames[i]
 			values = values = extractValues(timingData.data, opName, struct)
-			valueStr = " & ".join([ roundValue(x)  for x in values ])
+			valueStr = " & ".join([ roundValue(x, fpPrecision)  for x in values ])
 			structStr += "& %s & %s \\\\\\\\ \n" % (OPERATION_NAME_MAP[opName], valueStr)
 		# Finish with a hline
 		structStr += "\\hline"
@@ -106,14 +109,19 @@ def generateLatexTable(timingData):
 if __name__ == "__main__":
 	# Parse command line options
 	if len(sys.argv) < 2:
-		sys.exit("python %s \"<timingFilenameGlob>\"" % sys.argv[0])
+		sys.exit("python %s \"<timingFilenameGlob>\" {<floatingPointPrecision>}" % sys.argv[0])
 	timingFilenameGlob = sys.argv[1]
+	if len(sys.argv) >= 3:
+		floatingPointPrecision = int(sys.argv[2])
+	else:
+		floatingPointPrecision = 8
+
 	# Use glob to find all desired files
 	filenames = glob.glob(timingFilenameGlob)
 	# Process each timing file in turn
 	for fname in filenames:
 		# Retrieve contents of timing file
 		data = parseTimingFile(fname, False)
-		# TODO
-		tableStr = generateLatexTable(data)
+		# Generate and output LaTeX table
+		tableStr = generateLatexTable(data, floatingPointPrecision)
 		print(tableStr)
