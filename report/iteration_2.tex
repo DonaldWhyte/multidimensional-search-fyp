@@ -8,11 +8,11 @@ The Pyramid Tree implementation is identical to the Pseudo-Pyramid Tree implemen
 
 \subsection{B${}^+$-Tree as Underlying Structure}
 
-Berchtold et al. originally used a B${}^{+}$-tree when developing the Pyramid Tree \cite{pyramid-tree}. It was decided that using the same underlying search structure would allow for a more fair comparison of the Pyramid tree data structure. Two B${}^{+}$-tree implementations, cpp-btree\cite{cpp-btree} and bpt\cite{bpt}, were plugged and tested into the Pyramid Tree. The first is a C++ implementation while the second is a pure C implementation.
+Berchtold et al. originally used a B${}^{+}$-tree when developing the Pyramid Tree \cite{pyramid-tree}. It was decided that using the same underlying search structure would allow for a more fair comparison of the Pyramid tree data structure. Two B${}^{+}$-tree implementations, cpp-btree\cite{cpp-btree} and bpt\cite{bpt}, were used as the underlying structure for the Pyramid Tree. The first is a C++ implementation while the second is a pure C implementation.
 
 Table \ref{tab:hashtable-bplus-time-comparison} provides timings for a single synthetic dataset. There is a substantial difference between the speed of the hash table Pyramid tree and the B${}^{+}$-tree implementations. After profiling, it was discovered the main cause of the decrease in speed was simply the additional overhead incurred by splitting and merging nodes in the B${}^{+}$-tree. This matches the theoretical performance analyses of the two structures, where it is shown that hash tables and B${}^{+}$-trees have amortised $O(1)$ and $O(\log n)$ operations respectively (the former being dependant on the hashing function used).
 
-Based on these results, it has been decided to continue using the hash table and the underlying search structure, and not the B${}^{+}$-tree.
+Based on these results, it has been decided to continue using the hash table as the underlying search structure and not the B${}^{+}$-tree.
 
 \begin{table}
 	\centering
@@ -25,7 +25,7 @@ Based on these results, it has been decided to continue using the hash table and
 		\textbf{Point Query} & TODO & TODO & TODO \\
 		\hline
 	\end{tabular}
-	\caption{Total Execution Time (in Seconds) of Batch Pseudo-Pyramid Tree With Different Underlying 1D Index Structures (200D Randomly Uniform Dataset, 10,000 operations each)}
+	\caption{Total Execution Time (in Seconds) of Pseudo-Pyramid Tree With Different Underlying 1D Index Structures (200D Randomly Uniform Dataset, 10,000 operations each)}
 	\label{tab:hashtable-bplus-time-comparison}
 \end{table}
 
@@ -60,7 +60,7 @@ The same underlying implementation is used for the Pseudo-Pyramid Tree, Pyramid 
 			\hline
 			& & \multicolumn{4}{c|}{\textbf{Bucket Size Statistics}} \\
 			\hline
-			\textbf{Dataset} & \textbf{Time to Insert (sec)} & \textbf{Average} & \textbf{St. Dev} & \textbf{Min} & \textbf{Max} \\
+			\textbf{Dataset} & \textbf{Time to Query (sec)} & \textbf{Average} & \textbf{St. Dev} & \textbf{Min} & \textbf{Max} \\
 			\hline
 			\textbf{Pseudo-Pyramid Tree} & & & & & \\
 			500,000 16D Random Points & TODO & 1.0312 & 0.115177 & 1 & 4 \\
@@ -86,7 +86,7 @@ The same underlying implementation is used for the Pseudo-Pyramid Tree, Pyramid 
 	\label{tab:perf2-bucket-stats}
 \end{table}
 
-Table \ref{tab:perf2-bucket-stats} contains statistics on bucket size for all three hashing functions. TODO: discussion of results and implications
+Table \ref{tab:perf2-bucket-stats} contains statistics on bucket size of all three hashing functions, using all real datasets TODO: discussion of results and implications
 
 \subsection{Summary}
 
