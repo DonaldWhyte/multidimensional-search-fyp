@@ -155,30 +155,6 @@ These results show storing separate point arrays for each bucket, instead of usi
 
 The differences in speed between the bucket and splay tree implementations is small, but the Bucket Pseudo-Pyramid Tree slightly outperforms the Splay Tree with most datasets. Again, this may be due to having a lower cache miss rate. 
 
-\subsection{Profiling Results}
-
-CPU and heap profiling was performed on each structure to determine where the performance bottlenecks are and how much memory each structure uses. Table \ref{tab:perf1-profiling} shows which functions took the majority of the execution time for each structure, as well as how much heap memory the structure consumed when storing all of the input dataset's points. This was produced by profiling the CPU and heap when the Insert-Query-Delete operation list was executed with 500,000 random 16D points (uniform distribution).
-
-\begin{table}
-	\centering
-	\makebox[\textwidth][c]{%
-		\begin{tabular}{|l|l|l|}
-			\hline
-			\textbf{Structure} & \textbf{Peak Heap Memory (MB)} & \textbf{Dominant Function (\% Total Time Spent)} \\
-			\hline
-			Sequential Scan & 4.1 & \texttt{pointExists()} (34.4\%) \\
-			Rebuild PPT & 16.8 & \texttt{rebuild()} (60.7\%)\\
-			Bucket PPT & 11.2 & \texttt{remove()} (19.2\%) \\
-			Splay PPT & 11.8 & \texttt{insert()} (47.2\%) \\
-			\hline
-		\end{tabular}
-	}%
-	\caption{CPU and Heap Profiling Statistics for Insert-Query Delete Operation List with 500,000 Points from 16D Uniform Synthetic Dataset}
-	\label{tab:perf1-profiling}
-\end{table}
-
-TODO: analysis
-
 \subsection{Real Datasets and Impact of Bucket Size}
 
 \begin{table}
