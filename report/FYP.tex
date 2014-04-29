@@ -53,7 +53,9 @@
   \usepackage{caption}
   
   \usepackage{booktabs}  % nice looking tables
-  \usepackage{numprint} % for rounding numbers in tables
+  \newcommand{\centrespecialcell}[2][c]{ \begin{tabular}[#1]{@{}c@{}}#2\end{tabular} }
+  \newcommand{\leftspecialcell}[2][c]{ \begin{tabular}[#1]{@{}l@{}}#2\end{tabular} }  
+  \newcommand{\rightspecialcell}[2][c]{ \begin{tabular}[#1]{@{}r@{}}#2\end{tabular} }  
 
   \usepackage{fancyhdr}
   \chead{Donald Whyte}

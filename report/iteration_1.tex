@@ -1,6 +1,6 @@
 \section{Iteration \#1 -- Pseudo-Pyramid Tree}
 
-This iteration deals with the low-level implementation details of the Pseudo-Pyramid Tree index structure. Different optimisation techniques are applied to the structure and  multiple implementations of the Pseudo-Pyramid Tree are analysed to determine which is the fastest.
+This iteration deals with the low-level implementation details of the Pseudo-Pyramid Tree index structure. Different optimisation techniques are applied to the structure and multiple implementations of the Pseudo-Pyramid Tree are analysed to determine which is the fastest.
 
 \subsection{Initial Pseudo-Pyramid Tree Implementations}
 
@@ -157,6 +157,8 @@ Storing separate point arrays for each bucket, instead of using one large array 
 
 The differences in speed between the bucket and splay variants is small, but the Bucket Pseudo-Pyramid Tree outperforms the Splay Tree with most datasets. Again, this may be due to having a lower cache miss rate. With severely skewed synthetic data, the splay variant is \textit{slightly} faster, but the speed increase is negligible. This could be an indication that self-adjusting structures are useful for heavily skewed data however, highlighting an area for further study. TODO: refer to table
 
+TODO: sort out delete being so much faster???
+
 \begin{table}
 	\centering
 	\makebox[\textwidth][c]{%
@@ -166,21 +168,21 @@ The differences in speed between the bucket and splay variants is small, but the
 			\hline
 			\textbf{Structure} & \textbf{Operation} & \textbf{Astrophysics} & \textbf{Hurricane Isabel} & \textbf{Armadillo Mesh} \\
 			\hline
-			\multirow{4}{*}{Sequential Scan} & Insert & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO \\
-				& Point Query & TODO & TODO & TODO \\
+			\multirow{4}{*}{Sequential Scan} & Delete & 1315.81 & 1920.73 & TODO \\
+				& Insert & 436.385 & 691.833 & TODO \\
+				& Point Query & 435.88 & 651.428 & TODO \\
 			\hline
-			\multirow{4}{*}{Rebuild PPT} & Insert & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO \\
-				& Point Query & TODO & TODO & TODO \\
+			\multirow{4}{*}{Rebuild Index PPT} & Delete & 1856.11 & 2121.9 & TODO \\
+				& Insert & 139.346 & 117.441 & TODO \\
+				& Point Query & 139.048 & 117.292 & TODO \\
 			\hline
-			\multirow{4}{*}{Bucket PPT} & Insert & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO \\
-				& Point Query & TODO & TODO & TODO \\
+			\multirow{4}{*}{Bucket PPT} & Delete & 41.8115 & 34.8281 & TODO \\
+				& Insert & 81.231 & 69.401 & TODO \\
+				& Point Query & 70.4391 & 69.3368 & TODO \\
 			\hline
-			\multirow{4}{*}{Splay PPT} & Insert & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO \\
-				& Point Query & TODO & TODO & TODO \\
+			\multirow{4}{*}{Splay PPT} & Delete & 44.0876 & 34.8037 & TODO \\
+				& Insert & 84.0908 & 69.5318 & TODO \\
+				& Point Query & 70.3729 & 69.3996 & TODO \\
 			\hline
 		\end{tabular}
 	}%

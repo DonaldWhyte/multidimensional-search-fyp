@@ -6,8 +6,8 @@ from maps import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
-COLOURS = [ 'b', 'y', 'm', 'r' ]
-MARKERS = [ 'o', 's', 'D', 'x' ]
+COLOURS = [ 'b', 'c', 'y', 'm', 'r' ]
+MARKERS = [ 'o', 'v', 's', 'D', 'x' ]
 
 def extract2DCoordinates(points):
 	return [ p[0] for p in points ], [ p[1] for p in points ]

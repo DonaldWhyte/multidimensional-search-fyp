@@ -4,108 +4,43 @@ This iteration explores a widely used index structure based on spatial decomposi
 
 \subsection{Point $kd$-Tree}
 
-The $kd$-Tree variant described in Section \ref{sec:kd-tree-chosen} was implemented, which shall be referred to as the \textbf{Point $kd$-Tree}. Each node is represented as a C-struct which stores a single point as well as pointers to its children. Every node is allocated using a call to \texttt{malloc()}, which allocates enough memory on the heap to store the node. This means each node may reside in different areas of the heap, resulting in fragmented memory.=
+The $kd$-Tree variant described in Section \ref{sec:kd-tree-chosen} was implemented, which shall be referred to as the \textbf{Point $kd$-Tree}. Each node is represented as a C-struct which stores a single point as well as pointers to its children. Every node is allocated using a call to \texttt{malloc()}, which allocates enough memory on the heap to store the node. This means each node may reside in different areas of the heap, resulting in fragmented memory.
 
 \subsection{Performance Timings}
 
 TODO
 
-\begin{table}
-	\centering
-	\makebox[\textwidth][c]{%
-		\begin{tabular}{|r|r|l|l|l|l|l|l|l|l|}
-			\hline
-			\multicolumn{2}{|c}{} & \multicolumn{8}{|c|}{\textbf{Dimensionality}} \\
-			\hline
-			\textbf{Structure} & \textbf{Operation} & 1 & 2 & 3 & 5 & 10 & 50 & 100 & 200 \\
-			\hline
-			\multirow{3}{*}{Bucket PPT} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-			\hline			
-			\multirow{3}{*}{Bucket PT} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-			\hline			
-			\multirow{3}{*}{Bucket Hash Table} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-			\hline
-			\multirow{3}{*}{Point $kd$-Tree} & Insert & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
-			\hline
-		\end{tabular}
-	}%
-
-	\caption{Total Execution Time (in seconds) of Each Operation for Varying Number of Dimensions in Uniformly Distributed Synthetic Dataset}
-	\label{tab:perf3-dimensionality}
-\end{table}
-
 \begin{figure}
-	\begin{center}
+	\makebox[\textwidth][c]{%
 		\begin{subfloat}[\texttt{insert}\label{fig:perf3-dimensionality-insert}]{%
-			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+			\includegraphics[scale=0.5]{figures/performance_analysis/iteration_3/randuniform_insert.pdf}
 		}
-		\end{subfloat}~
-		\begin{subfloat}[\texttt{remove}\label{fig:perf3-dimensionality-remove}]{%
-			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+		\end{subfloat}
+		\begin{subfloat}[\texttt{delete}\label{fig:perf3-dimensionality-remove}]{%
+			\includegraphics[scale=0.5]{figures/performance_analysis/iteration_3/randuniform_delete.pdf}
 		}
-		\end{subfloat}~
-	\end{center}
+		\end{subfloat}
+	}%
 
 	\caption{Index Structure Performance With Respect To Dimensionality (10,000 Points from Uniform Distribution Synthetic Dataset)}
 	\label{fig:perf3-dimensionality}
 \end{figure}
 
-\begin{table}
-	\centering
-	\makebox[\textwidth][c]{%
-		\begin{tabular}{|r|r|l|l|l|l|}
-			\hline
-			\multicolumn{2}{|c}{} & \multicolumn{4}{|c|}{\textbf{Points in Dataset}} \\
-			\hline
-			\textbf{Structure} & \textbf{Operation} & 10,000 & 100,000 & 500,000 & 1,000,000 \\
-			\hline
-			\multirow{3}{*}{Bucket PPT} & Insert & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO \\
-			\hline			
-			\multirow{3}{*}{Bucket PT} & Insert & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO \\
-			\hline			
-			\multirow{3}{*}{Bucket Hash Table} & Insert & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO \\
-			\hline
-			\multirow{3}{*}{Point $kd$-Tree} & Insert & TODO & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO & TODO \\
-			\hline
-		\end{tabular}
-	}%
-
-	\caption{Total Execution Time (in seconds) of Each Operation for Varying Number of Points in Uniformly Distributed Synthetic Dataset}
-	\label{tab:perf3-size}
-\end{table}
-
 \begin{figure}
-	\begin{center}
+	\makebox[\textwidth][c]{%
 		\begin{subfloat}[\texttt{insert}\label{fig:perf3-size-insert}]{%
-			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+			\includegraphics[scale=0.5]{figures/performance_analysis/iteration_3/sizevary_insert.pdf}
 		}
-		\end{subfloat}~
-		\begin{subfloat}[\texttt{remove}\label{fig:perf3-size-remove}]{%
-			\includegraphics[scale=0.25]{figures/uniform_distribution.pdf}
+		\end{subfloat}
+		\begin{subfloat}[\texttt{delete}\label{fig:perf3-size-remove}]{%
+			\includegraphics[scale=0.5]{figures/performance_analysis/iteration_3/sizevary_delete.pdf}
 		}
-		\end{subfloat}~
-	\end{center}
+		\end{subfloat}
+	}%
 
 	\caption{Index Structure Performance With Respect To Dataset Size (10,000 Points from Uniform Distribution Synthetic Dataset)}
 	\label{fig:perf3-size}
 \end{figure}
-
 
 \begin{table}
 	\centering
@@ -116,30 +51,26 @@ TODO
 			\hline
 			\textbf{Structure} & \textbf{Operation} & \textbf{Astrophysics} & \textbf{Hurricane Isabel} & \textbf{Armadillo Mesh} \\
 			\hline
-			\multirow{4}{*}{Bucket PPT} & Insert & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO \\
-				& Random Operation List & TODO & TODO & TODO \\
+			\multirow{4}{*}{Bucket Hash Table} & Delete & 0.191339 & 0.248544 & 0.102674 \\
+				& Insert & 0.360452 & 0.419106 & 0.2828 \\
+				& Point Query & 0.172516 & 0.222288 & 0.0811833 \\
 			\hline
-			\multirow{4}{*}{Bucket PT} & Insert & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO \\
-				& Random Operation List & TODO & TODO & TODO \\
+			\multirow{4}{*}{$kd$-Tree} & Delete & 68.9612 & 578.798 & 0.91045 \\
+				& Insert & 0.663231 & 0.434781 & 0.384241 \\
+				& Point Query & 0.639265 & 0.408527 &  0.374425 \\
 			\hline
-			\multirow{4}{*}{Bucket Hash Table} & Insert & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO \\
-				& Random Operation List & TODO & TODO & TODO \\
+			\multirow{4}{*}{Bucket PPT} & Delete & 41.8115 & 34.8281 & TODO \\
+				& Insert & 81.231 & 69.401 & TODO \\
+				& Point Query & 70.4391 & 69.3368 & TODO \\
 			\hline
-			\multirow{4}{*}{Point $kd$-Tree} & Insert & TODO & TODO & TODO \\
-				& Delete & TODO & TODO & TODO \\
-				& PQuery & TODO & TODO & TODO \\
-				& Random Operation List & TODO & TODO & TODO \\
+			\multirow{4}{*}{Pyramid Tree} & Delete & 33.7258 & 34.9182 & 0.164531 \\
+				& Insert & 65.0126 & 69.5751 & 0.192165 \\
+				& Point Query & 60.0216 & 69.4891 & 0.134481 \\
 			\hline
 		\end{tabular}
 	}%
 
-	\caption{Total Execution Time (in seconds) of Each Operation for 500,000 Points Sampled From Real Datasets}
+	\caption{Total Execution Time (in seconds) of Each Operation on Sampled Real Datasets}
 	\label{tab:perf3-real}
 \end{table}
 
@@ -151,17 +82,19 @@ The cause of this is most likely the \textit{balance} of the tree. Skewed datase
 
 \begin{table}
 	\centering
-	\begin{tabular}{|l|l|l|l|}
-		\hline
-		\textbf{Dataset} & \textbf{Balance Factor} & \textbf{Max Path Length} & \textbf{Time to Query All Points (seconds)} \\
-		\hline
-		Random 10D Points (Uniform Distribution) & 24.8285 & 47 & 0.591447 \\
-		Random 10D Points (Skewed Distribution) & 24.9092 & 44 & 0.602856 \\
-		Random 10D Points (Clustered Distribution) & 30.3362 & 57 & 0.479269 \\
-		Astrophysics & 32.405 & 120 & 0.65575 \\
-		Hurricane Isabel & 47.7236 & 123 & 0.466654 \\
-		\hline
-	\end{tabular}
+	\makebox[\textwidth][c]{%
+		\begin{tabular}{|l|l|l|l|}
+			\hline
+			\textbf{Dataset} & \centrespecialcell{\textbf{Balance} \\ \textbf{Factor}} & \centrespecialcell{\textbf{Max Path} \\ \textbf{Length}} & \centrespecialcell{\textbf{Time to Query} \\ \textbf{All Points (seconds)}} \\
+			\hline
+			\leftspecialcell{Random 10D Points \\ (Uniform Distribution)} & 24.8285 & 47 & 0.591447 \\
+			\leftspecialcell{Random 10D Points \\ (Skewed Distribution)} & 24.9092 & 44 & 0.602856 \\
+			\leftspecialcell{Random 10D Points \\ (Clustered Distribution)} & 30.3362 & 57 & 0.479269 \\
+			Astrophysics & 32.405 & 120 & 0.65575 \\
+			Hurricane Isabel & 47.7236 & 123 & 0.466654 \\
+			\hline
+		\end{tabular}
+	}%
 	\caption{Point $kd$-Tree Balance Factor with 500,000 Points from Various Datasets}
 	\label{tab:kdtree-balance-factor}
 \end{table}
