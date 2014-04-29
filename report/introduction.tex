@@ -9,7 +9,7 @@ Since multi-dimensional search is a problem that appears in so many areas in com
 
 \section{Aim}
 
-This project will survey existing multi-dimensional search structures which attempt to solve the multi-dimensional search problem, identifying the major challenges of the field and how this has guided the development of structures throughout the last two decades. The core aim of the project is to implement one or more modern index structures, optimising them specifically for high-dimensional datasets. These implementation(s) will be then be evaluated with respect to their proposed performance in the literature and pre-defined baselines using test datasets. This evaluation will highlight the found performance bottlenecks in the implementations and limitations of the algorithms themselves.
+This project will survey existing multi-dimensional search structures which attempt to solve the multi-dimensional search problem efficiently, identifying the major challenges of the field and how this has guided the development of structures throughout the last two decades. The core aim of the project is to implement one or more index structures, optimising them specifically for high-dimensional datasets. These implementation(s) will then be evaluated with respect to their proposed performance in the literature and pre-defined baselines, using pre-defined test datasets. This evaluation will highlight the found performance bottlenecks in the implementations and limitations of the algorithms themselves.
 
 \section{Objectives}
 
@@ -44,7 +44,7 @@ The following will be delivered upon project completion:
 \section{Core Assumptions}
 \label{sec:core-assumptions}
 
-Throughout the project, some assumptions have been made. These are used to narrow the scope of the project and allow more time to be spent focusing on the core aim of the project (high-dimensional data). The assumptions are:
+Throughout the project, some assumptions have been made. These are used to narrow the scope of the project and allow more time to be spent focusing on the core aim of the project, which is high-dimensional data. The assumptions are:
 \begin{enumerate}
 	\item Datasets have a ``high" number of dimensions ($\geq 10$), meaning the performance of the index structures will be measured using data with at least 10 dimensions. However, data using a smaller number of dimensions may be used for the purposes of understanding how the implementations behave with respect to dimensionality.
 	\item Datasets will be able to fit into the main memory (i.e. RAM) of the machine used for evaluation. That is, none of the data is paged to secondary memory and page accesses causing reduced performance does not need to be considered.

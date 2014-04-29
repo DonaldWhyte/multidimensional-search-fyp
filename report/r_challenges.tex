@@ -1,11 +1,11 @@
 \section{Challenges in Multi-dimensional Search}
 \label{sec:challenges}
 
-A significant number of index structures were developed in the 1970s and 1980s, which were shown to provide good performance through empirical usage. Despite the efficiencies gained from these foundational structures, there are still numerous challenges to overcome. As such, work on developing new index structures has continued throughout the past twenty years. With increasing amounts of data being produced and the high number of dimensions said data may contain causes some of these existing structures to perform extremely poorly.
+A significant number of index structures were developed in the 1970s and 1980s, which were shown to provide good performance through empirical usage. Despite the efficiencies gained from these foundational structures, there are still numerous challenges to overcome. As such, work on developing new index structures has continued throughout the past twenty years. With the size and dimensionality of datasets continuously increasing, some of these existing structures start to perform extremely poorly.
 
 Four core challenges repeatedly discussed in the literature have been identified. Many attempts have been made to mitigate the effects of these challenges through new or modified index structures. This section will discuss these challenges, the impact they have on multi-dimensional search efficiency and \textit{why} they have these impacts.
 
-\subsubsection{Curse of Dimensionality}
+\subsection{Curse of Dimensionality}
 \label{sec:curse-of-dimensionality}
 
 The curse of dimensionality is a term used to refer to the issues that occur when data with large numbers of dimensions is processed \cite{curse-of-dimensionality}. Spatial partitioning of high-dimensional feature vectors or geometric points becomes difficult because large regions of the data space are empty. This causes many index structures to contain many empty or near-empty nodes/regions, resulting in a large amount of memory overhead that does not boost performance (e.g. many regions in octrees with high $d$ are completely empty but exist anyway to due to uniformly sized regions). This is especially problematic when many of the dimensions might not tell you anything relevant about the data \cite{irrelevant-dimension}, causing large amounts of memory and computation to be wasted. Relating this back to multi-dimensional search specifically, Indyk and Motwani in \cite{knn-curse-of-dimensionality} discuss how efficient \textbf{nearest neighbour search} with a small number of dimensions is ``well-solved", but with a high number of dimensions the problem is much more challenging.
@@ -14,7 +14,7 @@ The majority of index structures discussed in the literature are hierarchical. D
 
 Therefore, for high $d$, sequential scan or methods based on linear data structures (e.g. lists) often provide better performance than methods which recursively decompose space into tree structures \cite{md-structures-samet}. This leads to the conclusion that the curse of dimensionality removes many of the benefits gained from using traditional index structures when high dimensional data is used.
 
-\subsubsection{Variation in Data}
+\subsection{Variation in Data}
 
 When developing an index structure, one does not know the nature of the input data in advance. Therefore, it is unwise to make too many assumptions when evaluating the efficiency of your structure with test data. Some datasets may be uniform, some may have noticeable skew and others may have a large number of clusters with complex shapes in data space. Different index structures are more efficient with different kinds of data. For example, quad/octrees become inefficient with non-uniform and skewed data and kd-tree variants often have poor utilisation of nodes \cite{bkd-tree} (i.e. few nodes actually have many data points).
 
@@ -29,13 +29,13 @@ Comprehensively evaluating an index structure's performance therefore requires a
 \end{itemize}	
 Both generating/finding these types of data and ensuring an index structure performs well on most inputs have been found to be significant challenges.
 
-\subsubsection{Dynamically Constructing Structures}
+\subsection{Dynamically Constructing Structures}
 
 In order to provide fast queries, it is common to impose invariants that maintain a balanced structure. An invariant is a condition or property of the index structure that \textbf{must hold} to ensure good performance of queries. This is simple for static index structures, since the structure is built once and never changes. When inserting, deleting or updating points with dynamic index structures, maintaining invariants can be non-trivial. A simple example of a dynamic index structure is the red-black tree, which rotate various components of the tree repeatedly to fix broken invariants when a new point is inserted or a point is deleted \cite{introduction-to-algorithms}.
 
 These invariants can result in \texttt{insert}, \texttt{update} and \texttt{delete} operations being slow. Creating index structures that provide fast queries without requiring invariants that are expensive to maintain can be difficult. The balance between dynamic construction performance and query performance depends on the application. If the index structure must be updated often, then prioritising fast construction over fast queries may be appropriate.
 
-\subsubsection{Memory Access and Paging}
+\subsection{Memory Access and Paging}
 \label{sec:paging}
 
 Different index structures have different storage requirements. It is important to consider this when choosing/developing an index structure. Structures whose size in memory grows quickly as the amount of data increases may not be able to fit entirely in main memory, meaning some of it will have to be \textbf{paged} in secondary memory (e.g. hard disk). This drastically affects performance, as it is much slower to access the hard disk than accessing main memory. This issue is amplified for high-dimensional data, as more memory is consumed per data item.
