@@ -85,9 +85,7 @@ All implementations of the Pseudo-Pyramid Tree hash $d$-dimensional points to a 
 
 The remaining Pseudo-Pyramid implementations and the two baselines, Sequential Scan and Octree, were timed with the full collection of synthetic and real datasets. $B = 300000$ was used for the hashing function, which was found to produce the fastest speed on the target hardware through trial and error. $R=3000$ was used for the Rebuild Index Pseudo-Pyramid Tree, which caps the amount of unused memory the structure allocates at 3000 points.
 
-TODO: justificaiton for insert and delete and not query
-
-Plots with dimension against execution time are shown for \texttt{insert} and \texttt{delete} in Figure \ref{fig:perf1-dimensionality} when processing random points from a uniform distribution. The execution times for skewed and clustered data was almost identical to the uniformly random datasets. The total execution times of all three operations of each structure, for synthetic data (uniform, skewed and clustered distributions) where the dimensionality is varied, is shown in Tables \ref{tab:perf1-dimensionality-uniform}, \ref{tab:perf1-dimensionality-skewed} and \ref{tab:perf1-dimensionality-clustered} in Appendix \ref{chap:performance-timings}.
+Plots with point dimensionality against execution time for \texttt{insert} and \texttt{delete} are shown in Figure \ref{fig:perf1-dimensionality}. Plotting point query execution time adds little information, because both of these operations will perform a point query anyway (due to Core Assumption (4)). The total execution times of all three operations of each structure, for synthetic data (uniform, skewed and clustered distributions) where the dimensionality is varied, is shown in Tables \ref{tab:perf1-dimensionality-uniform}, \ref{tab:perf1-dimensionality-skewed} and \ref{tab:perf1-dimensionality-clustered} in Appendix \ref{chap:performance-timings}. For brevity, they are not included in the main report.
 
 \begin{figure}
 	\makebox[\textwidth][c]{%
@@ -146,9 +144,9 @@ These results show storing separate point arrays for each bucket, instead of usi
 		\hline
 		\textbf{Structure} & \textbf{Cache Miss Rate (\%) (2 dp)} \\
 		\hline
-		Rebuild Pseudo-Pyramid Tree & 4.65 \\
-		Bucket Pseudo-Pyramid Tree & 0.13 \\
-		Splay Pseudo-Pyramid Tree & 0.29 \\
+		Rebuild Pseudo-Pyramid Tree & 15.33 \\
+		Bucket Pseudo-Pyramid Tree & 4.65 \\
+		Splay Pseudo-Pyramid Tree & 5.24 \\
 		\hline
 	\end{tabular}
 	\caption{Cache Hit Rate for \texttt{insert} Operations with Pseudo-Pyramid Variants (200D Randomly Uniform Dataset, 10,000 operations each)}
