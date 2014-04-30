@@ -50,6 +50,7 @@ Suppose the point to query was the output of a more complex computation, where r
 Therefore, the Bucket Hash Table may be unreliable for certain applications, especially ones where the input points are the result of computations involving many arithmetic operations.
 
 \subsection{Bucket Statistics}
+\label{sec:bucket-stats}
 
 The same underlying implementation is used for the Pseudo-Pyramid Tree, Pyramid Tree and Bucket Hash Table. Only how the hashing function allocates points to buckets varies. Pyramid Tree's and Bucket Hash Table's hash functions have also been parallelised using SSE, which has made the difference between execution times of the individual hash functions of the three structures very small, allowing for a fair comparison of execution time.
 

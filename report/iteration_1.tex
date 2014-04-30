@@ -85,7 +85,9 @@ All implementations of the Pseudo-Pyramid Tree hash $d$-dimensional points to a 
 
 The remaining Pseudo-Pyramid implementations and the two baselines, Sequential Scan and Octree, were timed with the full collection of synthetic and real datasets. $B = 300000$ was used for the hashing function, which was found to produce the fastest speed on the target hardware through trial and error. $R=3000$ was used for the Rebuild Index Pseudo-Pyramid Tree, which caps the amount of unused memory the structure allocates at 3000 points.
 
-Plots with dimension against execution time are shown for \texttt{insert} and \texttt{delete} in Figure \ref{fig:perf1-dimensionality}. The execution times for skewed and clustered data was almost identical to the uniformly random datasets. The total execution times of all three operations of each structure, for synthetic data (uniform, skewed and clustered distributions) where the dimensionality is varied, is shown in Tables \ref{tab:perf1-dimensionality-uniform}, \ref{tab:perf1-dimensionality-skewed} and \ref{tab:perf1-dimensionality-clustered} in Appendix \ref{chap:performance-timings}.
+TODO: justificaiton for insert and delete and not query
+
+Plots with dimension against execution time are shown for \texttt{insert} and \texttt{delete} in Figure \ref{fig:perf1-dimensionality} when processing random points from a uniform distribution. The execution times for skewed and clustered data was almost identical to the uniformly random datasets. The total execution times of all three operations of each structure, for synthetic data (uniform, skewed and clustered distributions) where the dimensionality is varied, is shown in Tables \ref{tab:perf1-dimensionality-uniform}, \ref{tab:perf1-dimensionality-skewed} and \ref{tab:perf1-dimensionality-clustered} in Appendix \ref{chap:performance-timings}.
 
 \begin{figure}
 	\makebox[\textwidth][c]{%
@@ -103,7 +105,7 @@ Plots with dimension against execution time are shown for \texttt{insert} and \t
 	\label{fig:perf1-dimensionality}
 \end{figure}
 
-The three plots show that dimensionality has little effect on the performance of Sequential Scan. The structure \textit{slightly} decreases in speed as $d$ is increased, which is most likely because more computation needed for point comparisons, allocation and deallocation due an increased amount of data.
+The two plots show that dimensionality has little effect on the performance of Sequential Scan. The structure \textit{slightly} decreases in speed as $d$ is increased, which is most likely because more computation needed for point comparisons, allocation and deallocation due an increased amount of data.
 
 As expected, the Octree takes exponentially longer as $d$ increases, due to the exponential increase in nodes at each level ($2^d$ children per node). When $d > 10$, the number of excessive nodes was so high that the performance tests crashed because there was enough memory to store the exponentially increasing nodes.
 
@@ -189,7 +191,7 @@ The differences in speed between the bucket and splay tree implementations is sm
 	\label{tab:perf1-real}
 \end{table}
 
-Table \ref{tab:perf1-real} shows the runtime of each operation on sampled real datasets, measured using the Insert-Query-Delete operation list. Work gone into increasing the speed of the Pseudo-Pyramid Tree by exploring different implementations, which has worked to greatly accelerate the structure for most of the evaluation datasets. However, Table \ref{tab:perf1-real} shows that on the two scientific datasets, the relative speedup from Sequential Scan achieved by the Bucket Pseudo-Pyramid Tree appears low.
+Table \ref{tab:perf1-real} shows the runtime of each operation on sampled real datasets. Work gone into increasing the speed of the Pseudo-Pyramid Tree by exploring different implementations, which has worked to greatly accelerate the structure for most of the evaluation datasets. However, Table \ref{tab:perf1-real} shows that on the two scientific datasets, the relative speedup from Sequential Scan achieved by the Bucket Pseudo-Pyramid Tree appears low.
 
 For example, $500,000$ point queries with the astrophysics dataset takes 435.88 seconds with Sequential Scan and 70.4391 seconds with the Bucket Pseudo-Pyramid Tree, meaning a speedup of $\frac{435.88}{70.4391} \approx 6.18$ has been achieved. Speedup for the hurricane Isabel dataset is slightly higher, being approximately 9.39. Compare these figures to the speedup gained with the armadillo mesh, which is 2221. With such a high speedup on some datasets, and the fact there exist algorithms which can perform search in $O(log_2 n)$ time, this raised an important question: why the speedup is so low?
 
@@ -217,6 +219,6 @@ The mean, standard deviation, minimum and maximum bucket size has been used to d
 
 \subsection{Summary}
 
-All Pseudo-Pyramid tree invariants greatly outperform the two baselines, with the Octree failing to store large numbers of points or points with more than 10 dimensions due to exponential memory requirements. The defragmented and rebuild variants of the Pseudo-Pyramid are clearly inferior to batch and splay, being slower for all three operations. While the Splay Pseudo-Pyramid Tree performs the fastest for some datasets, the Bucket Pseudo-Pyramid Tree performs the fastest on the majority of the datasets. Therefore, the Bucket Pseudo-Pyramid Tree will be used for any future evaluations.
+All Pseudo-Pyramid tree invariants greatly outperform the two baselines, with the Octree failing to store large numbers of points or points with more than 10 dimensions due to exponential memory requirements. The Rebuild Index Pseudo-Pyramid are clearly inferior to batch and splay, being slower for all three operations. While the Splay Pseudo-Pyramid Tree performs the fastest for some datasets, the Bucket Pseudo-Pyramid Tree performs the fastest on the majority of the datasets. Therefore, the Bucket Pseudo-Pyramid Tree will be used for any future evaluations.
 
 With both scientific datasets, all Pseudo-Pyramid Tree variants degenerated to semi-sequential scan because they caused the hashing function to assign the same 1D value to a very large number of points. There appears to be a correlation between bucket size and the performance of hash-based structures. More research into decreasing bucket size by using different hashing functions should be performed to determine if hash-based structures can provide fast point queries for scientific datasets such as the astrophysics and hurricane Isabel simulations.
