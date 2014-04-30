@@ -1,6 +1,6 @@
 \section{Iteration \#3 -- $kd$-Tree Exploration}
 
-This iteration explores a widely used index structure based on spatial decomposition, instead of using dimension reduction via a hashing function. One implementation of the structure is evaluated alongside the best performing hash-based approaches from the previous iterations.
+Some index structures that reduce the dimensionality of points via a hashing function degenerate to semi-sequential scan when processing the two scientific datasets. To find an index structure which performs well on these scientific datasets, this iteration turns an entirely different type of structure which is based on a \textit{hierarchical} decomposition of space. An implementation of the point $kd$-Tree is evaluated alongside the best performing hash-based approaches from the previous iterations.
 
 \subsection{Point $kd$-Tree}
 

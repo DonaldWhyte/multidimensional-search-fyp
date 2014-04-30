@@ -51,7 +51,7 @@ Therefore, the Bucket Hash Table may be unreliable for certain applications, esp
 
 \subsection{Bucket Statistics}
 
-The same underlying implementation is used for the Pseudo-Pyramid Tree, Pyramid Tree and Bucket Hash Table; only the hashing function varies. Pyramid Tree's and Bucket Hash Table's hash functions have also been parallelised using SSE, which has made the difference between execution times between the hash functions of the three structures very small. The core factor which determines the performance of each structure is still bucket size. Therefore, statistics on the bucket size will be used to determine which structure is superior. As in iteration one, one synthetic dataset and all three real datasets will be used for bucket size measurement.
+The same underlying implementation is used for the Pseudo-Pyramid Tree, Pyramid Tree and Bucket Hash Table. Only how the hashing function allocates points to buckets varies. Pyramid Tree's and Bucket Hash Table's hash functions have also been parallelised using SSE, which has made the difference between execution times of the individual hash functions of the three structures very small, allowing for a fair comparison of execution time.
 
 \begin{table}
 	\centering
@@ -86,10 +86,10 @@ The same underlying implementation is used for the Pseudo-Pyramid Tree, Pyramid 
 	\label{tab:perf2-bucket-stats}
 \end{table}
 
-Table \ref{tab:perf2-bucket-stats} contains statistics on bucket size of all three hashing functions, using all real datasets and the 16D synthetic dataset.
+Since the implementation details of the three structures are similar, the bucket size will be used to compare the structures. Table \ref{tab:perf2-bucket-stats} contains statistics on bucket size of all three hashing functions, using all real datasets and the 16D synthetic dataset.
 
- TODO: discussion of results and implications
+From these results it is clear that the core factor which determines the performance of each structure is bucket size. The Pseudo-Pyramid Tree and Pyramid Tree have much larger buckets when storing the scientific datasets compared to when they store the synthetic dataset or armadillo mesh. With hurricane Isabel, one bucket in the Pyramid Tree is as large as 497,953, causing it degenerate to semi-sequential scan. When the average bucket size tends to one, all the structures can query all the points in the dataset in less than a half a second.
 
 \subsection{Summary}
 
-TODO
+This iteration has explored different hashing functions and shown that bucket size is the core factor affecting the performance of hash-based index structures. All three hashing functions explored can be used to process the synthetic data and the 3D armadillo mesh in very little time, relative to Sequential Scan. Bucket Hash Table provides the best performance for the scientific datasets because it ensures the average bucket size tends to one, but is very susceptible to floating point error. The Pyramid Tree is less susceptible to such errors, but like the Pseudo-Pyramid Tree, degenerates to semi-sequential scan for the two scientific datasets.
