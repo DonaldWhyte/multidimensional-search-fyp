@@ -5,18 +5,82 @@
 
 We have shown that the point $kd$-tree greatly outperforms the Pyramid tree for the two scientific datasets. For all synthetic data and the 3D point cloud dataset, the Pyramid tree is faster, especially with regard to point deletion.
 
-This section will explore the reasons for this, determining which characteristics in the data cause the performance of the structures to degenerate. The section will conclude by discussing the types of data suitable for the Pyramid Tree and $kd$-Tree, along with some further discussion on the implications of the results from this evaluation.
+This chapter will explore the reasons for this, determining what characteristics the astrophysics dataset cause the performance of the structures to degenerate. The chapter will conclude by discussing the types of data suitable for the Pyramid Tree and $kd$-Tree, along with some further discussion on the implications of the results from this evaluation.
 
-TODO: summary of findings so far
+\section{Characteristics of Astrophysics Dataset}
+\label{sec:data-characteristics}
 
-\section{Characteristics of Test Data}
+A dataset is considered \textit{skewed} if a greater number of points are present in certain regions of the data space than other regions of the space. That is, the underlying frequency or probability distribution of point locations is non-uniform. Figure \ref{fig:frequency-distributions} visualises uniform, Gaussian and skewed frequency distributions using histograms. Intuitively, the skewness of a dataset increases as the difference between the frequency of points in different spatial regions increases.
+
+\begin{figure}
+	\begin{center}
+		\begin{subfloat}[Uniform\label{fig:uniform-freq-distribution}]{%
+			\includegraphics[scale=0.25]{figures/freqdist_uniform.pdf}
+		}
+		\end{subfloat}~
+		\begin{subfloat}[Gaussian\label{fig:gaussian-freq-distribution}]{%
+			\includegraphics[scale=0.25]{figures/freqdist_gaussian.pdf}
+		}
+		\end{subfloat}~
+		\begin{subfloat}[Gamma (Skewed)\label{fig:skewed-freq-distribution}] {%
+			\includegraphics[scale=0.25]{figures/freqdist_gamma.pdf}
+		}
+		\end{subfloat}
+	\end{center}
+
+	\caption{Three Types of Frequency Distributions}
+	\label{fig:frequency-distributions}
+\end{figure}
+
+Histograms are used to visualise the frequency distributions of one-dimensional data. Since this project deals with multi-dimensional data, multiple histograms, one for each dimension, will be analysed.  TODO: justify why histograms will be used and their limitations
+
+Ten histograms have been generated using each dimension of the astrophysics dataset. Figure \ref{fig:astrophysics-histograms} shows the histograms of dimensions 1, 2, 3 and 7. The histograms for the remaining dimensions are provided in Appendix \ref{sec:app-histograms} for completeness, as they have distributions similar to the dimensions shown here.
+
+\begin{figure}
+	\begin{center}
+		\begin{subfloat}[Dimension 1]{%
+			\includegraphics[scale=0.36]{figures/histograms/astrophysics_500000_0.pdf}
+		}
+		\end{subfloat}~
+		\begin{subfloat}[Dimension 2]{%
+			\includegraphics[scale=0.36]{figures/histograms/astrophysics_500000_1.pdf}
+		}
+		\end{subfloat}
+	\end{center}
+
+	\caption{Frequency Distributions of Dimensions 1 and 2 of Astrophysics Dataset}
+	\label{fig:astrophysics-histograms1}
+\end{figure}
+
+\begin{figure}
+	\begin{center}
+		\begin{subfloat}[Dimension 3]{%
+			\includegraphics[scale=0.36]{figures/histograms/astrophysics_500000_2.pdf}
+		}
+		\end{subfloat}~
+		\begin{subfloat}[Dimension 7]{%
+			\includegraphics[scale=0.36]{figures/histograms/astrophysics_500000_6.pdf}
+		}
+		\end{subfloat}
+	\end{center}
+
+	\caption{Frequency Distributions of Dimensions 3 and 7 of Astrophysics Dataset}
+	\label{fig:astrophysics-histograms2}
+\end{figure}
+
+TODO: REMARKS on histograms and what it means
+
+\section{Effect of Distribution on Pyramid Tree}
 
 TODO
 
-
-\section{Distribution of Points Across Buckets}
+\section{Effect of Distribution on $kd$-Tree}
 
 TODO
+
+\section{Why So Sparse?}
+
+TODO: conjecture on why the astrophysics dataset is so sparse
 
 \section{Suitable Data for Index Structures}
 

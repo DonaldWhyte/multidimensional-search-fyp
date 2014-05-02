@@ -43,7 +43,7 @@ def parseHistogramFile(filename):
 		line = f.readline()
 		fields = line[:-1].split()
 		data = [ [ float(col) ] for col in fields ] 
-		# Use first line to get number of coloumns
+		# Use first line to get number of columns
 		for line in f.readlines():
 			fields = line[:-1].split()
 			for i in range(len(fields)):

@@ -12,9 +12,8 @@ A variety of measurements have been used to evaluate the performance of index st
 
 \begin{itemize}
 	\item \textbf{Total Execution Time} -- total time it took an operation to execute
-	\item \textbf{Cache Hit Rate} -- rate of cache hits to misses ($\frac{\text{\# cache hits}}{\text{\# cache misses}}$)
+	\item \textbf{Cache Miss Rate} -- rate of cache misses over all cache accesses ($\frac{\text{\# cache misses}}{\text{total cache accesses}}$)
 	\item \textbf{Peak Heap Memory} -- maximum amount of heap memory used at once by the simulation 
-	\item \textbf{\# Heap Allocations} -- the amount of system calls made to allocate memory on the heap
 	\item \textbf{Speedup Factor} -- increase in speed when compared to another index structure (e.g. evaluation baselines). This is given by $\frac{t_1}{t_2}$, where $t_1$ and $t_2$ are the running times of the two index structures being compared.
 \end{itemize}
 
