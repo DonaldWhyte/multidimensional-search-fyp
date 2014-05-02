@@ -37,9 +37,9 @@ Based on these results, it has been decided to continue using the hash table, no
 % http://stackoverflow.com/questions/4948780/magic-number-in-boosthash-combine
 % http://burtleburtle.net/bob/hash/doobs.html
 
-If larger bucket sizes mean more point comparisons are performed on average, then it is not unreasonable to expect an average bucket size of 1 to provide very good performance. After all, if the hashing function is an $O(d)$ operation, then it follows that \texttt{insert}, \texttt{delete} and point query operations take $O(d)$ time. 
+If larger bucket sizes mean more point comparisons are performed on average, then it is not unreasonable to expect an average bucket size of 1 to provide very good performance. If bucket size is one and the hashing function is an $O(d)$ operation, then each operation will only take $O(d)$ time, regardless of dataset size.
 
-The Bucket Hash Table also uses a \texttt{boost::unordered\_map} in the back-end, but instead of trying to exploit the spatial properties of points directly to provide good bucket size, a different, more general-purpose hashing function provided in the Boost library is used. Like the other hash-based structures discussed in this section, it is possible for two points to be hashed to the same value. However, from empirical performance tests, it has been shown that the average bucket size is almost always near one (bucket size measurements are provided in the next section), meaning most operations are performed in $O(d)$ time.
+The Bucket Hash Table is a structure which uses the same underlying implemention as a Bucket Pseudo-Pyramid Tree. However, instead of trying to exploit the spatial properties of points directly to provide good bucket size, a different, more general-purpose hashing function provided in the Boost library is used. Like the other hash-based structures discussed in this section, it is possible for two points to be hashed to the same value. However, from empirical performance tests, it has been shown that the average bucket size is almost always near one (bucket size measurements are provided in the next section), meaning most operations are performed in $O(d)$ time.
 
 A high-level algorithm describing the hashing function is given in Algorithm \ref{alg:point-hashing} in Appendix \ref{chap:supp-material}. This function hashes each individual coordinate (floating point value) and combines them using exclusive-or ($\oplus$) and bitshifting operations. A magic number representing the reciprocal of the golden ratio, $\phi = \frac{1 + \sqrt{5}}{2}$, is used when combining the hash values of individual coordinates. The choice to use the golden ratio was inspired by Jenkins' hash function\cite{hash-combine}, where it is used to ensure consecutive floating point values will be mapped to integers with large distances between them. This increases the likelihood of having points distributed more uniformly across buckets when points are clustered within a small numerical range (like they are in the astrophysics dataset).
 
@@ -61,25 +61,25 @@ The same underlying implementation is used for the Pseudo-Pyramid Tree, Pyramid 
 			\hline
 			& & \multicolumn{3}{c|}{\textbf{Bucket Size Statistics}} \\
 			\hline
-			\textbf{Dataset} & \textbf{Time to Query (sec)} & \textbf{Average} & \textbf{St. Dev} & \textbf{Max} \\
+			\textbf{Dataset} & \textbf{Time to Query (sec)} & \textbf{Average} & \textbf{Max} & \textbf{\#Buckets} \\
 			\hline
 			\textbf{Pseudo-Pyramid Tree} & & & & \\
-			500,000 16D Random Points & 0.105091 & 1.0312 & 0.115177 & 4 \\
-			500,000 Astrophysics Points & 70.4391 & 3586.57 & 24,528 & 235260 \\
-			500,000 Hurricane Isabel Points & 69.3996 & 17323.66 & 83,533 & 293949 \\
-			435,544 3D Armadillo Mesh Points & 0.141219 & 19.1465 & 14.9386 & 187 \\
+			500,000 16D Random Points & 0.105091 & 1.0312  & 4 & TODO \\
+			500,000 Astrophysics Points & 70.4391 & 3586.57 & 235260 & TODO \\
+			500,000 Hurricane Isabel Points & 69.3996 & 17323.66 & 293949 & TODO \\
+			435,544 3D Armadillo Mesh Points & 0.141219 & 19.1465 & 187 & TODO \\
 			\hline
 			\textbf{Pyramid Tree} & & & & \\
-			500,000 16D Random Points & 0.177153 & 1.16285 & 0.444827 & 7 \\
-			500,000 Astrophysics Points & 60.0216 & 358645.7 & 54145.2 & 143496 \\
-			500,000 Hurricane Isabel Points & 69.4891 & 248977 & 248976 & 497953 \\
-			435,544 3D Armadillo Mesh Points & 0.13448 & 2.45933 & 24.3335 & 1173 \\
+			500,000 16D Random Points & 0.177153 & 1.16285 & 7 & TODO \\
+			500,000 Astrophysics Points & 60.0216 & 47820.89 & 143496 & TODO \\
+			500,000 Hurricane Isabel Points & 69.4891 & 248977 & 497953 & TODO \\
+			435,544 3D Armadillo Mesh Points & 0.13448 & 2.45933 & 1173 & TODO \\
 			\hline
 			\textbf{Bucket Hash Table} & & & & \\
-			500,000 16D Random Points & 0.249102 & 1.01004 & 0.100054 & 3 \\
-			500,000 Astrophysics Points & 0.172516 & 1.01057 & 0.104108 & 4 \\
-			500,000 Hurricane Isabel Points & 0.222288 & 1.00987 & 0.0993287 & 3 \\
-			435,544 3D Armadillo Mesh Points & 0.0811833 & 1.00857 & 0.0928895 & 3 \\
+			500,000 16D Random Points & 0.249102 & 1.01004 & 3 & TODO \\
+			500,000 Astrophysics Points & 0.172516 & 1.01057 & 4 & TODO \\
+			500,000 Hurricane Isabel Points & 0.222288 & 1.00987 & 3 & TODO \\
+			435,544 3D Armadillo Mesh Points & 0.0811833 & 1.00857 & 3 & TODO \\
 			\hline
 		\end{tabular}
 	}%

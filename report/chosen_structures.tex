@@ -5,10 +5,6 @@
 
 This section describes the structures which have been chosen to be implemented, in addition to the baselines described in Section \ref{sec:baselines}. The reasons for choosing these structures and the hypotheses that were made regarding their performance on the evaluation datasets will be discussed and defined.
 
-\section{Splay Quadtree}
-
-The first index structure to implement was originally going to be the Splay Quadtree (Section \ref{sec:splay-quadtree}). However, due to the complexity of the structure, it was felt that there was not enough time in the project to both implement the structure and produce a comprehensive evaluation. It was abandoned in favour of the Pyramid Tree.
-
 \section{Pyramid Tree}
 \label{sec:pyramid-tree-detail}
 
@@ -19,7 +15,7 @@ As described in Section \ref{sec:pyramid-tree}, the Pyramid tree reduces multi-d
 \end{enumerate}
 While the database dataset is of course mapped to a spatial domain, the data may have different properties or distributions than continuous, spatial-based data such as the astrophysics turbulence simulation. Therefore, it was decided that the Pyramid Tree shall be implemented to explore if the Pyramid Tree can provide equally good performance with point queries on these scientific datasets, in addition to the data being dynamic.
 
-To elaborate on the reduction technique, the Pyramid tree partitions the data space into $2d$ Pyramids, where each is represented the $(d - 1)$ hyperplane corresponding to the Pyramid's base. Each pyramid is is segmented by splitting them along $(d-1)$ hyperplanes parallel to the base of the pyramid. The one-dimensional value of a point, called the \textit{pyramid value}, describes which Pyramid it is in and the height of that point in that Pyramid. The resultant spatial partition looks like Figure \ref{fig:pyramid-tree-buckets}, where each Pyramid segment has a corresponding bucket which stores the points.
+The reduction technique will now be explained in further detail. The Pyramid tree partitions the data space into $2d$ Pyramids where each Pyramid uses a $(d - 1)$ hyperplane for its base and the centre of the data space as its tip. Figure \ref{fig:pyramid-tree-pyramids} shows how the $2d$ pyramids extend from the centre point to the data space's boundaries. Each pyramid is is segmented by splitting them along $(d-1)$ hyperplanes parallel to the base of the pyramid. The one-dimensional value of a point, called the \textit{pyramid value}, describes which Pyramid it is in and the height of that point in that Pyramid. The resultant spatial partition looks like Figure \ref{fig:pyramid-tree-buckets}, where each Pyramid segment has a corresponding bucket which stores the points.
 
 \begin{figure}
 		\begin{center}
@@ -33,10 +29,11 @@ To elaborate on the reduction technique, the Pyramid tree partitions the data sp
 			\end{subfloat}
 		\end{center}
 
+		\caption{Pyramid Tree's Decomposition of Underlying Data Space}
 		\label{fig:pyramid-tree-partition}
 \end{figure}
 
-More formally, the pyramid value $pv_v$ of a point $v$ is given by $pv_v = (i + h_v)$, where $i$ represents the pyramid $v$ is contained in and $h_v$ is height of $v$ in pyramid $i$. $i$ and $h_v$ are given in Equations \ref{eq:pyramid-value-index} and \ref{eq:pyramid-value-height} respectively, where $MOD$ refers to the modulo operator.
+More formally, the pyramid value $pv_v$ of a point $v$ is given by $pv_v = (i + h_v)$, where $i$ represents the pyramid $v$ is contained in, and $h_v$ is height of $v$ in pyramid $i$. $i$ and $h_v$ are given in Equations \ref{eq:pyramid-value-index} and \ref{eq:pyramid-value-height} respectively, where $MOD$ refers to the modulo operator.
 
 \begin{multline}\\
 	i = \begin{cases}
@@ -59,7 +56,7 @@ Let $d$ be the number of dimensions and $x = (x_0, x_1, \dots, x_{d -1})$, $y = 
 	\item $\forall k \; 0 \leq k \leq d, k \neq 0: \;\; \lvert 0.5 - x_0 \rvert \geq \lvert 0.5 - x_k \rvert$,
 	\item $\forall k \; 0 \leq k \leq d, k \neq 0: \;\; \lvert 0.5 - y_0 \rvert \geq \lvert 0.5 - y_k \rvert$.
 \end{enumerate}
-Since $x_0 \leq 0.5$ and $y \leq 0.5$, both $x$ and $y$ are mapped to pyramid 0 ($i = 0$). It follows that $h_x = h_y = \lvert 0.5 - v_{0 \; MOD \; 3} \rvert = \lvert 0.5 - v_{0} \rvert = \lvert 0.5 - 0 \rvert = 0.5$. $pv_x = pv_y = 0 + 0.5 = 0.5$ and $x \neq y$, meaning two distinct points can have the same Pyramid value.
+Since $x_0 \leq 0.5$ and $y_0 \leq 0.5$, both $x$ and $y$ are mapped to pyramid 0 ($i = 0$). It follows that $h_x = h_y = \lvert 0.5 - v_{0 \; MOD \; d} \rvert = \lvert 0.5 - v_{0} \rvert = \lvert 0.5 - 0 \rvert = 0.5$. $pv_x = pv_y = 0 + 0.5 = 0.5$ and $x \neq y$, meaning two distinct points can have the same Pyramid value.
 
 \end{proof}
 
@@ -77,9 +74,9 @@ The School of Computing have an implementation of an index structure which is si
 	\label{fig:point-boundary-distance}
 \end{wrapfigure}
 
-To determine if a point $p$ is stored in the structure, $p$ is first hashed into its one-dimensional representation. The corresponding bucket is then sequentially scanned until the point is found or the end of the bucket is reached. To reduce the number of floating point comparisons, especially for large $d$, the \textit{sums} of each point are stored when they are inserted. This way, a $O(d)$ point comparison needs to be made if the $O(1)$ point sum comparison passes. Simple optimisations were initially made to the original implementation. The original implementation passed many heap allocated structures by-value, resulting in excessive copies and more time being spent allocating memory and copying data. These copies were not necessary and were removed where possible by passing the data by-reference.
+To determine if a point $p$ is stored in the structure, $p$ is first hashed into its one-dimensional representation. The corresponding bucket is then sequentially scanned until the point is found or the end of the bucket is reached. To reduce the number of floating point comparisons, especially for large $d$, the \textit{sums} of each point are stored when they are inserted. This way, a $O(d)$ point comparison needs to be made if the $O(1)$ point sum comparison passes. he original implementation passed many heap allocated structures by-value, resulting in excessive copies and more time being spent allocating memory and copying data. These copies were not necessary and were removed where possible by passing the data by-reference. 
 
-In this report, this variant of the Pyramid Tree shall be called the \textbf{Pseudo-Pyramid Tree}. This is because the hashing function used is \textit{inspired} by the Pyramid tree, but is not the same. Let $min_i$ and $max_i$ define the minimum and maximum bounds for dimension $i$ and $p$ be a point. To hash $p$, how far along the boundary $p$ is in each dimension is computed using Equation \ref{eq:point-boundary-distance} first. See Figure \ref{fig:point-boundary-distance} for an illustration of what these values mean.
+In this report, this index structure shall be called the \textbf{Pseudo-Pyramid Tree}. This is because the hashing function used is \textit{inspired} by the Pyramid tree, but is not the same. Let $min_i$ and $max_i$ define the minimum and maximum bounds for dimension $i$ and $p$ be a point. To hash $p$, how far along the boundary $p$ is in each dimension is computed using Equation \ref{eq:point-boundary-distance} first. See Figure \ref{fig:point-boundary-distance} for an illustration of what these values mean.
 
 \begin{equation}
 	h_i(p) = \frac{p_i - min_i}{max_i - min_i}
@@ -100,11 +97,11 @@ Higher $B$ means higher $m$. This increases the magnitude of $h_i(p)$ before it 
 
 The $kd$-Tree is a widely used structure for both low and high dimensional data. In the literature, there is a lot of discussion as to how and why this structure performs poorly in a high-dimensional setting \cite{highd-nn, search-highd-analysis}. This reveals that $kd$-trees are typically used for \textit{approximate} queries in higher-dimensional space, as they tend to degenerate to Sequential Scan for exact range and nearest neighbour queries \cite{similarity-searching}. 
 
-Similar to the Pyramid Tree, the focus of the literature on $kd$-Trees is typically for range and nearest neighbour queries, and not point queries. Unlike the Pyramid Tree however, dynamic variants of $kd$-Trees have been explored much more (e.g. in \cite{bkd-tree, kdb-tree}), with the original paper proposing operations for incremental insertion and removal \cite{kd-tree}. The structure will be implemented because of it is dynamic and widely adopted in the field. Additionally, since the $kd$-Tree is a different class of index structure, not being a dimension reduction technique, a more comprehensive evaluation of the efficiency of all chosen structures can be produced.
+Similar to the Pyramid Tree, the focus of the literature on $kd$-Trees is typically for range and nearest neighbour queries, and not point queries. Unlike the Pyramid Tree however, dynamic variants of $kd$-Trees have been explored much more (e.g. in \cite{bkd-tree, kdb-tree}), with the original paper proposing operations for incremental insertion and removal \cite{kd-tree}. The structure will be implemented because it is dynamic and widely adopted in the field. Additionally, since the $kd$-Tree is a different class of index structure, not being a dimension reduction technique, a more comprehensive evaluation of the efficiency of all chosen structures can be produced.
 
 $kd$-Trees will now be explained in more detail. The structure is a multi-dimensional binary tree, meaning it does not have the exponential memory requirements the Octree has. $kd$-Trees split the data space along a single dimension at each level of the tree (known as a level's \textit{cutting dimension}), instead of splitting by \textit{all} dimensions.
 
-The variant of the tree implemented for this project contains one point per node and cycles through each dimension when choosing deciding which cutting dimension to use for each level of the tree. If $n$ is a $kd$-tree node, $i$ is the cutting dimension on that node's level and $p$ is the point stored in this node, then:
+The variant of the tree implemented for this project contains one point per node and cycles through each dimension when choosing a cutting dimension to use for each level of the tree. If $n$ is a $kd$-tree node, $i$ is the cutting dimension on that node's level and $p$ is the point stored in this node, then:
 \begin{enumerate}
 	\item $\forall q$ stored in the \textbf{left} subtree rooted at $n$: $p_i > q_i$ 
 	\item $\forall q$ stored in the \textbf{right} subtree rooted at $n$: $p_i \leq q_i$.

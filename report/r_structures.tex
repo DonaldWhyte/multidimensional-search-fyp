@@ -143,6 +143,7 @@ Another non-hierarchical index structure that has been used are hash maps \cite{
 
 
 \subsection{History-sensitive Structures}
+\label{sec:history-sensitive-structures}
 
 Given the same data twice, most structures will behave exactly the same. That is, how the structure builds itself and access times have little, if any, variation. There are some structures which are \textbf{history-sensitive}, meaning that their behaviour is either non-deterministic, involving some element of randomness that affects how the structure performs over time, or self-adjusting, changing itself based on how the stored data is accessed. These can allow structures to be much more dynamic and adjust themselves to perform optimal search based on the application it's being used in. Two of these structures, the quadtreap and splay quadtree, are described here.
 

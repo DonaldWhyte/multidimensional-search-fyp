@@ -22,19 +22,15 @@ One assumption being made about the target data is that it is dynamic, meaning p
 \section{Timing Operations}
 \label{sec:timing-operations}
 
-\textbf{Amortised analysis}, introduced by Tarjan in 1985, is used to analyse the performance of algorithms over a sequence of operations, rather than an individual one \cite{amortised-analysis}. This type of analysis is typically used for algorithms where some operations take longer than others, with the goal of making operations later quicker. The amortised time complexity of an algorithm. Some index structures, particularly self-adjusting ones, have used this to bound the running time of their operations, such as the Splay Tree, Quadtreap and Splay Quadtree \cite{splay-tree, quadtreap, splay-quadtree}.
+Amortised analysis, introduced by Tarjan in 1985, is used to analyse the performance of algorithms over a sequence of operations, rather than an individual one \cite{amortised-analysis}. This type of analysis is typically used for algorithms where some operations take longer than others in order to make future operations quicker. The amortised time complexity of an algorithm describes the \textit{average} runtime of an operation over a sequent of operations. Some index structures, particularly self-adjusting ones, have used this to bound the running time of their operations, such as the Splay Tree, Quadtreap and Splay Quadtree (see Section \ref{sec:history-sensitive-structures}).
 
-This project will use a similar concept for measuring the execution time of the structures. Instead of measuring the time of a single operartion, the times of many thousands of operations will be measured. This is to get an idea on what the runtime of an operation is on average, over a sequence of operations. This prevents single, slow operations from causing the execution time to appear worse, or short operations making the performance appear better. A typical performance test therefore has the following steps:
+This project will use a similar concept for measuring the execution time of the structures. Instead of measuring the time of a single operation, the times of many thousands of operations will be measured. This is to get an idea on what the runtime of an operation is on average, over a sequence of operations. This prevents single, slow operations from causing the execution time to appear worse, or short operations making the performance appear better. A typical performance test will the \textbf{Insert-Query-Delete} operation list, which has the following steps:
 \begin{enumerate}
 	\item \textbf{Initial Build} -- incrementally build structure by adding each point in test dataset one-by-one
-	\item \textbf{Query Points} -- query each point in the dataset, which should not be in the structure
+	\item \textbf{Query Points} -- query each point in the dataset
 	\item \textbf{Delete Points} -- delete each point in the dataset from the structure until it is empty
 \end{enumerate}
-Using this process allows the runtime of large numbers of \texttt{insert}, \texttt{delete} and point query operations to be measured. Any performance tests of sequences of operations will be performed twice, and the recorded time will be the \textit{average} of the two times.
-
-By interleaving \texttt{insert} and \texttt{delete} operations with a number of point queries, more insight can be gained into how well the implementations perform in real applications that use dynamic data structures, where the pattern of operations is less straightforward. The performance of the implementations on interleaved operations may be different from the test process described previously due to cache coherency. The contents of the cache may change frequently due to different operations being performed consecutively, potentially causing a greater number of cache misses.
-
-The term \textbf{operation list} will be used to refer to a sequence of operations. Each operation will either be an \texttt{insert}, \texttt{delete} or point query, and will be paired with a $d$-dimensional point. These points will be pulled from the datasets described in the next section. Two main operation lists will be used for testing with a given dataset. rst, called \textbf{Insert-Query-Delete}, inserts each point in the dataset, then queries each point and finally deletes each point. The total execution time of each operation type The fiwill be measured. The second operation list, \textbf{Random Operations}, contains randomly generated interleaved operations using points taken from the target dataset and points \textit{not present} in the dataset. This is being used to measure how well the structures perform in scenarios that may occur if the structure was used in a real application, as it contains interleaved operations and queries with non-existent points.
+Using this process allows the runtime of large numbers of \texttt{insert}, \texttt{delete} and point query operations to be measured. Any performance tests of sequences of operations will be performed five times, and the recorded time will be the \textit{average} of those five times.
 
 \section{Datasets}
 \label{sec:datasets}
@@ -43,11 +39,11 @@ This section defines the datasets that will be used for the evaluation. Both syn
 
 \subsection{Synthetic Datasets}
 
- Three types of randomly generated \textit{synthetic} datasets will be generated, which are uniformly distributed, skewed and clustered. All generated points are in $[0,1]^d$. Multiple instances of these datasets will be used, with varying numbers of dimensions. Using such datasets was inspired by Wang et al. and Berchtold et al., who used similar datasets to evaluate the performance of the PK-tree and pyramid tree respectively \cite{pk-tree, pyramid-tree}. The reason for testing the index structures with these datasets is that the variety of point distributions and number of dimensions should tease out which data the implementations struggle with and which they work well at.
+Three types of randomly generated \textit{synthetic} datasets will be generated, which are uniformly distributed, skewed and clustered. All generated points are in $[0,1]^d$. Multiple instances of these datasets will be used, with varying numbers of dimensions. Using such datasets was inspired by Wang et al. and Berchtold et al., who used similar datasets to evaluate the performance of the PK-tree and pyramid tree respectively \cite{pk-tree, pyramid-tree}. The reason for testing the index structures with these datasets is that the variety of point distributions and number of dimensions should tease out which data the implementations struggle with and which they work well at.
 
-The synthetic data was generating randomly using the \texttt{boost::random} library and the Mersenne twister pseudorandom number generator (PRNG) \cite{mersenne-twister}.  The Mersenne twister passes ``stringent statistical tests" of randomness, including diehard \cite{mersenne-twister}. \texttt{boost::random} was chosen over using the C standard library function \texttt{rand()} because the latter is platform-dependant, so it is know as to what underlying PRNG will be used and if it passes these stastical tests.
+The synthetic data was generated randomly using the \texttt{boost::random} library and the Mersenne twister pseudorandom number generator (PRNG) \cite{mersenne-twister}.  The Mersenne twister passes ``stringent statistical tests" of randomness, including diehard \cite{mersenne-twister}. The \texttt{boost::random} function was chosen over using the C standard library function \texttt{rand()} because the latter is platform-dependent. Therefore, one cannot assume the underlying PRNG used by \texttt{rand()} passes these statistical tests.
 
-Figure \ref{fig:synthetic-data} shows 2D randomly generated points using uniform, skewed and clustered distributions. Skewed data was generated by applying a power to the number. Let $p$ be a generated point. Since $0 \leq p_i \leq 1$ for all $i \in \lbrace 1, ..., d \rbrace$, this means $p_i^e \leq p_i$ for all $e \geq 1$. This makes smaller values more likely, generating a skewed distribution of points. $e = 1.5$ was used for all skewed datasets generated. The clustered datasets contain two clusters of points, each contained within the hypercubes $[0,0.5]^d$ and $[0.7,0.8]^d$.
+Figure \ref{fig:synthetic-data} shows 2D randomly generated points using uniform, skewed and clustered distributions. Skewed data was generated by applying a power to the number. Let $p$ be a generated point. Since $0 \leq p_i \leq 1$ for all $i \in \lbrace 1, ..., d \rbrace$, this means $p_i^e \leq p_i$ for all $e \geq 1$. This makes smaller values more likely, generating a skewed distribution of points. $e = 1.5$ was used for all skewed datasets generated. The clustered datasets contain two clusters of points, each contained within the hypercubes $[0,0.5]^d$ and $[0.7,0.8]^d$. There is zero probability that points will appear outside of those cubes.
 
 \begin{figure}
 	\begin{center}
@@ -69,7 +65,7 @@ Figure \ref{fig:synthetic-data} shows 2D randomly generated points using uniform
 	\label{fig:synthetic-data}
 \end{figure}
 
-Multiple synthetic datasets with 10,000 points have been generated for each distribution, with varying numbers of dimensions. Tests using these datasets will measure the \textit{total} runtime of the operations. The structures will also be measured against data of varying size. 500,000 randomly generated points with a uniform probability distribution has been generated, which will be sampled to construct each dataset. The large dataset has 16 dimensions, which was chosen to match the tests performed by Berchtold et. al for their Pyramid Tree in \cite{pyramid-tree}. The total runtime will also be used to measure performance against these datasets, despite the number of operations varying. Relationships between structure performance and dataset size can be still be gleaned using this measurement (e.g. if runtime increases linearly with dataset size, we can conclude that an implementation roughly has $O(n)$ performance). The Insert-Query-Delete operation list will be used for all of these datasets. 
+Multiple synthetic datasets with 10,000 points have been generated for each distribution, with varying numbers of dimensions. Tests using these datasets will measure the \textit{total} runtime of the operations. The structures will also be measured against data of varying size. Randomly generated points with a uniform probability distribution have been generated, which will be sampled to construct each dataset. This dataset has 500,000 points and 16 dimensions, which was chosen to match the tests performed by Berchtold et al. for their Pyramid Tree in \cite{pyramid-tree}. The total runtime will also be used to measure performance against these datasets, despite the number of operations varying. Relationships between structure performance and dataset size can be still be gleaned using this measurement (e.g. if runtime increases linearly with dataset size, we can conclude that an implementation roughly has $O(n)$ performance). The Insert-Query-Delete operation list will be used for all of these datasets. 
 
 \subsection{Real Datasets}
 
@@ -105,23 +101,27 @@ For intermediate evaluations, it was decided to use smaller instances of these d
 
 $500,000$ points will be sampled from timestep 100 and 24 of the astrophysics turbulence and hurricane Isabel simulations respectively. These timesteps were chosen because there is a greater amount of \textit{``activity"} in the data. That is, the phenomena being modelled starts develop as more time passes, meaning there is a greater variety of points and the distributions. The timesteps at the start of such simulations tend to be sparse and uniform. Both of these timesteps still contain some amount of sparsity however, resulting in dense regions of activity surrounded by relatively sparse, uniform regions. This type of data is common in scientific computation, so these datasets should act as a good test on how well the index structures can handle data in such a domain.
 
-The sampled points will be used as the real datasets for the evaluation, with both the Insert-Query-Delete and Random Operations lists. Again, the total runtime of operations will be measured Table \ref{tab:operation-lists} shows the operation lists that will be used for evaluation, which datasets the points will be pulled from, the different values the varying parameter (dimension or dataset size) will have and what performance measure will be used for an operation. All 435,544 points of the 3D armadillo mesh will be used.
+The sampled points will be used as the real datasets for the evaluation, using the Insert-Query-Delete operations list to time the structures. Again, the total runtime of operations will be measured Table \ref{tab:operation-lists} shows the operation lists that will be used for evaluation, which datasets the points will be pulled from, the different values the varying parameter (dimension or dataset size) will have and what performance measure will be used for an operation. All 435,544 points of the 3D armadillo mesh will be used.
 
 \begin{table}
 	\centering
 	\makebox[\textwidth][c]{%
-	\begin{tabular}{|p{3.5cm}|p{4cm}|p{3.5cm}|p{4cm}|p{4cm}|}
+	\begin{tabular}{|p{4.5cm}|p{3.5cm}|p{2cm}|p{3cm}|}
 		\hline
-		\textbf{Operation List} & \textbf{Dataset(s)} & \textbf{Varying Parameter} & \textbf{Parameter Values}  \\
+		\textbf{Dataset(s)}
+			& \leftspecialcell{\textbf{Fixed} \\ \textbf{Parameter(s)}}
+			& \leftspecialcell{\textbf{Varying} \\ \textbf{Parameter}}
+			& \textbf{Parameter Values}  \\
 		\hline
-		Insert-Query-Delete & Uniform, Skewed, Clustered & Dimension & 1, 2, 3, 5, 8, 10, 30, 50, 100, 200 \\
-		Insert-Query-Delete & Uniform & Input Size & 10, 100, 1,000, 5,000, 10,000, 50,000, 100,000, 500,000 \\
-		Insert-Query-Delete & Astrophysics ($t = 100$) & - & - \\
-		Random Operations & Astrophysics ($t = 100$) & - & - \\
-		Insert-Query-Delete & Hurricane Isabel ($t = 24$) & - & - \\
-		Random Operations & Hurricane Isabel ($t = 24$) & - & - \\
-		Insert-Query-Delete & Armadillo Mesh & - & - \\
-		Random Operations & Armadillo Mesh & - & - \\
+		Uniform, Skewed, Clustered & 10,000 Points & Dimension & \leftspecialcell{1, 2, 3, 5, 10, \\ 50, 100, 200} \\
+		\hline
+		16D Uniform & 16 dimensions & Input Size & \leftspecialcell{10,000, 100,000, \\ 500,000} \\
+		\hline
+		Astrophysics ($t = 100$) & \leftspecialcell{10 dimensions, \\500,000 points} & - & - \\
+		\hline
+		Hurricane Isabel ($t = 24$)& \leftspecialcell{13 dimensions, \\500,000 points} & - & - \\
+		\hline
+		Armadillo Mesh & \leftspecialcell{3 dimensions, \\435,544 points} & - & -\\
 		\hline
 	\end{tabular}}%
 	\caption{Operation Lists Used for Main Evaluation}

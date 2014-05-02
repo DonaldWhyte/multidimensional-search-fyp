@@ -3,18 +3,7 @@ ExampleSuite
 ./results/
 1
 
-kdtree
 pyramid_tree
 
-randuniform Dimensions
-	1 randuniform_1d.dat
-	10 randuniform_10d.dat
-	100 randuniform_100d.dat
-sizevary Points
-	500000 sizevary_n500000.dat
 astrophysics Points
-	100000 astrophysics_100000.dat
-armadillo Points
-	0 armadillo_unique.dat
-hurricane Points
-	0 hurricane_100000.dat
+	500000 astrophysics_500000.dat
