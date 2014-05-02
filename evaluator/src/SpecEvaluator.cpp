@@ -5,6 +5,7 @@
 #include "KDTree.h"
 #include "BucketKDTree.h"
 #include "PyramidTree.h"
+#include "DuplicateHashTable.h"
 
 namespace mdsearch
 {
@@ -134,6 +135,7 @@ namespace mdsearch
 						KDTree* kdTree = dynamic_cast<KDTree*>(structure);
 						PyramidTree* pyramidTree = dynamic_cast<PyramidTree*>(structure);
 						BucketKDTree* bucketKDTree = dynamic_cast<BucketKDTree*>(structure);
+						DuplicateHashTable* dht = dynamic_cast<DuplicateHashTable*>(structure);
 
 						// TIME INSERT
 						Timing startTime = getTime();
@@ -157,8 +159,17 @@ namespace mdsearch
 						}
 						else if (pyramidTree)
 						{
+							std::cout << "Average Bucket Size: " << pyramidTree->averagePointsPerBucket() << std::endl;
+							std::cout << "Total # Buckets: " << pyramidTree->numBuckets() << std::endl;
+							std::cout << "Max Bucket Size: " << pyramidTree->maxPointsPerBucket() << std::endl;
 							std::string outputFilename = "pyramidtree_" + dsSpec->name + "_" + subSpec->name + ".hist";
 							pyramidTree->toHistogramFile(outputFilename);
+						}
+						else if (dht)
+						{
+							std::cout << "Average Bucket Size: " << dht->averagePointsPerBucket() << std::endl;
+							std::cout << "Total # Buckets: " << dht->numBuckets() << std::endl;
+							std::cout << "Max Bucket Size: " << dht->maxPointsPerBucket() << std::endl;
 						}
 
 						// TIME PQUERY

@@ -148,6 +148,11 @@ namespace mdsearch
 		return total;
 	}
 
+	unsigned int PyramidTree::numBuckets() const
+	{
+		return hashMap.size();
+	}
+
 	Real PyramidTree::averagePointsPerBucket() const
 	{
 		return static_cast<Real>(numPointsStored()) / hashMap.size();

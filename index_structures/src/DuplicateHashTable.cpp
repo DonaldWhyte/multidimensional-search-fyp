@@ -124,6 +124,11 @@ namespace mdsearch
 		return total;
 	}
 
+	unsigned int DuplicateHashTable::numBuckets() const
+	{
+		return hashMap.size();
+	}
+
 	Real DuplicateHashTable::averagePointsPerBucket() const
 	{
 		return static_cast<Real>(numPointsStored()) / hashMap.size();

@@ -48,6 +48,8 @@ namespace mdsearch
 
 		/* Return total number of points currently stored in the structure. */
 		unsigned int numPointsStored() const;
+		/* Return total number of buckets in structure. */
+		unsigned int numBuckets() const;
 		/* Return average number of points stored in a bucket. */
 		Real averagePointsPerBucket() const;
 		/* Return standard deviation of points in buckets. */
