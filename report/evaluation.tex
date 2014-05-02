@@ -32,17 +32,19 @@ A dataset is considered \textit{skewed} if a greater number of points are presen
 	\label{fig:frequency-distributions}
 \end{figure}
 
-Histograms are used to visualise the frequency distributions of one-dimensional data. Since this project deals with multi-dimensional data, multiple histograms, one for each dimension, will be analysed.  TODO: justify why histograms will be used and their limitations
+Histograms are used to visualise the frequency distributions of one-dimensional data. Since this project deals with multi-dimensional data, multiple histograms, one for each dimension, will be produced. The astrophysics dataset was computed using a 3D sampling lattice, computing ten fields at each point. The original simulation imposes continuous, spatial relationships between the points through interpolation \cite{TODO}. TODO Carr et. al \cite{histograms-and-isosurfaces}
 
-Ten histograms have been generated using each dimension of the astrophysics dataset. Figure \ref{fig:astrophysics-histograms} shows the histograms of dimensions 1, 2, 3 and 7. The histograms for the remaining dimensions are provided in Appendix \ref{sec:app-histograms} for completeness, as they have distributions similar to the dimensions shown here.
+While Carr et. al have shown that   TODO: justify why histograms will be used and their limitations
+
+Ten histograms have been generated using each dimension of the astrophysics dataset. Figure \ref{fig:astrophysics-histograms} shows the histograms of dimensions 1, 2, 3 and 7. The histograms for the remaining dimensions are provided in Appendix \ref{sec:app-histograms}, and not here, because they have distributions similar to the dimensions shown here.
 
 \begin{figure}
 	\begin{center}
-		\begin{subfloat}[Dimension 1]{%
+		\begin{subfloat}[Dimension 1 (total particle density)]{%
 			\includegraphics[scale=0.36]{figures/histograms/astrophysics_500000_0.pdf}
 		}
 		\end{subfloat}~
-		\begin{subfloat}[Dimension 2]{%
+		\begin{subfloat}[Dimension 2 (gas temperature)]{%
 			\includegraphics[scale=0.36]{figures/histograms/astrophysics_500000_1.pdf}
 		}
 		\end{subfloat}
@@ -54,11 +56,11 @@ Ten histograms have been generated using each dimension of the astrophysics data
 
 \begin{figure}
 	\begin{center}
-		\begin{subfloat}[Dimension 3]{%
+		\begin{subfloat}[Dimension 3 (H mass abundance)]{%
 			\includegraphics[scale=0.36]{figures/histograms/astrophysics_500000_2.pdf}
 		}
 		\end{subfloat}~
-		\begin{subfloat}[Dimension 7]{%
+		\begin{subfloat}[Dimension 7 (He${}^{++}$ mass abundance)]{%
 			\includegraphics[scale=0.36]{figures/histograms/astrophysics_500000_6.pdf}
 		}
 		\end{subfloat}
@@ -67,6 +69,8 @@ Ten histograms have been generated using each dimension of the astrophysics data
 	\caption{Frequency Distributions of Dimensions 3 and 7 of Astrophysics Dataset}
 	\label{fig:astrophysics-histograms2}
 \end{figure}
+
+Total particle density (D) and gas temperature (G), the first two dimensions, appear to have the greatest
 
 TODO: REMARKS on histograms and what it means
 
@@ -80,8 +84,12 @@ TODO
 
 \section{Why So Sparse?}
 
-TODO: conjecture on why the astrophysics dataset is so sparse
+TODO: conjecture on why the astrophysics dataset is so sparse -- referencing literature and how this might support stuff
 
 \section{Suitable Data for Index Structures}
+
+TODO
+
+\section{Project Process}
 
 TODO
