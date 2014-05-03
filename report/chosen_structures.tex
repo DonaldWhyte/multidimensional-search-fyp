@@ -62,17 +62,17 @@ Since $x_0 \leq 0.5$ and $y_0 \leq 0.5$, both $x$ and $y$ are mapped to pyramid 
 
 \section{Pseudo-Pyramid Tree}
 
-The School of Computing have an implementation of an index structure which is similar to the Pyramid Tree. Like the Pyramid Tree, it reduces $d$-dimensional points to a single dimension, which is used to search for the original point in a one-dimensional search structure. Each 1D key has its own bucket that contains references to the original points which are mapped to it. Being another dimension reduction approach and have similarities to the Pyramid Tree, this will be implemented and evaluated alongside the other chosen structures. 
-
 \begin{wrapfigure}[12]{r}{0.5\textwidth}
-	\vspace{-40pt}
+	\vspace{-30pt}
 	\begin{center}
-		\includegraphics[scale=0.6]{figures/pseudo-pyramid_tree_point_boundary_distances.pdf}
+		\includegraphics[scale=0.85]{figures/pseudo-pyramid_tree_point_boundary_distances.pdf}
 	\end{center}
 	\vspace{-20pt}
-	\caption{Computing Distance of Point Along Pseudo-Pyramid Tree Boundary Along Each Dimension}
+	\caption{Computing Distance of Point Along Pseudo-Pyramid Tree Boundary for Each Dimension}
 	\label{fig:point-boundary-distance}
 \end{wrapfigure}
+
+The School of Computing have an implementation of an index structure which is similar to the Pyramid Tree. Like the Pyramid Tree, it reduces $d$-dimensional points to a single dimension, which is used to search for the original point in a one-dimensional search structure. Each 1D key has its own bucket that contains references to the original points which are mapped to it. Being another dimension reduction approach and have similarities to the Pyramid Tree, this will be implemented and evaluated alongside the other chosen structures. 
 
 To determine if a point $p$ is stored in the structure, $p$ is first hashed into its one-dimensional representation. The corresponding bucket is then sequentially scanned until the point is found or the end of the bucket is reached. To reduce the number of floating point comparisons, especially for large $d$, the \textit{sums} of each point are stored when they are inserted. This way, a $O(d)$ point comparison needs to be made if the $O(1)$ point sum comparison passes. he original implementation passed many heap allocated structures by-value, resulting in excessive copies and more time being spent allocating memory and copying data. These copies were not necessary and were removed where possible by passing the data by-reference. 
 
