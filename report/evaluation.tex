@@ -30,7 +30,7 @@ This chapter will explore the reasons for this, determining what characteristics
 	\label{fig:frequency-distributions}
 \end{figure}
 
-A dataset is considered \textit{skewed} if a greater number of points are present in certain regions of the data space than other regions of the space. That is, the underlying frequency or probability distribution of point locations is non-uniform. Figure \ref{fig:frequency-distributions} visualises uniform, Gaussian and skewed frequency distributions using histograms. Intuitively, the skewness of a dataset increases as the difference between the frequency of points in different spatial regions increases.
+A dataset is considered \textit{skewed} if a greater number of points are present in certain regions of the data space than other regions of the space. That is, the underlying frequency or probability distribution of point locations is non-uniform. Figure \ref{fig:frequency-distributions} visualises uniform, Gaussian and skewed frequency distributions using histograms. Intuitively, the skewness of a dataset increases as the \textit{difference} between the frequency/probability of points in different spatial regions increases.
 
 Histograms are used to visualise the frequency distributions of one-dimensional data. Since this project deals with multi-dimensional data, multiple histograms, one for each dimension, can be produced to gain insight into point distribution. The astrophysics dataset was computed using a 3D sampling lattice, computing ten fields at each point. The original simulation imposes uses interpolation between points in the sampling lattice \cite{astrophysics-dataset}. Carr et al. discusses how this interpolation ``implicitly applies the spatial relation between sample points" and shows that histograms are equivalent to nearest-neighbour interpolation. This means histograms poorly represent datasets that use higher-order interpolants, such as the astrophysics dataset, because it ``over-emphasizes densely-sampled regions and under-emphasizes sparsely-sampled regions". 
 
@@ -72,13 +72,42 @@ Ten histograms have been generated using each dimension of the sampled astrophys
 \begin{enumerate}
 	\item the first two dimensions, total particle density and gas temperature, appear to have the greatest variance, although there are still very large peaks
 	\item the majority of points are clustered on the lower or upper boundaries of dimensions 3, 4, 5 and 6. The respective histograms have massive peaks at either end of the distribution and much smaller peaks in-between
-	\item the majority of the points are clustered on the lower boundary of dimensions 7, 8, 9 and 10, (single large peak)
+	\item the majority of the points are clustered on the lower boundary of dimensions 7, 8, 9 and 10 (single large peak at lower boundary)
 \end{enumerate}
-The astrophysics dataset is therefore highly skewed, since most points are clustered at the boundaries of the dimensions.
+The astrophysics dataset is therefore highly skewed, since most points are clustered at the boundaries of the dimensions. It follows that the vast majority of the data space has little to no points, making the dataset \textit{sparse}.
 
 \section{Effect of Distribution on Pyramid Tree}
 
-We now explore the effect of the highly skewed distribution on the Pyramid Tree. Recall that the Pyramid Tree maps a point $v$ to a single scalar named the Pyramid value $pv_v$. 
+We now explore the effect of the highly skewed distribution on the Pyramid Tree. Recall that the Pyramid Tree maps a point $v$ to a single scalar named the Pyramid value $pv_v$. Figure \ref{fig:astrophysics-pyval-histogram1} illustrates the distribution of Pyramid values within the sampled astrophysics dataset using a histogram. Ideally, the distribution of Pyramid values should be uniform, since this will minimise average bucket size which, as shown in Section \ref{sec:iteration2}, is the main factor which affects the Pyramid Tree's performance.
+
+Figure \ref{fig:astrophysics-pyval-histogram1} shows a massively skewed distribution, with the majority of Pyramid values lying in the same region. This increases the likelihood that points will be mapped to the same buckets, increasing average bucket size. Figures \ref{fig:astrophysics-pyval-histogram2} and \ref{fig:astrophysics-pyval-histogram3} show pyramid value distribution when just using dimensions 1 and 2, and 3 and 7, respectively. Notice how pyramid value distribution is considerably more skewed when using the first dimensions 3 and 7 compared to the first two dimensions. TODO
+
+TODO: boundary ignore
+
+\begin{figure}
+	\begin{center}
+		\begin{subfloat}[All Dimensions\label{fig:astrophysics-pyval-histogram1}]{%
+			\includegraphics[scale=0.25]{figures/histograms/astrophysics_500000_2.pdf}
+		}
+		\end{subfloat}~
+		\begin{subfloat}[Dimensions 1 and 2 \label{fig:astrophysics-pyval-histogram2}]{%
+			\includegraphics[scale=0.25]{figures/histograms/astrophysics_500000_6.pdf}
+		}
+		\end{subfloat}
+		\begin{subfloat}[Dimensions 3 and 7\label{fig:astrophysics-pyval-histogram3}]{%
+			\includegraphics[scale=0.25]{figures/histograms/astrophysics_500000_6.pdf}
+		}
+		\end{subfloat}
+		\begin{subfloat}[Ignoring Boundary Values\label{fig:astrophysics-pyval-histogram4}]{%
+			\includegraphics[scale=0.25]{figures/histograms/astrophysics_500000_6.pdf}
+		}
+		\end{subfloat}
+	\end{center}
+
+	\caption{Distribution of Pyramid Values in Different Samples of Astrophysics Dataset}
+	\label{fig:astrophysics-pyval-histograms}
+\end{figure}
+
 
 \section{Effect of Distribution on $kd$-Tree}
 
@@ -89,9 +118,5 @@ TODO
 TODO: conjecture on why the astrophysics dataset is so sparse -- referencing literature and how this might support stuff
 
 \section{Suitable Data for Index Structures}
-
-TODO
-
-\section{Project Process}
 
 TODO
