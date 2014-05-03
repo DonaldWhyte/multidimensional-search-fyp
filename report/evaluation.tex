@@ -10,20 +10,18 @@ This chapter will explore the reasons for this, determining what characteristics
 \section{Characteristics of Astrophysics Dataset}
 \label{sec:data-characteristics}
 
-A dataset is considered \textit{skewed} if a greater number of points are present in certain regions of the data space than other regions of the space. That is, the underlying frequency or probability distribution of point locations is non-uniform. Figure \ref{fig:frequency-distributions} visualises uniform, Gaussian and skewed frequency distributions using histograms. Intuitively, the skewness of a dataset increases as the difference between the frequency of points in different spatial regions increases.
-
 \begin{figure}
 	\begin{center}
 		\begin{subfloat}[Uniform\label{fig:uniform-freq-distribution}]{%
-			\includegraphics[scale=0.25]{figures/freqdist_uniform.pdf}
+			\includegraphics[scale=0.2]{figures/freqdist_uniform.pdf}
 		}
 		\end{subfloat}~
 		\begin{subfloat}[Gaussian\label{fig:gaussian-freq-distribution}]{%
-			\includegraphics[scale=0.25]{figures/freqdist_gaussian.pdf}
+			\includegraphics[scale=0.2]{figures/freqdist_gaussian.pdf}
 		}
 		\end{subfloat}~
 		\begin{subfloat}[Gamma (Skewed)\label{fig:skewed-freq-distribution}] {%
-			\includegraphics[scale=0.25]{figures/freqdist_gamma.pdf}
+			\includegraphics[scale=0.2]{figures/freqdist_gamma.pdf}
 		}
 		\end{subfloat}
 	\end{center}
@@ -32,11 +30,11 @@ A dataset is considered \textit{skewed} if a greater number of points are presen
 	\label{fig:frequency-distributions}
 \end{figure}
 
-Histograms are used to visualise the frequency distributions of one-dimensional data. Since this project deals with multi-dimensional data, multiple histograms, one for each dimension, will be produced. The astrophysics dataset was computed using a 3D sampling lattice, computing ten fields at each point. The original simulation imposes continuous, spatial relationships between the points through interpolation \cite{TODO}. TODO Carr et. al \cite{histograms-and-isosurfaces}.
+A dataset is considered \textit{skewed} if a greater number of points are present in certain regions of the data space than other regions of the space. That is, the underlying frequency or probability distribution of point locations is non-uniform. Figure \ref{fig:frequency-distributions} visualises uniform, Gaussian and skewed frequency distributions using histograms. Intuitively, the skewness of a dataset increases as the difference between the frequency of points in different spatial regions increases.
 
-While Carr et. al have shown that   TODO: justify why histograms will be used and their limitations
+Histograms are used to visualise the frequency distributions of one-dimensional data. Since this project deals with multi-dimensional data, multiple histograms, one for each dimension, can be produced to gain insight into point distribution. The astrophysics dataset was computed using a 3D sampling lattice, computing ten fields at each point. The original simulation imposes uses interpolation between points in the sampling lattice \cite{astrophysics-dataset}. Carr et al. discusses how this interpolation ``implicitly applies the spatial relation between sample points" and shows that histograms are equivalent to nearest-neighbour interpolation. This means histograms poorly represent datasets that use higher-order interpolants, such as the astrophysics dataset, because it ``over-emphasizes densely-sampled regions and under-emphasizes sparsely-sampled regions". 
 
-Ten histograms have been generated using each dimension of the astrophysics dataset. Figure \ref{fig:astrophysics-histograms} shows the histograms of dimensions 1, 2, 3 and 7. The histograms for the remaining dimensions are provided in Appendix \ref{sec:app-histograms}, and not here, because they have distributions similar to the dimensions shown here.
+Isosurface statistics have been proposed as a superior representation of datasets \cite{histograms-and-isosurfaces}. They are conceptually and computationally more complex to compute however. Due to project time constraints, isosurface statistics shall not be used. While histograms are poorer representation of the data, the aim of this evaluation is determine the magnitude of the skew present in the different dimensions of the dataset. Histograms still provide a visual representation of data distribution, even if it is not as accurate as desired. Therefore, histograms will be used to visualise the distribution of the astrophysics dataset.
 
 \begin{figure}
 	\begin{center}
@@ -70,13 +68,17 @@ Ten histograms have been generated using each dimension of the astrophysics data
 	\label{fig:astrophysics-histograms2}
 \end{figure}
 
-Total particle density (D) and gas temperature (G), the first two dimensions, appear to have the greatest
-
-TODO: REMARKS on histograms and what it means
+Ten histograms have been generated using each dimension of the sampled astrophysics dataset used for performance analyses in Chapter \ref{chap:design-and-implementation}.Figures \ref{fig:astrophysics-histograms1} and \ref{fig:astrophysics-histograms2} show histograms of dimensions 1, 2, 3 and 7. The histograms for the remaining dimensions are provided in Appendix \ref{sec:app-histograms} since they have distributions similar to the dimensions shown here and thus, add little information. Using these histograms, the following observations can be made:
+\begin{enumerate}
+	\item the first two dimensions, total particle density and gas temperature, appear to have the greatest variance, although there are still very large peaks
+	\item the majority of points are clustered on the lower or upper boundaries of dimensions 3, 4, 5 and 6. The respective histograms have massive peaks at either end of the distribution and much smaller peaks in-between
+	\item the majority of the points are clustered on the lower boundary of dimensions 7, 8, 9 and 10, (single large peak)
+\end{enumerate}
+The astrophysics dataset is therefore highly skewed, since most points are clustered at the boundaries of the dimensions.
 
 \section{Effect of Distribution on Pyramid Tree}
 
-TODO
+We now explore the effect of the highly skewed distribution on the Pyramid Tree. Recall that the Pyramid Tree maps a point $v$ to a single scalar named the Pyramid value $pv_v$. 
 
 \section{Effect of Distribution on $kd$-Tree}
 
