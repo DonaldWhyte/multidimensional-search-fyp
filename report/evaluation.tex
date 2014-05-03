@@ -10,29 +10,9 @@ This chapter will explore the reasons for this, determining what characteristics
 \section{Characteristics of Astrophysics Dataset}
 \label{sec:data-characteristics}
 
-\begin{figure}
-	\begin{center}
-		\begin{subfloat}[Uniform\label{fig:uniform-freq-distribution}]{%
-			\includegraphics[scale=0.2]{figures/freqdist_uniform.pdf}
-		}
-		\end{subfloat}~
-		\begin{subfloat}[Gaussian\label{fig:gaussian-freq-distribution}]{%
-			\includegraphics[scale=0.2]{figures/freqdist_gaussian.pdf}
-		}
-		\end{subfloat}~
-		\begin{subfloat}[Gamma (Skewed)\label{fig:skewed-freq-distribution}] {%
-			\includegraphics[scale=0.2]{figures/freqdist_gamma.pdf}
-		}
-		\end{subfloat}
-	\end{center}
+A dataset is considered \textit{skewed} if a greater number of points are present in certain regions of the data space than other regions of the space. That is, the underlying frequency or probability distribution of point locations is non-uniform. Intuitively, the skewness of a dataset increases as the \textit{difference} between the frequency/probability of points in different spatial regions increases. That is, some regions of the data space are denser than others.
 
-	\caption{Three Types of Frequency Distributions}
-	\label{fig:frequency-distributions}
-\end{figure}
-
-A dataset is considered \textit{skewed} if a greater number of points are present in certain regions of the data space than other regions of the space. That is, the underlying frequency or probability distribution of point locations is non-uniform. Figure \ref{fig:frequency-distributions} visualises uniform, Gaussian and skewed frequency distributions using histograms. Intuitively, the skewness of a dataset increases as the \textit{difference} between the frequency/probability of points in different spatial regions increases.
-
-Histograms are used to visualise the frequency distributions of one-dimensional data. Since this project deals with multi-dimensional data, multiple histograms, one for each dimension, can be produced to gain insight into point distribution. The astrophysics dataset was computed using a 3D sampling lattice, computing ten fields at each point. The original simulation imposes uses interpolation between points in the sampling lattice \cite{astrophysics-dataset}. Carr et al. discusses how this interpolation ``implicitly applies the spatial relation between sample points" and shows that histograms are equivalent to nearest-neighbour interpolation. This means histograms poorly represent datasets that use higher-order interpolants, such as the astrophysics dataset, because it ``over-emphasizes densely-sampled regions and under-emphasizes sparsely-sampled regions". 
+Histograms are used to visualise the frequency distributions of one-dimensional data. Since this project deals with multi-dimensional data, multiple histograms, one for each dimension, can be produced to gain insight into point distribution. The astrophysics dataset was computed using a 3D sampling lattice, computing ten fields at each point. The original simulation imposes uses interpolation between points in the sampling lattice \cite{astrophysics-dataset}. Carr et al. discusses how this interpolation ``implicitly applies the spatial relation between sample points" and shows that histograms are equivalent to nearest-neighbour interpolation \cite{histograms-and-isosurfaces}. This means histograms poorly represent datasets that use higher-order interpolants, such as the astrophysics dataset, because they ``over-emphasizes densely-sampled regions and under-emphasizes sparsely-sampled regions" \cite{histograms-and-isosurfaces}. 
 
 Isosurface statistics have been proposed as a superior representation of datasets \cite{histograms-and-isosurfaces}. They are conceptually and computationally more complex to compute however. Due to project time constraints, isosurface statistics shall not be used. While histograms are poorer representation of the data, the aim of this evaluation is determine the magnitude of the skew present in the different dimensions of the dataset. Histograms still provide a visual representation of data distribution, even if it is not as accurate as desired. Therefore, histograms will be used to visualise the distribution of the astrophysics dataset.
 
@@ -68,7 +48,7 @@ Isosurface statistics have been proposed as a superior representation of dataset
 	\label{fig:astrophysics-histograms2}
 \end{figure}
 
-Ten histograms have been generated using each dimension of the sampled astrophysics dataset used for performance analyses in Chapter \ref{chap:design-and-implementation}.Figures \ref{fig:astrophysics-histograms1} and \ref{fig:astrophysics-histograms2} show histograms of dimensions 1, 2, 3 and 7. The histograms for the remaining dimensions are provided in Appendix \ref{sec:app-histograms} since they have distributions similar to the dimensions shown here and thus, add little information. Using these histograms, the following observations can be made:
+Ten histograms have been generated using each dimension of the sampled astrophysics dataset used for performance analyses in Chapter \ref{chap:design-and-implementation}. Figures \ref{fig:astrophysics-histograms1} and \ref{fig:astrophysics-histograms2} show histograms of dimensions 1, 2, 3 and 7. The histograms for the remaining dimensions are provided in Appendix \ref{sec:app-histograms} since they have distributions similar to the dimensions shown here and thus, add little information. Using these histograms, the following observations can be made:
 \begin{enumerate}
 	\item the first two dimensions, total particle density and gas temperature, appear to have the greatest variance, although there are still very large peaks
 	\item the majority of points are clustered on the lower or upper boundaries of dimensions 3, 4, 5 and 6. The respective histograms have massive peaks at either end of the distribution and much smaller peaks in-between
@@ -76,41 +56,66 @@ Ten histograms have been generated using each dimension of the sampled astrophys
 \end{enumerate}
 The astrophysics dataset is therefore highly skewed, since most points are clustered at the boundaries of the dimensions. It follows that the vast majority of the data space has little to no points, making the dataset \textit{sparse}.
 
+\section{Why So Sparse?}
+
+TODO: conjecture on why the astrophysics dataset is so sparse -- referencing literature and how this might support stuff
+
 \section{Effect of Distribution on Pyramid Tree}
 
-We now explore the effect of the highly skewed distribution on the Pyramid Tree. Recall that the Pyramid Tree maps a point $v$ to a single scalar named the Pyramid value $pv_v$. Figure \ref{fig:astrophysics-pyval-histogram1} illustrates the distribution of Pyramid values within the sampled astrophysics dataset using a histogram. Ideally, the distribution of Pyramid values should be uniform, since this will minimise average bucket size which, as shown in Section \ref{sec:iteration2}, is the main factor which affects the Pyramid Tree's performance.
+We now explore the effect of the highly skewed distribution on the Pyramid Tree. Recall that the Pyramid Tree maps a point $v$ to a single scalar named the Pyramid value $pv_v$. Points with the same Pyramid value are stored in the same bucket. Table \ref{tab:final-bucket-size} shows bucket size statistics and how long it takes to query all the points for the sampled astrophysics dataset, when different dimensions are used. When only dimensions 1 and 2, the dimensions with the greatest variance, are used, average bucket size decreases substantially. Dimensions 3 and 7 have larger clusters of points close together, so they cause the average bucket size to increase.
 
-Figure \ref{fig:astrophysics-pyval-histogram1} shows a massively skewed distribution, with the majority of Pyramid values lying in the same region. This increases the likelihood that points will be mapped to the same buckets, increasing average bucket size. Figures \ref{fig:astrophysics-pyval-histogram2} and \ref{fig:astrophysics-pyval-histogram3} show pyramid value distribution when just using dimensions 1 and 2, and 3 and 7, respectively. Notice how pyramid value distribution is considerably more skewed when using the first dimensions 3 and 7 compared to the first two dimensions. TODO
-
-TODO: boundary ignore
+The histograms from Section \ref{sec:data-characteristics} illustrate how most points lie on, or close to, the boundaries of the dataset. This is a significant problem for the Pyramid Tree because it always chooses the dimension whose distance from the centre point of the data is the highest. If a large number of points are on a dimensional boundary, then its likely the same dimension will be chosen. Since each point will the same coordinate value for the chosen dimension, because they are on the same boundary, they will have the same pyramid value.
 
 \begin{table}
 	\centering
 	\makebox[\textwidth][c]{%
 		\begin{tabular}{|l|l|l|l|l|}
 			\hline
-			\textbf{Sample} & \textbf{Time to Query (sec)} & \textbf{Average} & \textbf{Max} & \textbf{\#Buckets} \\
+			\textbf{Dimensions} & \textbf{Time to Query (sec)} & \textbf{Average} & \textbf{Max} & \textbf{\#Buckets} \\
 			\hline
-			All Dimensions & 60.0216 & 3586.57 & 235260 & 120 \\
-			Dimensions 1 and 2 & 0.0713558 & 6.52433 & 102 & 25232 \\
-			Dimensions 3 and 7 & 8.30587 & 89.2853 & 141235 & 3056 \\
-			Ignore Boundary Coordinates& 27.6034 & 25.3722 & 45031 & 16963 \\
+			All & 60.0216 & 3586.57 & 235260 & 120 \\
+			1 and 2 & 0.0713558 & 6.52433 & 102 & 25232 \\
+			3 and 7 & 8.30587 & 89.2853 & 141235 & 3056 \\
+			\hline
+			No Boundary Coordinates & 27.6034 & 25.3722 & 45031 & 16963 \\
 			\hline
 		\end{tabular}
 	}%
-	\caption{Pyramid Tree Bucket Size Statistics with Different Samples of Astrophysics Dataset}
+	\caption{Pyramid Tree Bucket Size Statistics with Different Dimensions of Astrophysics Dataset}
 	\label{tab:final-bucket-size}
 \end{table}
 
+Histograms are equivalent to nearest-neighbour interpolation, so they do not show if the points inside the bins at the boundary of the graphs are \textit{actually} boundary values or just close to the boundary. To determine if clusters of points at boundaries is truly the main cause of large buckets, a heuristic called \textbf{No Boundary Coordinates} was developed. Let $v$ be a point and $min_i$ and $max_i$ be the minimum and maximum boundary values for dimension $i \in \lbrace 0, 1, ..., d - 1 \rbrace$. Let $j$ be the dimension $v$ is furthest from the centre point. If $v_j = min_j$ or $v_j = max_j$, then a new dimension $k$ is chosen, such that $v_k$ is the \textit{second} furthest coordinate from the centre point. If $v_k$ is at the boundary, then the next furthest is chosen again. This process is repeated until a coordinate which is not on a boundary is found. If all coordinates are on a boundary, then the first dimension is chosen.
+
+Table \ref{tab:final-bucket-size} shows how this simple heuristic causes performance to increase by decreasing average bucket size. However, it is still significantly slower than the $kd$-Tree, so other kinds of skew are still causing problems.
+
+One could apply further heuristics to improve Pyramid Tree performance on the 
+
+TODO: how this requires 
 
 \section{Effect of Distribution on $kd$-Tree}
 
-TODO
+TODO: say same tests
 
-\section{Why So Sparse?}
+TODO: introduce table and remark on results
 
-TODO: conjecture on why the astrophysics dataset is so sparse -- referencing literature and how this might support stuff
+\begin{table}
+	\centering
+	\makebox[\textwidth][c]{%
+		\begin{tabular}{|l|l|l|l|l|}
+			\hline
+			\textbf{Dimensions} & \textbf{Time to Query (sec)}  & \textbf{Balance Factor} & \textbf{Max Path Length}  \\
+			\hline
+			All & 0.639265 & 32.405 & 120 \\
+			1 and 2 & 0.18445 & 26.5923 & 73 \\
+			3 and 7 & 0.257211 & 28.6481 & 69 \\
+			\hline
+		\end{tabular}
+	}%
+	\caption{Point $kd$-Tree Statistics with Different Dimensions of Astrophysics Dataset}
+	\label{tab:final-balance-factor}
+\end{table}
 
-\section{Suitable Data for Index Structures}
+\section{Suitability of Hash-Based Approaches}
 
-TODO
+TODO: what data are they suitable for, recap why they fail on dynamic data and sporadic distributions
