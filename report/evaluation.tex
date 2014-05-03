@@ -87,17 +87,11 @@ The histograms from Section \ref{sec:data-characteristics} illustrate how most p
 
 Histograms are equivalent to nearest-neighbour interpolation, so they do not show if the points inside the bins at the boundary of the graphs are \textit{actually} boundary values or just close to the boundary. To determine if clusters of points at boundaries is truly the main cause of large buckets, a heuristic called \textbf{No Boundary Coordinates} was developed. Let $v$ be a point and $min_i$ and $max_i$ be the minimum and maximum boundary values for dimension $i \in \lbrace 0, 1, ..., d - 1 \rbrace$. Let $j$ be the dimension $v$ is furthest from the centre point. If $v_j = min_j$ or $v_j = max_j$, then a new dimension $k$ is chosen, such that $v_k$ is the \textit{second} furthest coordinate from the centre point. If $v_k$ is at the boundary, then the next furthest is chosen again. This process is repeated until a coordinate which is not on a boundary is found. If all coordinates are on a boundary, then the first dimension is chosen.
 
-Table \ref{tab:final-bucket-size} shows how this simple heuristic causes performance to increase by decreasing average bucket size. However, it is still significantly slower than the $kd$-Tree, so other kinds of skew are still causing problems.
-
-One could apply further heuristics to improve Pyramid Tree performance on the 
-
-TODO: how this requires 
+Table \ref{tab:final-bucket-size} shows how this simple heuristic causes performance to increase by decreasing average bucket size. However, it is still significantly slower than the $kd$-Tree, so other kinds of skew are still causing problems. One could apply further heuristics in an attempt to improve Pyramid Tree performance on the astrophysics dataset, but it is likely that the structure will start overfitting the dataset and performing worse on other datasets. Doing so also assumes pre-existing knowledge of the dataset's distribution,  which contradicts the core assumption that data is dynamic (i.e. it is not \textit{possible} to know all the data in advance).
 
 \section{Effect of Distribution on $kd$-Tree}
 
-TODO: say same tests
-
-TODO: introduce table and remark on results
+For completeness, different dimensions of the astrophysics dataset were also tested on the point $kd$-Tree. Table \ref{tab:final-balance-factor} shows the query time, balance factor and maximum path length of the tree with these different dimensions. It can be observed that the point $kd$-Tree, like the Pyramid Tree, loses performance due to the skew present in the astrophysics dataset as well. Using dimensions 1 and 2 gives a lower balance factor than the more skewed dimensions 3 and 7. The difference in performance between the chosen dimensions is much smaller than the Pyramid tree, however.
 
 \begin{table}
 	\centering
