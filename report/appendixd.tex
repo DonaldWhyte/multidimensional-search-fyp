@@ -71,7 +71,7 @@ This section contains diagrams which illustrate the project's schedule, mileston
 			\hline
 			Sequential Scan & Low & No (but since data is stored contiguously, there are minimal I/O operations due to sequential access) & Often better than other structures with high $d$ (but significantly poorer performance with low $d$) & Low \\		
 			B${}^{+}$-Tree & Low & Yes & One-dimensional & Low \\
-			$kd$-Tree & Low & Some variants use buckets & Known to be poor with range and nearest neighbour queries with high $d$ \cite{similarity-searching} & Low \\
+			$kd$-tree & Low & Some variants use buckets & Known to be poor with range and nearest neighbour queries with high $d$ \cite{similarity-searching} & Low \\
 			R-Tree & Moderate & Yes & Poor for $d > 10$ \cite{pyramid-tree} & Moderate \\
 			Quadtree & Low with uniformly distributed data, high for skewed data due to unnecessary nodes caused by splitting sparse regions of data space & No & Poor because it tries to use balanced splits \cite{pyramid-tree} & Low \\
 			Pyramid Tree & Low & Yes (based on B${}^{+}$-tree) & Good & Moderate \\

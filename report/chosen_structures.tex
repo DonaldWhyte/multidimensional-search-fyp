@@ -92,14 +92,14 @@ Let $B$ be a parameter which controls how likely points will be in the same buck
 
 Higher $B$ means higher $m$. This increases the magnitude of $h_i(p)$ before it is truncated to an integer, meaning less points will have the same hashed value, meaning less points in the same bucket on average. Lower $B$ will therefore mean more points will be in the same bucket on average.
 
-\section{$kd$-Tree}
+\section{$kd$-tree}
 \label{sec:kd-tree-chosen}
 
-The $kd$-Tree is a widely used structure for both low and high dimensional data. In the literature, there is a lot of discussion as to how and why this structure performs poorly in a high-dimensional setting \cite{highd-nn, search-highd-analysis}. This reveals that $kd$-trees are typically used for \textit{approximate} queries in higher-dimensional space, as they tend to degenerate to Sequential Scan for exact range and nearest neighbour queries \cite{similarity-searching}. 
+The $kd$-tree is a widely used structure for both low and high dimensional data. In the literature, there is a lot of discussion as to how and why this structure performs poorly in a high-dimensional setting \cite{highd-nn, search-highd-analysis}. This reveals that $kd$-trees are typically used for \textit{approximate} queries in higher-dimensional space, as they tend to degenerate to Sequential Scan for exact range and nearest neighbour queries \cite{similarity-searching}. 
 
-Similar to the Pyramid Tree, the focus of the literature on $kd$-Trees is typically for range and nearest neighbour queries, and not point queries. Unlike the Pyramid Tree however, dynamic variants of $kd$-Trees have been explored much more (e.g. in \cite{bkd-tree, kdb-tree}), with the original paper proposing operations for incremental insertion and removal \cite{kd-tree}. The structure will be implemented because it is dynamic and widely adopted in the field. Additionally, since the $kd$-Tree is a different class of index structure, not being a dimension reduction technique, a more comprehensive evaluation of the efficiency of all chosen structures can be produced.
+Similar to the Pyramid Tree, the focus of the literature on $kd$-trees is typically for range and nearest neighbour queries, and not point queries. Unlike the Pyramid Tree however, dynamic variants of $kd$-trees have been explored much more (e.g. in \cite{bkd-tree, kdb-tree}), with the original paper proposing operations for incremental insertion and removal \cite{kd-tree}. The structure will be implemented because it is dynamic and widely adopted in the field. Additionally, since the $kd$-tree is a different class of index structure, not being a dimension reduction technique, a more comprehensive evaluation of the efficiency of all chosen structures can be produced.
 
-$kd$-Trees will now be explained in more detail. The structure is a multi-dimensional binary tree, meaning it does not have the exponential memory requirements the Octree has. $kd$-Trees split the data space along a single dimension at each level of the tree (known as a level's \textit{cutting dimension}), instead of splitting by \textit{all} dimensions.
+$kd$-trees will now be explained in more detail. The structure is a multi-dimensional binary tree, meaning it does not have the exponential memory requirements the Octree has. $kd$-trees split the data space along a single dimension at each level of the tree (known as a level's \textit{cutting dimension}), instead of splitting by \textit{all} dimensions.
 
 The variant of the tree implemented for this project contains one point per node and cycles through each dimension when choosing a cutting dimension to use for each level of the tree. If $n$ is a $kd$-tree node, $i$ is the cutting dimension on that node's level and $p$ is the point stored in this node, then:
 \begin{enumerate}
@@ -127,7 +127,7 @@ Figure \ref{fig:kd-tree} illustrates the \texttt{insert} and \texttt{delete} ope
 		}%
 	\end{center}
 
-	\caption{$kd$-Tree Operations for 2D Dataset (Cutting Dimension Alternates Between X and Y)}
+	\caption{$kd$-tree Operations for 2D Dataset (Cutting Dimension Alternates Between X and Y)}
 	\label{fig:kd-tree}
 \end{figure}
 
@@ -136,8 +136,8 @@ Figure \ref{fig:kd-tree} illustrates the \texttt{insert} and \texttt{delete} ope
 
 Since there has been no published evaluations of the Pseudo-Pyramid Tree, no hypotheses will be made regarding the performance of the structure. It is suspected that the Pseudo-Pyramid Tree will perform well on high-dimensional data, because it is a hash-based method, but little is currently known about how well the structure's hashing function performs, so there is a little basis for such suspicion. Before starting implementation, the following hypothesis regarding the Pyrmid Tree and $kd-Tree$ was devised:
 
-\paragraph{\textbf{HYPOTHESIS:}} Pyramid Tree will be faster than the baselines and $kd$-Trees on all evaluation datasets containing high-dimensional data ($\geq 10$ dimensions).
+\paragraph{\textbf{HYPOTHESIS:}} Pyramid Tree will be faster than the baselines and $kd$-trees on all evaluation datasets containing high-dimensional data ($\geq 10$ dimensions).
 
 \paragraph{}
 
-This hypothesis was based on the reported performance of the Pyramid Tree and $kd$-Tree in a high-dimensional setting in the literature, as discussed in the previous sections. After the implementation phase, the hypothesis will be revisited to determine if it still holds, and \textit{why} it does or does not hold will be explored.
+This hypothesis was based on the reported performance of the Pyramid Tree and $kd$-tree in a high-dimensional setting in the literature, as discussed in the previous sections. After the implementation phase, the hypothesis will be revisited to determine if it still holds, and \textit{why} it does or does not hold will be explored.
