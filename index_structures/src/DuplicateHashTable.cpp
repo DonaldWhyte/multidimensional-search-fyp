@@ -1,6 +1,7 @@
 #include "DuplicateHashTable.h"
 #include "Hashing.h"
 #include "Util.h"
+#include <sstream>
 
 namespace mdsearch
 {

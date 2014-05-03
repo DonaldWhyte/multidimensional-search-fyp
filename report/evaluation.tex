@@ -84,29 +84,23 @@ Figure \ref{fig:astrophysics-pyval-histogram1} shows a massively skewed distribu
 
 TODO: boundary ignore
 
-\begin{figure}
-	\begin{center}
-		\begin{subfloat}[All Dimensions\label{fig:astrophysics-pyval-histogram1}]{%
-			\includegraphics[scale=0.25]{figures/histograms/astrophysics_500000_2.pdf}
-		}
-		\end{subfloat}~
-		\begin{subfloat}[Dimensions 1 and 2 \label{fig:astrophysics-pyval-histogram2}]{%
-			\includegraphics[scale=0.25]{figures/histograms/astrophysics_500000_6.pdf}
-		}
-		\end{subfloat}
-		\begin{subfloat}[Dimensions 3 and 7\label{fig:astrophysics-pyval-histogram3}]{%
-			\includegraphics[scale=0.25]{figures/histograms/astrophysics_500000_6.pdf}
-		}
-		\end{subfloat}
-		\begin{subfloat}[Ignoring Boundary Values\label{fig:astrophysics-pyval-histogram4}]{%
-			\includegraphics[scale=0.25]{figures/histograms/astrophysics_500000_6.pdf}
-		}
-		\end{subfloat}
-	\end{center}
-
-	\caption{Distribution of Pyramid Values in Different Samples of Astrophysics Dataset}
-	\label{fig:astrophysics-pyval-histograms}
-\end{figure}
+\begin{table}
+	\centering
+	\makebox[\textwidth][c]{%
+		\begin{tabular}{|l|l|l|l|l|}
+			\hline
+			\textbf{Sample} & \textbf{Time to Query (sec)} & \textbf{Average} & \textbf{Max} & \textbf{\#Buckets} \\
+			\hline
+			All Dimensions & 60.0216 & 3586.57 & 235260 & 120 \\
+			Dimensions 1 and 2 & 0.0713558 & 6.52433 & 102 & 25232 \\
+			Dimensions 3 and 7 & 8.30587 & 89.2853 & 141235 & 3056 \\
+			Ignore Boundary Coordinates& 27.6034 & 25.3722 & 45031 & 16963 \\
+			\hline
+		\end{tabular}
+	}%
+	\caption{Pyramid Tree Bucket Size Statistics with Different Samples of Astrophysics Dataset}
+	\label{tab:final-bucket-size}
+\end{table}
 
 
 \section{Effect of Distribution on $kd$-Tree}

@@ -174,13 +174,13 @@ The differences in speed between the bucket and splay tree implementations is sm
 				& Insert & 139.346 & 117.441 & 0.112088 \\
 				& Point Query & 139.048 & 117.292 & 0.0492687 \\
 			\hline
-			\multirow{4}{*}{Bucket PPT} & Delete & 82.908 & 71.006 & 0.160532 \\
-				& Insert & 81.231 & 69.401 & 0.126938 \\
-				& Point Query & 70.4391 & 69.3368 & 0.0956872 \\
+			\multirow{4}{*}{Bucket PPT} & Delete & 82.908 & 14.9052 & 0.160532 \\
+				& Insert & 81.231 & 14.4715 & 0.126938 \\
+				& Point Query & 70.4391 & 14.3358 & 0.0956872 \\
 			\hline
-			\multirow{4}{*}{Splay PPT} & Delete & 88.4574 & 73.3033 & 0.203571 \\
-				& Insert & 84.0908 & 69.5318 & 0.192196 \\
-				& Point Query & 70.3729 & 69.3996 & 0.141219 \\
+			\multirow{4}{*}{Splay PPT} & Delete & 88.4574 & 15.3893 & 0.203571 \\
+				& Insert & 84.0908 & 14.7177 & 0.192196 \\
+				& Point Query & 70.3729 & 14.6499 & 0.141219 \\
 			\hline
 		\end{tabular}
 	}%
@@ -205,7 +205,7 @@ Despite hashing a point taking $O(d)$ time, point queries will take much longer 
 		\hline
 		500,000 16D Random Points & 0.105091 & 1.0312 & 4 & 493488 \\
 		500,000 Astrophysics Points & 70.4391 & 47820.89 & 153471 & 8  \\
-		500,000 Hurricane Isabel Points & 69.3996 & 248977 & 497953 & 2 \\
+		500,000 Hurricane Isabel Points & 14.3358 & 1257.46 & 154979 & 396 \\
 		435,544 3D Armadillo Mesh Points & 0.141219 & 19.1465 & 187 & 22748 \\
 		\hline
 	\end{tabular}

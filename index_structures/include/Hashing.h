@@ -5,7 +5,7 @@
 #include <vector>
 #include "Point.h"
 #include "Region.h"
-#include <complex>
+#include "Util.h"
 
 #include <boost/functional/hash.hpp>
 
@@ -54,18 +54,19 @@ namespace mdsearch
 		Real dMaxHeight = pyramidHeight(p[0], minPoint[0], maxPoint[0]);
 		for (int d = 1; (d < numDimensions); d++)
 		{
+			Real currentHeight = pyramidHeight(p[d], minPoint[d], maxPoint[d]);
 			#ifdef BOUNDARY_VALUE_HACK
-				if (p[d] == minPoint[d] || p[d] == maxPoint[d])
+				if (compare(currentHeight, 0.5f) == 0)
 					continue;
 			#endif
 
-			Real currentHeight = pyramidHeight(p[d], minPoint[d], maxPoint[d]);
 			if (dMaxHeight < currentHeight)
 			{
 				dMax = d;
 				dMaxHeight = currentHeight;
 			}
 		}
+
 		if (normaliseCoord(p[dMax], minPoint[dMax], maxPoint[dMax]) < 0.5f)
 			index = dMax; // pyramid lower than central point
 		else 
@@ -75,7 +76,7 @@ namespace mdsearch
 	}
 
 	/* Compute pseudo-pyramid value (hash) of n-dimensional point.
-	 * Credit: Zheng Ghao. */
+	 * Credit: Zhao Geng. */
 	inline int computePseudoPyramidValue(unsigned int numDimensions, const Point& point,
 		const Point& minPoint, const Point& maxPoint, const std::vector<int>& scaleFactor,
 		const std::vector<int>& cumulativeSFProducts)

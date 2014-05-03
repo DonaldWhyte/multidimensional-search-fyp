@@ -1,9 +1,9 @@
 ExampleSuite
-/usr/not-backed-up/DonaldFYP/test_data/datasets/
+/media/Maxtor/DonaldFYP/test_data/datasets/
 ./results/
 1
 
-pyramid_tree
+pseudo_pyramid_tree
 
-astrophysics Points
-	500000 astrophysics_500000.dat
+hurricane Points
+	500000 hurricane_500000_unique.dat
