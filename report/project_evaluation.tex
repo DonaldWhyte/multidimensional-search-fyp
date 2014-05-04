@@ -3,7 +3,7 @@
 \centerline{\rule{149mm}{.02in}}
 \vspace{2cm}
 
-TODO
+This section will evaluate the project as whole, discussing its process and succes. Limitations of the project are discussed and proposals for future work in this field are also proposed.
 
 \section{Process Evaluation}
 
@@ -11,9 +11,27 @@ TODO
 
 \section{Objectives and Minimum Requirements}
 
-TODO: emphasise minimum requirements were exceeded
+Sections \ref{sec:objectives} and \ref{sec:requirements} lists the project's objectives and minimum requirements respectively. The minimum requirements were developed so that meeting them also meets the project's objectives. For brevity, the minimum requirements will be referred to by their numbers.
 
-TODO: state all deliverables were met
+Requirement 1 was met by producing a literature review which has been placed in this report. The challenges of multi-dimensional search were summarised, most classes of index structures were discussed in some way and a taxonomy showing how index structures have affected each other was developed. The literature review itself was comprehensive
+
+Requirement 2 was met by implementing the initial Pseudo-Pyramid Tree implementation, which was analysed at the end of Section \ref{sec:iteration1}. This requirement was largely exceeded, since a total of twelve implementations were developed for this project. Eight of these implementations being discussed and analysed with respect to both performance timings and their general behaviour (e.g. bucket size and balance factor). Due to time constraints, the remaining four structures could not be discussed and evaluated in detail. These are described in Appendix \ref{chap:additional-structures}.
+
+Requirement 3 was met by optmising the Pseudo-Pyramid Tree hashing function both algorithmically and through SSE. Several implementations of the hash-based index structures were developed to reduce cache misses and computation. Several additional structures were also implemented to determine which provides the best performance for the target datasets. Therefore, this requirement was also exceeded.
+
+Evaluation was present throughout the Chapters \ref{chap:design-and-implementation} and \ref{chap:technical-evaluation}, meaning Requirement 4 has been met. Again, the requirement was exceeded because three evaluations based on empirical performance timings were performed, along with a separate evaluation of the high-level algorithms deriving insight into what kind of index structures may be suitable for the project's target data.
+
+Therefore, all the minimum requirements were met and exceeded to varying degrees. In particular, the amount of optimisations and index structures that were implemented and evaluation was much larger than intended. This was done to ensure the evaluation was a comprehensive as possible within the three months of the project.
+
+\section{Deliverables}
+
+The deliverables described in Section \ref{sec:deliverables} were all produced in the following ways:
+\begin{enumerate}
+	\item Source code of the evaluation framework and all implemented structures, along with documentation, accompanies this recursive-partition-structures
+	\item A user manual describing the data formats and how to use select index structures is provided in Appendix \ref{chap:user-manual}
+	\item An evaluation of the index structures was performed as part of Requirement 4
+	\item Generated synthetic data can be re-produced using the data generators provided in the source code of deliverable 1
+\end{enumerate}
 
 \section{Limitations}
 
@@ -21,7 +39,9 @@ TODO
 
 \section{Future Work}
 
-TODO
+TODO: verify hypotheses
+
+ Structures similar to the $kd$-tree include the KDB-tree and splay quadtree (see Sections \ref{sec:recursive-partition-structures} and \ref{sec:history-sensitive-structures}).
 
 \begin{itemize}
 	\item Exploration of kd-tree variants
@@ -29,3 +49,11 @@ TODO
 	\item More exploration of adaptive dimension reduction techniques
 	\item Parallel kd-trees, since they seem to perform well
 \end{itemize}
+
+\section{Conclusion}
+
+TODO: general conclusion to project findings and stuff
+
+The overall aim of the project was to implement one or more index structures and evaluate their performance with respective to high-dimensional datasets (i.e. $d > 10$). Using the astrophysics dataset as a test case, the evaluation went into much greater detail than initially expected. A greater number of index structures and optimisations were implemented than planning, resulting in a more comprehensive evaluation. Therefore, the project's aim has been met and exceeded.
+
+Furthermore, the evaluation resulted in a conjecture and several hypotheses being made. Doing so has created a foundation for future work to be started. Considering the project has resulted in several index structures being implemented, which have been evaluated in detail, and provided a platform for future work, I would consider the project a success.
