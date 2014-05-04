@@ -3,28 +3,29 @@
 \centerline{\rule{149mm}{.02in}}
 \vspace{2cm}
 
-This section will discuss the limitations of the project's work, future work to support or extend the project's findings and whether or nort the project has met the minimum requirements and can be deemed a success.
+This section will discuss the limitations of the project's work, future work to support or extend the project's findings and whether or not the project has met the minimum requirements and can be deemed a success.
 
 \section{Limitations}
 
-TODO
+This project has only worked with three synthetic datasets and three real datasets. Only two of these datasets represent the kind of data this project is targeting, which is data from scientific computation. Using more data from a scientific domain and performing further analysis on their properties may have derived more insight into which index structures are suited to such data.
+
+A large chunk of the Design and Implementation phase was spent focusing on the Pseudo-Pyramid tree and Pyramid Tree before they were found to perform poorly with point queries on the scientific datasets. By the time the limitations of these structures were discovered, there was not enough time to go into as much depth with the implementation or evaluation of other structures. Originally, it was intended that another variant of the $kd$-tree would be discussed and evaluated alongside the point $kd$-tree, but the remaining time simply did not allow for this.
 
 \section{Future Work}
 
-TODO: verify hypotheses
+The end of this project resulted in a conjecture and three hypotheses being made, meaning potential future work includes exploring these in much greater detail. This section suggests some of the ways the insights made in this project can be explored further.
 
- Structures similar to the $kd$-tree include the KDB-tree and splay quadtree (see Sections \ref{sec:recursive-partition-structures} and \ref{sec:history-sensitive-structures}).
+To verify Hypothesis 1, the Pyramid Tree's suitability with higher-dimensional scientific datasets can be examined in further detail by testing it with several more scientific datasets. Non-scientific datasets can even be used to determine the types of data the structure can process efficiently. Examining a larger number of scientific datasets could be used to further explore the conjecture that most scientific datasets have dense clusters of points in data space and large sparse regions. In fact, studying the mathematical challenges of $\mathbb{R}^m \rightarrow \mathbb{R}^d$, where $d > m$, is a whole project in itself.
 
-\begin{itemize}
-	\item Exploration of kd-tree variants
-	\item Embedding or distance-based methods
-	\item More exploration of adaptive dimension reduction techniques
-	\item Parallel kd-trees, since they seem to perform well
-\end{itemize}
+Exploring Hypothesis 2 would involve implementing and evaluating several adaptive dimension reduction techniques, perhaps using the same test datasets as this project. Examples of such techniques to research include iDistance \cite{idistance} and the Recursive Pyramid Tree proposed in Appendix \ref{chap:additional-structures}.
+
+The most important insight in the project the vastly superior performance of a tree-based index structure. Verifying Hypothesis 3, which claims most dynamic tree-based structures are more suitable to scientific datasets than dimension reduction techniques, would involve implement several dynamic tree-based structures. Again, these could be evaluated sing the same test datasets as this project. Examples of such structures include bucket KD-trees and BD-trees \cite{kdtree-v-bdtree}, as well as the KDB-tree, Quadtreap and the Splay Quadtree structures mentioned in Sections \ref{sec:recursive-partition-structures} and \ref{sec:history-sensitive-structures}.
+
+Finally, embedding, distance-based or parallel structures (all briefly mentioned in Section \ref{chap:background_research}) are avenues to explore. Based on the literature review, little research has been done on the suitability of these structure types for point queries on dynamic data.
 
 \section{Process Evaluation}
 
-TODO
+TODO: iterative approach did allow for change when finding that PT sucked -- AND SPLAY QUADTREE WAS TOO HARD TO IMPLEMENT
 
 \section{Objectives and Minimum Requirements}
 
@@ -34,7 +35,7 @@ Requirement 1 was met by producing a literature review which has been placed in 
 
 Requirement 2 was met by implementing the initial Pseudo-Pyramid Tree implementation, which was analysed at the end of Section \ref{sec:iteration1}. This requirement was largely exceeded, since a total of twelve implementations were developed for this project. Eight of these implementations being discussed and analysed with respect to both performance timings and their general behaviour (e.g. bucket size and balance factor). Due to time constraints, the remaining four structures could not be discussed and evaluated in detail. These are described in Appendix \ref{chap:additional-structures}.
 
-Requirement 3 was met by optmising the Pseudo-Pyramid Tree hashing function both algorithmically and through SSE. Several implementations of the hash-based index structures were developed to reduce cache misses and computation. Several additional structures were also implemented to determine which provides the best performance for the target datasets. Therefore, this requirement was also exceeded.
+Requirement 3 was met by optimising the Pseudo-Pyramid Tree hashing function both algorithmically and through SSE. Several implementations of the hash-based index structures were developed to reduce cache misses and computation. Several additional structures were also implemented to determine which provides the best performance for the target datasets. Therefore, this requirement was also exceeded.
 
 Evaluation was present throughout the Chapters \ref{chap:design-and-implementation} and \ref{chap:technical-evaluation}, meaning Requirement 4 has been met. Again, the requirement was exceeded because three evaluations based on empirical performance timings were performed, along with a separate evaluation of the high-level algorithms deriving insight into what kind of index structures may be suitable for the project's target data.
 

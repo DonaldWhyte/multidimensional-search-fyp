@@ -12,7 +12,7 @@ A dataset can be considered \textit{skewed} if there are more points in some reg
 
 Histograms are used to visualise the frequency distributions of one-dimensional data. Since this project deals with multi-dimensional data, multiple histograms, one for each dimension, can be produced to gain insight into point distribution. The astrophysics dataset was computed using a 3D sampling lattice, computing ten fields at each point. The original simulation uses interpolation to compute the ten fields at each point on the lattice \cite{astrophysics-dataset}. Carr et al. discusses how this interpolation ``implicitly applies the spatial relation between sample points" and shows that histograms are equivalent to nearest-neighbour interpolation \cite{histograms-and-isosurfaces}. This means histograms poorly represent datasets that use higher-order interpolants, such as the astrophysics dataset, because they ``over-emphasizes densely-sampled regions and under-emphasizes sparsely-sampled regions" \cite{histograms-and-isosurfaces}. 
 
-Isosurface statistics have been proposed as a superior representation of such datasets \cite{histograms-and-isosurfaces}. They are conceptually and computationally more complex to compute however. Due to the project's time constraints, isosurface statistics will not be used. While histograms are poorer representation of the data, the aim of this evaluation is to get an approximation of the magnitude of the astrophysics dataset's skew. Histograms still allow for this even if they are not as accurate as other techniques. As such, histograms will be used to visualise the distribution of the astrophysics dataset.
+Isosurface statistics have been proposed as a superior representation of such datasets \cite{histograms-and-isosurfaces}. They are conceptually and computationally more complex to compute however. Due to the project's time constraints, isosurface statistics will not be used. While histograms are poorer representation of the data, the aim of this evaluation is to get determine how large clusters of points are and determine the \textit{magnitude} of skew in the data space. Histograms still allow for this even if they are not as accurate at representing the data as other techniques. For these reason, histograms will be used to visualise the distribution of the astrophysics dataset.
 
 \begin{figure}
 	\begin{center}
@@ -185,11 +185,8 @@ Based on the empirical evidence from Chapter \ref{chap:design-and-implementation
 
 \paragraph{\textbf{HYPOTHESIS 2:}} Index structures based on dimension reduction or hashing cannot adapt well to dynamically changing distributions of data, due to the cost of rebuilding the structure when adapting.
 
-\paragraph{\textbf{HYPOTHESIS 3:}} Dynamic tree-based structures, which adapt the decomposition of the data space as points are inserted, provide better point query performance for dynamic high-dimensional datasets than the Pyramid Tree.
+\paragraph{\textbf{HYPOTHESIS 3:}} Dynamic tree-based structures, which adapt the decomposition of the data space as points are inserted, provide better point query performance for dynamic high-dimensional datasets than dimension reduction techniques such as the Pyramid Tree.
 
 \paragraph{}
 
 Hypothesis 1 has been verified specifically for the astrophysics (and to a lesser extent, the hurricane Isabel dataset). More research and analysis with other scientific datasets is required to fully verify both this hypotheses. Some evidence verifying hypotheses 2 and 3 is present in this report, as there are empirical timings to support the clams, but more comprehensive research should be performed. it is beyond the scope of this project to explore these hypotheses further, however.
-
-TODO: refer to future work section OR ACTUALLY HAVE FUTURE WORK HERE???
-TODO: could have work on how to VERIFY HYPOTHESES HERE
