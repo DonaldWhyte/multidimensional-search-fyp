@@ -137,56 +137,90 @@ Data sparsity becomes an even greater issue when mapping continuous domains to h
 
 \section{Implications to Multi-dimensional Search}
 
-This conjecture has implications for which index structures to use for scientific datasets. If most scientific datasets are highly space, they may be difficult for index structures which decompose the underlying data space. For example, the Pyramid Tree uses a \textit{static} decomposition. Based on an initial boundary, exactly how the space is decomposed is already decided. For some data, such as the synthetic data used in Chapter \ref{chap:design-and-implementation}, this is not a problem. However, there cases where the lack of ability to \textit{adapt} the decomposition to the input data becomes problematic. This was the case with the astrophysics dataset, where the Pyramid Tree ended up mapping the points to the same few buckets.
+This conjecture has implications for which index structures to use for scientific datasets. If most scientific datasets are highly space, they may be difficult for index structures which decompose the underlying data space without factoring in the points. For example, the Pyramid Tree uses a \textit{static} decomposition. Based on an initial boundary, exactly how the space is decomposed is already decided. For some data, such as the synthetic data used in Chapter \ref{chap:design-and-implementation}, this is not a problem. However, there cases where the lack of ability to \textit{adapt} the decomposition to the input data becomes problematic. This was the case with the astrophysics dataset, where the Pyramid Tree ended up mapping the points to the same few buckets.
 
 \begin{figure}
 	\begin{center}
-		\begin{subfloat}[Non-Continuous 2D Data Decomposed with Pyramid Tree\label{fig:non-continuous-embedding}]{%
+		\begin{subfloat}[Pyramid Tree (Static)\label{fig:non-continuous-embedding}]{%
 			\includegraphics[scale=0.65]{figures/non_continuous_pyramid.pdf}
 		}
-		\end{subfloat}~~~~~~~
-		\begin{subfloat}[1-Manifold Decomposed Using Pyramid Tree\label{fig:continuous-embedding-pyramid}]{%
+		\end{subfloat}~~~~~
+		\begin{subfloat}[Pyramid Tree (Static)\label{fig:continuous-embedding-pyramid}]{%
 			\includegraphics[scale=0.65]{figures/1d_manifold_pyramid.pdf}
 		}
-		\end{subfloat}~~~~~~~
-		\begin{subfloat}[1-Manifold Decomposed using Adaptive Octree\label{fig:continuous-embedding-octree}]{%
+		\end{subfloat}~~~~~
+		\begin{subfloat}[Octree (Adaptive)\label{fig:continuous-embedding-octree}]{%
 			\includegraphics[scale=0.65]{figures/1d_manifold_octree.pdf}
+		}
+		\end{subfloat}~~~~~
+		\begin{subfloat}[Multigrid (Static)\label{fig:continuous-embedding-multigrid}]{%
+			\includegraphics[scale=0.65]{figures/1d_manifold_multigrid.pdf}
 		}
 		\end{subfloat}
 	\end{center}
 
-	\caption{Various Spatial Decompositions of Datasets}
+	\caption{Various Spatial Decompositions of Non-Continuous 2D Dataset and 1-Manifold in 2D Space. Each Polygon Represents a Bucket}
 	\label{fig:static-adaptive-decomposition}
 \end{figure}
 
-Figure \ref{fig:non-continuous-embedding} shows a dataset computed using the mapping $f : \mathbb{R}^1 \rightarrow \mathbb{R}^2$. Unlike the astrophysics dataset, $f$ is not modelling continuous physical phenomenon and a such, the resulting dataset in $\mathbb{R}^2$ is not continuous (i.e. is not a curve). This would be the case for the synthetic data randomly generated for performance analysis in Chapter \ref{chap:design-and-implementation}. In this particular example, the resulting points are  
+Figure \ref{fig:non-continuous-embedding} shows a dataset computed using the mapping $f : \mathbb{R}^1 \rightarrow \mathbb{R}^2$. Unlike the astrophysics dataset, $f$ is not modelling continuous physical phenomenon and a such, the resulting dataset in $\mathbb{R}^2$ is not continuous (i.e. is not a curve). This would be the case for the synthetic data randomly generated for performance analysis in Chapter \ref{chap:design-and-implementation}. In this particular example, the points are more evenly distributed across the space.
 
-Figure \ref{fig:continuous-embedding-pyramid} shows a continuous one-dimensional manifold. It is similar to the astrophysics dataset in that strips of points are aligned along some value close to the boundary. The Pyramid Tree ends up storing all the points in just threes buckets. Without the ability to adapt, the performance of the structure will rapidly degrade as more and more points are mapped to the same few buckets. Recall that the original Pyramid Tree paper evaluated the structure using a discrete text database and range queries \cite{pyramid-tree}. Continuous data with point queries was not tested, so it is not entirely surprising that the Pyramid Tree's performance is poor.
+Figure \ref{fig:continuous-embedding-pyramid} shows a continuous one-dimensional manifold. Here, the points on the manifold will be stored in just five buckets. Without the ability to adapt, the performance of the structure will rapidly degrade as more and more points are mapped to the same few buckets.
 
-Figure \ref{fig:continuous-embedding-octree} shows an adaptive Octree decomposition, which adapts the decomposition by providing greater discrimination between points in regions that contain more points. The point $kd$-tree can be seen as an adaptive index structure to some extent, since decomposition of the underlying data space depends on the values of the given points. This, along with its resilience to points aligned in strips close to boundaries, are some of the reasons its performance is vastly superior to the Pyramid Tree for the two scientific datasets.
+Figure \ref{fig:continuous-embedding-octree} shows an Octree decomposition, which adapts the decomposition by providing greater discrimination between points in regions that contain more points. The point $kd$-tree can be seen as an adaptive index structure to some extent, since decomposition of the underlying data space depends on the values of the given points. This, along with its resilience to points aligned in strips close to boundaries, are some of the reasons its performance is vastly superior to the Pyramid Tree for the two scientific datasets.
+
+\subsection{Case Study: Multigrid}
+
+To further support the claim that static decompositions perform poorly, we turn to the Multigrid described in Appendix \ref{chap:additional-structures}. To summarise, this index structure splits the entire data space into equal sized cells and hashes points to buckets based on the cell they are contained in. Figure \ref{fig:continuous-embedding-multigrid} shows a Multigrid decomposition of the 1-manifold discussed earlier.
+
+The Multigrid essentially quantises continuous values into a discrete range to avoid the floating point inaccuracy issues present with the Bucket Hash Table. Like the other hash-based approaches, the ultimate goal is to have a small number of points in each cell so query times become closer to $O(d)$.  The smaller the cells are made, the greater the discrimination between points there is and the smaller average bucket size will be. Theoretically, all one has to do to make the Multigrid work efficiently with the astrophysics dataset, or any dataset with dense clusters in a large space, is keep decreasing cell size until the average bucket size becomes small enough.
+
+On real machines however, this does not work. If the cell size becomes small enough, points begin being mapped to the same cell even if they are conceptually in different cells. The reason for this is that small cell sizes cause rounding errors due to limited precision of floating point arithmetic. In other words, there is a limit to how small cells can be. The astrophysics has a highly clustered distribution, with most of the data space being almost empty. This means extremely small cell sizes are required to map points to different buckets.
+
+Table \ref{tab:cell-size-effect} shows the effect of cell size on average bucket size when storing 100,000 points from the astrophysics dataset. It shows that, as you increase the number of cells for each dimension (making individual cells smaller), the average bucket size decreases. When the number of cells exceeds a certain number, which is approximately 11,000,000 for this dataset, no additional benefit is gained and the average bucket size does not change.  This shows there is a limit to how much data skew static decompositions can handle, regardless of how granular the decomposition is.
+
+\begin{table}
+	\centering
+	\begin{tabular}{|r|l|l|}
+	\hline
+	\textbf{Cells Per Dimension} & \textbf{Average Bucket Size} & \textbf{Total Buckets} \\
+	\hline
+	100 & 1149.43 & 87 \\
+	1,000 & 168.919 & 592 \\
+	10,000 & 26.5252 & 3,770 \\
+	100,000 & 10.7181 & 9,330 \\
+	1,000,000 & 9.10581 & 10,997 \\
+	1,100,000 & 9.06454 & 11,032 \\
+	1,200,000 & 9.06454 & 11,032 \\
+	1,000,0000 & 9.06454 & 11,032 \\
+	\hline
+	\end{tabular}
+	\caption{Number of Cells Used for Multigrid Index Structure and Its Effect on Bucket Size with 100,000 Astrophysics Dataset Points}
+	\label{tab:cell-size-effect}
+\end{table}
+
+To summarise, adaptive decompositions allows one to quickly ``zoom in" to regions of the data space dense with points and ignore the sparse regions, even when the point distribution is not known in advance. This is something that cannot be achieved with static decompositions.
 
 \section{Suitability of Hash-Based Approaches}
 
-The Pseudo-Pyramid Tree and Pyramid Tree both produce a static decomposition of the underlying data space through the use of dimension reduction (i.e. they \textit{hash} points). They do not adapt to the distribution of the input data by modifying the amount or size of bins. With dynamic data, where one does not know the distribution of the data in advance, these approaches are severely limited. This is shown by the empirical results from this project; the performance of these two structures on the real datasets is vastly inferior to the point $kd$-tree, a simple and well-established technique.
+The Pseudo-Pyramid Tree and Pyramid Tree both produce a static decomposition of the underlying data space through the use of dimension reduction (i.e. they \textit{hash} points). It was shown in the empirical results from this project that the performance of these two structures being vastly inferior to the point $kd$-tree, a simple and well-established technique. This matches with the discussion on the suitability of static decompositions for highly skewed datasets.
 
-Adaptive variants of the Pyramid Tree exist, such as the Extended Pyramid-Technique \cite{pyramid-tree} and iMinMax($\theta$) (see Appendix \ref{chap:additional-structures}). However, the \textit{cost} of adapting such structures limits their usefulness. For example, the Extended Pyramid-Technique moves the centre of the data space to be the median point. Doing so means that the entire structure must be rebuild, because each stored point may be hashed to a different value after the data space is moved. For large $n$ this has a massive impact on performance. Suppose the structure stores a million points and then has to adapt -- a million points must be re-inserted. iMinMax($\theta$) was implemented in this project, but the performance was still poor despite it adapting to the dataset, due of the rebuilding procedure. For this reason, it has not been covered in detail in this report and the project did not explore adaptive dimension reduction techniques any further.
+Adaptive variants of the Pyramid Tree exist, such as the Extended Pyramid-Technique \cite{pyramid-tree} and iMinMax($\theta$). However, the \textit{cost} of adapting such structures limits their usefulness. For example, the Extended Pyramid-Technique moves the centre of the data space to be the median point. Doing so means that the entire structure must be rebuild, because each stored point may be hashed to a different value after the data space is moved. For large $n$ this has a massive impact on performance. iMinMax($\theta$)  (see Appendix \ref{chap:additional-structures}) was implemented in this project, but the performance was still poor despite it adapting to the dataset because of the high cost of rebuilding.
 
-Despite the more adaptive point $kd$-tree performing worse on highly skewed data like the astrophysics dataset, the structure can still process the data reasonably quickly. No major optimisations were applied to the implementation and no additional exploration was performed the numerous $kd$-tree variants that have been developed.
+Despite the more adaptive point $kd$-tree performing worse on highly skewed data, the structure's performance is vastly superior when compared when compared to the other structures explored in this project.
 
-The empirical performance timings has lead the author of this report to conclude that techniques which perform a static decomposition of the data space are \textit{not} suitable for dynamic data, unless one knows about the kinds of distributions that will be given in advance. The supplementary theoretical analysis performed in this chapter has shown that data generated by mapping continuous domains mapped to higher-dimensional ranges are especially a challenge for structures that cannot adapt, due to the highly clustered and skewed distributions of points that result from such a mapping. Since the cost of adapting dimension reduction technique is so high due to rebuilds being required, perhaps dimension reduction in general is not suitable for dynamic data.
+The empirical performance timings has lead this project to conclude that techniques which perform a static decomposition of the data space are \textit{not} suitable for dynamic data, unless one knows about the kinds of distributions that will be given in advance. The supplementary theoretical analysis performed in this chapter has shown that data generated by mapping continuous domains to higher-dimensional ranges are especially a challenge for structures that cannot adapt, due to the highly clustered and skewed distributions of points which can result from such a mapping. Since the cost of adapting dimension reduction techniques is so high due to rebuilds being required, it follows that most dimension reduction are likely to be unsuitable for dynamic data.
 
-Index structures which can adapt to different distributions of data \textit{as} points are inserted tend to require less computation. From initial experimentation with the point $kd$-tree, they appear to offer good performance with point queries. The literature often discussed how $kd$-trees degenerate to Sequential Scan with higher dimensions, but this does not appear to be the case for point queries.
+Index structures which can adapt to different distributions of data \textit{as} points are inserted do not require an expensive rebuild procedure. From initial experimentation with the point $kd$-tree, they appear to offer good performance with point queries. Existing literature often discusses how $kd$-trees degenerate to Sequential Scan with higher dimensions, but this does not appear to be the case for point queries, even with real datasets with high skew.
 
 \section{New Hypotheses}
 
-Based on the empirical evidence from Chapter \ref{chap:design-and-implementation} and the theoretical evaluation from Chapter \ref{chap:technical-evaluation}, the hypothesis from Section \ref{sec:main-hypothesis} has been abandoned in favour of the following new hypothesis.
+Based on the empirical evidence from Chapter \ref{chap:design-and-implementation} and the theoretical evaluation from Chapter \ref{chap:technical-evaluation}, the hypothesis from Section \ref{sec:main-hypothesis} has been abandoned in favour of the following new hypotheses.
 
-\paragraph{\textbf{HYPOTHESIS 1:}} The Pyramid Tree is not a suitable index structure for performing point queries in higher-dimensional scientific datasets.
+\paragraph{\textbf{HYPOTHESIS 1:}} The Pyramid Tree is not a suitable index structure for performing point queries, due to it being highly sensitive to skewed datasets.
 
-\paragraph{\textbf{HYPOTHESIS 2:}} Index structures based on dimension reduction or hashing cannot adapt well to dynamically changing distributions of data, due to the cost of rebuilding the structure when adapting.
+\paragraph{\textbf{HYPOTHESIS 2:}} Existing index structures based on dimension reduction or hashing cannot adapt well to dynamically changing distributions of data, due to the cost of rebuilding the structure when adapting.
 
 \paragraph{\textbf{HYPOTHESIS 3:}} Dynamic tree-based structures, which adapt the decomposition of the data space as points are inserted, provide better point query performance for dynamic high-dimensional datasets than dimension reduction techniques such as the Pyramid Tree.
 
-\paragraph{}
-
-Hypothesis 1 has been verified specifically for the astrophysics (and to a lesser extent, the hurricane Isabel dataset). More research and analysis with other scientific datasets is required to fully verify both this hypotheses. Some evidence verifying hypotheses 2 and 3 is present in this report, as there are empirical timings to support the clams, but more comprehensive research should be performed. it is beyond the scope of this project to explore these hypotheses further, however.
+Sadly, it beyond the scope and time constraints of this project to explore these hypotheses further.

@@ -5,25 +5,22 @@
 
 This section describes index structures which were implemented during the project, but were not discussed or evaluated in the main report due to time constraints. Preliminary findings on the structures' performance is discussed.
 
+\section{Multigrid}
+
+TODO
+
 \section{iMinMax($\theta$)}
 
-iMinMax($\theta$) is an index structure similar to the Pyramid Tree, whose behaviour is affected by the parameter $\theta$ \cite{iminmax}. $\theta$ can be tuned to optimise the structure for different data distributions. Like the Pyramid Tree, it reduces points to a single dimension and applies a one-dimensional search structure to these values. 
+iMinMax($\theta$) is an index structure similar to the Pyramid Tree, whose behaviour is affected by the parameter $\theta$ \cite{iminmax}. $\theta$ can be tuned to optimise the structure for different data distributions. Like the Pyramid Tree, it reduces points to a single dimension and applies a one-dimensional search structure to these values. To adapt to a dynamic distribution, the value of $\theta$ is tweaked, changing the hashing function. This means the structure must be rebuild every time $\theta$ is changed.
 
-An implementation of this was developed by modifying the existing Bucket Pseudo-Pyramid Tree implementation (see Section \ref{sec:iteration1}). Preliminary tests reveled that the structure was only slightly faster than the Pyramid Tree for the astrophysics and hurricane Isabel datasets, regardless of the value of $\theta$.
-
-\section{Recursive Pyramid Tree}
-
-The main disadvantage of th Pyramid Tree is that it does not adapt to the data distribution. This means for highly skewed dynamic data the structure is likely to degenerate to semi-sequential scan, as shown in Chapter \ref{chap:design-and-implementation}. Variants of the Pyramid Tree which adapt the decomposition of the data space to better suit a dataset's distribution exist. Examples of such variants include the Extended Pyramid-Technique or iMinMax($\theta$). However, adapting requires rebuilding the entire structure. When the TODO.
-
-A new structure, called the \textbf{Recursive Pyramid Tree}, is proposed. It is a tree-based structure, where each node contains an array of points or a Pyramid Tree. The root node is a $d$-dimensional Pyramid Tree and its children are the individual buckets .
-
+An implementation of this was developed by modifying the existing Bucket Pseudo-Pyramid Tree implementation (see Section \ref{sec:iteration1}). Preliminary tests revealed that the structure was only slightly faster than the Pyramid Tree for the astrophysics and hurricane Isabel datasets, regardless of which value was chosen for $\theta$. The majority of the structure's execution time was spent rebuilding the structure, supporting the claim that existing dimension reduction techniques will require rebuilding are not suitable for dynamic data (discussed in Section \ref{sec:implications-to-md-search}).
 
 \section{Bucket $kd$-Tree}
 
-Instead of storing a single point in every node of the tree, the \textbf{Bucket $kd$-Tree} stores multiple points in each node (termed a bucket), with the constraint that only leaf nodes store points. Non-leaf nodes serve to partition the data space, each cutting the space along a single dimension by some value (the cutting value). When the number of points in a leaf exceeds a certain number, say $M$, then a cutting dimension and value are determined, whichis used to split a leaf into two. The left and right children nodes are leaves that contain the points from the split node that lie on one of the sides of the split.
+Instead of storing a single point in every node of the tree, the \textbf{Bucket $kd$-Tree} stores multiple points in each node (termed a bucket), with the constraint that only leaf nodes store points. Non-leaf nodes serve to partition the data space, each cutting the space along a single dimension by some value (the cutting value). When the number of points in a leaf exceeds a certain number, say $M$, then a cutting dimension and value are determined, which is used to split a leaf into two. The left and right children nodes are leaves that contain the points from the split node that lie on one of the sides of the split.
 
 To query or delete a point, the leaf containing the point is found, which is sequentially scanned to find the point. If the point is found, it is removed from the leaf. If the total number of points being stored in the modified leaf node and its sibling is less than $\frac{M}{4}$, then the two leaf nodes are \textit{merged} into their parent. The parent becomes a leaf node containing all the points stored in the two leaves.
 
-Compared to the point $kd$-tree, the bucket $kd$-tree has more knowledge about the distribution of the points since multiple are stored in a bucket. With the point $kd$-tree, only one point at a time is used to determine the cutting dimension, so less knowledge about the distribution is used to perform a split. Knowing more about the distribution allows the bucket-$kdtree$ to partition the data more effectively to construct a more balanced tree.
+Compared to the point $kd$-tree, the bucket $kd$-tree has more knowledge about the distribution of the points since multiple are stored in a bucket. With the point $kd$-tree, only one point at a time is used to determine the cutting dimension, so less knowledge about the distribution is used to perform a split. Knowing more about the distribution allows the bucket $kd$-tree to partition the data more effectively to construct a more balanced tree.
 
 This structure was implemented as part of the project. The \textit{sliding midpoint} splitting rule was used to split full leaves, which is described in \cite{sliding-midpoint-split}. Preliminary results show that it reduced balance factor, but an inefficient implementation meant there were large constant factors that dominated performance. This made the structure slower than the point $kd$-tree implementation. More work optimising the implementation should be performed to assess its suitability for dynamic scientific datasets.
