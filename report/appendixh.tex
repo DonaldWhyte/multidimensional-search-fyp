@@ -5,9 +5,15 @@
 
 This section describes index structures which were implemented during the project, but were not discussed or evaluated in the main report due to time constraints. Preliminary findings on the structures' performance is also discussed.
 
-\section{Recursive Pyramid Tree}
+\section{IMinMax}
 
 TODO
+
+\section{Recursive Pyramid Tree}
+
+The main disadvantage of th Pyramid Tree is that it does not adapt to the data distribution. This means for highly skewed dynamic data the structure is likely to degenerate to semi-sequential scan, as shown in Chapter \ref{chap:design-and-implementation}. Variants of the Pyramid Tree which adapt the decomposition of the data space to better suit a dataset's distribution exist. Examples of such variants include the Extended Pyramid-Technique or IMinMax($\theta$). However, adapting requires rebuilding the entire structure. When the TODO.
+
+A new structure, called the \textbf{Recursive Pyramid Tree}, is proposed. It is a tree-based structure, where each node contains an array of points or a Pyramid Tree. The root node is a $d$-dimensional Pyramid Tree and its children are the individual buckets .
 
 \section{Multigrid}
 
@@ -17,6 +23,3 @@ TODO
 
 TODO
 
-\section{IMinMax}
-
-TODO
