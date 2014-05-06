@@ -15,6 +15,16 @@ namespace mdsearch
 	public:
 		typedef std::vector< Point<D> > PointList;
 
+		/* Add all given points to this dataset. */
+		void load(const PointList& newPoints)
+		{
+			// Pre-allocate memory in one sys call
+			points.reserve(points.size() + newPoints.size());
+			// Append given points to end of current point list
+			points.insert(points.end(), newPoints.begin(), newPoints.end());
+		}
+
+		/* Add all points in file to this dataset. */
 		void load(const std::string& filename)
 		{
 			// Open specified file and just return empty list of points if
@@ -75,22 +85,21 @@ namespace mdsearch
 			{
 				// Use first point for dimensionality and initial boundary
 				const Point<D>& firstPoint = points[0];
-				unsigned int numDimensions = firstPoint.numDimensions();
-				for (unsigned int d = 0; (d < numDimensions); d++)
+				for (unsigned int d = 0; (d < D); d++)
 				{
-					boundary.minValue(d) = firstPoint[d];
-					boundary.maxValue(d) = firstPoint[d];
+					boundary.minVal(d) = firstPoint[d];
+					boundary.maxVal(d) = firstPoint[d];
 				}
 				// Now search through rest of points in dataset to find
 				// minimum and maximum values for each dimension
 				for (typename PointList::const_iterator p = points.begin() + 1; (p != points.end()); p++)
 				{
-					for (unsigned int d = 0; (d < numDimensions); d++)
+					for (unsigned int d = 0; (d < D); d++)
 					{
-						if ((*p)[d] < boundary[d].min)
-							boundary.minValue(d) = (*p)[d];
-						else if ((*p)[d] > boundary[d].max)
-							boundary[d].maxValue(d) = (*p)[d];
+						if ((*p)[d] < boundary.minVal(d))
+							boundary.minVal(d) = (*p)[d];
+						else if ((*p)[d] > boundary.maxVal(d))
+							boundary.maxVal(d) = (*p)[d];
 					}
 				}
 			}

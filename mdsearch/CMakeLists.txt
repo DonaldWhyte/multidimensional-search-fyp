@@ -1,10 +1,7 @@
-# Static library containing index structures implemented for public release
-add_library( mdsearch
-	# Source Files
-	"src/test.cpp"
-	# Header files
-	"include/kdtree.h"
-	"include/pyramidtree.h"
+# Executable for testing implemented structures
+add_executable(mdsearch_tests
+	# Source files
+	"src/test_structures.cpp"
 )
 # Ensure include directory is in search path
 include_directories ("include")

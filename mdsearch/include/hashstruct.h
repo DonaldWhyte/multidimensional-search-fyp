@@ -6,7 +6,21 @@
 namespace mdsearch
 {
 
-	typedef std::size_t HashType;
+	/* Remove element at given index from vector, using erase-remove
+	 * idiom to prevent $(n) move operation. 
+	 *
+	 * NOTE: This deletes an element, but does NOT preserve the
+	 * vector's order.
+	 *
+	 * NOTE: This does NOT perform a check to ensure the given index
+	 * is within the bounds of the vector -- this be done by the calling
+	 * code. */
+	template <typename T>
+	inline void removeElementAtIndex(std::vector<T>& vec, unsigned int index)
+	{
+		std::iter_swap(vec.begin() + index, vec.end() - 1);
+		vec.erase(vec.end() - 1);
+	}
 
 	template<int D>
 	class HashStructure
@@ -27,7 +41,7 @@ namespace mdsearch
 		inline bool insert(const Point<D>& point)
 		{
 			// Retrieve containing bucket by hashing point into key
-			HashType searchKey = computePyramidValue(point);
+			HashType searchKey = hashPoint(point);
 			// Search underlying 1D structure to find point's bucket
 			Bucket* bucket = NULL;
 			typename OneDMap::iterator it = hashMap.find(searchKey);
@@ -147,7 +161,7 @@ namespace mdsearch
 		inline Bucket* getContainingBucket(const Point<D>& point)
 		{
 			// Hash point into one-dimensional key
-			HashType searchKey = computePyramidValue(point);
+			HashType searchKey = hashPoint(point);
 			// Search underlying structure to find point's bucket
 			typename OneDMap::iterator it = hashMap.find(searchKey);
 			if (it != hashMap.end())

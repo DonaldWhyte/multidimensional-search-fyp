@@ -11,6 +11,8 @@ namespace mdsearch
 	typedef float Real;
 	typedef std::vector<Real> RealList;
 
+	typedef long HashType;
+
 	template <int D>
 	struct Point
 	{
