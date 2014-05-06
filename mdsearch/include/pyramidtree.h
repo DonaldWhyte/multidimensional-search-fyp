@@ -25,7 +25,7 @@ namespace mdsearch
 			// NOTE: This is currently unused, but could be updated to create
 			// an adaptive variant of the structure (e.. Extended Pyramid-Technique)
 			for (unsigned int d = 0; (d < D); d++)
-				medianPoint[d] = boundary.minVal[d] + ((boundary.maxVal[d] - boundary.minVal[d]) / 2.0f);
+				medianPoint[d] = boundary.minVal(d) + ((boundary.maxVal(d) - boundary.minVal(d)) / 2.0f);
 		}
 
 	protected:
@@ -49,10 +49,10 @@ namespace mdsearch
 		{
 			int index = 0;
 			int dMax = 0;
-			Real dMaxHeight = pyramidHeight(p[0], boundary.minVal[0], boundary.maxVal[0]);
+			Real dMaxHeight = pyramidHeight(p[0], boundary.minVal(0), boundary.maxVal(0));
 			for (int d = 1; (d < D); d++)
 			{
-				Real currentHeight = pyramidHeight(p[d], boundary.minVal[d], boundary.maxVal[d]);
+				Real currentHeight = pyramidHeight(p[d], boundary.minVal(d), boundary.maxVal(d));
 				#ifdef BOUNDARY_VALUE_HACK
 					if (compare(currentHeight, 0.5f) == 0)
 						continue;
@@ -65,7 +65,7 @@ namespace mdsearch
 				}
 			}
 
-			if (normaliseCoord(p[dMax], boundary.minVal[dMax], boundary.maxVal[dMax]) < 0.5f)
+			if (normaliseCoord(p[dMax], boundary.minVal(dMax), boundary.maxVal(dMax)) < 0.5f)
 				index = dMax; // pyramid lower than central point
 			else 
 				index = dMax + D; // pyramid higher than central point

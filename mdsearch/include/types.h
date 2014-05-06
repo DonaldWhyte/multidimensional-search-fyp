@@ -15,7 +15,14 @@ namespace mdsearch
 	struct Point
 	{
 
-		Real values[D];
+		Point()
+		{
+		}
+
+		Point(const Real* initialValues)
+		{
+			memcpy(values, initialValues, sizeof(Real) * D);
+		}
 
 		inline bool operator==(const Point& other) const
 		{
@@ -47,6 +54,8 @@ namespace mdsearch
 				s += values[d];
 			return s;	
 		}
+
+		Real values[D];
 
 	};
 

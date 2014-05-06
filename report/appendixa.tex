@@ -14,13 +14,15 @@ I have learnt much from this project, but the especially valuable lessons were:
 \begin{itemize}
 	\item \textbf{Background Research} -- I have learnt how to dive into a field I have very little knowledge about, find relevant literature in a methodical way and synthesise that literature into higher-level insights about the field.
 	\item \textbf{Risk Management} -- research projects generally involve high amounts of risks and I believe this project was no exception. This project's implementation phase in particular carried lots of risk -- a structure could take longer to implement than expected, may not perform as well as expected or I might even fail to find the necessary information to implement the structure (e.g. the Splay Quadtree). I had to become better at planning for risk and mitigating its effects to ensure the project continued running smoothly.
-	\item \textbf{Methodical Evaluation} -- this is the first project that has required me to perform such an in-depth, rigorous evaluation. This experience has taught me how to methodically evaluate the deliverables, considering different evaluation approaches and how they might affect (or even bias) the final results.
-	\item \textbf{Algorithm Design and Analysis} -- TODO
+	\item \textbf{Methodical Evaluation} -- this is the first project that has required me to perform such an in-depth, rigorous evaluation. It required \textit{thinking} about what I am doing and why at all times and a systematic approach to support this thinking. The project has has improved my ability to do this, by methodically evaluating the results of experiments and deriving new insights.
+	\item \textbf{Technical Skills} -- the sheer amount of algorithms reviewed, created and modified for this report has improved my algorithm design skills. Additionally, I have learnt how to write efficient code by considering cache coherency, memory management and how the underlying C/C++ code works.
 \end{itemize}
 
 \section{What I Would Do Differently}
 
-Doing this project again, TODO.
+The biggest mistake made in this project was not following a systematic and methodical approach. If a truly systematic approach was followed with the evaluation of the implementations, then the problems with the Pyramid Tree should have been caught some in the first two weeks of the Design and Implementation phase, not the fourth week like it was. The discovery was made too late in the project, making it difficult to steer the project in a different direction in time.
+
+Further mistakes were made after this discovery. Rather than perform an in-depth evaluation into \textit{why} the Pyramid Tree had such bad performance straight away, other structures were explored. However, these were all other hash-based structures, which as shown in the final technical evaluation in this report, are likely to always perform poorly with the target datasets. I should have had the discipline to stop and think about the reason for the poor performance of the Pyramid Tree, rather than rushing into implementing other structures without considering the wider implications of the findings. By the time I had realised this, it was late into the project.
 
 \section{Advice to Fellow Students}
 
@@ -34,4 +36,6 @@ Finally, \textbf{be realistic about the project's goals}. Ambition causes people
 
 \section{Final Remarks}
 
-The project was challenging at times, but without those challenges it would not have been as satisfying to complete. While the end results were not as efficient as I had wanted, I hope someone will find use in the project's deliverables for their own work in the future. Above all, I greatly enjoyed this project (even if I probably spent far too many evenings in the lab). I found myself becoming highly interested in the field of multi-dimensional search, and I have only scratched the surface of it. Perhaps one day I will revisit the field and delve much deeper!
+While the end results were not as efficient as I had wanted, I hope someone will find use in the project's deliverables and findings for their own work in the future. I greatly enjoyed this project, even if I probably spent far too many evenings in the lab. I found myself becoming highly interested in multi-dimensional search and I have only scratched the surface of it. 
+
+The project was challenging at times, but without those challenges it would not have been as satisfying to complete. While I would like to revisit the problem again someday, I believe think the project was repeatedly steered in the wrong directions due to poor decision making and lack of systematic approach. While I have learnt many lessons from this project, the result of this project leads me to believe I not cut out for research.
