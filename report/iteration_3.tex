@@ -4,7 +4,7 @@ Some index structures that reduce the dimensionality of points via a hashing fun
 
 \subsection{Point $kd$-tree}
 
-The $kd$-tree variant described in Section \ref{sec:kd-tree-chosen} was implemented, which shall be referred to as the \textbf{Point $kd$-tree}. Each node is represented as a C-struct which stores a single point as well as pointers to its children. Every node is allocated using a call to \texttt{malloc()}, which allocates enough memory on the heap to store the node. This means each node may reside in different areas of the heap, resulting in fragmented memory.
+The $kd$-tree variant described in Section \ref{sec:kd-tree-detail} was implemented, which shall be referred to as the \textbf{Point $kd$-tree}. Each node is represented as a C-struct which stores a single point as well as pointers to its children. Every node is allocated using a call to \texttt{malloc()}, which allocates enough memory on the heap to store the node. This means each node may reside in different areas of the heap, resulting in fragmented memory.
 
 \subsection{Performance Timings}
 

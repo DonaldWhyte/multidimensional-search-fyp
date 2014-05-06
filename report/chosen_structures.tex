@@ -93,7 +93,7 @@ Let $B$ be a parameter which controls how likely points will be in the same buck
 Higher $B$ means higher $m$. This increases the magnitude of $h_i(p)$ before it is truncated to an integer, meaning less points will have the same hashed value, meaning less points in the same bucket on average. Lower $B$ will therefore mean more points will be in the same bucket on average.
 
 \section{$kd$-tree}
-\label{sec:kd-tree-chosen}
+\label{sec:kd-tree-detail}
 
 The $kd$-tree is a widely used structure for both low and high dimensional data. In the literature, there is a lot of discussion as to how and why this structure performs poorly in a high-dimensional setting \cite{highd-nn, search-highd-analysis}. This reveals that $kd$-trees are typically used for \textit{approximate} queries in higher-dimensional space, as they tend to degenerate to Sequential Scan for exact range and nearest neighbour queries \cite{similarity-searching}. 
 
