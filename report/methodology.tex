@@ -10,7 +10,7 @@ This section gives information on how the project will be tackled, describing th
 
 The original schedule was devised near the end of the first week of the project, on 31/01/14. The schedule was broken down into the individual tasks required to complete the defined milestones. These tasks were then grouped into different \textbf{phases}, which mostly run in a serial fashion. Milestones were associated with these phases, each corresponding to the completion of some deliverable.
 
-The phases of the project and their milestones are:
+On 20/02/14, this schedule was modified slightly to adapt to tasks taking longer than expected. The final project phases, and their milestones, are:
 \begin{enumerate}
 	\item \textbf{Project Definition}
 	\begin{itemize}
@@ -19,8 +19,11 @@ The phases of the project and their milestones are:
 	\item \textbf{Literature Review and Data Collection}
 	\begin{itemize}	
 		\item \textbf{Literature Review Complete} -- a literature review of multi-dimensional search has been produced
-		\item \textbf{Test Data Collected} -- any non-synthetic external test data sets have been decided and collected
+		\item \textbf{Test Data Collected} -- real test datasets have been decided and collected
 	\end{itemize}
+
+	\vspace{60pt}
+
 	\item \textbf{Mid-project Presentation and Report}
 	\begin{itemize}	
 		\item \textbf{Mid-project Presentation Delivered} -- mid-project presentation delivered to relevant research group (Computational Science and Engineering)
@@ -32,27 +35,27 @@ The phases of the project and their milestones are:
 	\end{itemize}
 	\item \textbf{Final Report Write-up}
 	\begin{itemize}
-		\item \textbf{Final Report Finished} -- final report, the core deliverable of the project, has been submitted
+		\item \textbf{Final Report Finished} -- final report has been submitted
 	\end{itemize}
 	\item \textbf{Student Symposium}
 	\begin{itemize}
-		\item \textbf{Final Presentation Delivered} -- final project presentation has been delivered in the School's Student Symposium	
+		\item \textbf{Final Presentation Delivered} -- final project presentation has been delivered 
 	\end{itemize}
 \end{enumerate}
 
-Figure \ref{fig:revised-schedule} in Appendix \ref{chap:supp-material} shows a Gantt chart of the project phases, marking the start and end dates for each phase. Notice how some phases are running in parallel, with one phase being the primary focus and other being a secondary focus where less is spent. It was decided that a more granular Gantt chart, which shows low-level tasks, would not be created. The primary reason for this was the exploratory nature of the project, which meant the exact tasks for each iteration of the Design and Implementation phase was not known in advance.
+Figure \ref{fig:revised-schedule} in Appendix \ref{chap:supp-material} shows a Gantt chart of the project phases, marking the start and end dates for each phase. Notice how some phases are running in parallel, with one phase being the primary focus and other being a secondary focus where less is spent. This is a research project by nature, so the exact tasks for most phases were not known in advance. Therefore, it was decided that a more detailed breakdown of the tasks throughout the project would not be created.
 
 Figure \ref{fig:revised-milestone-timeline} shows a timeline marked with every milestone. The location of a milestone on the timeline marks the latest completion date of that milestone.
 
 \subsection{Iterative Design and Implementation}
 \label{sec:iterative-d-and-i}
 
-The performance tests and evaluation of the implementations could produce unexpected results, showing that it may be beneficial to implement an entirely different index structure or use a different technology. Therefore, deciding on a \textit{fixed} set of index structures to implement and their technologies before starting implementation would be unwise. With such an approach, there is no way to go backwards and revise the project plan if performance tests highlight a poor index structure or technology.
+The performance tests and evaluation of the implementations could produce unexpected results, showing that it may be beneficial to implement an entirely different index structure or use a different technology. Therefore, deciding on a \textit{fixed} set of index structures to implement before starting implementation would be unwise. With such an approach, there is no way to go backwards and revise the project plan if performance tests reveal an inefficient index structure.
 
-A decision was made to decide on a \textit{single} index structure to implement before starting the Design and Implementation phase. This will be evaluated and based on that evaluation, it will be optimised or it will be discarded in favour of another index structure. This will be repeated in iterations, where each iteration contains the following sub-phases:
+A decision was made to choose a \textit{single} index structure to implement before starting the Design and Implementation phase. This will be evaluated and based on that evaluation, it will be optimised or it will be discarded in favour of another index structure. This will be repeated in iterations, where each iteration contains the following sub-phases:
 \begin{enumerate}
-	\item \textbf{Design} -- plan exactly what needs to be done in the iteration and the architectural design of the system/implementation
-	\item \textbf{Build} -- implement an index structure or perform one or more optimisations
+	\item \textbf{Design} -- plan what will be implemented in iteration and design implementation
+	\item \textbf{Build} -- implement an index structure or perform a set of optimisations
 	\item \textbf{Test} -- perform correctness tests on index structure to ensure it (still) works
 	\item \textbf{Performance Analysis} -- perform performance analysis on index structure developed/optimised
 	\item \textbf{Evaluation} -- evaluate the results of the analysis and use it to decide what to implement or optimise in the next iteration
@@ -61,15 +64,15 @@ When enough iterations have passed or there is no time left to spend on the Desi
 
 \subsection{Modifications to Original Plan}
 
-The plan has changed since its initial conception. The original plan stated that the initial, unoptimised implementations of the index structures should be finished before the mid-project presentation or report. The idea behind this decision was that having implementations of index structures finished before the presentation, an initial evaluation of the index structures could be performed. The results from this evaluation could then used in the presentation and report to justify decisions on the remaining project will consist of. However, due to the scope of the research field, the literature take one more week than expected. This meant that there was little time between the end of the literature review and the start of the mid-project presentation and report.
+The plan has changed since its initial conception. The original plan stated that the initial, unoptimised implementations of the index structures should be finished before the mid-project presentation/report. By finishing the initial implementations of index structures before the presentation, an initial evaluation of the index structures could be performed. The results from this evaluation could be used in the presentation/report to justify decisions on what the remaining project will consist of. However, due to the scope of the research field, the literature review took one more week than expected. This meant there was little time between the end of the literature review and the start of the mid-project presentation/report. Furthermore, additional time was required to become fully informed about the field of multi-dimensional search and the nature of the data that will be used for evaluation. This knowledge informs the decisions on which index structures to implement, so it was felt that rushing into an initial implementation may result in a poor decision being made on which structures to implement. 
 
-Furthermore, additional time was required to become fully informed about the field of multi-dimensional search and the nature of the data that will be used for evaluation. This knowledge informs the decisions on which index structures to implement, so it was felt that rushing into an initial implementation may result in a poor decision being made on which structures to implement. Therefore, any implementation was pushed back until after the submission of the mid-project report. By doing this, there was more time to consolidate the research findings and make a more informed decision on the index structure(s) to implement.
+It was decided to delay any implementation until after the submission of the mid-project report. By doing this, there was more time to consolidate the research findings and make a more informed decision on the index structures to implement.
 
 For completeness, the Gantt chart and milestone timeline for the original plan is shown in Figures \ref{fig:initial-schedule} and \ref{fig:initial-milestone-timeline} in Appendix \ref{chap:supp-material}.
 
 \subsection{Splay Quadtree}
 
-The first index structure to implement was originally going to be the Splay Quadtree (Section \ref{sec:splay-quadtree}). However, due to the complexity of the structure, it was felt that there was not enough time to both implement the structure and produce a comprehensive evaluation. It was abandoned in favour of the Pyramid Tree.
+The first index structure to implement was originally going to be the Splay Quadtree (Section \ref{sec:splay-quadtree}). Due to the complexity of the structure, it was felt that there was not enough time to implement the structure and produce a comprehensive evaluation. It was abandoned in favour of the Pyramid Tree.
 
 \section{Technology}
 
@@ -77,33 +80,33 @@ This section compares some of the potential technologies to use when implementin
 
 \subsection{Programming Language}
 
-There exist many programming languages, all developed for specific purposes. Three programming languages have been considered for this project, with each having different properties. This section will describe these languages, discuss their differences and state which will be used for this project and why.
+There exist many programming languages, all developed for specific purposes. Three programming languages have been considered for this project. This section will describe these languages, discuss their differences and state which will be used for this project and why.
 
-\textbf{Python} is a high-level interpreted language built for general-purpose computing, which has a large standard library and many third-party libraries \cite{python}. \textbf{C++} is a middle-level, compiled systems programming language, combining low-level features (e.g. manual memory management) and high-level features (e.g. object-orientated programming) \cite{cpp}. C++ applications are compiled straight to the native machine's CPU instruction set, meaning less time is spent translating the code to instructions the hardware can directly execute. \textbf{Haskell} is a purely functional general-purpose programming language which compiles to a native executable, similar to C++ \cite{haskell}. Being purely functional means that applications written in Haskell have no mutable state. This is unlike Python and C++, whose applications have mutable state (since both languages are imperative).
+\textbf{Python} is a high-level interpreted language built for general-purpose computing, which has a large standard library and many third-party libraries \cite{python}. \textbf{C++} is a middle-level, compiled systems programming language, combining low-level features (e.g. manual memory management) and high-level features (e.g. object-orientated programming) \cite{cpp}. C++ applications are compiled straight to the native machine's CPU instruction set, meaning less time is spent translating the code to instructions the hardware can directly execute. \textbf{Haskell} is a purely functional general-purpose programming language which, like C++, compiles to native CPU instructions \cite{haskell}.
 
 The following aspects have been considered when deciding which language to use:
 \begin{itemize}
 	\item \textbf{Performance} -- how fast the final application can run. This is based on a number of factors, such as how many intermediary layers there are between the code and the physical machine. Higher-level languages require the computer to do more work, as it has to convert the application's instructions into CPU instructions that are executed directly on the processor.
-	\item \textbf{Ease/Speed of Development} -- this encompasses multiple aspects of a language. In order to develop applications quickly, the language must have a mature tool set, large amounts of documentation and support, be easy to understand and require little boilerplate code (so less time is required to write the code). This makes it easier for the developer to write the application, increasing the speed it can be developed.
+	\item \textbf{Ease/Speed of Development} -- this encompasses multiple aspects of a language. To facilitate fast development, the language must have a mature tool set, good  documentation and support, be easy to understand and require little boilerplate code (so less time is required to write code).
 	\item \textbf{Portability} -- can an application written in a given language execute on many supported platforms or just one? Do multiple versions of the application have to be written or compiled for each platform?
 \end{itemize}
  
-Executing a Python statement often has more overhead than it would for C++ or Haskell. This is because Python is a high-level, interpreted language, where statements are compiled into bytecode at runtime which is then run on a virtual machine (which translates the bytecode to native assembly instructions). Therefore, many Python applications run slower than C++ or Haskell, which pre-compile applications to native CPU instructions. However, due to the large amount of experience the developer has in Python, its large standard library and the higher number of abstractions, Python would most likely result in the fastest development time. 
+Executing a Python statement introduces more overhead than C++ or Haskell statements. This is because Python is a high-level, interpreted language, where statements are compiled into bytecode at runtime which is then run on a virtual machine, which translates the bytecode to native assembly instructions. Therefore, many Python applications run slower than C++ or Haskell applications, which are pre-compiled to native CPU instructions. However, due to the large amount of experience the developer has in Python, its large standard library and the higher number of abstractions, it is likely Python would result in the fastest development time. 
 
-Haskell's pure functional nature makes it fundamentally different than most popular languages and the developer of this project also has little experience writing programs in a purely functional style. It is predicted this will increase the time it takes to develop the structures, as there is more overhead in learning about functional programming. However, if it is decided that the index structures will be parallelised, then the lack of state and built-in support for parallelisation \cite{parallel-haskell} would make Haskell a powerful choice.
+Haskell's purely functional nature makes it fundamentally different than most popular languages and the developer of this project also has little experience writing programs in a purely functional style. It is predicted this will increase the time it takes to develop the structures. Additionally, it is unlikely well-written, optimised Haskell code will be produced in such a short time. If parallel index structures are implemented, the lack of state and built-in support for parallelisation \cite{parallel-haskell} would make Haskell a powerful choice.
 
-Despite speed of development being important, the primary aim of the project is the acceleration of search. Haskell can be used to write highly optimised code, especially when implementing parallel algorithms to utilise multiple CPU cores. C++ gives the developer more control over the computation and management of memory, allowing for low-level performance tuning. The trade-off for this control is the added complexity of the language \cite{cpp-hard}, leading to an increased amount of code to write and the decrease in development speed that follows. C++ is also a mature language with a large set of tools and resources to aid development. Since the developer has significantly more experience developing in C++ than Haskell, it is unlikely well-written, optimised Haskell code will be produced in such a short time. 
+Despite development speed being important, the primary aim of the project is the acceleration of search. Haskell can be used to write highly optimised code, especially when implementing parallel algorithms to utilise multiple CPU cores. C++ gives the developer more control over the computation and management of memory, allowing for low-level performance tuning. The trade-off for this control is the added complexity of the language \cite{cpp-hard}, leading to an increased amount of code to write and the decrease in development speed that follows.
 
-C, another low-level systems programming language \cite{c-lang} and parent of C++ \cite{cpp}, is also a potential choice. There is much debate on whether C produces faster code than C++ (e.g. \cite{c-vs-cpp1, c-vs-cpp2, c-vs-cpp3}). This report will not make assertions about the relative performance of these two languages, but if C \textit{is} generally faster than C++ and the primary goal of the project is speed, then it seems logical to choose C. While the developer has experience using C, they are still significantly more experienced with C++.
+C, another low-level systems programming language \cite{c-lang} and parent of C++ \cite{cpp}, is also a potential choice. There is much debate on whether C produces faster code than C++ (e.g. \cite{c-vs-cpp1, c-vs-cpp2, c-vs-cpp3}). This report will not make assertions about the relative performance of these two languages, but if C \textit{is} generally faster than C++ and the primary goal of the project is speed, then it seems logical to choose C.
 
-In a project such as this, where many ideas will be implemented, tested and potentially thrown away, programmer productivity is vital. The importance of this is amplified by the short duration for the project (approximately three months). Therefore, as a compromise between the goal of high performance and the programmer's current skill set, C++ has been chosen as the language to use for developing the initial implementation of the index structure. 
+In a project such as this, where many ideas will be implemented, tested and potentially thrown away, programmer productivity is still vital. The importance of this is amplified by the project's short duration. While the developer has experience using C, they are still significantly more experienced with C++. Therefore, as a compromise between the goal of high performance and the programmer's current skill set, C++ has been chosen as the language to use for developing the initial implementation of the index structure. 
 
 \subsection{Development Tools}
 \label{sec:development-tools}
 
-Various tools will be used throughout the development of the structures. \textbf{CMake} \cite{cmake} will be used to automate the building of the written C++ programs. Using a build automation tool means a Makefile can be automatically generated by writing simpler, higher-level and cross-platform scripts, meaning less time is spent focused on build scripts.
+Various tools will be used throughout the development of the structures. \textbf{CMake} \cite{cmake} will be used to automate the C++ build process. Using a build automation tool allows one to write high-level build scripts that are cross-platform, increasing the portability of the implemented index structures.
 
-Unit tests will be written to ensure the implemented index structures and all the associated algorithms are functioning correctly. A unit test ensures a single unit of the code is exhibiting the desired behaviour. A test is performed in isolation, preventing other code in the application from being executed so it does interfere with the test's results \cite{automated-defect-prevention}. A unit test framework is a suite of code and tools that make writing unit tests easier and faster \cite{unit-test-frameworks}. C++ has many unit testing frameworks, such as CppUnit \cite{cppunit}, NullUnit \cite{nullunit} and Google Test \cite{google-test}. \textbf{Google Test} has been chosen for this project because of the wide feature set and the comprehensive documentation available (at \cite{google-test}).
+Unit tests will be written to ensure the implemented index structures and all the associated algorithms are functioning correctly. A unit test ensures a single unit of the code is exhibiting the desired behaviour. A test is performed in isolation, preventing other code in the application from being executed so it does interfere with the test's results \cite{automated-defect-prevention}. A unit test framework makes the process of writing unit tests easier and faster \cite{unit-test-frameworks}. C++ has many unit testing frameworks, such as CppUnit \cite{cppunit}, NullUnit \cite{nullunit} and Google Test \cite{google-test}. \textbf{Google Test} has been chosen for this project because of the wide feature set and the comprehensive documentation available (at \cite{google-test}).
 
 Version control is a way of tracking changes to textual documents, as well as \textit{who} made the changes \cite{pragmatic-version-control}. A VCS (version control system) will be used to track the changes of the implementation's source code, tests and built automation scripts. Despite this project only having a single developer, there are multiple reasons it has been decided to manage the source code using a VCS. Firstly, it allows the developer to easily keep a log of the changes made to any file and \textit{why} those changes were made. One can also revert source files to prior versions if bugs are found or previously deleted code is required again, Finally, using a VCS means there will be multiple copies of the source code, which can be used as backups to mitigate the damage caused by data loss. The distributed VCS \textbf{Git} \cite{git} will be used for this project, due to the developer having prior experience in the tool, meaning less time is taken from implementation to learn a new tool.
 
@@ -113,11 +116,11 @@ In addition to considering the theoretical performance of the chosen algorithms,
 
 To optimise the implementations, a profiler that can measure heap usage and cache misses will be used. One which can produce call graphs with timings, that measure the flow of execution and how much time is spent in each function, is also desired. Using a profiler that produces little slow down is useful, but not critical, since timings could be scaled to take the extra overhead into consideration. 
 
-Many profilers were considered when choosing one for this project. Intel VTune \cite{intel-vtune} is feature-rich profiler for Intel-based machines, but it is proprietary, so it will not be used for this project. Valgrind \cite{valgrind}, Profiny \cite{profiny} and gperftools \cite{gperftools} are freely available profilers. Out of these, only Valgrind can measure both heap usage and cache misses. gperftools can generate a visualisation of program flow and where the program spends most of its time via a call graph image, with just a single command. gperftools provides a similar feature for heap profiling as well. Therefore, both Valgrind and gperftools will be used for profiling.
+Many profilers were considered when choosing one for this project. Intel VTune \cite{intel-vtune} is feature-rich profiler for Intel-based machines, but it is proprietary. Valgrind \cite{valgrind}, Profiny \cite{profiny} and gperftools \cite{gperftools} are freely available profilers. Out of these, only Valgrind can measure both heap usage and cache misses. gperftools can generate visualisations of program flow and where the program spends most of its time using call graph images. gperftools provides a similar feature for heap profiling as well. Valgrind and gperftools will both be used to measure cache misses and generate call graphs images.
 
 \subsection{SSE Optimisation}
 \label{sec:sse}
 
-SIMD stands for Single Instruction, Multiple Data and was defined by Flynn as a classification of parallel computing \cite{flynns-taxonomy}. In SIMD, a single instruction is used to operation on multiple data items at the same time. If $p$ is the maximum number of data items that can be operated on in parallel at a time, then in an ideal scenario it is possible increase the speed of a computation by $p$ times. However, it is only suitable for computations where the same operation can be applied to multiple data items independantly, where the order in which those operations complete does not affect the final output.
+SIMD stands for Single Instruction, Multiple Data and was defined by Flynn as a classification of parallel computing \cite{flynns-taxonomy}. In SIMD, a single instruction is applied to multiple data items at the same time. If $p$ is the maximum number of data items that can be operated on in parallel at a time, then ideally a computation can be made $p$ times faster. However, it is only suitable for computations where the same operation can be applied to multiple data items independently, and the order in which those operations complete does not affect the final output.
 
-Streaming SIMD Extensions, or SSE, is a specification of an instruction set that performs SIMD operations for the widely used x86 CPU architecture \cite{sse}, which is the architecture used for the development and test environment of this project. SSE, or specifically SSE2, since that's the latest version supported by the development environment, may be used to accelerate parts of the implementations, which are used frequently, that perform a collection of independant computations.
+Streaming SIMD Extensions, or SSE, is a specification of an instruction set that performs SIMD operations on the widely used x86 CPU architecture \cite{sse}, which is the architecture used for the development and test environment of this project. SSE will be used to accelerate frequent executed code where possible.
