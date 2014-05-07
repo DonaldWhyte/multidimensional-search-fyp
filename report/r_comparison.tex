@@ -4,29 +4,28 @@
 \subsection{Measuring Efficiency}
 \label{sec:measuring-efficiency}
 
-One can measure the efficiency of an index structure by simply measuring the amount of time it takes perform dynamic operations and queries \cite{dynamic-data-structures}. In addition to execution time, one must also consider how much memory overhead is produced by the index structure. Such overhead may not be an issue for small data sets, but when your index structure becomes very large, it must be considered due to the issues discussed in Section \ref{sec:paging}. Some of the ways the performance or efficiency an index structure can be measured include:
+One can measure the efficiency of an index structure by simply measuring the amount of time it takes perform dynamic operations and queries \cite{dynamic-data-structures}. In addition to execution time, one must also consider how much memory overhead is produced by the index structure. Such overhead may not be an issue for small data sets, but when your index structure becomes very large, it must be considered due to the issues discussed in Section \ref{sec:paging}. Measurements of index structure efficiency include:
 \begin{itemize}
-	\item \textbf{Structure Size} -- amount of memory required to store the structure, relative to the size of the data
-	\item \textbf{Build Time} -- how long it takes to build the structure initially, as a pre-processing operation (relative to number of initial data items)
-	\item \textbf{Dynamic Operation Execution Time} -- time it takes to perform an \texttt{insert}, \texttt{delete} or \texttt{update} operation
-	\item \textbf{Query Time Execution Time} -- time it takes to perform a point, range or nearest neighbour query
+	\item \textbf{Structure Size} -- memory required to store the structure, relative to dataset size
+	\item \textbf{Construction Time} -- how long it takes to construct a structure storing $n$ points
+	\item \textbf{Dynamic Operation Execution Time} -- execution times of \texttt{insert} and \texttt{delete} operations
+	\item \textbf{Query Execution Time} -- execution times of point, range or nearest neighbour queries
 \end{itemize}
-Big-Oh notation \cite{design-analysis-algorithms} refers to the worse case execution time of an algorithm, often with respect to the size of the input. This is used to bound the worst, average or expected execution time of an algorithm. This can be used to construct theoretical performance measurements for an index structure and has been used to guide the development and evaluation of some structures (e.g. in  \cite{splay-quadtree}).
+Big-Oh notation \cite{design-analysis-algorithms} refers to the worse case execution time of an algorithm, often with respect to the size of the input. This is used to bound the worst, average or expected execution time of an algorithm. This can be used to construct theoretical performance measurements for an index structure and if often used to guide the development and evaluation of index structures structures (e.g. in  \cite{splay-quadtree}).
 
-The focus of bucket methods is to minimise I/O operations while still retaining well-balanced search trees. Therefore, in addition to the runtime of each operation, the number of I/O operations, or \textbf{page accesses}, is often measured (e.g. in  \cite{pk-tree, pyramid-tree, x-tree}). In conjunction with the CPU processing time, page access count can give good insight into how efficient an index structure is for large datasets.
+The focus of bucket methods is to minimise I/O operations while still retaining well-balanced search trees. Therefore, in addition to the runtime of each operation, the number of I/O operations, or \textbf{page accesses}, is often measured (e.g. \cite{pk-tree, pyramid-tree, x-tree}). In conjunction with CPU processing time, page access count can give good insight into how efficient an index structure is for large datasets.
 
 \subsection{Deciding on an Index Structure}
 \label{sec:structure-decision}
 
-When comparing index structure's efficiency for a given problem, there are a number of questions one can ask:
+While there are some structures which have been shown to be less efficient than others (e.g. R-tree when compared to X-tree \cite{x-tree}), the behaviour of these structures often varies with the data it is given. Some structures work better on low-dimensional, uniform data, while others are better for high-dimensional data. Table \ref{tab:comparison} in Appendix \ref{chap:supp-material} lists some of the index structures discussed in this review and their strengths/weaknesses.
+In other words, there is no ``best" structure. Choosing an index structure to use is \textit{task-dependent}. There are many factors to consider when choosing an index structure, some of which are listed below. Note that this is by no means an exhaustive list.
 \begin{itemize}
-	\item will the data change?
-	\item how frequently are new points being added, removed or changed? It is feasible to rebuild the structure when new points are added?
-	\item how many data points will the structure contain?
+	\item how many points will the structure contain?
 	\item how many dimensions does the data have?
-	\item do queries have to be fast? Do queries have to be performed near real-time or is it acceptable to wait a few minutes?
+	\item how frequently will the data be modified, if at all?
+	\item do queries have to be performed near real-time or is it acceptable to wait a few minutes?
+	\item what distributions will be input data be? will they uniform or highly skewed?
 \end{itemize}
 
-While there are some structures which have been shown to be less efficient than others (e.g. R-tree when compared to X-tree \cite{x-tree}), the behaviour of these structures often varies with the data it is given. Some structures work better on low-dimensional, uniform data, while others are better for high-dimensional data. Table \ref{tab:comparison} in the appendix lists some of the index structures discussed in this review and their strengths/weaknesses with regards to the mentioned questions. All of these data structures are dynamic and under specific conditions can perform \texttt{insert}, \texttt{update} and \texttt{delete} operations reasonably quickly. Some index structures will perform these operations faster than others due to the way the structure's invariants are maintained, especially as the number of data points becomes large, but the worst/expected case bounds for each are similar \cite{ubiquitous-btree, r-tree, kd-tree, pyramid-tree, pk-tree, skip-quadtree, rsr-tree, quadtreap, splay-quadtree}. Index structures with the same asymptotic bounds can differ in execution time in reality however, as implementations of each structure may have different overheads which impact performance.
-
-To summarise, B${}^{+}$-trees are very popular for one-dimensional data because they are fast, simple and have low memory overhead \cite{ubiquitous-btree}. Quadtrees, kd-trees and R-tree variants have good performance on multi-dimensional data (e.g. for geometric optimisation of a 3D scene \cite{kd-tree-gpu}) and are simple to implement (no complex invariants to maintain). However, performance starts to decrease as you increase the number of dimensions due to the curse of dimensionality (see Section \ref{sec:challenges}). This is why index structures such as pyramid trees and PK-trees were developed, as there was a need for structures which can perform efficient queries in high-dimensional space \cite{pk-tree, pyramid-tree}. For even higher dimensions (e.g. $d > 10$), it has been shown that non-hierarchical methods can provide better performance (e.g. hashing, sequential scan, etc.).
+The strengths and weaknesses of the structures discussed in the review will now be summarised. B${}^{+}$-trees are very popular for one-dimensional data because they are fast, simple and have low memory overhead \cite{ubiquitous-btree}. Quadtrees, kd-trees and R-tree variants have good performance on multi-dimensional data (e.g. for geometric optimisation of a 3D scene \cite{kd-tree-gpu}) and are simple to implement (no complex invariants to maintain). However, performance starts to decrease as you increase the number of dimensions. There is a need for structures which can perform efficient queries in high-dimensional space, so structures such as the pyramid tree and PK-tree were developed \cite{pk-tree, pyramid-tree}. For even higher dimensions (e.g. $d > 10$), it has been shown that non-hierarchical methods may provide better performance (e.g. hashing, sequential scan, etc.).
