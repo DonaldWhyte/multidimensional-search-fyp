@@ -24,3 +24,66 @@ TODO
 \section{Summary}
 
 TODO
+
+
+
+
+\subsection{Real Datasets and Impact of Bucket Size}
+
+\begin{table}
+	\centering
+	\makebox[\textwidth][c]{%
+		\begin{tabular}{|r|r|l|l|l|}
+			\hline
+			\multicolumn{2}{|c}{} & \multicolumn{3}{|c|}{\textbf{Dataset}} \\
+			\hline
+			\textbf{Structure} & \textbf{Operation} & \textbf{Astrophysics} & \textbf{Hurricane Isabel} & \textbf{Armadillo Mesh} \\
+			\hline
+			\multirow{4}{*}{Sequential Scan} & Delete & 1315.81 & 1920.73 & 1336.2 \\
+				& Insert & 436.385 & 691.833 & 215.865 \\
+				& Point Query & 435.88 & 651.428 & 212.585 \\
+			\hline
+			\multirow{4}{*}{Rebuild Index PPT} & Delete & 1856.11 & 2121.9 & 36.0037 \\
+				& Insert & 139.346 & 117.441 & 0.112088 \\
+				& Point Query & 139.048 & 117.292 & 0.0492687 \\
+			\hline
+			\multirow{4}{*}{Bucket PPT} & Delete & 82.908 & 14.9052 & 0.160532 \\
+				& Insert & 81.231 & 14.4715 & 0.126938 \\
+				& Point Query & 70.4391 & 14.3358 & 0.0956872 \\
+			\hline
+			\multirow{4}{*}{Splay PPT} & Delete & 88.4574 & 15.3893 & 0.203571 \\
+				& Insert & 84.0908 & 14.7177 & 0.192196 \\
+				& Point Query & 70.3729 & 14.6499 & 0.141219 \\
+			\hline
+		\end{tabular}
+	}%
+
+	\caption{Total Execution Time (in seconds) of Each Operation on Real Datasets}
+	\label{tab:perf1-real}
+\end{table}
+
+Table \ref{tab:perf1-real} shows the runtime of each operation on sampled real datasets. Work gone into increasing the speed of the Pseudo-Pyramid Tree by exploring different implementations, which has worked to greatly accelerate the structure for most of the evaluation datasets. However, Table \ref{tab:perf1-real} shows that on the two scientific datasets, the relative speedup from Sequential Scan achieved by the Bucket Pseudo-Pyramid Tree appears low.
+
+For example, $500,000$ point queries with the astrophysics dataset takes 435.88 seconds with Sequential Scan and 70.4391 seconds with the Bucket Pseudo-Pyramid Tree, meaning a speedup of $\frac{435.88}{70.4391} \approx 6.18$ has been achieved. Speedup for the hurricane Isabel dataset is slightly higher, being approximately 45.44. Compare these figures to the speedup gained with the armadillo mesh, which is 2221. With such a high speedup on some datasets, and the fact there exist algorithms which can perform search in $O(log_2 n)$ time, this raised an important question: why the speedup is so low?
+
+Despite hashing a point taking $O(d)$ time, point queries will take much longer if there are large numbers of points in buckets. If each bucket contains exactly one point, then the complexity approaches $O(d)$. On the other extreme, where a single bucket contains all points, the complexity becomes $O(n)$. The number of points in a bucket, or \textit{bucket size}, is one of the most important factors to consider when analysing the performance of hash-based index structures. A ``good" hashing function tries to achieve an amortised running time of $O(1)$ by ensuring only one or two points are mapped to the same hash value.
+
+\begin{table}
+	\centering
+	\begin{tabular}{|l|l|l|l|l|}
+		\hline
+		& & \multicolumn{3}{c|}{\textbf{Bucket Size Statistics}} \\
+		\hline
+		\textbf{Dataset} & \textbf{Time to Query (sec)} & \textbf{Average} & \textbf{Max} & \textbf{\#Buckets} \\
+		\hline
+		500,000 16D Random Points & 0.105091 & 1.0312 & 4 & 493488 \\
+		500,000 Astrophysics Points & 70.4391 & 47820.89 & 153471 & 8  \\
+		500,000 Hurricane Isabel Points & 14.3358 & 1257.46 & 154979 & 396 \\
+		435,544 3D Armadillo Mesh Points & 0.141219 & 19.1465 & 187 & 22748 \\
+		\hline
+	\end{tabular}
+	\caption{Statistics on Bucket Size with Pseudo-Pyramid Tree Based on Dataset}
+	\label{tab:perf1-bucket-stats}
+\end{table}
+
+The mean, standard deviation, minimum and maximum bucket size has been used to determine if bucket size is the reason the Pseudo-Pyramid Tree is so slow for the astrophysics dataset. Table \ref{tab:perf1-bucket-stats} shows these statistics when the Pseudo-Pyramid Tree is storing points from one synthetic dataset and all the real datasets. There appears to be a relationship between average bucket size and the speed of the Pseudo-Pyramid Tree. The average bucket size for the scientific datasets go into the thousands for the scientific datasets, with the largest bucket containing 153471 and 497953 points using the astrophysics and hurricane datasets respectively. Notice how the time to query all points in the 16D random dataset takes the shorter time, due to the average bucket size being as small as 1.0312. These results match the observation that larger average bucket size means more computation must be performed per operation on average.
