@@ -4,32 +4,59 @@
 \centerline{\rule{149mm}{.02in}}
 \vspace{0.75cm}
 
-TODO
+This section evaluates the baselines and index structures discussed in Section \ref{chap:chosen-structures-hypothesis} using empirical timings of each structure's operations. The structure's performance on all the synthetic and real datasets.
 
-\section{Performance Timings}
-
-TODO
-
-\section{Memory Overhead}
+\subsection{Synthetic Data}
 
 TODO
 
-\section{Impact of Bucket Size}
+\begin{figure}
+	\makebox[\textwidth][c]{%
+		\begin{subfloat}[\texttt{insert}\label{fig:perf3-dimensionality-insert}]{%
+			\includegraphics[scale=0.5]{figures/performance_analysis/randuniform_insert.pdf}
+		}
+		\end{subfloat}
+		\begin{subfloat}[\texttt{delete}\label{fig:perf3-dimensionality-remove}]{%
+			\includegraphics[scale=0.5]{figures/performance_analysis/randuniform_delete_zoomed.pdf}
+		}
+		\end{subfloat}
+	}%
 
-TODO
+	\caption{Index Structure Performance With Respect To Dimensionality (10,000 Points from Uniform Distribution Synthetic Dataset)}
+	\label{fig:perf-dimensionality}
+\end{figure}
 
-\section{Impact of Tree Balance}
+\begin{figure}
+	\makebox[\textwidth][c]{%
+		\begin{subfloat}[\texttt{insert}\label{fig:perf3-size-insert}]{%
+			\includegraphics[scale=0.5]{figures/performance_analysis/sizevary_insert_zoomed.pdf}
+		}
+		\end{subfloat}
+		\begin{subfloat}[\texttt{delete}\label{fig:perf3-size-remove}]{%
+			\includegraphics[scale=0.5]{figures/performance_analysis/sizevary_delete_zoomed.pdf}
+		}
+		\end{subfloat}
+	}%
 
-TODO
+	\caption{Index Structure Performance With Respect To Dataset Size (10,000 Points from Uniform Distribution Synthetic Dataset)}
+	\label{fig:perf-size}
+\end{figure}
 
-\section{Summary}
+% ITERAITON 3
 
-TODO
+Tables containing the total execution times of all three operations of each structure for all synthetic datasets is available in Appendix \ref{sec:appendix-perf3}. Plots with dimension against execution time are shown for \texttt{insert} and \texttt{delete} in Figure \ref{fig:perf3-dimensionality} when processing random points from a uniform distribution.
 
+In general, as $d$ increases the speed of the hash-based structures decreases faster than the $kd$-tree. For insertion, the $kd$-tree consistently outperforms the hash-based structures. For deletion, the $kd$-tree is initially slower but as $d$ increases it starts to beat the hash-based structures. This is most likely because each hashing function takes $O(d)$ time. The $kd$-tree does not require such a function to begin the search and as such, is more resilient to higher-dimensional search for point queries.
 
+The Bucket Hash Table results in lower bucket size at the cost of a more expensive hashing function. Despite having the same complexity, the Pseudo-Pyramid Tree and Pyramid Tree hash functions require less computation (i.e. the constant factor is lower). Since these two structures also result in low average bucket size for synthetic data, they are faster than the Bucket Hash Table for synthetic data. Figure \ref{fig:perf3-dimensionality} illustrates this by showing that the growth in execution time of Bucket Hash Table is the fastest. 
 
+The execution times between the Pyramid Tree and the Pseudo-Pyramid Tree is very small, but the latter structure is consistently faster. Table \ref{tab:perf2-bucket-stats} in Section \ref{sec:bucket-stats} shows that the Pseudo-Pyramid Tree results in lower bucket size for random points generated from a uniform distribution. This combined with the fact the Pseudo-Pyramid Tree function requires slightly less computation makes it faster than the Pyramid Tree.
 
-\subsection{Real Datasets and Impact of Bucket Size}
+Execution times for the 16 dimension dataset of varying size is shown in Figure \ref{fig:perf1-size}. While the $kd$-tree performs faster when $d$ is increased, the increase in speed becomes negligible as more points are inserted into the structures. This is especially the case with \texttt{delete}, where execution time grows much faster.
+
+As long as the average bucket size tends to one, the speed of the hash-based structures is higher than the $kd$-tree. Since all three hash-based structures have low average bucket size for the synthetic data, the relative performance of the structures depends on the hashing function itself. Since the Pseudo-Pyramid Tree has the cheapest hashing function, it is the fastest structure for the synthetic datasets.
+
+\subsection{Real Data}
 
 \begin{table}
 	\centering
@@ -44,24 +71,46 @@ TODO
 				& Insert & 436.385 & 691.833 & 215.865 \\
 				& Point Query & 435.88 & 651.428 & 212.585 \\
 			\hline
-			\multirow{4}{*}{Rebuild Index PPT} & Delete & 1856.11 & 2121.9 & 36.0037 \\
-				& Insert & 139.346 & 117.441 & 0.112088 \\
-				& Point Query & 139.048 & 117.292 & 0.0492687 \\
-			\hline
-			\multirow{4}{*}{Bucket PPT} & Delete & 82.908 & 14.9052 & 0.160532 \\
+			\multirow{4}{*}{Pseudo-Pyramid Tree} & Delete & 82.908 & 14.9052 & 0.160532 \\
 				& Insert & 81.231 & 14.4715 & 0.126938 \\
 				& Point Query & 70.4391 & 14.3358 & 0.0956872 \\
 			\hline
-			\multirow{4}{*}{Splay PPT} & Delete & 88.4574 & 15.3893 & 0.203571 \\
-				& Insert & 84.0908 & 14.7177 & 0.192196 \\
-				& Point Query & 70.3729 & 14.6499 & 0.141219 \\
+			\multirow{4}{*}{Pyramid Tree} & Delete & 60.8105 & 41.5488 & 0.164531 \\
+				& Insert & 65.0126 & 44.2493 & 0.192165 \\
+				& Point Query & 60.0216 & 44.1224 & 0.134481 \\
+			\hline
+			\multirow{4}{*}{Bucket Hash Table} & Delete & 0.191339 & 0.248544 & 0.102674 \\
+				& Insert & 0.360452 & 0.419106 & 0.11828 \\
+				& Point Query & 0.172516 & 0.222288 & 0.0811833 \\
+			\hline
+			\multirow{4}{*}{$kd$-tree} & Delete & 68.9612 & 578.798 & 0.91045 \\
+				& Insert & 0.663231 & 0.434781 & 0.384241 \\
+				& Point Query & 0.639265 & 0.408527 &  0.374425 \\
 			\hline
 		\end{tabular}
 	}%
 
 	\caption{Total Execution Time (in seconds) of Each Operation on Real Datasets}
-	\label{tab:perf1-real}
+	\label{tab:perf-real}
 \end{table}
+
+% ITERATION 3
+
+Table \ref{tab:perf3-real} shows the runtime of each operation on sampled real datasets. Bucket Hash Table is consistently the fastest structure for all operations and data because its average bucket size is always close to one. Again, the Pseudo-Pyramid Tree and Pyramid Tree degenerate to semi-sequential on the two scientific datasets, with the Pyramid Tree performing slightly better than the Pseudo-Pyramid Tree on the astrophysics dataset.
+
+The $kd$-tree is over one hundred times faster than the Pseudo-Pyramid and Pyramid Trees for the scientific datasets for \texttt{insert} and point queries. However, the structure processes these datasets slower than the synthetic data or armadillo mesh. $kd$-tree's \texttt{delete} operation is also the slowest of all the structures, taking over 500 seconds to individually delete all the points from the hurricane dataset.
+
+
+
+\section{Memory Overhead}
+
+TODO
+
+\section{Impact of Bucket Size}
+
+TODO: re-write, using as much as possible from below
+
+% ITERATION 1
 
 Table \ref{tab:perf1-real} shows the runtime of each operation on sampled real datasets. Work gone into increasing the speed of the Pseudo-Pyramid Tree by exploring different implementations, which has worked to greatly accelerate the structure for most of the evaluation datasets. However, Table \ref{tab:perf1-real} shows that on the two scientific datasets, the relative speedup from Sequential Scan achieved by the Bucket Pseudo-Pyramid Tree appears low.
 
@@ -69,37 +118,9 @@ For example, $500,000$ point queries with the astrophysics dataset takes 435.88 
 
 Despite hashing a point taking $O(d)$ time, point queries will take much longer if there are large numbers of points in buckets. If each bucket contains exactly one point, then the complexity approaches $O(d)$. On the other extreme, where a single bucket contains all points, the complexity becomes $O(n)$. The number of points in a bucket, or \textit{bucket size}, is one of the most important factors to consider when analysing the performance of hash-based index structures. A ``good" hashing function tries to achieve an amortised running time of $O(1)$ by ensuring only one or two points are mapped to the same hash value.
 
-\begin{table}
-	\centering
-	\begin{tabular}{|l|l|l|l|l|}
-		\hline
-		& & \multicolumn{3}{c|}{\textbf{Bucket Size Statistics}} \\
-		\hline
-		\textbf{Dataset} & \textbf{Time to Query (sec)} & \textbf{Average} & \textbf{Max} & \textbf{\#Buckets} \\
-		\hline
-		500,000 16D Random Points & 0.105091 & 1.0312 & 4 & 493488 \\
-		500,000 Astrophysics Points & 70.4391 & 47820.89 & 153471 & 8  \\
-		500,000 Hurricane Isabel Points & 14.3358 & 1257.46 & 154979 & 396 \\
-		435,544 3D Armadillo Mesh Points & 0.141219 & 19.1465 & 187 & 22748 \\
-		\hline
-	\end{tabular}
-	\caption{Statistics on Bucket Size with Pseudo-Pyramid Tree Based on Dataset}
-	\label{tab:perf1-bucket-stats}
-\end{table}
-
 The mean, standard deviation, minimum and maximum bucket size has been used to determine if bucket size is the reason the Pseudo-Pyramid Tree is so slow for the astrophysics dataset. Table \ref{tab:perf1-bucket-stats} shows these statistics when the Pseudo-Pyramid Tree is storing points from one synthetic dataset and all the real datasets. There appears to be a relationship between average bucket size and the speed of the Pseudo-Pyramid Tree. The average bucket size for the scientific datasets go into the thousands for the scientific datasets, with the largest bucket containing 153471 and 497953 points using the astrophysics and hurricane datasets respectively. Notice how the time to query all points in the 16D random dataset takes the shorter time, due to the average bucket size being as small as 1.0312. These results match the observation that larger average bucket size means more computation must be performed per operation on average.
 
-
-
-
-
-
-
-
-
-
-\subsection{Bucket Statistics}
-\label{sec:bucket-stats}
+% ITERATION 2
 
 The same underlying implementation is used for the Pseudo-Pyramid Tree, Pyramid Tree and Bucket Hash Table. Only how the hashing function allocates points to buckets varies. Pyramid Tree's and Bucket Hash Table's hash functions have also been parallelised using SSE, which has made the difference between execution times of the individual hash functions of the three structures very small, allowing for a fair comparison of execution time.
 
@@ -133,102 +154,18 @@ The same underlying implementation is used for the Pseudo-Pyramid Tree, Pyramid 
 		\end{tabular}
 	}%
 	\caption{Statistics on Bucket Size, Based on Dataset, of All Hash-Based Structures}
-	\label{tab:perf2-bucket-stats}
+	\label{tab:perf-bucket-stats}
 \end{table}
 
 Since the implementation details of the three structures are similar, the bucket size will be used to compare the structures. Table \ref{tab:perf2-bucket-stats} contains statistics on bucket size of all three hashing functions, using all real datasets and the 16D synthetic dataset.
 
 From these results it is clear that the core factor which determines the performance of each structure is bucket size. The Pseudo-Pyramid Tree and Pyramid Tree have much larger buckets when storing the scientific datasets compared to when they store the synthetic dataset or armadillo mesh. With hurricane Isabel, one bucket in the Pyramid Tree is as large as 497,953, causing it degenerate to semi-sequential scan. When the average bucket size tends to one, all the structures can query all the points in the dataset in less than a half a second.
 
+\section{Impact of Tree Balance}
 
+TODO
 
-
-
-
-\subsection{Performance Timings}
-
-\begin{figure}
-	\makebox[\textwidth][c]{%
-		\begin{subfloat}[\texttt{insert}\label{fig:perf3-dimensionality-insert}]{%
-			\includegraphics[scale=0.5]{figures/performance_analysis/iteration_3/randuniform_insert.pdf}
-		}
-		\end{subfloat}
-		\begin{subfloat}[\texttt{delete}\label{fig:perf3-dimensionality-remove}]{%
-			\includegraphics[scale=0.5]{figures/performance_analysis/iteration_3/randuniform_delete.pdf}
-		}
-		\end{subfloat}
-	}%
-
-	\caption{Index Structure Performance With Respect To Dimensionality (10,000 Points from Uniform Distribution Synthetic Dataset)}
-	\label{fig:perf3-dimensionality}
-\end{figure}
-
-\begin{figure}
-	\makebox[\textwidth][c]{%
-		\begin{subfloat}[\texttt{insert}\label{fig:perf3-size-insert}]{%
-			\includegraphics[scale=0.5]{figures/performance_analysis/iteration_3/sizevary_insert.pdf}
-		}
-		\end{subfloat}
-		\begin{subfloat}[\texttt{delete}\label{fig:perf3-size-remove}]{%
-			\includegraphics[scale=0.5]{figures/performance_analysis/iteration_3/sizevary_delete.pdf}
-		}
-		\end{subfloat}
-	}%
-
-	\caption{Index Structure Performance With Respect To Dataset Size (10,000 Points from Uniform Distribution Synthetic Dataset)}
-	\label{fig:perf3-size}
-\end{figure}
-
-Tables containing the total execution times of all three operations of each structure for all synthetic datasets is available in Appendix \ref{sec:appendix-perf3}. Plots with dimension against execution time are shown for \texttt{insert} and \texttt{delete} in Figure \ref{fig:perf3-dimensionality} when processing random points from a uniform distribution.
-
-In general, as $d$ increases the speed of the hash-based structures decreases faster than the $kd$-tree. For insertion, the $kd$-tree consistently outperforms the hash-based structures. For deletion, the $kd$-tree is initially slower but as $d$ increases it starts to beat the hash-based structures. This is most likely because each hashing function takes $O(d)$ time. The $kd$-tree does not require such a function to begin the search and as such, is more resilient to higher-dimensional search for point queries.
-
-The Bucket Hash Table results in lower bucket size at the cost of a more expensive hashing function. Despite having the same complexity, the Pseudo-Pyramid Tree and Pyramid Tree hash functions require less computation (i.e. the constant factor is lower). Since these two structures also result in low average bucket size for synthetic data, they are faster than the Bucket Hash Table for synthetic data. Figure \ref{fig:perf3-dimensionality} illustrates this by showing that the growth in execution time of Bucket Hash Table is the fastest. 
-
-The execution times between the Pyramid Tree and the Pseudo-Pyramid Tree is very small, but the latter structure is consistently faster. Table \ref{tab:perf2-bucket-stats} in Section \ref{sec:bucket-stats} shows that the Pseudo-Pyramid Tree results in lower bucket size for random points generated from a uniform distribution. This combined with the fact the Pseudo-Pyramid Tree function requires slightly less computation makes it faster than the Pyramid Tree.
-
-Execution times for the 16 dimension dataset of varying size is shown in Figure \ref{fig:perf1-size}. While the $kd$-tree performs faster when $d$ is increased, the increase in speed becomes negligible as more points are inserted into the structures. This is especially the case with \texttt{delete}, where execution time grows much faster.
-
-As long as the average bucket size tends to one, the speed of the hash-based structures is higher than the $kd$-tree. Since all three hash-based structures have low average bucket size for the synthetic data, the relative performance of the structures depends on the hashing function itself. Since the Pseudo-Pyramid Tree has the cheapest hashing function, it is the fastest structure for the synthetic datasets.
-
-\subsection{Real Datasets}
-
-\begin{table}
-	\centering
-	\makebox[\textwidth][c]{%
-		\begin{tabular}{|r|r|l|l|l|}
-			\hline
-			\multicolumn{2}{|c}{} & \multicolumn{3}{|c|}{\textbf{Dataset}} \\
-			\hline
-			\textbf{Structure} & \textbf{Operation} & \textbf{Astrophysics} & \textbf{Hurricane Isabel} & \textbf{Armadillo Mesh} \\
-			\hline
-			\multirow{4}{*}{Bucket Hash Table} & Delete & 0.191339 & 0.248544 & 0.102674 \\
-				& Insert & 0.360452 & 0.419106 & 0.11828 \\
-				& Point Query & 0.172516 & 0.222288 & 0.0811833 \\
-			\hline
-			\multirow{4}{*}{$kd$-tree} & Delete & 68.9612 & 578.798 & 0.91045 \\
-				& Insert & 0.663231 & 0.434781 & 0.384241 \\
-				& Point Query & 0.639265 & 0.408527 &  0.374425 \\
-			\hline
-			\multirow{4}{*}{Bucket PPT} & Delete & 82.908 & 14.9052 & 0.160532 \\
-				& Insert & 81.231 & 14.4715 & 0.126938 \\
-				& Point Query & 70.4391 & 14.3358 & 0.0956872 \\
-			\hline
-			\multirow{4}{*}{Pyramid Tree} & Delete & 60.8105 & 41.5488 & 0.164531 \\
-				& Insert & 65.0126 & 44.2493 & 0.192165 \\
-				& Point Query & 60.0216 & 44.1224 & 0.134481 \\
-			\hline
-		\end{tabular}
-	}%
-	\caption{Total Execution Time (in seconds) of Each Operation on Sampled Real Datasets}
-	\label{tab:perf3-real}
-\end{table}
-
-Table \ref{tab:perf3-real} shows the runtime of each operation on sampled real datasets. Bucket Hash Table is consistently the fastest structure for all operations and data because its average bucket size is always close to one. Again, the Pseudo-Pyramid Tree and Pyramid Tree degenerate to semi-sequential on the two scientific datasets, with the Pyramid Tree performing slightly better than the Pseudo-Pyramid Tree on the astrophysics dataset.
-
-The $kd$-tree is over one hundred times faster than the Pseudo-Pyramid and Pyramid Trees for the scientific datasets for \texttt{insert} and point queries. However, the structure processes these datasets slower than the synthetic data or armadillo mesh. $kd$-tree's \texttt{delete} operation is also the slowest of all the structures, taking over 500 seconds to individually delete all the points from the hurricane dataset.
-
-\subsection{Impact of $kd$-tree Balance}
+% ITERATION 3
 
 The performance timings in the previous section show that the $kd$-tree becomes slower with particular datasets. Despite the $kd$-tree storing the same number of points in each of the real datasets, the performance is different. The speed of processing 500,000 points from the astrophysics or hurricane Isabel datasets is much slower than the armadillo mesh or the synthetic datasets. 
 
@@ -260,6 +197,8 @@ The balance factor clearly increases as $n$ is increased, so the concern here is
 The table shows that the exact match query cost increases as the balance factor does and thus, the average amount of work required to perform a point query. While the $kd$-tree does not degenerate when processing datasets with skew, these results show that these datasets do affect the structure's overall performance. For this reason, many variants of the $kd$-tree have been developed with the goal of reducing the balance factor, such as the BD-Tree \cite{kdtree-v-bdtree} and fair split tree\cite{fair-split-tree}. However, it is beyond the scope of this document to explore these variants here.
 
 \subsection{Summary}
+
+TODO: re-write, make sure is consistent
 
 This iteration showed that the point $kd$-tree, even with no attempts to further optimise the structure, significantly outperformed the Pseudo-Pyramid Tree and Pyramid Tree. The point $kd$-tree is slower than the Bucket Hash Table, especially with individual point deletion, but it is more resilient to floating point inaccuracy as it does not rely on a potentially inaccurate hashing function. The timing data from this iteration results in the following observations:
 \begin{enumerate}[noitemsep]

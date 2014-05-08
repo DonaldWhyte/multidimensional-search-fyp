@@ -3,11 +3,12 @@ import glob
 from timing_file_parser import parseTimingFile
 from maps import *
 
+import pylab
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
-COLOURS = [ 'b', 'c', 'y', 'm', 'r' ]
-MARKERS = [ 'o', 'v', 's', 'D', 'x' ]
+COLOURS = [ 'b', 'c', 'y', 'm', 'r', 'g' ]
+MARKERS = [ 'o', 'v', 's', 'D', 'x', '^' ]
 
 def extract2DCoordinates(points):
 	return [ p[0] for p in points ], [ p[1] for p in points ]
@@ -37,7 +38,8 @@ class Dataset:
 		else:
 			return 0
 
-def generatePlot(filename, xAxisLabel, yAxisLabel, operation, structures, imposedMaxYValue = None):
+def generatePlot(filename, xAxisLabel, yAxisLabel, operation, structures,
+	imposedMaxYValue = None, legend = True, separateLegend = False):
 	# Maintain sorted list of structures and generate dataset object
 	# for each structure
 	structureNames = sorted(structures.keys())
@@ -56,14 +58,15 @@ def generatePlot(filename, xAxisLabel, yAxisLabel, operation, structures, impose
 	for ds in datasets:
 		plotObjects.append( ds.plot(plt) )
 	# Configure plot
-	# Make sure to replace 
 	presentStructureNames = [ STRUCTURE_NAME_MAP[name] for name in structureNames ]
-	plt.legend(plotObjects, presentStructureNames, "upper right", ncol=1, prop={'size':12})
+	if legend:
+		plt.legend(plotObjects, presentStructureNames, "upper right", ncol=3, prop={'size':12}, loc=2)
 	plt.xlabel(xAxisLabel)
 	plt.ylabel(yAxisLabel)
 	if maxYValue:
 		if maxYValue > imposedMaxYValue:
 			plt.ylim([0, imposedMaxYValue])
+
 	# Save plot to output file
 	pp = PdfPages(filename)
 	plt.savefig(pp, format="pdf")
@@ -71,11 +74,33 @@ def generatePlot(filename, xAxisLabel, yAxisLabel, operation, structures, impose
 
 	plt.clf()
 
+	# Construct separate file for legend if specified
+	if separateLegend:
+		figLegend = pylab.figure()
+		legend = figLegend.legend(plotObjects, presentStructureNames, "upper right", ncol=3, prop={'size':12})
+		outputFile = PdfPages(filename + ".legend")
+		figLegend.canvas.draw()
+		figLegend.savefig(outputFile, format="pdf")
+		outputFile.close()
+
+		figLegend.clf()
+
+
 
 if __name__ == "__main__":
 	# Parse command line options
 	if len(sys.argv) < 2:
-		sys.exit("python %s \"<timingFilenameGlob>\" <maxYValue>" % sys.argv[0])
+		sys.exit("python %s \"<timingFilenameGlob>\" <maxYValue> {--separate-legend} {--no-legend}" % sys.argv[0])
+	if "--no-legend" in sys.argv:
+		legend = False
+		sys.argv.remove("--no-legend")
+	else:
+		legned = True
+	if "--separate-legend" in sys.argv:
+		separateLegend = True
+		sys.argv.remove("--separate-legend")
+	else:
+		separateLegend = False
 	timingFilenameGlob = sys.argv[1]
 	if len(sys.argv) >= 3:
 		maxYValue = float(sys.argv[2])
@@ -103,4 +128,5 @@ if __name__ == "__main__":
 		# Generate a plot for each operation
 		for operation, structures in data.data.items():
 			outputFilename = "%s_%s.pdf" % (data.title, operation)
-			generatePlot(outputFilename, data.xAxis, data.yAxis, operation, structures, maxYValue)
+			generatePlot(outputFilename, data.xAxis, data.yAxis, operation, structures,
+				maxYValue, legend=legend, separateLegend=separateLegend)
