@@ -129,6 +129,30 @@ Figure \ref{fig:kd-tree} illustrates the \texttt{insert} and \texttt{delete} ope
 	\label{fig:kd-tree}
 \end{figure}
 
+
+\subsection{Bucket Hash Table}
+\label{sec:bucket-hash-table}
+
+% http://stackoverflow.com/questions/7403210/hashing-floating-point-values
+% https://svn.boost.org/trac/boost/ticket/4038
+% http://programmers.stackexchange.com/questions/63595/0x9e3779b9-golden-number
+% http://stackoverflow.com/questions/4948780/magic-number-in-boosthash-combine
+% http://burtleburtle.net/bob/hash/doobs.html
+
+TODO: rewrite or remove!!!
+
+If larger bucket sizes mean more point comparisons are performed on average, then it is not unreasonable to expect an average bucket size of 1 to provide very good performance. If bucket size is one and the hashing function is an $O(d)$ operation, then each operation will only take $O(d)$ time, regardless of dataset size.
+
+The Bucket Hash Table is a structure which uses the same underlying implemention as a Bucket Pseudo-Pyramid Tree. However, instead of trying to exploit the spatial properties of points directly to provide good bucket size, a different, more general-purpose hashing function provided in the Boost library is used. Like the other hash-based structures discussed in this section, it is possible for two points to be hashed to the same value. However, from empirical performance tests, it has been shown that the average bucket size is almost always near one (bucket size measurements are provided in the next section), meaning most operations are performed in $O(d)$ time.
+
+A high-level algorithm describing the hashing function is given in Algorithm \ref{alg:point-hashing} in Appendix \ref{chap:supp-material}. This function hashes each individual coordinate (floating point value) and combines them using exclusive-or ($\oplus$) and bitshifting operations. A magic number representing the reciprocal of the golden ratio, $\phi = \frac{1 + \sqrt{5}}{2}$, is used when combining the hash values of individual coordinates. The choice to use the golden ratio was inspired by Jenkins' hash function\cite{hash-combine}, where it is used to ensure consecutive floating point values will be mapped to integers with large distances between them. This increases the likelihood of having points distributed more uniformly across buckets when points are clustered within a small numerical range (like they are in the astrophysics dataset).
+
+One major issue with this approach is the potential for floating-point inaccuracy to give incorrect results. On the controlled performance tests executed in this project, a point is queried using the exact same floating point values for the coordinates as when it was inserted. This means the two points have the same identical bit patterns. 
+
+Suppose the point to query was the output of a more complex computation, where rounding errors may come into play. Even if an equal point conceptually is being stored in the structure, rounding errors may cause the two points to have different bit patterns, potentially resulting in different hashed values. The output point, while being stored in the structure, will appear as if it is not. This is a common issue when using floating point values in hashing functions.
+
+Therefore, the Bucket Hash Table may be unreliable for certain applications, especially ones where the input points are the result of computations involving many arithmetic operations.
+
 \section{Main Hypothesis}
 \label{sec:main-hypothesis}
 
