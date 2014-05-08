@@ -5,7 +5,7 @@ This iteration deals with the low-level implementation details of the Pseudo-Pyr
 
 \subsection{Initial Pseudo-Pyramid Tree Implementations}
 
-The Pseudo-Pyramid tree's reduction from $d$ dimensions to one can be seen as a hashing function, where the one-dimensional value acts as the hash to use when searching a hash table. The Initial implementation of the structure stores all the points in a single array, which hashes each point to an integer representation that acts as the key to a bucket stored in a hash map (specifically \texttt{boost::unordered\_map}, part of the Boost\footnote{\url{http://www.boost.org/}} library). A bucket is an array that contains indices to points in the single point array. Another array is used to store the sums of all stored points. This is used to speed up point queries, by comparing the sums (one comparison) of the input point to the points in a bucket. A full point comparison ($d$ comparisons) only needs to be performed if the sums match up.
+The Pseudo-Pyramid tree's reduction from $d$ dimednsions to one can be seen as a hashing function, where the one-dimensional value acts as the hash to use when searching a hash table. The Initial implementation of the structure stores all the points in a single array, which hashes each point to an integer representation that acts as the key to a bucket stored in a hash map (specifically \texttt{boost::unordered\_map}, part of the Boost\footnote{\url{http://www.boost.org/}} library). A bucket is an array that contains indices to points in the single point array. Another array is used to store the sums of all stored points. This is used to speed up point queries, by comparing the sums (one comparison) of the input point to the points in a bucket. A full point comparison ($d$ comparisons) only needs to be performed if the sums match up.
 
 % TODO: figure out what to do with this paragraph
 To determine if a point $p$ is stored in the structure, $p$ is first hashed into its one-dimensional representation. The corresponding bucket is then sequentially scanned until the point is found or the end of the bucket is reached. To reduce the number of floating point comparisons, especially for large $d$, the \textit{sums} of each point are stored when they are inserted. This way, a $O(d)$ point comparison needs to be made if the $O(1)$ point sum comparison passes. he original implementation passed many heap allocated structures by-value, resulting in excessive copies and more time being spent allocating memory and copying data. These copies were not necessary and were removed where possible by passing the data by-reference. 
@@ -31,7 +31,7 @@ Table \ref{tab:pseudo-pyramid-sse} shows the execution times of the Pseudo-Pyram
 		Point Query & 0.026402 & 0.007745 \\
 		\hline
 	\end{tabular}
-	\caption{Total Execution Time (in seconds) of Rebuild Index Pseudo-Pyramid Tree With and Without SSE Optimisation (200D Randomly Uniform Dataset, 10,000 operations each)}
+	\caption{Total Execution Time (in seconds) of Rebuild Index Pseudo-Pyramid Tree With and Without SSE Optimisation (10,000 10D Random Points)}
 	\label{tab:pseudo-pyramid-sse}
 \end{table}
 
