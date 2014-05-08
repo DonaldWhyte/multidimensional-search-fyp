@@ -4,9 +4,11 @@
 \centerline{\rule{149mm}{.02in}}
 \vspace{0.75cm}
 
-This section contains high-level pseudo-code and low-level code listings of algorithms/techniques whose details were not deemed important enough to be in the main report.
+This section contains high-level pseudo-code and low-level code listings of algorithms and techniques whose details were not present in the main report.
 
-\section{Algorithms}
+\section{Bit Hash Algorithm}
+
+Bit Hash's hashing function will be described in this section. The function hashes each individual coordinate (floating point value) and combines them using exclusive-or ($\oplus$) and bitshifting operations. A magic number representing the reciprocal of the golden ratio, $\phi = \frac{1 + \sqrt{5}}{2}$, is used when combining the hash values of individual coordinates. The choice to use the golden ratio was inspired by Jenkins' hash function\cite{hash-combine}, where it is used to ensure consecutive floating point values will be mapped to integers with large distances between them. This increases the likelihood of having points distributed more uniformly across buckets when points are clustered within a small numerical range.
 
 \begin{algorithm}[H]
 	\SetAlgoLined
@@ -31,7 +33,7 @@ This section contains high-level pseudo-code and low-level code listings of algo
 	\label{alg:point-hashing}
 \end{algorithm}
 
-\paragraph{\textbf{NOTE:}} \texttt{hashFloat} is a function which hashes an individual 32-bit floating point number and corresponds to the function \texttt{float\_hash\_impl2} in Listing \ref{lst:hash-float-function}.
+\texttt{hashFloat} is a function which hashes an individual 32-bit floating point number and corresponds to the function \texttt{float\_hash\_impl2} in Listing \ref{lst:hash-float-function}. This function iterates over each digit of the number system's radix and accumulates a hash value.
 
 \newpage
 

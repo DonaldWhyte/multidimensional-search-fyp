@@ -6,11 +6,13 @@
 
 mdsearch is a small C++ library that implements a subset of the index structures discussed in this report. The library is available to download on an online Git repository \footnote{\url{https://github.com/DonaldWhyte/mdsearch}}. This library makes heavy use of template metaprogramming and inline functions to boost performance. As such, it is a header-only library. Each implemented index structure can be used by simply including its corresponding header file.
 
+TODO: change bucket hash table to bit hash
+
 Currently, the following index structures have been implemented:
 \begin{itemize}
 	\item \textbf{Pyramid Tree} -- see Section \ref{sec:pyramid-tree-detail} for more information
 	\item \textbf{$kd$-Tree} -- see Section \ref{sec:kd-tree-detail} for more information
-	\item \textbf{Bucket Hash Table} -- see Section \ref{sec:bucket-hash-table} for more information
+	\item \textbf{Bucket Hash Table} -- see Section \ref{sec:bit-hash} for more information
 	\item \textbf{Multigrid} -- see Section \ref{sec:multigrid} for more information
 \end{itemize}
 

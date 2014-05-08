@@ -55,7 +55,7 @@ Table \ref{tab:compiler-optimisation} shows the execution times of the two basel
 		 & Point Query & 0.559736 & 0.0860926 \\
 		 \hline
 	\end{tabular}
-	\caption{Total Execution Time (in Seconds) of Structure Operations With Different Levels of Compiler Optimisations (10,000 10D Random Points)}
+	\caption{Total Execution Time (in Seconds) of Structure Operations With Different Levels of Compiler Optimisation (10,000 10D Random Points)}
 	\label{tab:compiler-optimisation}
 \end{table}
 
@@ -66,14 +66,14 @@ This section discusses the low-level implementation details of the hash-based st
 
 \subsection{Initial Hash Structure Implementation}
 
-The Pyramid Tree, Pseudo-Pyramid Tree and Bit Hash can all be seen as hashing functions, where the one-dimensional value acts as the hash to use when searching a hash table.
+The Pyramid Tree, Pseudo-Pyramid Tree and Bit Hash are essentially hashing functions, where the one-dimensional value acts as the hash to use when searching a hash table.
 An implementation of a generic hash structure, where the hashing function can be varied, will be created for these hash-based structures to use. The structure stores all the points in a single array, which hashes each point to an integer representation that acts as the key to a bucket stored in a hash map (specifically \texttt{boost::unordered\_map}, part of the Boost\footnote{\url{http://www.boost.org/}} library). A bucket is an array that contains indices to points in the large array.
 
 To determine if a point $p$ is stored in the structure, $p$ is first hashed into its one-dimensional representation. The corresponding bucket is then sequentially scanned until the point is found or the end of the bucket is reached. To reduce the number of floating point comparisons, especially for large $d$, the \textit{sums} of each point are stored when they are inserted. This way, a $O(d)$ point comparison only needs to be performed if the $O(1)$ point sum comparison passes.
 
-To delete a point $p$, the point is first hashed and the bucket containing the point is found. The index in the bucket pointing to $p$ is removed, but the actual point itself is not removed from the point array. In other words, the memory is never released until the whole structure is deleted. This makes the structure useful for batch computation because it can be discarded straight after a task, releasing all allocated memory then. However, if the structure is used as part of a long-running process then this is not suitable because there is the potential to run out of memory.  One of the core assumptions of this project is that data may be dynamic, meaning points may be inserted and deleted frequently. For this reason, another implementation of \texttt{delete} which releases memory has been developed.
+To delete a point $p$, the point is first hashed and the bucket containing the point is found. The index in the bucket pointing to $p$ is removed, but the actual point itself is not removed from the point array. This will not release memory now unused by the deleted point. This is not suitable if the structure is used as part of a long-running process because there is the potential to run out of memory. One of the core assumptions of this project is that data may be dynamic, meaning points may be inserted and deleted frequently. For this reason, memory must be released when deleting points.
 
-The \textbf{Rebuild Hash Structure} uses a different strategy for releasing memory for unused points. When a point is removed, the index of the element storing the point is marked. Once $R$ elements are marked, a rebuild procedure is performed. The entire hash structure is rebuilt by first clearing the structure and then inserting all the points \textit{not} marked for deletion. $n - R + 1$ points will be re-inserted and insertion in the worst case is $O(n)$, meaning the worst case complexity of \texttt{delete} is $O((n - R)n)$. The larger $R$ is, the less often the rebuild procedure executes, but a larger amount of allocated memory goes unused at a time.
+The \textbf{Rebuild Hash Structure} releases memory when $R$ points have been removed, where $R$ is a configurable parameter. When a point is removed, the index of the element storing the point is marked. Once $R$ elements are marked, a rebuild procedure is performed. The entire hash structure is rebuilt by first clearing the structure and then inserting all the points \textit{not} marked for deletion. $n - R + 1$ points will be re-inserted and insertion in the worst case is $O(n)$, meaning the worst case complexity of \texttt{delete} is $O((n - R)n)$. The larger $R$ is, the less often the rebuild procedure executes, but a larger amount of allocated memory goes unused at a time.
 
 \subsection{Bucket Implementation}
 
@@ -97,9 +97,9 @@ Table \ref{tab:perf1-cache-hit-rate} displays the cache miss rate when inserting
 		\hline
 		\textbf{Structure} & \textbf{Cache Miss Rate (\%) (2 dp)} \\
 		\hline
-		Rebuild Hash Structure & 4.62 \\
-		Bucket Hash Structure & 0.28 \\
-		Splay Hash Structure & 0.59 \\
+		Rebuild Hash & 4.62 \\
+		Bucket Hash & 0.28 \\
+		Splay Hash & 0.59 \\
 		\hline
 	\end{tabular}
 	\caption{Cache Hit Rate for \texttt{insert} Operations with Hash Structure Implementation Using Pseudo-Pyramid Tree Hashing Function (10,000 10D Random Points)}
@@ -116,9 +116,9 @@ Table \ref{tab:hash-implementation-speeds} shows the execution times of each ope
 	\hline
 	\textbf{Structure} & \textbf{Insert} & \textbf{Delete} & \textbf{Point Query}  \\
 	\hline
-	Rebuild Hash Structure & 0.002467 & 0.019018 & 0.000977 \\
-	Bucket Hash Structure & 0.003546 & 0.001448 & 0.000958 \\
-	Splay Hash Structure &  0.005368 & 0.002074 &  0.001542 \\
+	Rebuild Hash & 0.002467 & 0.019018 & 0.000977 \\
+	Bucket Hash & 0.003546 & 0.001448 & 0.000958 \\
+	Splay Hash &  0.005368 & 0.002074 &  0.001542 \\
 	\hline
 	\end{tabular}
 	\caption{Execution Time (in seconds) of Hash Structure Implementations Using Pseudo-Pyramid Tree Hashing Function (10,000 10D Random Points)}
@@ -150,7 +150,7 @@ Table \ref{tab:hashtable-bplus-time-comparison} provides total execution times o
 
 Point equality tests have been accelerated using SSE. Considering point equality is used throughout all the index structures, there should be some noticeable speed gains in the structures themselves. It is also possible to parallelise the hashing functions used in this project. For this report, the Pyramid tree hashing function is considered. Both this hashing function and point equality are executed in $O(d)$ time. In both operations there is loop which iterates once for each dimension, where each iteration is independent of the others. If 32-bit floating point numbers are used, then four dimensions can be processed at once using 128 bit SSE registers. If the number of dimensions is less than four, there is little benefit using SSE. When $d<4$, the structures use the sequential version of the code instead.
 
-Table \ref{tab:pyramid-sse} shows the execution times of the Pyramid Tree with and without SSE optimisation for its hash function and point equality. Across all three operations, the average speedup is approximately $1.37$ when there are 10 dimensions. Considering the ideal speedup is 4, it was expected the speed up would be higher. Nevertheless, the parallelising point equality achieves consistent speed up with all structures. Other parts of the implementations have been accelerated using SSE, but for brevity have not been included in this report.
+Table \ref{tab:pyramid-sse} shows the execution times of the Pyramid Tree with and without SSE optimisation for its hash function and point equality. Across all three operations, the average speedup is approximately $1.37$ when there are 10 dimensions. Considering the ideal speedup is 4, it was expected the speed up would be higher. Nevertheless, parallelising point equality consistently achieves speed up for all structures. Other parts of the implementations have been accelerated using SSE, but for brevity have not been included in this report.
 
 \begin{table}
 	\centering
