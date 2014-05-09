@@ -153,6 +153,8 @@ Despite hashing a point taking $O(d)$ time, point queries will take much longer 
 	\label{tab:perf-bucket-stats}
 \end{table}
 
+TODO: fix bucket stats
+
 There is a relationship between bucket size and performance -- higher average bucket sizes are paired with longer execution times. Ideally, the number of buckets is equal to the number of points, known as \textit{perfect hashing}. Table \ref{tab:perf-bucket-stats} shows the average and maximum bucket size, as well as how many buckets there are, for the real datasets and uniformly distributed synthetic dataset.
 
 The Pyramid Tree stores 235,260 points from the astrophysics dataset in a \textit{single} bucket, meaning up to 235,260 points will be scanned when performing a query. Both the Pyramid and Pseudo-Pyramid Tree essentially degenerate to a \textit{semi-sequential scan} with the scientific datasets. Bit Hash's average bucket size is very close to 1, meaning only one point must be scanned for most operations. Larger average bucket size means operations require more computation on average. The Pyramid Tree and Pseudo-Pyramid Tree are much faster on the synthetic dataset and the armadillo mesh than the two scientific datasets. Table \ref{tab:perf-bucket-stats} shows how average bucket size is much lower for these datasets when compared to the two scientific datasets. This shows that, given certain point distributions, the structures can be fast.
@@ -192,7 +194,30 @@ While the $kd$-tree does not degenerate to semi-sequential scan when processing 
 
 \section{Memory Overhead}
 
-TODO
+The memory consumption of each structure has been recorded alongside execution time. If a structure provides fast queries but produces a huge memory footprint, it is not scalable to large datasets. 32-bit floating point numbers are used in this project, so the minimum amount of memory required to store the 16D synthetic dataset and the 10D astrophysics dataset is 30.52MB and 19.07MB respectively.
+
+Table \ref{tab:memory-overhead} shows the memory used by each structure. The \textit{overhead factor} is also provided, which measures how much additional memory is needed to store the points. For example, an overhead factor of 1 would mean there is no overhead. A factor of 2 would mean \textit{twice} the minimum amount of memory is used. The memory overhead of the structures with a synthetic and real dataset are shown. Similar amounts of memory are used for the other test datasets, so for brevity they are not shown. Octree runs of memory, so no measurements are provided for it.
+
+\begin{table}
+	\centering
+	\begin{tabular}{|r|l|l|l|l|}
+		\hline
+		& \multicolumn{2}{|c|}{\textbf{16D Synthetic Data (Uniform)}} & \multicolumn{2}{|c|}{\textbf{Astrophysics}} \\ 
+		\hline
+		\textbf{Structure} & \multicolumn{1}{|c|}{\textbf{Memory Usage}} & \multicolumn{1}{|c|}{\textbf{Overhead}} & \multicolumn{1}{|c|}{\textbf{Memory Usage}} & \multicolumn{1}{|c|}{\textbf{Overhead}} \\
+		\hline
+		Sequential Scan & 30.53MB & 1.000327 & 19.074MB & 1.000327 \\
+		Pseudo-Pyramid Tree & 51.53MB & 1.688401 & 20.98MB & 1.099984 \\
+		Pyramid Tree & 42.493MB & 1.392300 & 20.99MB & 1.100508 \\
+		Bit Hash & 54.86MB & 1.797509 & 43.42MB & 2.276516 \\
+		$kd$-tree & 38.15MB & 1.25 & 26.7MB & 1.399884 \\
+		\hline
+	\end{tabular}
+	\caption{Memory Overhead of Structures When Storing 500,000 Points from Different Datasets}
+	\label{tab:memory-overhead}
+\end{table}
+
+TODO: insight
 
 \subsection{Summary}
 
@@ -206,4 +231,4 @@ The performance evaluation performed in this chapter has revealed the following:
 	\item TODO: memory overhead
 \end{enumerate}
 
-The point $kd$-tree is consistently slower than Bit Hash with the real datasets. However, the $kd$-tree is more reliable because it does not use a hashing function thatr is highly susceptible to floating point error. Bit Hash shows perfect hashing is a desirable property, but it will not be discussed further in the project because of its unreliability.
+The point $kd$-tree is consistently slower than Bit Hash with the real datasets. However, the $kd$-tree is more reliable because it does not use a hashing function that is highly susceptible to floating point error. Bit Hash shows perfect hashing is a desirable property, but it will not be discussed further in the project because of its unreliability.
