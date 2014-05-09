@@ -190,19 +190,20 @@ Table \ref{tab:kdtree-balance-factor} contains the balance factor, exact match q
 
 While the $kd$-tree does not degenerate to semi-sequential scan when processing datasets with skew, like the Pyramid Tree, these results show that these datasets do affect the structure's overall performance. For this reason, many variants of the $kd$-tree have been developed to reduce the balance factor with skewed datasets. Examples of variants include the BD-Tree \cite{kdtree-v-bdtree} and fair split tree\cite{fair-split-tree}. Appendix \ref{chap:additional-structures} discusses preliminary performance results of a variant of the $kd$-tree implemented in this project. Due to time constraints, the project could not explore the structure in greater detail.
 
-
 \section{Memory Overhead}
 
 TODO
 
 \subsection{Summary}
 
-TODO: re-write, make sure is consistent
-
-This iteration showed that the point $kd$-tree, even with no attempts to further optimise the structure, significantly outperformed the Pseudo-Pyramid Tree and Pyramid Tree. The point $kd$-tree is slower than the Bit Hash, especially with individual point deletion, but it is more resilient to floating point inaccuracy as it does not rely on a potentially inaccurate hashing function. The timing data from this iteration results in the following observations:
-\begin{enumerate}[noitemsep]
-	\item if a \textit{reliable} hashing function that produces an average bucket size very close to one can be found, then a structure which is faster than the point $kd$-tree for point queries can be constructed
-	\item the point $kd$-tree is affected by point distribution as shown by the increased balance factor and average point query cost when storing the two scientific datasets
-	\item individual point deletion from point $kd$-trees is the slower than every hash-based structure implemented
+The performance evaluation performed in this chapter has revealed the following:
+\begin{enumerate}
+	\item Pseudo-Pyramid Tree and Pyramid Tree degenerate to semi-sequential scan with the two scientific datasets, but perform well with the armadillo mesh and synthetic datasets
+	\item point $kd$-tree speed varies with point distribution, but to a lesser extent than hash-based structures
+	\item the point $kd$-tree significantly outperforms the Pseudo-Pyramid Tree and Pyramid Tree on real scientific datasets
+	\item point $kd$-tree point deletion is highly inefficient
+	\item if a \textit{reliable} hashing function that produces an average bucket size close to one can be found, then a structure faster than the point $kd$-tree has been found (especially with point deletion)
+	\item TODO: memory overhead
 \end{enumerate}
 
+The point $kd$-tree is consistently slower than Bit Hash with the real datasets. However, the $kd$-tree is more reliable because it does not use a hashing function thatr is highly susceptible to floating point error. Bit Hash shows perfect hashing is a desirable property, but it will not be discussed further in the project because of its unreliability.
