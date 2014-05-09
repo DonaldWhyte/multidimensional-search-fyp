@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 
-def barPlot(outputFilename, groupData, groupLabels, barLabels, plot):
+def barPlot(outputFilename, groupData, groupLabels, barLabels, plot, maxYValue = None):
 	# Number of GROUPS is size of inner list
 	numGroups = len(groupData[0])
 	# This needs to be a numpy range for xdata calculations to work
@@ -32,6 +32,9 @@ def barPlot(outputFilename, groupData, groupLabels, barLabels, plot):
 	plot.legend(plotObjects, barLabels)
 	plot.xlabel("Structure")
 	plot.ylabel("Execution Time (in seconds)")
+	if maxYValue:
+		print 5
+		plot.ylim([0, maxYValue])
 
 	# You should no longer need to manually set the plot limit since everything 
 	# is scaled to one.
@@ -47,7 +50,7 @@ def barPlot(outputFilename, groupData, groupLabels, barLabels, plot):
 	# Clear plot object now that it has been saved
 	plt.clf()
 
-def plotTimingData(outputFilename, timingData):
+def plotTimingData(outputFilename, timingData, maxYValue):
 	# Sort operation keys and structure keys for consistent output
 	opNames = sorted(timingData.keys())
 	structureNames = sorted(timingData[opNames[0]].keys())
@@ -64,7 +67,7 @@ def plotTimingData(outputFilename, timingData):
 				opData.append( timingData[op][struct][0][1] )
 		groupData.append(opData)
 	# Plot the bar chart
-	barPlot(outputFilename, groupData, groupLabels, barLabels, plt)
+	barPlot(outputFilename, groupData, groupLabels, barLabels, plt, maxYValue=maxYValue)
 
 if __name__ == "__main__":
 	"""data = [ [1, 1, 1, 1], [2, 2, 2, 2], [0.5, 0.5, 0.5, 0.5] ]
@@ -100,4 +103,4 @@ if __name__ == "__main__":
 			continue
 
 		outputFilename = "%s_times.pdf" % data.title
-		plotTimingData(outputFilename, data.data)
+		plotTimingData(outputFilename, data.data, maxYValue=maxYValue)
