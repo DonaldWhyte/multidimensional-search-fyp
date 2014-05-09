@@ -39,7 +39,7 @@ class Dataset:
 			return 0
 
 def generatePlot(filename, xAxisLabel, yAxisLabel, operation, structures,
-	imposedMaxYValue = None, legend = True, separateLegend = False):
+	imposedMaxYValue = None, legend = True, separateLegend = False, axes = True):
 	# Maintain sorted list of structures and generate dataset object
 	# for each structure
 	structureNames = sorted(structures.keys())
@@ -67,6 +67,12 @@ def generatePlot(filename, xAxisLabel, yAxisLabel, operation, structures,
 		if maxYValue > imposedMaxYValue:
 			plt.ylim([0, imposedMaxYValue])
 
+	if not axes:
+		plt.axes().set_xticklabels([])
+		plt.axes().set_yticklabels([])
+		plt.xlabel("")
+		plt.ylabel("")
+
 	# Save plot to output file
 	pp = PdfPages(filename)
 	plt.savefig(pp, format="pdf")
@@ -90,12 +96,17 @@ def generatePlot(filename, xAxisLabel, yAxisLabel, operation, structures,
 if __name__ == "__main__":
 	# Parse command line options
 	if len(sys.argv) < 2:
-		sys.exit("python %s \"<timingFilenameGlob>\" <maxYValue> {--separate-legend} {--no-legend}" % sys.argv[0])
+		sys.exit("python %s \"<timingFilenameGlob>\" <maxYValue> {--separate-legend} {--no-legend} {{-no-axes}}" % sys.argv[0])
 	if "--no-legend" in sys.argv:
 		legend = False
 		sys.argv.remove("--no-legend")
 	else:
 		legned = True
+	if "--no-axes" in sys.argv:
+		axes = False
+		sys.argv.remove("--no-axes")
+	else:
+		axes = True
 	if "--separate-legend" in sys.argv:
 		separateLegend = True
 		sys.argv.remove("--separate-legend")
@@ -129,4 +140,4 @@ if __name__ == "__main__":
 		for operation, structures in data.data.items():
 			outputFilename = "%s_%s.pdf" % (data.title, operation)
 			generatePlot(outputFilename, data.xAxis, data.yAxis, operation, structures,
-				maxYValue, legend=legend, separateLegend=separateLegend)
+				maxYValue, legend=legend, separateLegend=separateLegend, axes=axes)

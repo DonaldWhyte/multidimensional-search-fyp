@@ -12,34 +12,54 @@ TODO
 
 \begin{figure}
 	\makebox[\textwidth][c]{%
-		\begin{subfloat}[\texttt{insert}\label{fig:perf3-dimensionality-insert}]{%
-			\includegraphics[scale=0.5]{figures/performance_analysis/randuniform_insert.pdf}
+		\begin{subfloat}[\texttt{insert}\label{fig:perf-dimensionality-insert}]{%
+			\includegraphics[scale=0.5]{figures/performance_analysis/randuniform_insert_zoomed.pdf}
 		}
 		\end{subfloat}
-		\begin{subfloat}[\texttt{delete}\label{fig:perf3-dimensionality-remove}]{%
-			\includegraphics[scale=0.5]{figures/performance_analysis/randuniform_delete_zoomed.pdf}
+
+		\begin{subfloat}[\texttt{delete}\label{fig:perf-dimensionality-remove}]{%
+			\begin{overpic}[scale=0.5]{figures/performance_analysis/randuniform_delete_zoomed.pdf}
+				\put(45,33){\includegraphics[scale=0.22]{figures/performance_analysis/randuniform_delete.pdf}}
+				\put(60,31){\textbf{\sans{Full View}}}
+			\end{overpic}
 		}
 		\end{subfloat}
 	}%
 
-	\caption{Index Structure Performance With Respect To Dimensionality (10,000 Points from Uniform Distribution Synthetic Dataset)}
+	\caption{Structure Performance With Respect To Dimensionality (Uniform Synthetic Dataset)}
 	\label{fig:perf-dimensionality}
 \end{figure}
 
 \begin{figure}
 	\makebox[\textwidth][c]{%
-		\begin{subfloat}[\texttt{insert}\label{fig:perf3-size-insert}]{%
-			\includegraphics[scale=0.5]{figures/performance_analysis/sizevary_insert_zoomed.pdf}
+
+		\begin{subfloat}[\texttt{insert}\label{fig:perf-size-insert}]{%
+			\begin{overpic}[scale=0.5]{figures/performance_analysis/sizevary_insert_zoomed.pdf}
+				\put(40,33){\includegraphics[scale=0.22]{figures/performance_analysis/sizevary_insert.pdf}}
+				\put(55,31){\textbf{\sans{Full View}}}
+			\end{overpic}
 		}
 		\end{subfloat}
-		\begin{subfloat}[\texttt{delete}\label{fig:perf3-size-remove}]{%
-			\includegraphics[scale=0.5]{figures/performance_analysis/sizevary_delete_zoomed.pdf}
+
+		\begin{subfloat}[\texttt{delete}\label{fig:perf-size-remove}]{%
+			\begin{overpic}[scale=0.5]{figures/performance_analysis/sizevary_delete_zoomed.pdf}
+				\put(15,33){\includegraphics[scale=0.22]{figures/performance_analysis/sizevary_delete.pdf}}
+				\put(30,31){\textbf{\sans{Full View}}}
+			\end{overpic}
 		}
 		\end{subfloat}
 	}%
 
-	\caption{Index Structure Performance With Respect To Dataset Size (10,000 Points from Uniform Distribution Synthetic Dataset)}
+	\caption{Structure Performance With Respect To Dataset Size (Uniform Synthetic Dataset)}
 	\label{fig:perf-size}
+\end{figure}
+
+\begin{figure}
+	\begin{picture}(50,50)
+		\put(0,-5){\hbox{
+			\includegraphics[scale=1.0]{figures/performance_analysis/performance-plots-legend.pdf}
+		}}
+	\end{picture}
 \end{figure}
 
 % ITERAITON 3
