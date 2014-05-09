@@ -78,41 +78,30 @@ As long as the average bucket size tends to one, the speed of the hash-based str
 
 \subsection{Real Data}
 
-\begin{table}
-	\centering
+\begin{figure}
 	\makebox[\textwidth][c]{%
-		\begin{tabular}{|r|r|l|l|l|}
-			\hline
-			\multicolumn{2}{|c}{} & \multicolumn{3}{|c|}{\textbf{Dataset}} \\
-			\hline
-			\textbf{Structure} & \textbf{Operation} & \textbf{Astrophysics} & \textbf{Hurricane Isabel} & \textbf{Armadillo Mesh} \\
-			\hline
-			\multirow{4}{*}{Sequential Scan} & Delete & 1315.81 & 1920.73 & 1336.2 \\
-				& Insert & 436.385 & 691.833 & 215.865 \\
-				& Point Query & 435.88 & 651.428 & 212.585 \\
-			\hline
-			\multirow{4}{*}{Pseudo-Pyramid Tree} & Delete & 82.908 & 14.9052 & 0.160532 \\
-				& Insert & 81.231 & 14.4715 & 0.126938 \\
-				& Point Query & 70.4391 & 14.3358 & 0.0956872 \\
-			\hline
-			\multirow{4}{*}{Pyramid Tree} & Delete & 60.8105 & 41.5488 & 0.164531 \\
-				& Insert & 65.0126 & 44.2493 & 0.192165 \\
-				& Point Query & 60.0216 & 44.1224 & 0.134481 \\
-			\hline
-			\multirow{4}{*}{Bucket Hash Table} & Delete & 0.191339 & 0.248544 & 0.102674 \\
-				& Insert & 0.360452 & 0.419106 & 0.11828 \\
-				& Point Query & 0.172516 & 0.222288 & 0.0811833 \\
-			\hline
-			\multirow{4}{*}{$kd$-tree} & Delete & 68.9612 & 578.798 & 0.91045 \\
-				& Insert & 0.663231 & 0.434781 & 0.384241 \\
-				& Point Query & 0.639265 & 0.408527 &  0.374425 \\
-			\hline
-		\end{tabular}
-	}%
 
-	\caption{Total Execution Time (in seconds) of Each Operation on Real Datasets}
-	\label{tab:perf-real}
-\end{table}
+		\begin{subfloat}[Sampled Astrophysics (500,000 Points)\label{fig:perf-real-astrophyiscs}]{%
+			\includegraphics[scale=0.5]{figures/performance_analysis/astrophysics_times.pdf}
+		}
+		\end{subfloat}
+		\begin{subfloat}[Sampled Hurricane Isabel (500,000 Points)\label{fig:perf-real-hurricane}]{%
+			\includegraphics[scale=0.5]{figures/performance_analysis/hurricane_times.pdf}
+		}
+		\end{subfloat}
+	}%
+	
+	\makebox[\textwidth][c]{%
+		\begin{subfloat}[Armadillo Mesh (435,544 Points)\label{fig:perf-real-armadillo}]{%
+			\includegraphics[scale=0.5]{figures/performance_analysis/armadillo_times.pdf}
+		}
+		\end{subfloat}
+	}%
+	\caption{Structure Performance With Respect To Dataset Size (Uniform Synthetic Dataset)}
+	\label{fig:perf-real}
+\end{figure}
+
+
 
 % ITERATION 3
 

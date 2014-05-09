@@ -24,7 +24,6 @@ def barPlot(outputFilename, groupData, groupLabels, barLabels, plot):
 	s = plot.subplot(1,1,1)
 	plotObjects = []
 	for num, vals in enumerate(groupData):
-	    print "plotting:", vals
 	    # The position of the xdata must be calculated for each of the two data series
 	    xdata = ind + margin + (num * width)
 	    barRects = plot.bar(xdata, vals, width, color=COLOURS[num % len(COLOURS)])
@@ -41,11 +40,12 @@ def barPlot(outputFilename, groupData, groupLabels, barLabels, plot):
 	s.set_xticks(ind+0.5)
 	s.set_xticklabels(groupLabels)
 
-	# Save bar chart to file
-	# TODO
-	plot.show()
-
-	plot.clf()
+	# Save plot to output file
+	pp = PdfPages(outputFilename)
+	plt.savefig(pp, format="pdf")
+	pp.close()
+	# Clear plot object now that it has been saved
+	plt.clf()
 
 def plotTimingData(outputFilename, timingData):
 	# Sort operation keys and structure keys for consistent output
@@ -64,7 +64,6 @@ def plotTimingData(outputFilename, timingData):
 				opData.append( timingData[op][struct][0][1] )
 		groupData.append(opData)
 	# Plot the bar chart
-	print groupData
 	barPlot(outputFilename, groupData, groupLabels, barLabels, plt)
 
 if __name__ == "__main__":
