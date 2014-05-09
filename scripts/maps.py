@@ -19,3 +19,6 @@ OPERATION_NAME_MAP = {
 	"delete" : "Delete",
 	"pquery" : "Point Query"
 }
+
+COLOURS = [ 'b', 'c', 'y', 'm', 'r', 'g' ]
+MARKERS = [ 'o', 'v', 's', 'D', 'x', '^' ]
