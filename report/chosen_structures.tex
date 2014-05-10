@@ -63,16 +63,19 @@ Since $x_0 \leq 0.5$ and $y_0 \leq 0.5$, both $x$ and $y$ are mapped to pyramid 
 
 \section{Pseudo-Pyramid Tree}
 
-\begin{figure}
-	\centering
-	\includegraphics[scale=0.85]{figures/pseudo-pyramid_tree_point_boundary_distances.pdf}
-	\caption{Computing Distance of Point Along Pseudo-Pyramid Tree Boundary for Each Dimension}
+\begin{wrapfigure}[12]{r}{0.4\textwidth}
+	\vspace{-5pt}
+	\begin{center}
+		\includegraphics[scale=0.7]{figures/pseudo-pyramid_tree_point_boundary_distances.pdf}
+	\end{center}
+	\vspace{-15pt}
+	\caption{Distance of Point From Data Space Boundaries}
 	\label{fig:point-boundary-distance}
-\end{figure}
+\end{wrapfigure}
 
-The School of Computing have an implementation of an index structure which is similar to the Pyramid Tree. Like the Pyramid Tree, it reduces $d$-dimensional points to a single dimension, which is used to search for the original point in a one-dimensional search structure. Each 1D key has its own bucket that contains references to the original points which are mapped to it. This index structure will be called the \textbf{Pseudo-Pyramid Tree}, because the reduction technique used is \textit{inspired} by the Pyramid tree, but is not the same.  To gain more insight into the performance of dimension reduction techniques in general, the Pseudo-Pyramid Tree will be implemented.
+The School of Computing have an implementation of an index structure which is similar to the Pyramid Tree. Like the Pyramid Tree, it reduces $d$-dimensional points to a single dimension, which is used to search for the original point in a one-dimensional search structure. Each 1D key has its own bucket that contains references to the original points which are mapped to it. This index structure will be called the \textbf{Pseudo-Pyramid Tree}, because the reduction technique used is \textit{inspired} by the Pyramid tree, but is not the same.  To gain more insight into the performance of dimension reduction techniques as a whole, the Pseudo-Pyramid Tree will be implemented.
 
-The Pseudo-Pyramid Tree reduction will now be given. To reduce a point $p$, how far along the boundary the point is in each dimension is determined (Figure \ref{fig:point-boundary-distance} gives an illustration of this). These distances are computed using Equation \ref{eq:point-boundary-distance}, where  $min_i$ and $max_i$ define the minimum and maximum bounds for dimension $i$.
+The Pseudo-Pyramid Tree reduction will now be given. To reduce a point $p$, how far along the boundary the point is in each dimension is determined (see Figure \ref{fig:point-boundary-distance} for an illustration). These distances are computed using Equation \ref{eq:point-boundary-distance}, where  $min_i$ and $max_i$ define the minimum and maximum bounds for dimension $i$.
 
 \begin{equation}
 	h_i(p) = \frac{p_i - min_i}{max_i - min_i}

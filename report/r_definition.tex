@@ -12,11 +12,11 @@ A \textbf{multi-dimensional search structure}, often referred to as an \textbf{i
 Some dynamic structures have a \textbf{construction stage} when then structure is initially created, which provide fast ways of pre-loading data \cite{pyramid-tree}. Otherwise, an index structure can be incrementally constructed by repeatedly using the \texttt{insert} operation.
 
 \begin{wrapfigure}[12]{r}{0.4\textwidth}
-	\vspace{-40pt}
+	\vspace{-22pt}
 	\begin{center}
 		\includegraphics[scale=0.6]{figures/2D_data_space.pdf}
 	\end{center}
-	\vspace{-40pt}
+	\vspace{-15pt}
 	\caption{Data items represented as 2D points in the space $[0, 1]^d$ (not to scale)}
 	\label{fig:data-space}
 \end{wrapfigure}
@@ -26,7 +26,7 @@ The purpose of an index structure is to query the stored data. Common types of q
 	\item \textbf{Point Query} -- checks if a point $p$ exists in the structure \cite{rplus-tree}
 	\item \textbf{Range Query} -- return all points contained within a spatial region $r$ \cite{rplus-tree}, which is often a $d$-dimensional hyper-rectangle \cite{r-tree, pk-tree, pyramid-tree}
 	\item \textbf{\textit{k}-Nearest Neighbour Search} -- return the $k$ nearest points to a point $p$ \cite{pk-tree}
-	\item \textbf{Approximate Queries} -- return an approximation of a range or $k$-nearest neighbour query (less accuracy, faster queries) \cite{splay-quadtree} 
+	\item \textbf{Approximate Queries} -- approximation of a range or $k$-nearest neighbour query (faster queries) \cite{splay-quadtree} 
 \end{itemize}
 
 An index structure provides a mechanism for accessing multi-dimensional data, but it may not actually store the data itself. In a database for example, a point query comes in two parts: \textbf{searching} for a data point in the structure and \textbf{reading} retrieving the data file represented by the point \cite{rsr-tree}.
