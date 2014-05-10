@@ -4,7 +4,7 @@
 \centerline{\rule{149mm}{.02in}}
 \vspace{0.75cm}
 
-This section will discuss the limitations of the project's work, future work to support or extend the project's findings and whether or not the project has met the minimum requirements and can be deemed a success.
+This section will discuss the limitations of the project's work, future work to support or extend the project's findings and discusses the project's success.
 
 \section{Limitations}
 
@@ -12,11 +12,11 @@ TODO: never had time to verify new hypothesis! beyond scope to verify them or co
 
 This project has only worked with three synthetic datasets and three real datasets. Only two of these datasets represent the kind of data this project is targeting, which is data from scientific computation. Using more data from a scientific domain and performing further analysis on their properties may have derived more insight into which index structures are suited to such data.
 
-A large chunk of the Design and Implementation phase was spent focusing on the Pseudo-Pyramid tree and Pyramid Tree before they were found to perform poorly with point queries on the scientific datasets. By the time the limitations of these structures were discovered, there was not enough time to go into as much depth with the implementation or evaluation of other structures. Originally, it was intended that another variant of the $kd$-tree would be discussed and evaluated alongside the point $kd$-tree, but the remaining time simply did not allow for this.
+A large chunk of the Design and Implementation phase was spent focusing on the Pseudo-Pyramid tree and Pyramid Tree before they were found to perform poorly with point queries on the scientific datasets. By the time the limitations of these structures were discovered, there was not enough time to go into as much depth with the implementation or evaluation of other structures. Originally, it was intended that the bucket $kd$-tree (see Appendix \ref{chap:additional-structures}) would be discussed and evaluated alongside the point $kd$-tree, but the remaining time did not allow for this.
 
 \section{Future Work}
 
-The end of this project resulted in a conjecture and three hypotheses being made, meaning potential future work includes exploring these in much greater detail. This section suggests some of the ways the insights made in this project can be explored further.
+The end of this project resulted in a conjecture and three hypotheses being made, meaning potential future work includes exploring these in much greater detail. This section suggests some of the ways these hypothese	s can be explored further.
 
 To verify Hypothesis 1, the Pyramid Tree's suitability with higher-dimensional scientific datasets can be examined in further detail by testing it with several more scientific datasets. Non-scientific datasets can even be used to determine the types of data the structure can process efficiently. Examining a larger number of scientific datasets could be used to further explore the conjecture that most scientific datasets have dense clusters of points in data space and large sparse regions. In fact, studying the mathematical challenges of $\mathbb{R}^m \rightarrow \mathbb{R}^d$, where $d > m$, is a whole project in itself.
 
