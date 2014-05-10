@@ -76,6 +76,7 @@ To delete a point $p$, the point is first hashed and the bucket containing the p
 The \textbf{Rebuild Hash Structure} releases memory when $R$ points have been removed, where $R$ is a configurable parameter. When a point is removed, the index of the element storing the point is marked. Once $R$ elements are marked, a rebuild procedure is performed. The entire hash structure is rebuilt by first clearing the structure and then inserting all the points \textit{not} marked for deletion. $n - R + 1$ points will be re-inserted and insertion in the worst case is $O(n)$, meaning the worst case complexity of \texttt{delete} is $O((n - R)n)$. The larger $R$ is, the less often the rebuild procedure executes, but a larger amount of allocated memory goes unused at a time.
 
 \subsection{Bucket Implementation}
+\label{sec:bucket-hash-structure}
 
 The rebuild implementation stores indices in buckets, meaning that points in the same bucket may not be stored contiguously in memory. Searching a bucket in the rebuild implementation is likely to incur a lot of cache misses, because accessing a point will incur random access into the single point array. Reading a point in a bucket also requires the CPU to fetch two elements from main memory -- the index of the point and the point itself. Furthermore, having a large point array makes \texttt{delete} operations more complicated because the indices stored in buckets must be maintained.
 
