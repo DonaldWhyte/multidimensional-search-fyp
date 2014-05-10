@@ -68,7 +68,7 @@ Octree execution time exponentially increases with $d$, as shown by the plots. W
 
 All three hash-based structures use an $O(d)$ hashing function, but the constant factors in each are different. Execution times of Bit Hash, Pseudo-Pyramid Tree and Pyramid Tree increase linearly with $d$, but the slope is much greater with Bit Hash. Pseudo-Pyramid Tree has the cheapest hash function and as such, is the fastest of the three structures as $d$ increases.
 
-There have been discussions regarding the $kd$-tree's unsuitability for high-dimensional data in the literature \cite{TODO, TODO}. However, the $kd$-tree is affected the least by dimensionality in these tests. This was initially surprising, considering  The structure does not have an explicit $O(d)$ computation, since its best and worst running times are $O(\log_2 n$) and $O(n)$ respectively. Therefore, as long as the tree remains balanced, dimensionality will have little impact on the $kd$-tree's performance.
+There have been discussions regarding the $kd$-tree's unsuitability for high-dimensional data in the literature \cite{highd-nn, search-highd-analysis}. However, the $kd$-tree is affected the least by dimensionality in these tests. This was initially surprising, considering  The structure does not have an explicit $O(d)$ computation, since its best and worst running times are $O(\log_2 n$) and $O(n)$ respectively. Therefore, as long as the tree remains balanced, dimensionality will have little impact on the $kd$-tree's performance.
 
 \section{Dataset Size}
 
@@ -130,30 +130,28 @@ Despite hashing a point taking $O(d)$ time, point queries will take much longer 
 			\textbf{Dataset} & \textbf{Time to Query (sec)} & \textbf{Average} & \textbf{Max} & \textbf{\#Buckets} \\
 			\hline
 			\textbf{Pseudo-Pyramid Tree} & & & & \\
-			500,000 16D Random Points & 0.105091 & 1.0312 & 4 & 493488 \\
-			500,000 Astrophysics Points & 70.4391 & 47820.89 & 153471 & 8  \\
-			500,000 Hurricane Isabel Points & 14.3358 & 1257.46 & 154979 & 396 \\
+			500,000 16D Random Points & 0.105091 & 1.02395 & 4 & 488304 \\
+			500,000 Astrophysics Points & 70.4391 & 62500 & 153471 & 8 \\
+			500,000 Hurricane Isabel Points & 14.3358 & 1262.63 & 154979 & 396 \\
 			435,544 3D Armadillo Mesh Points & 0.141219 & 19.1465 & 187 & 22748 \\
 			\hline
 			\textbf{Pyramid Tree} & & & & \\
-			500,000 16D Random Points & 0.177153 & 1.16285 & 7 & 429974 \\
-			500,000 Astrophysics Points & 60.0216 & 3586.57 & 235260 & 120 \\
-			500,000 Hurricane Isabel Points & 44.1224 & 4048.4 & 354965 & 123 \\
-			435,544 3D Armadillo Mesh Points & 0.13448 & 2.45933 & 1173 & 177095 \\
+			500,000 16D Random Points & 0.177153 & 1.16286 & 7 & 429974 \\
+			500,000 Astrophysics Points & 60.0216 & 3521.13 & 235260 & 142 \\
+			500,000 Hurricane Isabel Points & 44.1224 & 4065.04 & 354965 & 123 \\
+			435,544 3D Armadillo Mesh Points & 0.13448 & 2.45938 & 1173 & 177095 \\
 			\hline
 			\textbf{Bit Hash} & & & & \\
-			500,000 16D Random Points & 0.249102 & 1.01004 & 3 & 495172 \\
-			500,000 Astrophysics Points & 0.172516 & 1.01057 & 5 & 425002 \\
-			500,000 Hurricane Isabel Points & 0.222288 & 1.00987 & 3 & 493081 \\
-			435,544 3D Armadillo Mesh Points & 0.0811833 & 1.00857 & 3 & 431696 \\
+			500,000 16D Random Points & 0.249102 & 1.00975 & 3 & 495172 \\
+			500,000 Astrophysics Points & 0.172516 & 1.01051 & 5 & 494800 \\
+			500,000 Hurricane Isabel Points & 0.222288 & 1.00861 & 3 & 495733 \\
+			435,544 3D Armadillo Mesh Points & 0.0811833 & 1.00891 & 3 & 431696 \\
 			\hline
 		\end{tabular}
 	}%
 	\caption{Statistics on Bucket Size, Based on Dataset, of All Hash-Based Structures}
 	\label{tab:perf-bucket-stats}
 \end{table}
-
-TODO: fix bucket stats
 
 There is a relationship between bucket size and performance -- higher average bucket sizes are paired with longer execution times. Ideally, the number of buckets is equal to the number of points, known as \textit{perfect hashing}. Table \ref{tab:perf-bucket-stats} shows the average and maximum bucket size, as well as how many buckets there are, for the real datasets and uniformly distributed synthetic dataset.
 
@@ -217,7 +215,9 @@ Table \ref{tab:memory-overhead} shows the memory used by each structure. The \te
 	\label{tab:memory-overhead}
 \end{table}
 
-TODO: insight
+Sequential scan incurs almost no overhead since only three extra pointers are used by the underlying resizeable array. The $kd$-tree also produces small smallest overhead. Each point incurs 8/16 bytes of overhead, since they are stored in a node that contains pointers to its two children. 
+
+The overhead incurred by the hash-based structures depends on the dataset. Each bucket adds overhead, so memory overhead is larger if there are many buckets. For execution speed, it is ideal to have one bucket for each point, but this incurs the most overhead. The Pseudo-Pyramid Tree maps all points in the astrophysics dataset to only 8 buckets and the structure's overhead factor is 1.099984. The structure uses 493,488 buckets for the synthetic data and has an overhead factor of 1.688401. Notice how the overhead factor is much higher. Bit Hash tends to have one bucket for each point, making the overhead factor large. While perfect hashing is desirable for speed, it can cause problems if large datasets must be processed on memory constrained systems. If memory is a limited resource, then the point $kd$-tree may be a more suitable structure because it has comparatively low overhead, which does not depend on data distribution.
 
 \subsection{Summary}
 
@@ -227,8 +227,8 @@ The performance evaluation performed in this chapter has revealed the following:
 	\item point $kd$-tree speed varies with point distribution, but to a lesser extent than hash-based structures
 	\item the point $kd$-tree significantly outperforms the Pseudo-Pyramid Tree and Pyramid Tree on real scientific datasets
 	\item point $kd$-tree point deletion is highly inefficient
-	\item if a \textit{reliable} hashing function that produces an average bucket size close to one can be found, then a structure faster than the point $kd$-tree has been found (especially with point deletion)
-	\item TODO: memory overhead
+	\item if near perfect hashing can be achieved, then a structure faster than the point $kd$-tree has been found (especially with point deletion)
+	\item hash-based structures use more memory than point $kd$-trees, with overhead increasing as they get closer to perfect hashing, highlighting that they might not suitable for large datasets if low memory consumption is a priority
 \end{enumerate}
 
 The point $kd$-tree is consistently slower than Bit Hash with the real datasets. However, the $kd$-tree is more reliable because it does not use a hashing function that is highly susceptible to floating point error. Bit Hash shows perfect hashing is a desirable property, but it will not be discussed further in the project because of its unreliability.

@@ -55,9 +55,13 @@ Using the same sampled astrophysics dataset used for performance analysis in Cha
 \end{enumerate}
 The astrophysics dataset is therefore highly skewed, since most points are clustered at the boundaries of each dimension. It follows that the vast majority of the data space has little to no points, making the data space \textit{sparse}.
 
-\section{Effect of Distribution on Pyramid Tree}
+\section{Effects of Data Distribution}
 
-We now explore the effect of the highly skewed distribution on the Pyramid Tree. Recall that the Pyramid Tree maps a point $v$ to a single scalar named the Pyramid value $pv_v$. Points with the same Pyramid value are stored in the same bucket. Table \ref{tab:final-bucket-size} shows bucket size statistics and how long it takes to query all the points for the sampled astrophysics dataset with different subsets of dimensions. When only dimensions 1 and 2, the dimensions with the greatest variance, are used, average bucket size decreases substantially. Dimensions 3 and 7 have larger clusters of points close together, so they cause the average bucket size to increase.
+We now explore the effects of the astrophysics dataset's distribution on the Pyramid Tree and $kd$-Tree.
+
+\subsection{Pyramid Tree}
+
+Recall that the Pyramid Tree maps a point $v$ to a single scalar named the Pyramid value $pv_v$. Points with the same Pyramid value are stored in the same bucket. Table \ref{tab:final-bucket-size} shows bucket size statistics and how long it takes to query all the points for the sampled astrophysics dataset with different subsets of dimensions. When only dimensions 1 and 2, the dimensions with the greatest variance, are used, average bucket size decreases substantially. Dimensions 3 and 7 have larger clusters of points close together, so they cause the average bucket size to increase.
 
 The histograms from Section \ref{sec:data-characteristics} illustrate how most points lie on, or close to, the boundaries of the dataset. This is a significant problem for the Pyramid Tree because it always chooses the dimension whose distance from the centre point of the data is the highest. If a large number of points are on a dimensional boundary, then its likely the same dimension will be chosen. Each point will the same coordinate value for the chosen dimension because they are on the same boundary, meaning will have the same pyramid value and will be mapped to the same bucket.
 
@@ -86,7 +90,7 @@ Histograms are equivalent to nearest-neighbour interpolation, so they do not sho
 
 Table \ref{tab:final-bucket-size} shows how this simple heuristic decreases average bucket size. However, it is still significantly slower than the $kd$-tree, so the remaining skew is still causing problems. One could apply further heuristics in an attempt to improve Pyramid Tree performance on the astrophysics dataset, but it is likely that the structure will start overfitting the dataset and performing worse on other datasets. Creating heurstics like this requires pre-existing knowledge of the dataset's distribution, which may not be available, especially when the data dynamic (i.e. it is not \textit{possible} to know all the data in advance).
 
-\section{Effect of Distribution on $kd$-tree}
+\subsection{$kd$-Tree}
 
 For completeness, different dimensions of the astrophysics dataset were also tested on the point $kd$-tree. Table \ref{tab:final-balance-factor} shows the query time, balance factor and maximum path length of the tree with these different dimensions. It can be observed that the point $kd$-tree, like the Pyramid Tree, performs worse because of the skew present in the astrophysics dataset as well. Using dimensions 1 and 2 gives a lower balance factor than the more skewed dimensions 3 and 7. The difference in performance between the chosen dimensions is much smaller than the Pyramid tree, however, again showing the point $kd$-tree is more resilient to skew.
 
