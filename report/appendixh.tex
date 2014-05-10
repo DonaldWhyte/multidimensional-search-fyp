@@ -6,8 +6,6 @@
 
 mdsearch is a small C++ library that implements a subset of the index structures discussed in this report. The library is available to download on an online Git repository \footnote{\url{https://github.com/DonaldWhyte/mdsearch}}. This library makes heavy use of template metaprogramming and inline functions to boost performance. As such, it is a header-only library. Each implemented index structure can be used by simply including its corresponding header file.
 
-TODO: change bucket hash table to bit hash
-
 Currently, the following index structures have been implemented:
 \begin{itemize}
 	\item \textbf{Pyramid Tree} -- see Section \ref{sec:pyramid-tree-detail} for more information
@@ -25,6 +23,8 @@ mdsearch requires the following header-only Boost libraries
 	\item Boost.Lexical\_Cast
 \end{itemize}
 
+\newpage
+
 \section{API}
 
 Each index structure is represented as a class, which implements the three operations evaluated in the project. Therefore, each index structure class has the following methods:
@@ -36,7 +36,20 @@ Each index structure is represented as a class, which implements the three opera
 
 Table \ref{tab:library-classes} describes the role of each class in the library. Figure \ref{fig:library-class-diagram} illustrates the inheritance and dependencies between these classes using a UML class diagram.
 
-\begin{table}[H]
+% YUML code to generate mdsearch UML class diagram
+\begin{comment}
+[HashStructure]^-[Pyramid Tree{bg:orange}]
+[Multigrid{bg:orange}]->[Point]
+[Multigrid{bg:orange}]->[Boundary]
+[Dataset]->[Point]
+[Dataset]->[Boundary]
+[Pyramid Tree]->[Boundary]
+[HashStructure]^-[Bit Hash{bg:orange}]
+[HashStructure]->[Point]
+[KDTree{bg:orange}]->[Point]
+\end{comment}
+
+\begin{table}[h]
 	\centering
 	\begin{tabular}{|p{4.25cm}|p{9.5cm}|}
 		\hline
@@ -52,14 +65,14 @@ Table \ref{tab:library-classes} describes the role of each class in the library.
 		\texttt{Multigrid<D>} & Multigrid for D-dimensional space \\
 		\texttt{HashStructure<D>} & Abstract class for hash-based structures, which follows the Bucket Pseudo-Pyramid Tree structure described in Section \ref{sec:iteration1} closely \\
 		\texttt{PyramidTree<D>} & Pyramid Tree for D-dimensional space \\
-		\texttt{BitHash<D>} & Bucket Hash Table for D-dimensional space \\
+		\texttt{BitHash<D>} & Bit Hash for D-dimensional space \\
 		\hline
 	\end{tabular}
 	\caption{Descriptions of Each Type in mdsearch Library}
 	\label{tab:library-classes}
 \end{table}
 
-\begin{figure}[H]
+\begin{figure}[h]
 	\centering
 	\includegraphics[scale=0.6]{figures/mdsearch_classes_uml.pdf}
 	\caption{UML Class Diagram of mdsearch Library. Coloured Boxes Represent Index Structures.}

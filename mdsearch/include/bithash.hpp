@@ -3,7 +3,7 @@
 mdsearch - Lightweight C++ library implementing a collection of
            multi-dimensional search structures
 
-File:        hashtable.hpp
+File:        bithash.hpp
 Description: TODO
 
 *******************************************************************************
@@ -42,7 +42,7 @@ namespace mdsearch
 {
 
 	template<int D>
-	class HashTable : public HashStructure<D>
+	class BitHash : public HashStructure<D>
 	{
 
 	protected:

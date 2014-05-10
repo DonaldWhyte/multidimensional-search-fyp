@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 #include "kdtree.hpp"
 #include "pyramidtree.hpp"
-#include "hashtable.hpp"
+#include "bithash.hpp"
 #include "multigrid.hpp"
 #include "dataset.hpp"
 #include <string>
@@ -140,10 +140,10 @@ int main(int argc, char* argv[])
 	testStructure< KDTree<NUM_DIMENSIONS> >("kd-tree", &kdTree, dataset.getPoints());
 
 	PyramidTree<NUM_DIMENSIONS> pyramidTree(dataset.computeBoundary());
-	testStructure< PyramidTree<NUM_DIMENSIONS> >("pyramid tree", &pyramidTree, dataset.getPoints());
+	testStructure< PyramidTree<NUM_DIMENSIONS> >("pyramidtree", &pyramidTree, dataset.getPoints());
 
-	HashTable<NUM_DIMENSIONS> hashTable;
-	testStructure< HashTable<NUM_DIMENSIONS> >("hash table", &hashTable, dataset.getPoints());
+	BitHash<NUM_DIMENSIONS> bitHash;
+	testStructure< BitHash<NUM_DIMENSIONS> >("bithash", &bitHash, dataset.getPoints());
 
 	Multigrid<NUM_DIMENSIONS> multigrid(dataset.computeBoundary());
 	testStructure< Multigrid<NUM_DIMENSIONS> >("multigrid", &multigrid, dataset.getPoints());

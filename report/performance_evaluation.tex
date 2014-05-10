@@ -4,9 +4,9 @@
 \centerline{\rule{149mm}{.02in}}
 \vspace{0.75cm}
 
-This section evaluates the baselines and index structures discussed in Section \ref{chap:chosen-structures-hypothesis} using their execution times on all the synthetic and real datasets. The performance is illustrated with plots and bar charts. Tables containing the exact times used to generate the plots is available in Appendix \ref{chap:performance-timings}.
+This section evaluates the performance of the index structures discussed in Section \ref{chap:chosen-structures-hypothesis} using their execution times on all the synthetic and real datasets. Execution times are illustrated with plots and bar charts. Tables containing all execution times are available in Appendix \ref{chap:performance-timings}.
 
-On all execution time plots, only \texttt{insert} and \texttt{delete} operations will be plotted. Since both point insertion or deletion will have to perform a point query (insert has to check the point is not already stored), point query execution time will not be plotted. See Appendix \ref{chap:performance-timings} for point query times.
+Since both point insertion or deletion will have to perform a point query (\texttt{insert} has to check the point is not already stored), point query execution time will not be plotted for some tests. See Appendix \ref{chap:performance-timings} for all point query times.
 
 \begin{figure}
 	\makebox[\textwidth][c]{%
@@ -62,21 +62,21 @@ On all execution time plots, only \texttt{insert} and \texttt{delete} operations
 
 \section{Dimensionality}
 
-Figure \ref{fig:perf-dimensionality} plots dataset \textit{dimensionality} against execution time of \texttt{insert} and \texttt{delete} operations for each structure. It shows that the performance of all structures gets worse as $d$ increases, but the rate performance decreases varies. For insertions, sequential scan quickly becomes slower as $d$ decreases, but the decrease starts to tail off as $d$ gets higher. For example, there is little different between \texttt{insert} execution time when the dimensions increase from 100 to 200. \texttt{delete} is sensitive to $d$, with its execution time increasing much faster as $d$ increases. This is because there is the data to move and de-allocate when performing array deletion is higher, as there is more data per point. \texttt{insert} pre-allocates memory up-front, meaning it is less susceptible to this problem.
+Figure \ref{fig:perf-dimensionality} plots point \textit{dimensionality} against execution time of \texttt{insert} and \texttt{delete} operations for each structure. It shows that the performance of all structures gets worse as $d$ increases, but the rate performance decreases varies. For insertions, sequential scan quickly becomes slower as $d$ decreases, but the decrease starts to tail off as $d$ gets higher. For example, there is little different between \texttt{insert} execution time when the dimensions increase from 100 to 200. \texttt{delete} is sensitive to $d$, with its execution time increasing much faster as $d$ increases. This is because more data must be moved and de-allocated when performing array deletion, because there is more data per point. \texttt{insert} pre-allocates memory up-front, so having more data per point has less of an impact on performance.
 
-Octree execution time exponentially increases with $d$, as shown by the plots. When $d > 10$, the sheer amount of nodes needed when sub-dividing space causes the structure to run out of memory. From this we can conclude that this baseline is not suitable for high-dimensional data.
+Octree execution time exponentially increases with $d$, as shown by the plots. When $d > 10$, the sheer amount of nodes needed when sub-dividing space causes the structure to run out of memory. From this we can conclude that this structure is not suitable for high-dimensional data.
 
-All three hash-based structures use an $O(d)$ hashing function, but the constant factors in each are different. Execution times of Bit Hash, Pseudo-Pyramid Tree and Pyramid Tree increase linearly with $d$, but the slope is much greater with Bit Hash. Pseudo-Pyramid Tree has the cheapest hash function and as such, is the fastest of the three structures as $d$ increases.
+All three hash-based structures use an $O(d)$ hashing function, but the constant factors in each are different. Execution times of Bit Hash, Pseudo-Pyramid Tree and Pyramid Tree all increase linearly with $d$, but Bit Hash has a greater slope. Pseudo-Pyramid Tree has the cheapest hash function and as such, is the fastest of the three structures as $d$ increases.
 
-There have been discussions regarding the $kd$-tree's unsuitability for high-dimensional data in the literature \cite{highd-nn, search-highd-analysis}. However, the $kd$-tree is affected the least by dimensionality in these tests. This was initially surprising, considering  The structure does not have an explicit $O(d)$ computation, since its best and worst running times are $O(\log_2 n$) and $O(n)$ respectively. Therefore, as long as the tree remains balanced, dimensionality will have little impact on the $kd$-tree's performance.
+There have been discussions regarding the $kd$-tree's unsuitability for high-dimensional data in the literature \cite{highd-nn, search-highd-analysis}. However, the $kd$-tree is affected the least by dimensionality in these tests, which was initially surprising. However, the structure does not have an explicit $O(d)$ computation; its best and worst running times are $O(\log_2 n$) and $O(n)$ respectively. Therefore, as long as the tree remains balanced, dimensionality will have little impact on the $kd$-tree's performance.
 
 \section{Dataset Size}
 
 Figure \ref{fig:perf-size} plots dataset \textit{size} against execution time of \texttt{insert} and \texttt{delete} operations for each structure. Sequential scan is clearly not scalable to large dynamic datasets, taking over 2000 seconds to incrementally construct a structure to store 1,000,000 unique points and over 6000 seconds to incrementally delete the points. The octree ran out of memory quickly, since 16-dimensional points are used. Again, this shows the octree is unsuitable for high-dimensional data.
 
-Figure \ref{fig:perf-dimensionality} showed the $kd$-tree provided the fastest performance with 10,000 points, but it becomes the slowest (barring sequential scan) as dataset size increases. Additionally, \texttt{delete} becomes even slower than \texttt{insert} does as $n$ increases, being two times slower when a 1,000,000 points are in the structure. This is a problem if an application removes individual points from the structure frequently.
+Figure \ref{fig:perf-dimensionality} shows the $kd$-tree is the fastest with 10,000 points, but it becomes the slowest (barring sequential scan) as dataset size increases. \texttt{delete} becomes even slower than \texttt{insert} does as $n$ increases, with deletions being two times slower than insertions with 1,000,000 points. This is a problem if an application removes individual points from the structure frequently.
 
-To recall, the Pseudo-Pyramid Tree and Bit Hash have the fastest and slowest hashing functions respectively. This again affects the performance of the structures, with the Pseudo-Pyramid Tree being the fastest for both operations and Bit Hash being the slowest. These tests show that three hash-based structures are the most scalable structures implemented in this project. As more synthetic data is given to the structures, execution time increases much slower than the $kd$-tree or sequential scan.
+The Pseudo-Pyramid Tree and Bit Hash have the fastest and slowest hashing functions respectively. This again affects the performance of the structures, with the Pseudo-Pyramid Tree being the fastest for both operations and Bit Hash being the slowest. These tests show that three hash-based structures are the most scalable structures out of the implemented in this project. As more synthetic data is given to the structures, execution time of the hash-based structures increases much slower than the point $kd$-tree or sequential scan.
 
 \section{Real Data}
 \label{sec:real-dataset-times}
@@ -104,11 +104,11 @@ To recall, the Pseudo-Pyramid Tree and Bit Hash have the fastest and slowest has
 	\label{fig:perf-real}
 \end{figure}
 
-Figure \ref{fig:perf-real} illustrates index structure performance of each operation on the three real datasets. Sequential scan is not shown because performance is similar to that shown in the dataset size plots in Figure \ref{fig:perf-size}. See Table \ref{tab:perf-real} for all structure times on the real datasets.
+Figure \ref{fig:perf-real} illustrates index structure performance of each operation on the three real datasets. Sequential scan is not shown because performance is similar to that shown in the dataset size plots in Figure \ref{fig:perf-size}. See Table \ref{tab:perf-real} in Appendix \ref{chap:performance-timings} for all execution times on the real datasets.
 
-Bit Hash outperforms all structures for point queries and deletion on all three datasets. It has the fastest insertion time as well, except for the armadillo mesh where the Pseudo-Pyramid Tree and Pyramid Tree beats it. Profiling revealed the cause of this was Bit Hash's hash function taking longer. Bit Hash is significantly faster than the other hash-based approaches on the astrophysics and hurricane Isabel dataset, with queries being over 400 and 198 times faster than the Pyramid Tree respectively.
+Bit Hash outperforms all structures for point queries and deletion on all three datasets. It has the fastest insertion time as well, except for the armadillo mesh where the Pseudo-Pyramid Tree and Pyramid Tree beats it. Profiling revealed that Bit Hash performs more memory allocations for insertions, which is the reason it is slower. Bit Hash is significantly faster than the other hash-based approaches on the astrophysics and hurricane Isabel dataset, with queries being over 400 and 198 times faster than the Pyramid Tree respectively.
 
-$kd$-trees vastly outperform Pseudo-Pyramid Tree and Pyramid Tree and almost match Bit Hash's speed, However, individual point deletion is incredibly slow. It took almost 580 seconds to individually delete each point from the hurricane dataset.
+$kd$-trees vastly outperform Pseudo-Pyramid Tree and Pyramid Tree and almost match Bit Hash's speed. However, individual point deletion is incredibly slow. It took almost 580 seconds to individually delete each point from the hurricane dataset.
 
 It is interesting see that Pyramid Tree was faster than the Pseudo-Pyramid Tree with the astrophysics dataset, but over two times slower with the hurricane Isabel dataset. The hashing functions appear to be highly sensitive to data distribution. This will be explored more in the next section.
 
