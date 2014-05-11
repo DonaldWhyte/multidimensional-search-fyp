@@ -4,9 +4,10 @@
 \centerline{\rule{149mm}{.02in}}
 \vspace{0.75cm}
 
-% TODO: why ignoring the pseudo-pyramid tree
+Chapter \ref{chap:performance-evaluation} showed that the point $kd$-tree greatly outperforms the Pyramid Tree and Pseudo-Pyramid Tree with the two scientific datasets.
+The Pseudo-Pyramid Tree has not been explored in the literature, so there were no expectations of its performance. However, it was hypothesised that the Pyramid Tree would perform better than the point $kd$-tree, which is not the case.
 
-Chapter \ref{chap:performance-evaluation} showed that the point $kd$-tree greatly outperforms the Pyramid tree with the two scientific datasets. This chapter will explore the reasons for this, determining which properties in the astrophysics dataset cause the performance of the structures to degenerate. The chapter concludes by discussing the suitability of the Pyramid Tree, $kd$-tree and different classes of index structures for high-dimensional scientific datasets.
+This chapter explores the reasons for this, determining which properties in the astrophysics dataset cause the performance of the Pyramid Tree to degenerate. The chapter concludes by discussing the suitability of the Pyramid Tree, $kd$-tree and different classes of index structures for high-dimensional scientific datasets.
 
 \section{Characteristics of Astrophysics Dataset}
 \label{sec:data-characteristics}
@@ -241,6 +242,4 @@ The original hypotheses, discussed in Section \ref{sec:main-hypothesis}, stated 
 
 \paragraph{}
 
-% TODO: explain how it supports???
-
-The empirical evidence paired with the further exploration in this chapter verifies hypothesis 4. The Pyramid tree is not suitable for skewed datasets. The empirical evidence from this project strongly supports hypotheses 1, 2 and 3. However, more research is required to fully verify these hypotheses.
+The empirical evidence verifies hypothesis 4 -- the Pyramid Tree is not suitable for skewed datasets. The empirical evidence from this project, paired with the additional evaluation in this chapter, strongly supports hypotheses 1, 2 and 3. However, more research is required to verify these hypotheses.

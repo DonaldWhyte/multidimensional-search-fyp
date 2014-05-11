@@ -10,11 +10,9 @@ This section will discuss the limitations of the project's work and future work 
 
 This project has only worked with three synthetic datasets and three real datasets. Only two of these datasets represent the kind of data this project is targeting, which is data from scientific computation. Using more data from a scientific domain and performing further analysis on their properties may have derived more insight into which index structures are suited to such data.
 
-A large chunk of the Design and Implementation phase was spent focusing on the Pseudo-Pyramid tree and Pyramid Tree before they were found to perform poorly with point queries on the scientific datasets. By the time the limitations of these structures were discovered, there was not enough time to evaluate the other implemented structures in detail. Originally, it was intended that the bucket $kd$-tree (see Appendix \ref{chap:additional-structures}) would be discussed and evaluated alongside the point $kd$-tree, but the remaining time did not allow for this.
+A large chunk of the Design and Implementation phase was spent focusing on the Pseudo-Pyramid tree and Pyramid Tree before they were found to perform poorly with point queries on the scientific datasets. By the time the limitations of these structures were discovered, there was not enough time to evaluate the other implemented structures in detail. Originally, it was intended that the Multigrid and bucket $kd$-tree (see Appendix \ref{chap:additional-structures}) would be discussed and evaluated alongside the other index structures, but the remaining time did not allow for this.
 
-% TODO: include multigrid if it's not in main report
-
-TODO: never had time to verify new hypothesis! beyond scope to verify them or conjecture!!
+If the additional index structures were explored in more detail and more scientific datasets were characterised and used for evaluation, then it may have been possible to explore the hypotheses made at the end of Chapter \ref{chap:technical-evaluation} in good detail.
 
 \section{Future Work}
 
@@ -26,7 +24,7 @@ Exploring Hypothesis 2 would involve implementing and evaluating several adaptiv
 
 Perhaps the most valuable finding is the superior performance of a tree-based index structure for the target data. Hypothesis 3 states dynamic tree-based structures are more suitable for scientific datasets than dimension reduction techniques for point queries. Verifying this involves implementing several dynamic tree-based structures and evaluating their performance on scientific datasets. Examples of such structures include bucket $kd$-trees and BD-trees \cite{kdtree-v-bdtree}, as well as the KDB-tree, Quadtreap and the Splay Quadtree structures described in Sections \ref{sec:recursive-partition-structures} and \ref{sec:history-sensitive-structures}.
 
-Finally, embedding, distance-based or parallel structures (all briefly mentioned in Section \ref{chap:background_research}) are avenues to explore. Based on the literature review, little research has been done on the suitability of these structure types for point queries on dynamic high-dimensional data.
+Finally, embedding, distance-based or parallel structures (all briefly mentioned in Chapter \ref{chap:background_research}) are avenues to explore. Based on the literature review, little research has been done on the suitability of these structure types for point queries on dynamic high-dimensional data.
 
 \section{Evaluation of Methodology}
 
@@ -54,6 +52,8 @@ Evaluation was present throughout the Chapters \ref{chap:performance-evaluation}
 
 All the minimum requirements were met and exceeded to varying degrees. In particular, the amount of optimisations and index structures that were implemented and evaluated was much larger than intended. This was done to ensure the evaluation was a comprehensive as possible within the three months of the project.
 
+\newpage
+
 \section{Deliverables}
 
 The deliverables described in Section \ref{sec:deliverables} were produced in the following ways:
@@ -68,4 +68,4 @@ The deliverables described in Section \ref{sec:deliverables} were produced in th
 
 To conclude, this project implemented several index structures and evaluated their performance on dynamic high-dimensional data, specifically focusing on scientific datasets. It was found that the Pyramid Tree and a similar structure, the Pseudo-Pyramid Tree, consistently gave poor point query performance with scientific datasets. A well-established structure, the point $kd$-tree, outperformed these two structures by a large margin. An evaluation of these structures' behaviour with the astrophysics dataset was performed, in which some conjectures and hypotheses were derived regarding the suitability of different classes of index structures for dynamic scientific datasets. Future work has been proposed to verify these hypotheses and explore the discussed issues in greater detail.
 
-The overall aim of the project was to implement one or more index structures and evaluate their performance with respect to high-dimensional datasets (i.e. $d > 10$). Using the astrophysics dataset as a test case, the evaluation went into much greater detail than initially expected. A greater number of index structures and optimisations were implemented than planned, resulting in a more comprehensive evaluation. This evaluation resulted in a conjecture and several hypotheses being made, which has created a foundation for future work in this area be started. Therefore, the aim of the project has been met and is considered a success.
+The overall aim of the project was to implement one or more index structures and evaluate their performance with respect to high-dimensional datasets (i.e. $d > 10$). Using the astrophysics dataset as a test case, the evaluation went into much greater detail than initially expected. A greater number of index structures and optimisations were implemented than planned, resulting in a more comprehensive evaluation. This evaluation resulted in a conjecture and several hypotheses being made, which has created a foundation for future work in this area be started. Therefore, the aim of the project has been met and the project is considered a success.
