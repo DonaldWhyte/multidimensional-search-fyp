@@ -10,7 +10,7 @@ Since multi-dimensional search is a problem that appears in so many areas in com
 
 \section{Aim}
 
-This project will survey existing multi-dimensional search structures which attempt to solve the multi-dimensional search problem efficiently, identifying the major challenges of the field and how this has guided the development of structures throughout the last two decades. The core aim of the project is to implement one or more index structures, optimising them specifically for high-dimensional datasets. These implementation(s) will then be evaluated with respect to their proposed performance in the literature and pre-defined baselines, using chosen test datasets. This evaluation will highlight the found performance bottlenecks in the implementations and limitations of the algorithms themselves.
+This project will survey existing multi-dimensional search structures that attempt to solve the multi-dimensional search problem efficiently. The major challenges in the field, and how they have guided the development of structures throughout the last two decades, will be identified. The core aim of the project is to implement one or more index structures, optimising them specifically for high-dimensional datasets. These implementations will then be evaluated with respect to their proposed performance in the literature and pre-defined baselines, using chosen test datasets. This evaluation will highlight performance bottlenecks in the implementations and fundamental limitations of the algorithms.
 
 \section{Objectives}
 \label{sec:objectives}
@@ -50,10 +50,10 @@ The following will be delivered upon project completion:
 
 Throughout the project, some assumptions have been made. These are used to narrow the scope of the project and allow more time to be spent focusing on the core aim of the project, which is high-dimensional data. The assumptions are:
 \begin{enumerate}
-	\item Datasets have a ``high" number of dimensions ($\geq 10$), meaning the performance of the index structures will be measured using data with at least 10 dimensions. Data using less dimensions may be used for the purposes of understanding how the implementations behave with respect to dimensionalitym however.
-	\item Datasets will be able to fit into the main memory (i.e. RAM) of the machine used for evaluation. That is, none of the data is paged to secondary memory and page accesses causing reduced performance does not need to be considered.
+	\item Datasets have a ``high" number of dimensions ($\geq 10$), meaning the performance of the index structures will be measured using data with at least 10 dimensions. Data using less dimensions may be used for the purposes of understanding how the implementations behave with respect to dimensionality, however.
+	\item Datasets will be able to fit into the main memory (i.e. RAM) of the machine used for evaluation. That is, none of the data is paged to secondary memory, so page accesses causing reduced performance does not need to be considered.
 	\item Datasets are dynamic, meaning points may be inserted, deleted or updated at any time.
-	\item Structures only store \textit{unique} points, meaning a structure cannot store two points with identical coordinates
+	\item Structures only store \textit{unique} points, meaning a structure cannot store two points with identical coordinates.
 \end{enumerate}
 
 Furthermore, the project is focused on the \textbf{scientific visualisation} applications of multi-dimensional search, and not database indexing. Therefore, the performance of the implemented index structures will be evaluated primarily using scientific datasets with continuous domains, instead of discrete data pulled from databases.

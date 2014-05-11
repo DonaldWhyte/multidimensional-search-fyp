@@ -18,7 +18,7 @@ The focus of bucket methods is to minimise I/O operations while still retaining 
 \subsection{Deciding on an Index Structure}
 \label{sec:structure-decision}
 
-While there are some structures which have been shown to be less efficient than others (e.g. R-tree when compared to X-tree \cite{x-tree}), the behaviour of these structures often varies with the data it is given. Some structures work better on low-dimensional, uniform data, while others are better for high-dimensional data. Table \ref{tab:comparison} in Appendix \ref{chap:supp-material} lists some of the index structures discussed in this review and their strengths/weaknesses.
+While there are some structures which have been shown to be less efficient than others (e.g. R-tree when compared to X-tree \cite{x-tree}), the behaviour of index structures generally depends on the input data. Table \ref{tab:comparison} in Appendix \ref{chap:supp-material} lists some of the index structures discussed in this review and their strengths/weaknesses.
 In other words, there is no ``best" structure. Choosing an index structure to use is \textit{task-dependent}. There are many factors to consider when choosing an index structure, some of which are listed below. Note that this is by no means an exhaustive list.
 \begin{itemize}
 	\item how many points will the structure contain?

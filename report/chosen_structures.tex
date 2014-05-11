@@ -14,9 +14,11 @@ As described in Section \ref{sec:high-dimensional-structures}, the pyramid tree 
 	\item the paper's analysis is for \textit{range} queries, whereas this project is assessing point queries
 	\item the real dataset, ``a large text database extracted from WWW-pages" \cite{pyramid-tree}, contains discrete values, whereas the real datasets considered in this project are continuous, scientific datasets
 \end{enumerate}
-While the database is mapped to a spatial domain when stored in an index structure, the data may have different properties or distributions than continuous, spatial-based data such as the astrophysics turbulence simulation. Therefore, it was decided that the Pyramid Tree will be implemented to explore if the structure can provide equally good performance with point queries on dynamic scientific datasets.
+While the database is mapped to a spatial domain when stored in an index structure, the data may have different properties or distributions than continuous, spatial-based data. Scientific datasets, the target of this project, tend to model continuous domains. Therefore, it was decided that the Pyramid Tree will be implemented to explore if the structure can provide equally good performance with point queries on dynamic scientific datasets.
 
-The reduction technique will now be explained in further detail. The Pyramid tree partitions the data space into $2d$ Pyramids where each pyramid uses a $(d - 1)$ hyperplane for its base and the centre of the data space as its tip. Figure \ref{fig:pyramid-tree-pyramids} shows how the $2d$ pyramids extend from the centre point to the data space's boundaries. Each pyramid is segmented by splitting them along $(d-1)$ hyperplanes parallel to the base of the pyramid. The one-dimensional value of a point, called the \textit{pyramid value}, defines which pyramid it is in and its height in said pyramid. The spatial partition is shown in Figure \ref{fig:pyramid-tree-buckets}, where each pyramid segment has a bucket that stores the points inside that segment.
+The dimension reduction technique will now be explained in further detail. The Pyramid tree partitions the data space into $2d$ Pyramids, where each pyramid uses a $(d - 1)$ hyperplane for its base and the centre of the data space as its tip. Figure \ref{fig:pyramid-tree-pyramids} shows how the $2d$ pyramids extend from the centre point to the data space's boundaries. Each pyramid is segmented by splitting them along $(d-1)$ hyperplanes parallel to the base of the pyramid.
+
+The one-dimensional value of a point, called the \textit{pyramid value}, defines which pyramid it is in and its height in said pyramid. The resultant spatial partition is shown in Figure \ref{fig:pyramid-tree-buckets}, where each pyramid segment has a bucket that stores the points inside that segment.
 
 \begin{figure}
 		\begin{center}
@@ -73,7 +75,7 @@ Since $x_0 \leq 0.5$ and $y_0 \leq 0.5$, both $x$ and $y$ are mapped to pyramid 
 	\label{fig:point-boundary-distance}
 \end{wrapfigure}
 
-The School of Computing have an implementation of an index structure which is similar to the Pyramid Tree. Like the Pyramid Tree, it reduces $d$-dimensional points to a single dimension, which is used to search for the original point in a one-dimensional search structure. Each 1D key has its own bucket that contains references to the original points which are mapped to it. This index structure will be called the \textbf{Pseudo-Pyramid Tree}, because the reduction technique used is \textit{inspired} by the Pyramid tree, but is not the same.  To gain more insight into the performance of dimension reduction techniques as a whole, the Pseudo-Pyramid Tree will be implemented.
+School of Computing at the University of Leeds have an implementation of an index structure which is similar to the Pyramid Tree. Like the Pyramid Tree, it reduces $d$-dimensional points to a single dimension, which is used to search for the original point in a one-dimensional search structure. Each 1D key has its own bucket that contains references to the original points which are mapped to it. This index structure will be called the \textbf{Pseudo-Pyramid Tree}, because the reduction technique used is \textit{inspired} by the Pyramid tree, but is not the same.  To gain more insight into the performance of dimension reduction techniques as a whole, the Pseudo-Pyramid Tree will be implemented.
 
 The Pseudo-Pyramid Tree reduction will now be given. To reduce a point $p$, how far along the boundary the point is in each dimension is determined (see Figure \ref{fig:point-boundary-distance} for an illustration). These distances are computed using Equation \ref{eq:point-boundary-distance}, where  $min_i$ and $max_i$ define the minimum and maximum bounds for dimension $i$.
 
@@ -100,13 +102,13 @@ The coefficient $M$ is used to increase the magnitude of $h_i(p)$ before it is t
 % http://stackoverflow.com/questions/4948780/magic-number-in-boosthash-combine
 % http://burtleburtle.net/bob/hash/doobs.html
 
-Bit Hash is another structure which reduces the dimensionality of points to one dimension. Instead of using a point's spatial properties, Bit Hash accumulates a hash value by hashing each individual coordinate. Each coordinate is hashed using a  32-bit floating point hashing function. The algorithms used for hashing a point and 32-bit floating point numbers is given in Algorithm \ref{alg:point-hashing} in Appendix \ref{chap:algs-and-code}.
+Bit Hash is another structure which reduces the dimensionality of points to one dimension. Instead of using a point's spatial properties, Bit Hash accumulates a hash value by hashing each individual coordinate. Each coordinate is hashed using a  32-bit floating point hashing function. The algorithms used for hashing a point and 32-bit floating point numbers are given in Appendix \ref{chap:algs-and-code}.
 
-The structure is susceptible to floating point inaccuracy because it uses the \textit{bits} of the point. On the controlled performance tests executed in this project, a point is queried using the exact same floating point values for the coordinates as when it was inserted. This means the two points have the same identical bit patterns and these errors will not occur.
+The structure is susceptible to floating point inaccuracy because it uses the \textit{bits} of the point to produce the hash value. On the controlled performance tests executed in this project, a point is queried using the exact same floating point values for the coordinates as when it was inserted. This means the two points have the same identical bit patterns and these errors will not occur.
 
 Suppose the point being queried was the output of some other computation, where rounding errors may come into play. Even if the point is \textit{mathematically} identical to a point stored in the structure, rounding errors can cause the two points to have different bit patterns and thus, have different hashed values.  Despite the point being stored in the structure, it will appear as if it is not. 
 
-This makes Bit Hash unreliable for certain applications, especially ones where the input points are the result of computations involving many arithmetic operations. Nevertheless, For the small subset of applications where all the points are pre-loaded into memory and not computed again, this can be a useful structure. Initial experiments have also shown this structure has very point query performance, so it will be explored further in this project.
+This makes Bit Hash unreliable for certain applications, especially ones where the input points are the result of computations involving many arithmetic operations. Nevertheless, For the small subset of applications where all the points are pre-loaded into memory and not computed again, this can be a useful structure. Initial experiments have also shown this structure has good point query performance, so it will be explored further in this project.
 
 \section{$kd$-tree}
 \label{sec:kd-tree-detail}
@@ -153,7 +155,7 @@ Figure \ref{fig:kd-tree} illustrates the \texttt{insert} and \texttt{delete} ope
 \section{Main Hypothesis}
 \label{sec:main-hypothesis}
 
-Since there has been no published evaluations of the Pseudo-Pyramid Tree, no hypotheses will be made regarding the performance of the structure. It is suspected that the Pseudo-Pyramid Tree will perform well on high-dimensional data, because it is a hash-based method, but little is currently known about how well the structure's hashing function performs, so there is a little basis for such suspicion. Before starting implementation, the following hypothesis regarding the Pyramid Tree and $kd$-tree was devised:
+Since there has been no published evaluations of the Pseudo-Pyramid Tree or Bit Hash, no hypotheses will be made regarding the performance of these structures. It is suspected that the Pseudo-Pyramid Tree will perform well on high-dimensional data, because it is a hash-based method, but little is currently known about how well the structure's hashing function performs, so there is a little basis for such suspicion. Before starting implementation, the following hypothesis regarding the Pyramid Tree and $kd$-tree was devised:
 
 \paragraph{\textbf{HYPOTHESIS:}} Pyramid Tree will be faster than the baselines and $kd$-trees on scientific datasets containing high-dimensional data ($\geq 10$ dimensions).
 
