@@ -27,7 +27,7 @@ There are three core modules of the framework, which are shown in Figure \ref{fi
 \end{figure}
 
 \section{Baseline Implementations}
- 
+
 Sequential scan was implemented using the C++ container \texttt{std::vector}, a dynamically resizeable array.  Point queries are performed in $O(n)$ time, as the query iterates through the array sequentially until the given point is found or the end of the array is reached. The structure must check if a point exists in the structure before inserting it, making \texttt{insert} take $O(n)$. \texttt{delete} is a standard array deletion, making it an $O(n)$ operation.
 
 The octree variant implemented is a bucket PR octree. The structure partitions the underlying data space into uniformly sized boxes, without using the points as pivots (unlike point quadtrees). It is a bucket octree because \textit{multiple} points can be stored in a single leaf node. The octree dynamically decomposes spatial regions based on its current contents. When the number of points in a leaf node exceeds a certain number, say $M$, then the region represented by the leaf is sub-divided, creating $2^d$ children. The $M + 1$ points are then scattered across the children. Therefore, dense regions of space have a finer decomposition than sparse regions.

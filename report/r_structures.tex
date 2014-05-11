@@ -4,6 +4,7 @@
 Many index structures have been developed throughout the past forty years, such as quadtrees in the early 1970s \cite{quadtree} and splay quadtrees in 2012 \cite{splay-quadtree}. New structures are often based on older index structures, either by modifying an existing structure or combining two different structures in some way. Figure \ref{fig:structure-taxonomy} in Appendix \ref{chap:supp-material} shows a \textit{taxonomy} of index structures. This section describes some of the widely used index structures, their limitations (with respect to the challenges discussed in Section \ref{sec:challenges}) and why this led onto the development of new structures.
 
 \subsection{Basic Structures}
+\label{sec:basic-structures}
 
 \textbf{Sequential scan} refers to the brute-force approach of searching a data set. You simply store the dataset in a linear data structure (e.g. a list) and iterate through each data item until the desired point is found. This means searching is an $O(n)$ operation. Using a standard array, insertion is $O(1)$ if new points are inserted at the end of the array and deletion is $O(n)$. There is little memory overhead for this approach, but search times will be very long if there are large number of points. Nevertheless, if the number of data items is small, a more complex index structure may not be needed.
 
@@ -11,7 +12,7 @@ Many index structures have been developed throughout the past forty years, such 
 
 A point query is equivalent to checking if a certain key is stored in the tree. In the best case, we get running time $O(\log_2 n)$ for the query, as the height of the tree is $\log_2 n$. However, this performance is not guaranteed. Skewed or sorted data may result in taller trees, where there are many nodes with only left or only right children. This makes the binary tree \textit{unbalanced} (height greater than $\log_2 n$). If balance is not guaranteed, the running time of a point query is $O(n)$ in the worst case, which is no better than a sequential search.
 
-\textbf{Balanced search trees} re-order the nodes to maintain balance (logarithmic height) when a node is inserted, updated or deleted, regardless of data skew. These operations cause dynamic index structure operations to become slower, but allow for faster queries. Examples of balanced search trees include red-black trees, AVL trees, Splay trees and treaps \cite{introduction-to-algorithms}.
+\textbf{Balanced search trees} re-order the nodes to maintain balance (logarithmic height) when a node is inserted, updated or deleted, regardless of data skew. These operations cause dynamic index structure operations to become slower, but allow for faster queries. Examples of balanced search trees include red-black trees, AVL trees, splay trees and treaps \cite{introduction-to-algorithms}.
 
 \subsection{Recursive Partitioning of Data Space}
 \label{sec:recursive-partition-structures}
@@ -147,15 +148,15 @@ Given the same data twice, most structures will behave exactly the same. That is
 
 \subsubsection{Quadtreap}
 
-A treap is a randomised search tree used to store one-dimensional keys, which combines a binary search tree with a heap by maintaining both \textbf{key-order} and \textbf{heap-order} (nodes ordered by the randomly assigned probabilities) \cite{quadtreap}. The main advantage of the quadtreap is that $\log n$ height can be maintained, even when dynamically inserting and removing points, with ``high probability" \cite{quadtreap}.
+A treap is a randomised search tree used to store one-dimensional keys, which combines a binary search tree with a heap by maintaining both \textit{key-order} and \textit{heap-order} (nodes ordered by the randomly assigned probabilities) \cite{quadtreap}. The main advantage of the quadtreap is that $\log n$ height can be maintained, even when dynamically inserting and removing points, with ``high probability" \cite{quadtreap}.
 
 A quadtreap is a combination of a compressed quadtree and a treap. Tree rotations are used to maintain a balanced height when the tree is modified. Let $h$ be the height of the tree. Running times for \texttt{insert} and point queries are $O(h)$, and \texttt{delete} is performed in $O(h^2)$. This means the \textit{expected} times for \texttt{insert} and \texttt{delete} are $O(\log n)$ and $O(\log^2 n)$ respectively.
 
 \subsubsection{Splay Quadtree}
 \label{sec:splay-quadtree}
 
-Splay trees are one-dimensional index structures which make use of a splaying operation to achieve fast dynamic operations \cite{introduction-to-algorithms}. A Splay tree is \textbf{self-adjusting}, which means it is ``a data structure that reorganises itself to fit the pattern of access." \cite{splay-quadtree} This is achieved with the splaying operation, which performs a series of $O(1)$ tree rotations to maintain a balanced tree with low height.
+Splay trees are one-dimensional index structures which make use of a splaying operation to achieve fast dynamic operations \cite{introduction-to-algorithms}. A splay tree is \textit{self-adjusting}, which means it is ``a data structure that reorganises itself to fit the pattern of access." \cite{splay-quadtree} This is achieved with the splaying operation, which performs a series of $O(1)$ tree rotations to maintain a balanced tree with low height.
 
-Park and Mount, the creators of the quadtreap \cite{quadtreap}, stated ``there is no comparable self-adjusting data structure for storing multi-dimensional point sets" with regard to splay trees \cite{splay-quadtree}. Hence, they developed the splay quadtree, which combines BBD-trees (box decomposition trees) with quadtrees by making use of an equivalent splaying operation on BBD-trees. Using entropy, Park and Mount proved good bounds on the running time of dynamic operations and queries.
+Park and Mount, the creators of the quadtreap \cite{quadtreap}, stated ``there is no comparable self-adjusting data structure for storing multi-dimensional point sets" with regard to splay trees \cite{splay-quadtree}. Hence, they developed the splay quadtree, which combines BBD-trees (balanced box decomposition trees) with quadtrees by making use of an equivalent splaying operation on BBD-trees. Park and Mount proved good bounds on the running time of dynamic operations and queries.
 
-The structure is also complicated to implement and no papers evaluating its performance empirically have been published. Currently, the splay quadtree remains a purely theoretical structure.
+The structure is complicated to implement and no papers evaluating its performance empirically have been published. Currently, the splay quadtree remains a purely theoretical structure.
