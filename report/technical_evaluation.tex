@@ -231,15 +231,16 @@ The point $kd$-tree shows that these structures can provide good performance wit
 
 The original hypotheses, discussed in Section \ref{sec:main-hypothesis}, stated that the Pyramid Tree would provide faster point queries for high-dimensional scientific datasets. Based on the empirical evidence from Chapter \ref{chap:performance-evaluation} and the discussion in this chapter, the hypothesis is false. It has been abandoned in favour of the following new hypotheses.
 
-\paragraph{\textbf{HYPOTHESIS 1:}} Existing index structures based on reduction to a 1D value use a static decomposition of space, and degenerate when processing highly skewed data due to floating point imprecision.
+\paragraph{\textbf{HYPOTHESIS 1:}} Most existing index structures based on reduction to a 1D value statically decompose space, and degenerate when processing highly skewed data due to floating point imprecision.
 
 \paragraph{\textbf{HYPOTHESIS 2:}} Dimension reduction techniques cannot adapt well to skewed distributions of data because the cost of rebuilding the structure when adapting is too high.
 
 \paragraph{\textbf{HYPOTHESIS 3:}} Dynamic tree-based structures, which adapt the decomposition of the data space as points are inserted, will generally provide better point query performance for high-dimensional scientific datasets than dimension reduction techniques.
 
-\paragraph{\textbf{HYPOTHESIS 4:}} The Pyramid Tree is not a suitable index structure for performing point queries, due to it being highly sensitive to skewed datasets.
+\paragraph{\textbf{HYPOTHESIS 4:}} The Pyramid Tree is not a suitable index structure for performing point queries on skewed datasets.
 
 \paragraph{}
 
-The empirical evidence from this project strongly supports hypotheses 1, 3 and 4. However, more research is required to fully verify any of these hypothesis.
+% TODO: explain how it supports???
 
+The empirical evidence paired with the further exploration in this chapter verifies hypothesis 4. The Pyramid tree is not suitable for skewed datasets. The empirical evidence from this project strongly supports hypotheses 1, 2 and 3. However, more research is required to fully verify these hypotheses.
