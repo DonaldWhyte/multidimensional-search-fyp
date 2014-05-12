@@ -129,3 +129,7 @@ Many profilers were considered when choosing one for this project. Intel VTune \
 SIMD stands for Single Instruction, Multiple Data and was defined by Flynn as a classification of parallel computing \cite{flynns-taxonomy}. In SIMD, a single instruction is applied to multiple data items at the same time. If $p$ is the maximum number of data items that can be operated on in parallel at a time, then ideally a computation can be made $p$ times faster. However, it is only suitable for computations where the same operation can be applied to multiple data items independently, and the order in which those operations complete does not affect the final output.
 
 Streaming SIMD Extensions, or SSE, is a specification of an instruction set that performs SIMD operations on the widely used x86 CPU architecture \cite{sse}, which is the architecture used for the development and test environment of this project. SSE will be used to accelerate frequent executed code where possible.
+
+\section{Conclusion}
+
+TODO

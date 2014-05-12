@@ -1,4 +1,4 @@
-\chapter{Final Evaluation}
+\chapter{Final Discussion}
 \label{chap:technical-evaluation}
 \vspace{-0.75cm}
 \centerline{\rule{149mm}{.02in}}
@@ -218,7 +218,7 @@ To summarise, adaptive decompositions allows one to quickly ``zoom in" on dense 
 
 \section{Suitability of Hash-Based Approaches}
 	
-The Pseudo-Pyramid Tree and Pyramid Tree both produce a static decomposition of the underlying data space through the use of dimension reduction. It was shown in the empirical results from this project that the performance of these two structures is vastly inferior to the point $kd$-tree, a simple and well-established technique. These empirical results conicide with the theoretical discussion on the suitability of static decompositions for highly skewed datasets.
+The Pseudo-Pyramid Tree and Pyramid Tree both produce a static decomposition of the underlying data space through the use of dimension reduction. It was shown in the empirical results from this project that the performance of these two structures is vastly inferior to the point $kd$-tree, a simple and well-established technique. These empirical results coincide with the theoretical discussion on the suitability of static decompositions for highly skewed datasets.
 
 Adaptive variants of the Pyramid Tree exist, such as the Extended Pyramid-Technique \cite{pyramid-tree} and iMinMax($\theta$) (see Appendix \ref{chap:additional-structures}). However, the \textit{cost} of adapting such structures limits their usefulness. For example, the Extended Pyramid-Technique moves the centre of the data space to be the median of all stored points. Doing so means that the entire structure must be rebuilt because each stored point may be hashed to a different value after the centre point has moved. For large $n$ this has a massive impact on performance. An adaptable iMinMax($\theta$) was implemented in this project, but its performance was poor, despite it adapting to the dataset, because of how long rebuilding takes.
 
@@ -228,7 +228,7 @@ Despite the adaptive point $kd$-tree performing worse on highly skewed data, the
 
 The point $kd$-tree shows that these structures can provide good performance with point queries. Existing literature often discusses how $kd$-trees degenerate to Sequential Scan with higher dimensions, but this is not the case for point queries, even with real datasets that are highly skewed.
 
-\section{New Hypotheses}
+\section{Conclusion}
 
 The original hypothesis, discussed in Section \ref{sec:initial-hypothesis}, stated that the Pyramid Tree would provide faster point queries for high-dimensional scientific datasets. Based on the empirical evidence from Chapter \ref{chap:performance-evaluation} and the discussion in this chapter, the hypothesis is false. It has been abandoned in favour of the following new hypotheses.
 

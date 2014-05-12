@@ -227,7 +227,7 @@ Sequential scan incurs almost no overhead since only three extra pointers are us
 
 The overhead incurred by the hash-based structures depends on the dataset. Each bucket adds overhead, so memory overhead is larger if there are many buckets. For execution speed, it is ideal to have one bucket for each point, but this consumes more memory. The Pseudo-Pyramid Tree maps all points in the astrophysics dataset to only 8 buckets and the structure's overhead factor is 1.099984. The structure uses 493,488 buckets for the synthetic data and has an overhead factor of 1.688401. Notice how the overhead factor is much higher. Bit Hash tends to use one bucket for each point, so it consumes the most memory out of all the structures. While perfect hashing is desirable for speed, it can cause problems if large datasets must be processed on memory constrained systems. If memory is a limited resource, then the point $kd$-tree may be a more suitable structure because it has comparatively low overhead that is not dependent on point distribution.
 
-\subsection{Summary}
+\section{Conclusion}
 
 The performance evaluation performed in this chapter has revealed the following:
 \begin{itemize}
@@ -235,7 +235,7 @@ The performance evaluation performed in this chapter has revealed the following:
 	\item the standard octree is not usable for high-dimensional data
 	\item Pseudo-Pyramid Tree and Pyramid Tree degenerate to semi-sequential scan with the two scientific datasets, but perform well with the armadillo mesh and synthetic datasets
 	\item point $kd$-tree speed is affected by point distribution, but not as much as hash-based structures
-	\item the point $kd$-tree significantly outperforms the Pseudo-Pyramid Tree and Pyramid Tree on real scientific datasets
+	\item the point $kd$-tree outperforms the Pseudo-Pyramid Tree and Pyramid Tree on real scientific datasets
 	\item individual point deletion with the point $kd$-tree is highly inefficient
 	\item if near perfect hashing is achieved, then a structure faster than the point $kd$-tree has been found
 	\item hash-based structures use more memory than point $kd$-trees, with overhead increasing as they get closer to perfect hashing
