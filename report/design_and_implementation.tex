@@ -4,9 +4,7 @@
 \centerline{\rule{149mm}{.02in}}
 \vspace{0.75cm}
 
-This section describes how each structure was implemented and documents the low-level optimisation efforts that went into accelerating the structures.
-
-TODO: add mention of how times are retrieved (more detail in detail...)
+This section describes the implementation details of the chosen structures, documenting the efforts that went into optimisation the structures. All execution times given in this chapter were measured by executing sequences of structure operations five times and using the average of these times. This is described in greater detail later in the report, in Section \ref{sec:timing-operations}.
 
 \section{Evaluation Framework}
 
@@ -173,11 +171,3 @@ Table \ref{tab:pyramid-sse} shows the execution times of the Pyramid Tree with a
 \section{$kd$-tree Implementation}
 
 The point $kd$-tree variant described in Section \ref{sec:kd-tree-detail} was implemented. Each node is represented as a C-struct which stores a single point as well as pointers to its children. Every node is allocated using a call to \texttt{malloc()}, which allocates enough memory on the heap to store the node. This means each node may reside in different areas of the heap, resulting in fragmented memory. Array-based implementations that store $kd$-tree contiguously in memory exist, but this project will not explore these due to time constraints.
-
-\section{Conclusion}
-
-The implementation details of the six chosen index structures have been discussed.
-
-TODO
-
-The same underlying implementation is used for all three hash-based structures. Particular attention has been given to optimising this implementation to speed up can be gained on all three structures at once. 
