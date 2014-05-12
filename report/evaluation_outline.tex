@@ -155,4 +155,15 @@ Table \ref{tab:system-specifications} lists the hardware, operating system and t
 
 Individual index structure operations are typically much lower than a second, sometimes even less than a millisecond. A high level of precision and accuracy is required because even millisecond savings are important when optimising index structures.
 
-C/C++ comes with two standard timing mechanisms. \texttt{time()}\footnote{Online documentation for \texttt{time()}: \url{http://www.cplusplus.com/reference/ctime/time/}} returns the number of seconds since the Unix epoch (00:00, 01/01/1970 UTC). \texttt{clock()}\footnote{Online documentation for \texttt{clock()}: \url{http://www.cplusplus.com/reference/ctime/clock/}} measures the number of CPU ticks since some epoch (typically the launch of the application). The amount of real time (i.e. milliseconds, seconds, etc.) a CPU tick takes is constant, but depends on the hardware. \texttt{clock\_gettime()}\footnote{Online documentation for \texttt{clock\_gettime()}: \url{http://linux.die.net/man/3/clock_gettime}} returns a time with nanosecond precision, but is only available on specific systems (e.g. Linux). Since the operating system used for the evaluation framework is a Linux distribution and nanosecond precision is desired, \texttt{clock\_gettime()} has been used for timing all operations.
+C/C++ comes with two standard timing mechanisms. \texttt{time()}\footnote{Online documentation for discussed functions at: \url{http://www.cplusplus.com/reference/}} returns the number of seconds since the Unix epoch (00:00, 01/01/1970 UTC). \texttt{clock()} measures the number of CPU ticks since some epoch (typically the launch of the application). The amount of real time (i.e. milliseconds, seconds, etc.) a CPU tick takes is constant, but depends on the hardware. \texttt{clock\_gettime()} returns a time with nanosecond precision, but is only available on specific systems (e.g. Linux). Since the operating system used for the evaluation framework is a Linux distribution and nanosecond precision is desired, \texttt{clock\_gettime()} has been used for timing all operations.
+
+\section{Initial Hypothesis}
+\label{sec:initial-hypothesis}
+
+Since there has been no published evaluations of the Pseudo-Pyramid Tree or Bit Hash, no hypotheses will be made regarding the performance of these structures. It is suspected that the Pseudo-Pyramid Tree will perform well on high-dimensional data, because it is a hash-based method, but little is currently known about how well the structure's hashing function performs, so there is a little basis for such suspicion. Based on the reported performance of the Pyramid Tree and $kd$-tree in a high-dimensional setting in the literature (see Chapter \ref{chap:background_research}), the following hypothesis was devised:
+
+\paragraph{\textbf{HYPOTHESIS:}} Pyramid Tree will be faster than the baselines and $kd$-trees on scientific datasets containing high-dimensional data ($\geq 10$ dimensions).
+
+\paragraph{}
+
+After the performance evaluation, the hypothesis will be revisited to determine if it still holds, and \textit{why} it does or does not hold will be explored.

@@ -158,14 +158,3 @@ Figure \ref{fig:kd-tree} illustrates the \texttt{insert} and \texttt{delete} ope
 	\caption{$kd$-tree Operations for 2D Dataset (Cutting Dimension Alternates Between X and Y)}
 	\label{fig:kd-tree}
 \end{figure}
-
-\section{Main Hypothesis}
-\label{sec:main-hypothesis}
-
-Since there has been no published evaluations of the Pseudo-Pyramid Tree or Bit Hash, no hypotheses will be made regarding the performance of these structures. It is suspected that the Pseudo-Pyramid Tree will perform well on high-dimensional data, because it is a hash-based method, but little is currently known about how well the structure's hashing function performs, so there is a little basis for such suspicion. Before starting implementation, the following hypothesis regarding the Pyramid Tree and $kd$-tree was devised:
-
-\paragraph{\textbf{HYPOTHESIS:}} Pyramid Tree will be faster than the baselines and $kd$-trees on scientific datasets containing high-dimensional data ($\geq 10$ dimensions).
-
-\paragraph{}
-
-This hypothesis was based on the reported performance of the Pyramid Tree and $kd$-tree in a high-dimensional setting in the literature, as discussed in the previous sections. After the implementation phase, the hypothesis will be revisited to determine if it still holds, and \textit{why} it does or does not hold will be explored.
