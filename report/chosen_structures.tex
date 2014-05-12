@@ -18,7 +18,7 @@ Sequential scan has been chosen as a baseline because it is the na\"{i}ve brute-
 
 As described in Section \ref{sec:high-dimensional-structures}, the pyramid tree reduces multi-dimensional points to one dimension, which can then be used in a one-dimensional index structure. The reason this structure has been chosen is because dimension reduction techniques have been found to perform well for high-dimensional data, compared to tree-based approaches \cite{md-structures-samet}. The original Pyramid-Tree paper showed good performance on uniformly distributed data and a real dataset (with the Extended Pyramid-Technique), when compared to Sequential Scan and the competitive X-tree \cite{pyramid-tree}. There are two fundamental differences between the focus of the paper's analysis and what this project is trying to achieve:
 \begin{enumerate}
-	\item the paper's analysis is for \textit{range} queries, whereas this project is assessing point queries
+	\item the paper's analysis is for \textit{range} queries, whereas this project is focused on point queries
 	\item the real dataset, ``a large text database extracted from WWW-pages" \cite{pyramid-tree}, contains discrete values, whereas the real datasets considered in this project are continuous, scientific datasets
 \end{enumerate}
 While the database is mapped to a spatial domain when stored in an index structure, the data may have different properties or distributions than continuous, spatial-based data. Scientific datasets, the target of this project, tend to model continuous domains. Therefore, it was decided that the Pyramid Tree will be implemented to explore if the structure can provide equally good performance with point queries on dynamic scientific datasets.
