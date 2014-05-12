@@ -60,6 +60,8 @@ More formally, the pyramid value $pv_v$ of a point $v$ is given by $pv_v = (i + 
 
 The following lemma shows that two distinct points can be mapped to the same pyramid value. It follows that multiple points may be stored in the same bucket. As such, bucket size will be a key performance factor for the structure and will be measured alongside execution time.
 
+\vspace{22pt}
+
 \begin{proof}[\textbf{Lemma: } For $d \geq 2$, there exist two points $x$ and $y$, such that $x \neq y$, with the same pyramid value]\mbox{}\\*
 Let $d$ be the number of dimensions and $x = (x_0, x_1, \dots, x_{d -1})$, $y = (y_0, y_1, \dots, y_{d - 1})$ be two $d$-dimensional points. Without loss of generality, assume $0 \leq x_i \leq 1$ and $0 \leq y_i \leq 1$ for all $i = 1, 2, \dots, d$. Suppose $x_0 = y_0 = 0$, $x_{d - 1} = 0.1$, $y_{d - 1} = 0.2$ and $x_i = y_i = 0.1$ for all $i = 1, \dots, {d - 2}$. This means $x \neq y$. The following holds:
 \begin{enumerate}

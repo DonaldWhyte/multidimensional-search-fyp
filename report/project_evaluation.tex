@@ -36,7 +36,9 @@ Implementing and testing index structures was the most exploratory part of the p
 
 At the end of each iteration, the evaluation allowed one to gather insight into the implemented structures' performance.  After the first two iterations, it was found that the Pyramid Tree had poor performance with the target datasets, so the next iteration turned to entirely different kind of structure. This shows planning everything that should be implemented in advance would be a waste, since new findings would have quickly made these plans irrelevant. It  was also a good decision to have the supervisor meetings (see Appendix \ref{chap:project-documentation} for documentation of these meetings) at the start of each iteration. It allowed the supervisor to be informed of new findings as soon as possible and offer their advice on what the next course of action should be.
 
-One aspect of the process that could have been improved was the amount of time left for writing the final report. While the schedule left four weeks to write the report, multiple unexpected findings were uncovered. These results required more time to evaluate and discuss, increasing the time it took to write the final evaluation. Perhaps the schedule should have left another week as a buffer in the case of unexpected findings, which are to be expected in a research project. Overall, mixing waterfall and iterative methodologies worked well for this project. It is felt that the project methodology chosen was the correct one.
+One aspect of the process that could have been improved was the amount of time left for writing the final report. While the schedule left four weeks to write the report, unexpected findings were uncovered. These findings required more time to evaluate and discuss, increasing the time it took to write the final evaluation. Perhaps the schedule should have left another week as a buffer for such situations, which are to be expected in a research project. Overall, combining waterfall and iterative methodologies worked well for this project. It is felt that the correct project methodology was chosen.
+
+The evaluation methodology stated that skewed and clustered synthetic data was tested on the structures. However, these datasets had no negative on the performance of the structures, unlike the real skewed datasets. This was because the synthetic datasets were simply not \textit{skewed enough}. Datasets with higher skew and smaller clusters should have been used. If they were, the Pyramid Tree's weaknesses may have been caught much earlier in the project. Perhaps time should have been spent working on the evaluation methodology before rushing into performance analysis.
 
 \section{Objectives and Minimum Requirements}
 
@@ -51,8 +53,6 @@ Requirement 3 was met by evaluating the performance of the structures as the dim
 Evaluation was present throughout the Chapters \ref{chap:performance-evaluation} and \ref{chap:technical-evaluation}, meaning Requirement 4 has been met. This requirement was exceeded by performing further evaluation in Chapter \ref{chap:technical-evaluation}, which targeted a specific scientific dataset. This concluded with several hypothesis related to the suitability of different classes of index structure to scientific datasets, exceeding the original requirements of just producing a performance evaluation. Therefore, it is felt requirement 4 has also been exceeded.
 
 All the minimum requirements were met and exceeded to varying degrees. In particular, the amount of optimisations and index structures that were implemented and evaluated was much larger than intended. This was done to ensure the evaluation was as comprehensive as possible within the project time frame.
-
-\newpage
 
 \section{Deliverables}
 
