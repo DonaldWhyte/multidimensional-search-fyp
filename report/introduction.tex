@@ -4,13 +4,13 @@
 \centerline{\rule{149mm}{.02in}}
 \vspace{0.75cm}
 
-Many problems require or benefit from multi-dimensional search, including database querying, computer vision and visualisation. In multi-dimensional search, individual data items are represented as points, vectors or regions in $n$-dimensional space. These are arranged in an indexing structure so relevant data can be retrieved quickly, even when the volume of data is huge.
+Many problems require or benefit from multi-dimensional search, including database querying, computer vision and visualisation. In multi-dimensional search, individual data items are represented as points, vectors or regions in $n$-dimensional space. These are arranged in an index structure so relevant data can be retrieved quickly, even when the volume of data is huge.
 
 \section{Motivation}
 
 TODO
 
-Since multi-dimensional search is a problem that appears in so many areas in computer science, developing fast, efficient ways of building and querying indexing structures has been the focus of many researchers over the past forty years. Dozens of multi-dimensional search structures have already been developed and there is still much ongoing work toward developing even more efficient search structures. 
+Since multi-dimensional search is a problem that appears in so many areas in computer science, developing fast, efficient ways of building and querying index structures has been the focus of many researchers over the past forty years. Dozens of multi-dimensional search structures have already been developed and there is still much ongoing work toward developing even more efficient search structures. 
 
 TODO: importance of sci viz
 
@@ -44,6 +44,12 @@ The minimum requirements are closely related to the objectives of the project. T
 	\item Evaluate and compare performance of final implementations to pre-defined baselines, unoptimised structures and their reported performance in the literature
 \end{enumerate}
 
+Possible extensions of the project include:
+\begin{enumerate}
+	\item Parallelising implementations using technologies such as Haskell, CUDA (GPGPU) or MPI
+	\item Developing an entirely new index structure, which is also implemented and evaluated
+\end{enumerate}
+
 \section{Deliverables}
 \label{sec:deliverables}
 
@@ -58,16 +64,14 @@ The following will be delivered upon project completion:
 \section{Core Assumptions}
 \label{sec:core-assumptions}
 
-Throughout the project, some assumptions have been made. These are used to narrow the scope of the project and allow more time to be spent focusing on the core aim of the project, which is high-dimensional data. The assumptions are:
+The School of Computing at the University of Leeds have a particular interest in the applications of multi-dimensional search for scientific visualisation. This project will focus on \textit{scientific visualisation} and not other applications, such as database indexing. Therefore, the performance of the implemented index structures will be evaluated primarily using high-dimensional scientific datasets with continuous domains, instead of discrete data pulled from databases.
+
+Throughout the project, some assumptions have been made. These are used to narrow the scope of the project and allow more time to be spent focusing on the core aim of the project, which is high-dimensional scientific data. The assumptions are:
 \begin{enumerate}
 	\item Datasets have a ``high" number of dimensions ($\geq 10$), meaning the performance of the index structures will be measured using data with at least 10 dimensions. Data using less dimensions may be used for the purposes of understanding how the implementations behave with respect to dimensionality, however.
 	\item Datasets will be able to fit into the main memory (i.e. RAM) of the machine used for evaluation. That is, none of the data is paged to secondary memory, so page accesses causing reduced performance does not need to be considered.
 	\item Datasets are dynamic, meaning points may be inserted, deleted or updated at any time.
-	\item Structures only store \textit{unique} points, meaning a structure cannot store two points with identical coordinates.
+	\item Structures only store \textit{unique} points, meaning a structure cannot store two identical points
 \end{enumerate}
 
-TODO: point query performance is focus -- WHY???
-
-TODO: focus on sci viz dartasers
-
-Furthermore, the project is focused on the \textbf{scientific visualisation} applications of multi-dimensional search, and not database indexing. Therefore, the performance of the implemented index structures will be evaluated primarily using scientific datasets with continuous domains, instead of discrete data pulled from databases.
+There are several ways of querying the data stored inside index structures. The School is interested in \textit{point query} performance, so this type of query will be the focus of the project.
