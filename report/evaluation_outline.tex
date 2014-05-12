@@ -81,8 +81,7 @@ Each of these datasets contains millions of points. It was decided that a smalle
 
 The final real dataset is a point cloud of a 3D armadillo from The Stanford 3D Scanning Repository \cite{armadillo-mesh}, which contains 435,544 points that represent a geometric mesh. This mesh has been used by other researchers to evaluate index structure performance applied to 3D graphics \cite{kd-tree-gpu, accelerating-kdtree-nn}. Appendix \ref{sec:app-real-datasets} shows visualisations of the three real datasets.
 
-Table \ref{tab:operation-lists} lists the evaluation datasets, their size and
-dimensionality and lists parameters that will be varied.
+Table \ref{tab:operation-lists} lists the evaluation datasets, their size and dimensionality and lists parameters that will be varied.
 
 \begin{table}
 	\centering
@@ -138,7 +137,7 @@ Table \ref{tab:system-specifications} lists the hardware, operating system and t
 
 Individual index structure operations are typically much lower than a second, sometimes even less than a millisecond. A high level of precision and accuracy is required because even millisecond savings are important when optimising index structures.
 
-C/C++ comes with two standard timing mechanisms. \texttt{time()}\footnote{Online documentation for discussed functions at: \url{http://www.cplusplus.com/reference/}} returns the number of seconds since the Unix epoch (00:00, 01/01/1970 UTC). \texttt{clock()} measures the number of CPU ticks since some epoch (typically the launch of the application). The amount of real time (i.e. milliseconds, seconds, etc.) a CPU tick takes is constant, but depends on the hardware. \texttt{clock\_gettime()} returns a time with nanosecond precision, but is only available on specific systems (e.g. Linux). Since the operating system used for the evaluation framework is a Linux distribution and nanosecond precision is desired, \texttt{clock\_gettime()} has been used for timing all operations.
+C/C++ comes with several timing mechanisms, such as \texttt{clock\_gettime()}, \texttt{time()} and \texttt{clock()}\footnote{Online documentation for these functions is available at: \url{http://www.cplusplus.com/reference/}}. \texttt{clock\_gettime()} will be used for timing all operations because it has nanosecond precision, the highest available precision on Linux systems \cite{clockgettime-fastest1,clockgettime-fastest2}.
 
 \section{Initial Hypothesis}
 \label{sec:initial-hypothesis}
@@ -147,10 +146,8 @@ Since there has been no published evaluations of the Pseudo-Pyramid Tree or Bit 
 
 \paragraph{\textbf{HYPOTHESIS:}} Pyramid Tree will be faster than the baselines and $kd$-trees on scientific datasets containing high-dimensional data ($\geq 10$ dimensions).
 
-\paragraph{}
-
-After the performance evaluation, the hypothesis will be revisited to determine if it still holds, and \textit{why} it does or does not hold will be explored.
-
 \section{Conclusion}
 
-TODO
+Each index structure will be evaluated using a collection of synthetic and real datasets. For each dataset, all points will be inserted into each structure, then all points will be queried and finally, all points will be deleted. The total execution time of each operation type will be measured.
+
+Based on the existing literature, it is hypothesised that the Pyramid Tree will outperform the $kd$-tree on high-dimensional scientific datasets. The next chapter will now evaluate the performance of the chosen structures and determine if this hypothesis still holds.
