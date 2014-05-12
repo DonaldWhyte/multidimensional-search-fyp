@@ -15,7 +15,7 @@ This structure is a hybrid of hash-based and tree-based structures. It is a tree
 
 The root node always hashes points using the interval of dimension 0 they are contained in. When these buckets exceed a certain capacity, say $M$, then the bucket is turned into a hash table which hash points to their interval in dimension 1. This is repeated until the last dimension, $d - 1$, is reached. At this point, there are no more dimensions to discriminate points with, so the buckets are not transformed into hash tables when their size exceeds $M$. 
 
-In effect, this creates a tree where the maximum height is $d + 1$ and each non-leaf node has at most $B$ children that correspond to the $B$ intervals of the dimension it is discriminating against. All non-leaf nodes at level $i$ of the tree hash points to the interval of dimension $i$ they belong to. The hashing function for dimension $i$ is given below:
+In effect, this creates a tree where the maximum height is $d + 1$ and each non-leaf node has at most $B$ children that correspond to the $B$ intervals of the dimension it is discriminating against. All non-leaf nodes at level $i$ of the tree hash points to the interval of dimension $i$ they belong to. The hashing function for dimension $i$ is given in Equation \ref{eq:multigrid-hash}.
 
 \begin{equation}
 	h_i(p) = \floor*{\frac{p_i - min_i}{max_i - min_i} \times B}
@@ -35,7 +35,7 @@ For highly skewed datasets, most of the points will end up being mapped to the s
 			\includegraphics[scale=0.65]{figures/multigrid_decomposition.pdf}
 		}
 		\end{subfloat}~~~~~
-		\begin{subfloat}[t][Multigrid Tree Decomposition with Clustered Data\label{fig:multigrid-clustered}]{%
+		\begin{subfloat}[t][Multigrid Tree Decomposition of Clustered Data\label{fig:multigrid-clustered}]{%
 			\includegraphics[scale=0.65]{figures/multigrid_clustered.pdf}
 		}
 		\end{subfloat}
