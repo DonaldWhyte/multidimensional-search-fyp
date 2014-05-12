@@ -22,3 +22,4 @@ OPERATION_NAME_MAP = {
 
 COLOURS = [ 'b', 'c', 'y', 'm', 'r', 'g' ]
 MARKERS = [ 'o', 'v', 's', 'D', 'x', '^' ]
+PATTERNS = [ "/" , "\\" , "|" , "-" , "+" , "x", "o", "O", ".", "*" ]

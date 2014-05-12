@@ -26,14 +26,13 @@ def barPlot(outputFilename, groupData, groupLabels, barLabels, plot, maxYValue =
 	for num, vals in enumerate(groupData):
 	    # The position of the xdata must be calculated for each of the two data series
 	    xdata = ind + margin + (num * width)
-	    barRects = plot.bar(xdata, vals, width, color=COLOURS[num % len(COLOURS)])
+	    barRects = plot.bar(xdata, vals, width, color=COLOURS[num % len(COLOURS)], hatch=PATTERNS[num % len(PATTERNS)])
 	    plotObjects.append(barRects[0])
 
-	plot.legend(plotObjects, barLabels)
+	plot.legend(plotObjects, barLabels, loc=2)
 	plot.xlabel("Structure")
 	plot.ylabel("Execution Time (in seconds)")
 	if maxYValue:
-		print 5
 		plot.ylim([0, maxYValue])
 
 	# You should no longer need to manually set the plot limit since everything 
