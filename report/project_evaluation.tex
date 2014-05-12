@@ -4,7 +4,7 @@
 \centerline{\rule{149mm}{.02in}}
 \vspace{0.75cm}
 
-This section will discuss the limitations of the project's work and future work to support or extend the project's findings. The project as a whole will be evaluated to determine if it is a success.
+This section will discuss the limitations of the project's work and propose future work to support or extend the project's findings. The project's methodology and final deliverables will then be discussed to determine if the project was a success.
 
 \section{Limitations}
 
@@ -12,13 +12,13 @@ This project has only worked with three synthetic datasets and three real datase
 
 A large chunk of the Design and Implementation phase was spent focusing on the Pseudo-Pyramid tree and Pyramid Tree before they were found to perform poorly with point queries on the scientific datasets. By the time the limitations of these structures were discovered, there was not enough time to evaluate the other implemented structures in detail. Originally, it was intended that the Multigrid and bucket $kd$-tree (see Appendix \ref{chap:additional-structures}) would be discussed and evaluated alongside the other index structures, but the remaining time did not allow for this.
 
-If the additional index structures were explored in more detail and more scientific datasets were characterised and used for evaluation, then it may have been possible to explore the hypotheses made at the end of Chapter \ref{chap:technical-evaluation} in good detail.
+Exploring these additional index structures, as well as acquiring more scientific datasets to characterise and use for evaluation, would have meant the project could explore the hypotheses made at the end of Chapter \ref{chap:technical-evaluation} in greater detail.
 
 \section{Future Work}
 
 This project ended with a conjecture and several hypotheses. Potential future work includes exploring these in greater detail. This section suggests ways these insights can be explored further.
 
-To further explore the conjecture that most scientific datasets have dense clusters of points in sparse data space , more  scientific datasets could be examined in detail. The volume of space which is empty could be measured in each case to derive . In fact, studying the mathematical challenges of $\mathbb{R}^m \rightarrow \mathbb{R}^d$ where $d > m$, is a whole project in itself.
+To further explore the conjecture that most scientific datasets have dense clusters of points in sparse data space, more scientific datasets could be examined in detail. The volume of space which is empty could be measured in each case to derive . In fact, studying the mathematical challenges of $\mathbb{R}^m \rightarrow \mathbb{R}^d$ where $d > m$, is a whole project in itself.
 
 Exploring Hypothesis 2 would involve implementing and evaluating several adaptive dimension reduction techniques, perhaps using the same test datasets as this project. Examples of techniques to research include iDistance \cite{idistance}, iMinMax($\theta$) and the Multigrid (see Appendix \ref{chap:additional-structures}).
 
@@ -42,7 +42,7 @@ One aspect of the process that could have been improved was the amount of time l
 
 This section discusses if the project have met its objectives. Sections \ref{sec:objectives} and \ref{sec:requirements} list the project's objectives and minimum requirements. The minimum requirements were developed so that meeting them also meets the project's objectives. For brevity, the minimum requirements will be referred to by their numbers.
 
-The literature review present in Chapter \ref{chap:background_research} was a comprehensive survey of the field. The challenges of multi-dimensional search were summarised, most classes of index structures were discussed in some way and a taxonomy showing how index structures have affected each other was developed. Therefore, requirement 1 has been met.
+The literature review present in Chapter \ref{chap:background_research} was a comprehensive survey of the field. The challenges of multi-dimensional search were summarised and most classes of index structures were discussed in some way. A taxonomy illustrating the development of index structures was also produced (see Appendix \ref{chap:supp-material}). Therefore, requirement 1 has been met.
 
 Requirement 2 was met and largely extended; a total of nine structures were implemented in the project. Six of these implementations were discussed and analysed in the report. Due to time constraints, the remaining three structures could not be discussed and evaluated in detail. These are described in Appendix \ref{chap:additional-structures}. 
 
@@ -50,7 +50,7 @@ Requirement 3 was met by evaluating the performance of the structures as the dim
 
 Evaluation was present throughout the Chapters \ref{chap:performance-evaluation} and \ref{chap:technical-evaluation}, meaning Requirement 4 has been met. This requirement was exceeded by performing further evaluation in Chapter \ref{chap:technical-evaluation}, which targeted a specific scientific dataset. This concluded with several hypothesis related to the suitability of different classes of index structure to scientific datasets, exceeding the original requirements of just producing a performance evaluation. Therefore, it is felt requirement 4 has also been exceeded.
 
-All the minimum requirements were met and exceeded to varying degrees. In particular, the amount of optimisations and index structures that were implemented and evaluated was much larger than intended. This was done to ensure the evaluation was a comprehensive as possible within the three months of the project.
+All the minimum requirements were met and exceeded to varying degrees. In particular, the amount of optimisations and index structures that were implemented and evaluated was much larger than intended. This was done to ensure the evaluation was as comprehensive as possible within the project time frame.
 
 \newpage
 
@@ -68,4 +68,4 @@ The deliverables described in Section \ref{sec:deliverables} were produced in th
 
 To conclude, this project implemented several index structures and evaluated their performance on dynamic high-dimensional data, specifically focusing on scientific datasets. It was found that the Pyramid Tree and a similar structure, the Pseudo-Pyramid Tree, consistently gave poor point query performance with scientific datasets. A well-established structure, the point $kd$-tree, outperformed these two structures by a large margin. An evaluation of these structures' behaviour with the astrophysics dataset was performed, in which some conjectures and hypotheses were derived regarding the suitability of different classes of index structures for dynamic scientific datasets. Future work has been proposed to verify these hypotheses and explore the discussed issues in greater detail.
 
-The overall aim of the project was to implement one or more index structures and evaluate their performance with respect to high-dimensional datasets (i.e. $d > 10$). Using the astrophysics dataset as a test case, the evaluation went into much greater detail than initially expected. A greater number of index structures and optimisations were implemented than planned, resulting in a more comprehensive evaluation. This evaluation resulted in a conjecture and several hypotheses being made, which has created a foundation for future work in this area be started. Therefore, the aim of the project has been met and the project is considered a success.
+The overall aim of the project was to implement one or more index structures and evaluate their performance with respect to high-dimensional datasets (i.e. $d > 10$). Using the astrophysics dataset as a test case, the evaluation went into much greater detail than initially expected. A greater number of index structures and optimisations were implemented than planned, resulting in a more comprehensive evaluation. This evaluation resulted in a conjecture and several hypotheses being made, which has created a foundation to start future work in this area. Therefore, the aim of the project has been met and the project is considered a success.
