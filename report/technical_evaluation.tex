@@ -169,7 +169,7 @@ This conjecture has implications for the suitability of classes of index structu
 			\includegraphics[scale=0.65]{figures/1d_manifold_octree.pdf}
 		}
 		\end{subfloat}~~~~~
-		\begin{subfloat}[Multigrid (Static)\label{fig:continuous-embedding-multigrid}]{%
+		\begin{subfloat}[Multigrid Tree (Static)\label{fig:continuous-embedding-multigrid}]{%
 			\includegraphics[scale=0.65]{figures/1d_manifold_multigrid.pdf}
 		}
 		\end{subfloat}
@@ -185,13 +185,13 @@ Figure \ref{fig:continuous-embedding-pyramid} shows a 1-manifold. Here, the poin
 
 Figure \ref{fig:continuous-embedding-octree} shows an Octree decomposition, which adapts the decomposition to provide greater discrimination between points in dense regions of space. The point $kd$-tree can be seen as an adaptive index structure to some extent, since decomposition of the underlying data space depends on the values of the given points. This is one of the reasons its performance is vastly superior to the Pyramid Tree with the two scientific datasets.
 
-\subsection{Case Study: Multigrid}
+\subsection{Case Study: Multigrid Tree}
 
-To further support the claim that static decompositions perform poorly, we turn to the Multigrid described in Appendix \ref{chap:additional-structures}. To summarise, this index structure splits the entire data space into equal sized cells and hashes points to buckets based on the cell they are contained in. Figure \ref{fig:continuous-embedding-multigrid} shows a Multigrid decomposition of the 1-manifold discussed earlier.
+To further support the claim that static decompositions perform poorly, we turn to the Multigrid Tree structure described in Appendix \ref{chap:additional-structures}. To summarise, this index structure splits the entire data space into equal sized cells and hashes points to buckets based on the cell they are contained in. Figure \ref{fig:continuous-embedding-multigrid} shows a Multigrid Tree decomposition of the 1-manifold discussed earlier.
 
-The Multigrid essentially quantises continuous domains into discrete ranges which are used to hash points reliably (unlike Bit Hash) to a one-dimensional domain. The ultimate goal is to achieve perfect hashing so query times become closer to $O(d)$. The smaller the cells are made, the greater the discrimination between points there is and the smaller average bucket size will be. Theoretically, all one has to do to make the Multigrid work efficiently with the astrophysics dataset, or any dataset with dense clusters in sparse data spaces, is to keep decreasing cell size until each point is in its own cell.
+The Multigrid Tree essentially quantises continuous domains into discrete ranges which are used to hash points reliably (unlike Bit Hash) to a one-dimensional domain. The ultimate goal is to achieve perfect hashing so query times become closer to $O(d)$. The smaller the cells are made, the greater the discrimination between points there is and the smaller average bucket size will be. Theoretically, all one has to do to make this structure work efficiently with the astrophysics dataset, or any dataset with dense clusters in sparse data spaces, is to keep decreasing cell size until each point is in its own cell.
 
-On real machines however, this does not work. When cells become small enough, rounding errors occur because of limited precision of floating point arithmetic. Points start being mapped to the same cell even if they are conceptually in different cells because of these rounding errors. In other words, there is a limit to how small cells can be. The astrophysics has a highly clustered distribution, with very small magnitudes for soem dimensions (e.g. $10^{-15}$). This means extremely small cell sizes are required to achieve perfect hashing and rounding errors appear very quickly.
+On real machines however, this does not work. When cells become small enough, rounding errors occur because of limited precision of floating point arithmetic. Points start being mapped to the same cell even if they are conceptually in different cells because of these rounding errors. In other words, there is a limit to how small cells can be. The astrophysics has a highly clustered distribution, with very small magnitudes in some dimensions (e.g. $10^{-15}$). This means extremely small cell sizes are required to achieve perfect hashing and rounding errors appear very quickly.
 
 Table \ref{tab:cell-size-effect} shows the effect of cell size on average bucket size when storing 100,000 points from the astrophysics dataset. It shows that, as you increase the number of cells for each dimension (making individual cells smaller), the average bucket size decreases. When the number of cells exceeds a certain number, which is approximately 11,000,000 per dimension for this dataset, no additional benefit is gained because the average bucket size does not change.  This shows there is a limit to how much skew static decompositions can handle, because there is a limit on how granular the decomposition can be made.	
 	
@@ -211,7 +211,7 @@ Table \ref{tab:cell-size-effect} shows the effect of cell size on average bucket
 	1,000,0000 & 9.06454 & 11,032 \\
 	\hline
 	\end{tabular}
-	\caption{Number of Cells Used for Multigrid Index Structure and its Effect on Bucket Size with 100,000 Astrophysics Dataset Points}
+	\caption{Number of Cells Used for Multigrid Tree Index Structure and its Effect on Bucket Size with 100,000 Astrophysics Dataset Points}
 	\label{tab:cell-size-effect}
 \end{table}
 

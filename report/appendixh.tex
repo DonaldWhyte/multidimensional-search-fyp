@@ -11,7 +11,7 @@ Currently, the following index structures have been implemented:
 	\item \textbf{Pyramid Tree} -- see Section \ref{sec:pyramid-tree-detail} for more information
 	\item \textbf{$kd$-Tree} -- see Section \ref{sec:kd-tree-detail} for more information
 	\item \textbf{Bit Hash} -- see Section \ref{sec:bit-hash} for more information
-	\item \textbf{Multigrid} -- see Section \ref{sec:multigrid} for more information
+	\item \textbf{Multigrid Tree} -- see Section \ref{sec:multigrid} for more information
 \end{itemize}
 
 \section{Dependencies}
@@ -39,8 +39,8 @@ Table \ref{tab:library-classes} describes the role of each class in the library.
 % YUML code to generate mdsearch UML class diagram
 \begin{comment}
 [HashStructure]^-[Pyramid Tree{bg:orange}]
-[Multigrid{bg:orange}]->[Point]
-[Multigrid{bg:orange}]->[Boundary]
+[Multigrid Tree{bg:orange}]->[Point]
+[Multigrid Tree{bg:orange}]->[Boundary]
 [Dataset]->[Point]
 [Dataset]->[Boundary]
 [Pyramid Tree]->[Boundary]
@@ -62,7 +62,7 @@ Table \ref{tab:library-classes} describes the role of each class in the library.
 		\texttt{Boundary<D>} & Boundary in D-dimensional space \\
 		\texttt{Dataset<D>} & Dataset containing D-dimension points, which can load points from files and compute the minimum bounding region containing every point \\
 		\texttt{KDTree<D>} & $kd$-tree for D-dimensional space \\
-		\texttt{Multigrid<D>} & Multigrid for D-dimensional space \\
+		\texttt{Multigrid Tree<D>} & Multigrid Tree for D-dimensional space \\
 		\texttt{HashStructure<D>} & Abstract class for hash-based structures, which follows the Bucket Pseudo-Pyramid Tree structure described in Section \ref{sec:iteration1} closely \\
 		\texttt{PyramidTree<D>} & Pyramid Tree for D-dimensional space \\
 		\texttt{BitHash<D>} & Bit Hash for D-dimensional space \\

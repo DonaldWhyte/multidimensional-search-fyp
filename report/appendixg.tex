@@ -6,12 +6,12 @@
 
 This section describes index structures which were implemented during the project, but were not discussed or evaluated in the main report due to time constraints. Preliminary findings on the structures' performance is discussed.
 
-\section{Multigrid}
+\section{Multigrid Tree}
 \label{sec:multigrid}
 
-The Multigrid decomposes the data space into a uniform grid by cutting each dimension into $B$ intervals. A cell is defined by the intervals of each dimension it is contained in. Formally, a cell is defined as a $d - 1$ tuple  $C = \lbrace c_0, c_1, \dots, c_{d - 1} \rbrace$, where	 $c_i$ is the interval the cell belongs to in dimension $i$. There are a total of $B^d$ cells. Figure \ref{fig:multigrid-decomposition} illustrates how the Multigrid decomposes 2D data space when $B = 8$, resulting in $8^2 = 64$ cells. Each cell corresponds to a bucket in the Multigrid structure.
+The Multigrid Tree decomposes the data space into a uniform grid by cutting each dimension into $B$ intervals. A cell is defined by the intervals of each dimension it is contained in. Formally, a cell is defined as a $d - 1$ tuple  $C = \lbrace c_0, c_1, \dots, c_{d - 1} \rbrace$, where	 $c_i$ is the interval the cell belongs to in dimension $i$. There are a total of $B^d$ cells. Figure \ref{fig:multigrid-decomposition} illustrates how the Multigrid Tree decomposes 2D data space when $B = 8$, resulting in $8^2 = 64$ cells. Each cell corresponds to a bucket in the Multigrid Tree.
 
-This structure is a hybrid of hash-based and tree-based structures. It is a tree where each leaf node is a bucket containing one or more points and non-leaves are hash tables. Each non-leaf hashes points to the interval the point is contained in, for a single dimension $i$. The bucket a point is hashed to is another node of the Multigrid tree. This node is either another hash table, which hashes points based on which interval of dimension $i + 1$ they are inside, or a bucket (i.e. an array of points).
+This structure is a hybrid of hash-based and tree-based structures. It is a tree where each leaf node is a bucket containing one or more points and non-leaves are hash tables. Each non-leaf hashes points to the interval the point is contained in, for a single dimension $i$. The bucket a point is hashed to is another node of the Multigrid Tree. This node is either another hash table, which hashes points based on which interval of dimension $i + 1$ they are inside, or a bucket (i.e. an array of points).
 
 The root node always hashes points using the interval of dimension 0 they are contained in. When these buckets exceed a certain capacity, say $M$, then the bucket is turned into a hash table which hash points to their interval in dimension 1. This is repeated until the last dimension, $d - 1$, is reached. At this point, there are no more dimensions to discriminate points with, so the buckets are not transformed into hash tables when their size exceeds $M$. 
 
@@ -23,7 +23,7 @@ In effect, this creates a tree where the maximum height is $d + 1$ and each non-
 \end{equation}
 where $p$ is a point and $min_i, max_i$ are the lower and upper boundaries of dimension $i$.
 
-Figure \ref{fig:multigrid-root} shows a Multigrid tree with a single non-leaf node and its accompanying spatial decomposition in 2D. Notice how points are discriminated only using the value of the $x$ dimension. Figure \ref{fig:multigrid-multiple-levels} shows a Multigrid where some of the bucket sizes have exceeded $M$, which is 3 in this case. Notice how some intervals in the $x$ dimension have been sliced in the $y$ dimension now, allowing for greater discrimination.
+Figure \ref{fig:multigrid-root} shows a Multigrid Tree with a single non-leaf node and its accompanying spatial decomposition in 2D. Notice how points are discriminated only using the value of the $x$ dimension. Figure \ref{fig:multigrid-multiple-levels} shows a Multigrid Tree where some of the bucket sizes have exceeded $M$, which is 3 in this case. Notice how some intervals in the $x$ dimension have been sliced in the $y$ dimension now, allowing for greater discrimination.
 
 Equation \ref{eq:multigrid-hash} can clearly be computed in constant time. Since there are at most $d + 1$ levels in the tree, at most $d$ instances of Equation \ref{eq:multigrid-hash} will be computed. It follows that retrieving the bucket a point is contained in takes $O(d)$ time. If points are uniformly distributed across the grid, then this structure will take $O(d)$ time for all operations.  However, it is possible for all the points in a dataset to be mapped to the same cell, making \texttt{insert}, \texttt{delete} and point queries take $O(n)$ time.
 
@@ -31,17 +31,17 @@ For highly skewed datasets, most of the points will end up being mapped to the s
 
 \begin{figure}
 	\begin{center}
-		\begin{subfloat}[Full Multigrid Decomposition\label{fig:multigrid-decomposition}]{%
+		\begin{subfloat}[Full Multigrid Tree Decomposition\label{fig:multigrid-decomposition}]{%
 			\includegraphics[scale=0.65]{figures/multigrid_decomposition.pdf}
 		}
 		\end{subfloat}~~~~~
-		\begin{subfloat}[t][Multigrid Decomposition with Clustered Data\label{fig:multigrid-clustered}]{%
+		\begin{subfloat}[t][Multigrid Tree Decomposition with Clustered Data\label{fig:multigrid-clustered}]{%
 			\includegraphics[scale=0.65]{figures/multigrid_clustered.pdf}
 		}
 		\end{subfloat}
 	\end{center}
 
-	\caption{Multigrid Decompositions}
+	\caption{Multigrid Tree Decompositions}
 	\label{fig:multigrid-decompositions}
 \end{figure}
 
