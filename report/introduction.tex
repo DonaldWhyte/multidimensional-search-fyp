@@ -55,17 +55,25 @@ The following will be delivered upon project completion:
 
 \newpage
 
-\section{Core Assumptions}
+\section{Project Scope}
 \label{sec:core-assumptions}
 
-The School of Computing at the University of Leeds have a particular interest in the applications of multi-dimensional search for scientific visualisation. This project will focus on \textit{scientific visualisation} and not other applications, such as database indexing. Therefore, the performance of the implemented index structures will be evaluated primarily using high-dimensional scientific datasets with continuous domains, instead of discrete data pulled from databases.
+A research group in the School of Computing at the University of Leeds have a particular interest in the applications of multi-dimensional search for scientific visualisation. This project will focus on \textit{scientific visualisation} and not other applications, such as database indexing. Therefore, the performance of the implemented index structures will be evaluated primarily using high-dimensional scientific datasets with continuous domains, instead of discrete data pulled from databases.
 
 Throughout the project, some assumptions have been made. These are used to narrow the scope of the project and allow more time to be spent focusing on the core aim of the project, which is high-dimensional scientific data. The assumptions are:
 \begin{enumerate}
-	\item Datasets have a ``high" number of dimensions ($\geq 10$), meaning the performance of the index structures will be measured using data with at least 10 dimensions. Data using less dimensions may be used for the purposes of understanding how the implementations behave with respect to dimensionality, however.
+	\item Datasets have a ``high" number of dimensions ($\geq 10$), meaning the performance of the index structures will be measured using data with at least 10 dimensions. Data using less dimensions may be used to understand how the implementations behave with respect to dimensionality.
 	\item Datasets will be able to fit into the main memory (i.e. RAM) of the machine used for evaluation. That is, none of the data is paged to secondary memory, so page accesses causing reduced performance does not need to be considered.
 	\item Datasets are dynamic, meaning points may be inserted, deleted or updated at any time.
 	\item Structures only store \textit{unique} points, meaning a structure cannot store two identical points
 \end{enumerate}
 
-There are several ways of querying the data stored inside index structures. The School is interested in \textit{point query} performance, so this type of query will be the focus of the project.
+There are several ways of querying the data stored inside index structures. The relevant research group is interested in \textit{point query} performance, so it was decided point queries will be the focus of the project.
+
+\section{Report Structure}
+
+Chapter \ref{chap:methodology} explains how the project was scheduled and the technologies used to produce the software deliverables. Chapter \ref{chap:background_research} reviews the existing work performed in this field and the core challenges which have driven the development of index structures throughout the past forty years. This leads into Chapter \ref{chap:chosen-structures}, which describes the index structures to be implemented and evaluated in this project in detail, explaining why they were chosen.
+
+Chapter \ref{chap:design-and-implementation} gives details on how the chosen index structures were implemented, documenting the low-level optimisation efforts performed to accelerate the structures. Chapter \ref{chap:evaluation-outline} covers what measurements and data will be used to evaluate the index structures' performance. Chapter \ref{chap:performance-evaluation} gives an evaluation of the implemented index structures using empirical performance timings. 
+
+Chapter \ref{chap:technical-evaluation} discusses the results from performance evaluation in greater detail, exploring the nature of scientific datasets and the suitability of different classes of structures for these types of datasets. Chapter \ref{chap:project-conclusion} concludes the project by proposing future work to explore the hypotheses made in the previous chapter.
