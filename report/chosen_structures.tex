@@ -119,7 +119,7 @@ Suppose the point being queried was the output of some other computation, where 
 
 This makes Bit Hash unreliable for certain applications, especially ones where the input points are the result of computations involving many arithmetic operations. Nevertheless, For the small subset of applications where all the points are pre-loaded into memory and not computed again, this can be a useful structure. Initial experiments have also shown this structure has good point query performance, so it will be explored further in this project.
 
-\section{$kd$-tree}
+\section{Point $kd$-Tree}
 \label{sec:kd-tree-detail}
 
 The $kd$-tree is a widely used structure for both low and high dimensional data. In the literature, there is a lot of discussion as to how and why this structure performs poorly in a high-dimensional setting \cite{highd-nn, search-highd-analysis}. $kd$-trees are typically used for \textit{approximate} queries in higher-dimensional space, because they degenerate to Sequential Scan for exact range and nearest neighbour queries \cite{similarity-searching}. 

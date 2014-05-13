@@ -18,14 +18,15 @@ The focus of bucket methods is to minimise I/O operations while still retaining 
 \subsection{Deciding on an Index Structure}
 \label{sec:structure-decision}
 
-While there are some structures which have been shown to be less efficient than others (e.g. R-tree when compared to X-tree \cite{x-tree}), the behaviour of index structures generally depends on the input data. Table \ref{tab:comparison} in Appendix \ref{chap:supp-material} lists some of the index structures discussed in this review and their strengths/weaknesses.
-In other words, there is no ``best" structure. Choosing an index structure to use is \textit{task-dependent}. There are many factors to consider when choosing an index structure, some of which are listed below. Note that this is by no means an exhaustive list.
+While some structures are generally less efficient than others, such as the R-tree when compared to X-tree, the behaviour of index structures typically depends on the input data. In other words, there is no ``best" structure. Choosing the best index structure is \textit{task-dependent}. There are many factors to consider when choosing an index structure, some of which are listed below.
 \begin{itemize}
 	\item how many points will the structure contain?
 	\item how many dimensions does the data have?
 	\item how frequently will the data be modified, if at all?
 	\item do queries have to be performed near real-time or is it acceptable to wait a few minutes?
-	\item what distributions will be input data be? will they uniform or highly skewed?
+	\item what distributions will the input data have? will they be uniform or highly skewed?
 \end{itemize}
 
-The strengths and weaknesses of the structures discussed in the review will now be summarised. B${}^{+}$-trees are very popular for one-dimensional data because they are fast, simple and have low memory overhead \cite{ubiquitous-btree}. Quadtrees, kd-trees and R-tree variants have good performance on multi-dimensional data (e.g. for geometric optimisation of a 3D scene \cite{kd-tree-gpu}) and are simple to implement (no complex invariants to maintain). However, performance starts to decrease as you increase the number of dimensions. There is a need for structures which can perform efficient queries in high-dimensional space, so structures such as the pyramid tree and PK-tree were developed \cite{pk-tree, pyramid-tree}. For even higher dimensions (e.g. $d > 10$), it has been shown that non-hierarchical methods may provide better performance (e.g. hashing, sequential scan, etc.).
+Note that this is by no means an exhaustive list. Table \ref{tab:comparison} in Appendix \ref{chap:supp-material} lists some of the index structures discussed in this review and their strengths and weaknesses.
+
+The strengths and weaknesses of the structures discussed in the review will now be summarised. B${}^{+}$-trees are very popular for one-dimensional data because they are fast, simple and have low memory overhead \cite{ubiquitous-btree}. Quadtrees, kd-trees and R-tree variants have good performance on multi-dimensional data (e.g. for geometric optimisation of a 3D scene \cite{kd-tree-gpu}) and are simple to implement (no complex invariants to maintain). However, performance starts to decrease as you increase the number of dimensions. There is a need for structures which can perform efficient queries in high-dimensional space, so structures such as the pyramid tree and PK-tree were developed \cite{pk-tree, pyramid-tree}. For even higher dimensions (e.g. $d \geq 10$), it has been shown that non-hierarchical methods, such has hash-based structures or sequential scan variants, may provide better performance.
