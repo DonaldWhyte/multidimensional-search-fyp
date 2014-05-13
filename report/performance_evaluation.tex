@@ -62,13 +62,13 @@ Since both point insertion or deletion will have to perform a point query (\text
 
 \section{Dimensionality}
 
-Figure \ref{fig:perf-dimensionality} plots point \textit{dimensionality} against execution time of \texttt{insert} and \texttt{delete} operations for each structure. It shows that the performance of all structures gets worse as $d$ increases, but the rate performance decreases varies. For insertions, sequential scan quickly becomes slower as $d$ decreases, but the decrease starts to tail off as $d$ gets higher. For example, there is little different between \texttt{insert} execution time when the dimensions increase from 100 to 200. \texttt{delete} is sensitive to $d$, with its execution time increasing much faster as $d$ increases. This is because more data must be moved and de-allocated when performing array deletion, because there is more data per point. \texttt{insert} pre-allocates memory up-front, so having more data per point has less of an impact on performance.
+Figure \ref{fig:perf-dimensionality} plots point \textit{dimensionality} against execution time of \texttt{insert} and \texttt{delete} operations for each structure. It shows that the performance of all structures gets worse as $d$ increases, but the rate performance decreases varies. For insertions, sequential scan quickly becomes slower as $d$ increases, but the decrease in speed tails off as $d$ gets higher. For example, there is little different between \texttt{insert} execution time when the dimensions increase from 100 to 200. \texttt{delete} is sensitive to $d$, with its execution time increasing much faster as $d$ increases. Higher $d$ means more data must be moved when performing array deletion. Sequential scan pre-allocates memory for new points, so having more data per point has less of an impact on performance for insertions.
 
 The plots show that octree execution time exponentially increases with $d$. When $d > 10$, the sheer amount of nodes needed when sub-dividing space causes the structure to run out of memory. From this we can conclude that this structure is not suitable for high-dimensional data.
 
 All three hash-based structures use an $O(d)$ hashing function, but the constant factors in each are different. Execution times of Bit Hash, Pseudo-Pyramid Tree and Pyramid Tree all increase linearly with $d$, but Bit Hash has a greater slope. Pseudo-Pyramid Tree has the cheapest hash function and as such, is the fastest of the three structures as $d$ increases.
 
-There have been discussions regarding the $kd$-tree's unsuitability for high-dimensional data in the literature \cite{highd-nn, search-highd-analysis}. However, the $kd$-tree is affected the least by dimensionality, which was initially surprising. However, the structure does not have an explicit $O(d)$ computation; its best and worst running times are $O(\log_2 n$) and $O(n)$ respectively. Therefore, as long as the tree remains balanced, dimensionality will have little impact on the $kd$-tree's performance.
+There have been discussions regarding the $kd$-tree's unsuitability for high-dimensional data in the literature \cite{highd-nn, search-highd-analysis}. However, the $kd$-tree is affected the least by dimensionality, which was initially surprising. However, the structure does not have an explicit $O(d)$ computation; its best and worst running times are $O(\log_2 n$) and $O(n)$ respectively. Therefore, as long as the tree remains balanced, dimensionality will have little impact on the point $kd$-tree's performance.
 
 \section{Dataset Size}
 
@@ -76,14 +76,14 @@ Figure \ref{fig:perf-size} plots dataset \textit{size} against execution time of
 
 Figure \ref{fig:perf-dimensionality} shows the $kd$-tree is the fastest with 10,000 points, but it becomes the slowest (barring sequential scan) as dataset size increases. \texttt{delete} becomes even slower than \texttt{insert} does as $n$ increases, with deletions being two times slower than insertions with 1,000,000 points. This is a problem if an application removes individual points from the structure frequently.
 
-The Pseudo-Pyramid Tree and Bit Hash have the fastest and slowest hashing functions respectively. This again affects the performance of the structures, with the Pseudo-Pyramid Tree being the fastest for both operations and Bit Hash being the slowest. These tests show that three hash-based structures are the most scalable structures out of the implemented in this project. As more synthetic data is given to the structures, execution time of the hash-based structures increases much slower than the point $kd$-tree or sequential scan.
+The Pseudo-Pyramid Tree and Bit Hash have the fastest and slowest hashing functions respectively. This again affects the performance of the structures, with the Pseudo-Pyramid Tree being the fastest hash-based structure and Bit Hash being the slowest. These tests show that the three hash-based structures are the most scalable structures out of six evaluated. As more synthetic data is given to the structures, execution time of the hash-based structures increases much slower than the point $kd$-tree or sequential scan.
 
 \section{Real Data}
 \label{sec:real-dataset-times}
 
 \begin{figure}
 	\makebox[\textwidth][c]{%
-		\begin{subfloat}[\label{fig:perf-real-astrophyiscs}]{%
+		\begin{subfloat}[Sampled Astrophysics (500,000 Points)\label{fig:perf-real-astrophyiscs}]{%
 			\includegraphics[scale=0.5]{figures/performance_analysis/astrophysics_times.pdf}
 		}
 		\end{subfloat}
@@ -122,11 +122,11 @@ $kd$-trees vastly outperform Pseudo-Pyramid Tree and Pyramid Tree and almost mat
 
 \section{Impact of Bucket Size}
 
-Pyramid Tree point queries are approximately 7.26 times faster than sequential scan with the astrophysics dataset and 14.76 times faster with hurricane Isabel. With the armadillo mesh, Pyramid Tree queries are \textit{1580} times faster. The speedup varies massively between datasets. Considering algorithms which perform queries in $O(\log n)$ time exist, this raises an important question: why is the Pyramid Tree so slow with some datasets?
+Pyramid Tree point queries are approximately 7 times faster than sequential scan with the astrophysics dataset and 14 times faster with hurricane Isabel. With the armadillo mesh, Pyramid Tree queries are \textit{1580} times faster. The speedup varies massively between datasets. Considering algorithms which perform queries in $O(\log n)$ time exist, this raises an important question: why is the Pyramid Tree so slow with some datasets?
 
 With the real datasets, Bit Hash is the fastest structure and Pyramid Tree is the slowest. Both structures use the same underlying hash table implementation. Therefore, the performance differences must be caused by how the structures reduce points to a one-dimensional value. 
 
-Despite hashing a point taking $O(d)$ time, point queries will take much longer if buckets contain many points. If each bucket contains exactly one point, then operation execution time approaches $O(d)$. On the other extreme, where a single bucket contains all points, the complexity becomes $O(n)$. The number of points in a bucket, or \textit{bucket size}, is one of the most important factors to consider when analysing the performance of hash-based index structures. A ``good" hashing function tries to achieve an amortised running time of $O(d)$ by ensuring very few points are mapped to the same bucket.
+Despite hashing a point taking $O(d)$ time, point queries will take much longer if buckets contain many points. If each bucket contains exactly one point, then operation execution time approaches $O(d)$. On the other extreme, where a single bucket contains all points, the complexity becomes $O(n)$. The number of points in a bucket, or \textit{bucket size}, is one of the most important factors to consider when analysing the performance of hash-based index structures. A ``good" hashing function tries to achieve an average running time of $O(d)$ by ensuring very few points are mapped to the same bucket.
 
 \begin{table}
 	\centering
@@ -161,7 +161,7 @@ Despite hashing a point taking $O(d)$ time, point queries will take much longer 
 	\label{tab:perf-bucket-stats}
 \end{table}
 
-Table \ref{tab:perf-bucket-stats} shows the average and maximum bucket size, as well as how many buckets there are, for the real datasets and a uniformly distributed synthetic dataset. The table shows there is a relationship between bucket size and speed -- higher average bucket sizes are paired with longer execution times. 
+Table \ref{tab:perf-bucket-stats} shows the average and maximum bucket size, as well as how many buckets there are, for the real datasets and a uniformly distributed synthetic dataset. The table shows there is a relationship between bucket size and speed -- higher average bucket sizes are paired with longer query times.
 
 The Pyramid Tree stores 235,260 points from the astrophysics dataset in a \textit{single} bucket, meaning up to 235,260 points will be scanned when performing a query. Both the Pyramid and Pseudo-Pyramid Tree essentially degenerate to a \textit{semi-sequential scan} with the scientific datasets. Bit Hash's average bucket size is very close to 1, meaning only one point must be scanned for most operations. Larger average bucket size means queries require more computation on average. The Pyramid Tree and Pseudo-Pyramid Tree are much faster on the synthetic dataset and the armadillo mesh than the two scientific datasets. Table \ref{tab:perf-bucket-stats} shows how average bucket size is much lower for these datasets when compared to the two scientific datasets. This shows that, given certain point distributions, these structures can be fast.
 
@@ -196,7 +196,7 @@ Table \ref{tab:kdtree-balance-factor} contains the balance factor, exact match q
 	\label{tab:kdtree-balance-factor}
 \end{table}
 
-While the $kd$-tree does not degenerate to semi-sequential scan when processing datasets with skew, like the Pyramid Tree, these results show that these datasets do affect the structure's overall performance. For this reason, many variants of the $kd$-tree have been developed in an attempt to reduce the balance factor with skewed datasets. Examples of such variants include the BD-Tree \cite{kdtree-v-bdtree} and fair split tree\cite{fair-split-tree}. Appendix \ref{chap:additional-structures} discusses initial performance results of a $kd$-tree variant implemented in this project. This variant was not explored in more detail due to project time constraints.
+While the $kd$-tree does not degenerate to semi-sequential scan when processing datasets with skew, like the Pyramid Tree, these results show that these datasets do affect the structure's overall performance. For this reason, many variants of the $kd$-tree have been developed in an attempt to reduce the balance factor with skewed datasets. Examples of such variants include the BD-Tree \cite{kdtree-v-bdtree} and fair split tree\cite{fair-split-tree}. Appendix \ref{chap:additional-structures} discusses initial performance results of a $kd$-tree variant implemented in this project. This variant was not explored in more detail due to time constraints.
 
 \section{Memory Overhead}
 
@@ -225,7 +225,7 @@ Table \ref{tab:memory-overhead} shows the memory overhead of each structure when
 
 Sequential scan incurs almost no overhead since only three extra pointers are used by the underlying resizeable array. The point $kd$-tree produces the next lowest overhead. Each point in the tree incurs 8/16 bytes of overhead, since they are stored in a node that contains pointers to its two children. 
 
-The overhead incurred by the hash-based structures depends on the dataset. Each bucket adds overhead, so memory overhead is larger if there are many buckets. For execution speed, it is ideal to have one bucket for each point, but this consumes more memory. The Pseudo-Pyramid Tree maps all points in the astrophysics dataset to only 8 buckets and the structure's overhead factor is 1.099984. The structure uses 493,488 buckets for the synthetic data and has an overhead factor of 1.688401. Notice how the overhead factor is much higher. Bit Hash tends to use one bucket for each point, so it consumes the most memory out of all the structures. While perfect hashing is desirable for speed, it can cause problems if large datasets must be processed on memory constrained systems. If memory is a limited resource, then the point $kd$-tree may be a more suitable structure because it has comparatively low overhead that is not dependent on point distribution.
+The overhead incurred by the hash-based structures depends on the dataset. Each bucket adds overhead, so memory overhead is larger if there are many buckets. For execution speed, it is ideal to have one bucket for each point, but this consumes more memory. The Pseudo-Pyramid Tree maps all points in the astrophysics dataset to only 8 buckets and the structure's overhead factor is 1.099984. The structure uses 493,488 buckets for the synthetic data and has an overhead factor of 1.688401. Notice how the overhead factor is much higher. Bit Hash tends to use one bucket for each point, so it consumes the most memory out of all the structures. While perfect hashing is desirable for speed, it can cause problems if large datasets must be processed on memory constrained systems. If memory is a limited resource, then the point $kd$-tree may be more suitable because it has relatively low memory overhead, which is not dependent on point distribution.
 
 \section{Conclusion}
 
