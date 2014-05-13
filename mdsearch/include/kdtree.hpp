@@ -55,6 +55,12 @@ namespace mdsearch
 			delete root;
 		}
 
+		void clear()
+		{
+			delete root;
+			root = NULL;
+		}
+
 		bool insert(const Point<D>& p)
 		{
 			Node* previous = NULL; // previous node traversed

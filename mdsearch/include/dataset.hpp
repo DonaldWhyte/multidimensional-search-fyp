@@ -61,11 +61,11 @@ namespace mdsearch
 		/* Add all points in file to this dataset. */
 		void load(const std::string& filename)
 		{
-			// Open specified file and just return empty list of points if
+			// Open specified file and just do nothing if
 			// the file does not exist
 			std::ifstream file(filename.c_str());
 			if (!file.is_open())
-				return points;
+				return;
 
 			// Read header information
 			std::string numDimensionsStr;
@@ -82,18 +82,17 @@ namespace mdsearch
 			}
 			catch (boost::bad_lexical_cast& ex) // not integers -- invalid file!!
 			{
-				return points;
+				return;
 			}
 			// Only continue reading points if the points have at least
 			// one dimension and there is at least one point in the dataset
 			if (numDimensions < 1 || numPoints < 1)
-				return points;
+				return;
 
 			// Pre-allocate memory to store all the specified points
 			points.reserve(points.size() + numPoints);
 			// Treat the rest of lines as points
 			Real temp[D]; // temporary stores point's values
-			std::stringstream ss;
 			for (unsigned int i = 0; (i < numPoints); i++)
 			{
 				for (unsigned int j = 0; (j < numDimensions); j++)
@@ -107,8 +106,6 @@ namespace mdsearch
 				if (file.eof())
 					break;
 			}
-
-			return points;
 		}
 
 		Boundary<D> computeBoundary() const

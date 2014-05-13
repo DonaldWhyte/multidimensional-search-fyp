@@ -62,6 +62,12 @@ namespace mdsearch
 				medianPoint[d] = boundary.minVal(d) + ((boundary.maxVal(d) - boundary.minVal(d)) / 2.0f);
 		}
 
+		void clear(const Boundary<D>& newBoundary)
+		{
+			HashStructure<D>::clear();
+			boundary = newBoundary;
+		}
+
 	protected:
 		static const Real MAX_BUCKET_NUMBER = 300000;
 

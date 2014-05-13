@@ -38,6 +38,7 @@ THE SOFTWARE.
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <cstring>
 
 namespace mdsearch
 {
@@ -117,6 +118,19 @@ namespace mdsearch
 		out << point[D - 1] << ")";
 		return out;
 	}
+
+	template<int D>
+	std::ostream& operator<<(std::ostream& out, const Boundary<D>& boundary)
+	{
+		out << "(";
+		for (unsigned int i = 0; (i < D - 1); i++)
+			out << "[" << boundary.minVal(i) << "-" << boundary.maxVal(i) << "], ";
+		out << "[" << boundary.minVal(D - 1) << "-" << boundary.maxVal(D - 1) << "]";
+		out << ")";
+		return out;;
+	}
+
+
 
 	/* Defined error tolerance for floating point comparisons. */
 	static const Real EPSILON = 1.0e-7;
