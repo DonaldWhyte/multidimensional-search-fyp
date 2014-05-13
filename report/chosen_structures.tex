@@ -11,7 +11,7 @@ Six index structures will be implemented and evaluated in this report. These str
 
 There is little use in measuring the performance of the implemented index structures if there is nothing to compare the results to. Two baseline structures have been chosen: sequential scan and the PR octree (see Sections \ref{sec:basic-structures} and \ref{sec:recursive-partition-structures} respectively).
 
-Sequential scan has been chosen as a baseline because it is the na\"{i}ve brute-force approach to performing search. The PR octree was chosen because it is the basis of many index structures, both old and new. Both of these structures are well-known in the field, making them suitable baselines.
+Sequential scan has been chosen as a baseline because it is the na\"{i}ve brute-force approach to search. The PR octree was chosen because it is the basis of many index structures, both old and new. Therefore, both of these structures are well-known in the field, making them suitable baselines.
 
 \section{Pyramid Tree}
 \label{sec:pyramid-tree-detail}
@@ -63,19 +63,21 @@ The following lemma shows that two distinct points can be mapped to the same pyr
 \vspace{22pt}
 
 \begin{proof}[\textbf{Lemma: } For $d \geq 2$, there exist two points $x$ and $y$, such that $x \neq y$, with the same pyramid value]\mbox{}\\*
-Let $d$ be the number of dimensions and $x = (x_0, x_1, \dots, x_{d -1})$, $y = (y_0, y_1, \dots, y_{d - 1})$ be two $d$-dimensional points. Without loss of generality, assume $0 \leq x_i \leq 1$ and $0 \leq y_i \leq 1$ for all $i = 1, 2, \dots, d$. Suppose $x_0 = y_0 = 0$, $x_{d - 1} = 0.1$, $y_{d - 1} = 0.2$ and $x_i = y_i = 0.1$ for all $i = 1, \dots, {d - 2}$. This means $x \neq y$. The following holds:
+Let $d$ be the number of dimensions and $x = (x_0, x_1, \dots, x_{d -1})$, $y = (y_0, y_1, \dots, y_{d - 1})$ be two $d$-dimensional points. Without loss of generality, assume $0 \leq x_i \leq 1$ and $0 \leq y_i \leq 1$ for all $i = 0, 1, \dots, d - 1$. Suppose $x_0 = y_0 = 0$, $x_{d - 1} = 0.1$, $y_{d - 1} = 0.2$ and $x_i = y_i = 0.1$ for all $i = 1, \dots, {d - 2}$. Clearly, $x \neq y$. The following holds:
+
 \begin{enumerate}
 	\item $\forall k \; 0 \leq k \leq d, k \neq 0: \;\; \lvert 0.5 - x_0 \rvert \geq \lvert 0.5 - x_k \rvert$,
 	\item $\forall k \; 0 \leq k \leq d, k \neq 0: \;\; \lvert 0.5 - y_0 \rvert \geq \lvert 0.5 - y_k \rvert$.
 \end{enumerate}
-Since $x_0 \leq 0.5$ and $y_0 \leq 0.5$, both $x$ and $y$ are mapped to pyramid 0 ($i = 0$). It follows that $h_x = h_y = \lvert 0.5 - v_{0 \; MOD \; d} \rvert = \lvert 0.5 - v_{0} \rvert = \lvert 0.5 - 0 \rvert = 0.5$. $pv_x = pv_y = 0 + 0.5 = 0.5$ and $x \neq y$, meaning two distinct points can have the same Pyramid value.
+
+Since $x_0 \leq 0.5$ and $y_0 \leq 0.5$, both $x$ and $y$ are mapped to pyramid 0, so $i = 0$. It follows that $h_x = h_y = \lvert 0.5 - v_{0 \; MOD \; d} \rvert = \lvert 0.5 - v_{0} \rvert = \lvert 0.5 - 0 \rvert = 0.5$. $pv_x = pv_y = 0 + 0.5 = 0.5$. But $x \neq y$, meaning two distinct points can have the same Pyramid value.
 
 \end{proof}
 
 \section{Pseudo-Pyramid Tree}
 
-\begin{wrapfigure}[12]{r}{0.4\textwidth}
-	\vspace{-5pt}
+\begin{wrapfigure}[12]{r}{0.3\textwidth}
+	\vspace{-15pt}
 	\begin{center}
 		\includegraphics[scale=0.7]{figures/pseudo-pyramid_tree_point_boundary_distances.pdf}
 	\end{center}
@@ -84,16 +86,16 @@ Since $x_0 \leq 0.5$ and $y_0 \leq 0.5$, both $x$ and $y$ are mapped to pyramid 
 	\label{fig:point-boundary-distance}
 \end{wrapfigure}
 
-School of Computing at the University of Leeds have an implementation of an index structure which is similar to the Pyramid Tree. Like the Pyramid Tree, it reduces $d$-dimensional points to a single dimension, which is used to search for the original point in a one-dimensional search structure. Each 1D key has its own bucket that contains references to the original points which are mapped to it. This index structure will be called the \textbf{Pseudo-Pyramid Tree}, because the reduction technique used is \textit{inspired} by the Pyramid tree, but is not the same.  To gain more insight into the performance of dimension reduction techniques as a whole, the Pseudo-Pyramid Tree will be implemented.
+University of Leeds' School of Computing have an implementation of an index structure which is similar to the Pyramid Tree. Like the Pyramid Tree, it reduces $d$-dimensional points to a single dimension, which is used to search for the original point in a one-dimensional search structure. Each 1D key has its own bucket that contains references to the original points which are mapped to it. This index structure will be called the \textbf{Pseudo-Pyramid Tree}, because the reduction technique used is \textit{inspired} by the Pyramid tree, but is not the same.  To gain further insight into the performance of dimension reduction techniques for dynamic scientific data, the Pseudo-Pyramid Tree will be implemented.
 
-The Pseudo-Pyramid Tree reduction will now be given. To reduce a point $p$, how far along the boundary the point is in each dimension is determined (see Figure \ref{fig:point-boundary-distance} for an illustration). These distances are computed using Equation \ref{eq:point-boundary-distance}, where  $min_i$ and $max_i$ define the minimum and maximum bounds for dimension $i$.
+The Pseudo-Pyramid Tree reduction will now be given. To reduce a point $p$, how far along the boundary the point is in each dimension is determined (see Figure \ref{fig:point-boundary-distance} for an illustration). These distances are computed using Equation \ref{eq:point-boundary-distance}, where $min_i$ and $max_i$ define the minimum and maximum bounds for dimension $i$ respectively.
 
 \begin{equation}
 	h_i(p) = \frac{p_i - min_i}{max_i - min_i}
 	\label{eq:point-boundary-distance}
 \end{equation}
 
-Let $B$ be a parameter which controls how likely points will be in the same bucket and let $M = \ceil{B^{\frac{1}{d}}}$. The hashed value $h(p)$ of a point $p$ is then given by Equation \ref{eq:pseudo-pyramid-hash}. The function takes $O(d)$ time to compute because of the summation.
+Let $B$ be a parameter which controls how likely points will be hashed to the same value and stored in the same bucket. Let $M = \ceil{B^{\frac{1}{d}}}$. The hashed value $h(p)$ of a point $p$ is then given by Equation \ref{eq:pseudo-pyramid-hash}. The function takes $O(d)$ time to compute because of the summation.
 
 \begin{equation}
 	h(p) = \sum_{i = 0}^{d} { \lfloor h_i(p) \times M^{i} \rfloor }
@@ -113,16 +115,16 @@ The coefficient $M$ is used to increase the magnitude of $h_i(p)$ before it is t
 
 Bit Hash is another structure which reduces the dimensionality of points to one dimension. Instead of using a point's spatial properties, Bit Hash accumulates a hash value by hashing each individual coordinate. Each coordinate is hashed using a  32-bit floating point hashing function. The algorithms used for hashing a point and 32-bit floating point numbers are given in Appendix \ref{chap:algs-and-code}.
 
-The structure is susceptible to floating point inaccuracy because it uses the \textit{bits} of the point to produce the hash value. On the controlled performance tests executed in this project, a point is queried using the exact same floating point values for the coordinates as when it was inserted. This means the two points have the same identical bit patterns and these errors will not occur.
+The structure is susceptible to floating point inaccuracy because it uses the \textit{bits} of the point to produce the hash value. On the controlled performance tests executed in this project, a point is inserted and queried using the exact same floating point values for the coordinates. This means the two points have the same identical bit patterns and these errors will not occur.
 
-Suppose the point being queried was the output of some other computation, where rounding errors may come into play. Even if the point is \textit{mathematically} identical to a point stored in the structure, rounding errors can cause the two points to have different bit patterns and thus, have different hashed values.  Despite the point being stored in the structure, it will appear as if it is not. 
+However, suppose the point being queried was the output of some other computation, where rounding errors may come into play. Even if the point is \textit{mathematically} identical to a point stored in the structure, rounding errors can cause the two points to have different bit patterns and thus, have different hashed values.  Despite the point being stored in the structure, it will appear as if it is not. 
 
-This makes Bit Hash unreliable for certain applications, especially ones where the input points are the result of computations involving many arithmetic operations. Nevertheless, For the small subset of applications where all the points are pre-loaded into memory and not computed again, this can be a useful structure. Initial experiments have also shown this structure has good point query performance, so it will be explored further in this project.
+This makes Bit Hash unreliable for certain applications, especially ones where the input points are the result of computations involving many arithmetic operations. Nevertheless, for the small subset of applications where all the points are pre-loaded into memory and not computed again, this can be a useful structure. Initial experiments have also shown this structure has good point query performance, so it will be explored further in this project.
 
 \section{Point $kd$-Tree}
 \label{sec:kd-tree-detail}
 
-The $kd$-tree is a widely used structure for both low and high dimensional data. In the literature, there is a lot of discussion as to how and why this structure performs poorly in a high-dimensional setting \cite{highd-nn, search-highd-analysis}. $kd$-trees are typically used for \textit{approximate} queries in higher-dimensional space, because they degenerate to Sequential Scan for exact range and nearest neighbour queries \cite{similarity-searching}. 
+The $kd$-tree is a widely used structure for both low and high dimensional data. In the literature, there is a lot of discussion as to how and why this structure performs poorly in a high-dimensional setting \cite{highd-nn, search-highd-analysis}. $kd$-trees are typically used for \textit{approximate} queries in higher-dimensional space, because they degenerate to sequential scan for exact range and nearest neighbour queries \cite{similarity-searching}. 
 
 Similar to the Pyramid Tree, the focus of the literature on $kd$-trees is typically for range and nearest neighbour queries, and not point queries. Unlike the Pyramid Tree however, dynamic variants of $kd$-trees have been explored much more (e.g. in \cite{bkd-tree, kdb-tree}), with the original paper proposing operations for incremental insertion and removal \cite{kd-tree}. Assessing the suitability of multiple classes of structures provides a more comprehensive evaluation. The $kd$-tree has been chosen because it belongs to a different class of index structure than the other chosen structures, which use dimension reduction.
 
@@ -135,7 +137,7 @@ The variant of the tree implemented for this project is the point $kd$-tree (Sec
 \end{enumerate}
 When inserting or querying a point $p$, the tree is traversed top-down in a similar fashion to a standard binary tree, by comparing $p_i$ to $q_i$, where $q$ is the point stored in the current node and $i$ is the cutting dimension of the current level.
 
-The \texttt{delete} operation used is described in \cite{kdtree-remove}. Relative to \texttt{insert} and point queries, this operation requires more computation because it has to maintain the $kd$-tree invariant. To remove a point $p$, first the node containing $p$ is found using the aforementioned top-down traversal approach. Let $n$ be this node and $i$ be the current level's cutting dimension. If $n$ is a leaf, then the node can simply be deleted. Otherwise, let $n_L$ and $n_R$ be the left and right children of $n$ respectively. 
+The \texttt{delete} operation used is described in \cite{kdtree-remove}. Relative to \texttt{insert} and point queries, this operation requires more computation because it has to maintain the $kd$-tree invariant. To remove a point $p$, first the node containing $p$ is found using the aforementioned top-down traversal approach. Let $n$ be this node and $i$ be the current level's cutting dimension. If $n$ is a leaf, then the node is simply deleted. Otherwise, let $n_L$ and $n_R$ be the left and right children of $n$ respectively. 
 
 If $n_R$ exists, a node $m$ containing a point with the \textit{minimum} value for dimension $i$ is found in the sub-tree rooted at $n_R$. The points stored in nodes $n$ and $m$ are swapped and \texttt{delete($p$)} is called recursively on the sub-tree rooted at $n_R$.
 

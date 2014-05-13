@@ -4,13 +4,13 @@
 \centerline{\rule{149mm}{.02in}}
 \vspace{0.75cm}
 
-This section describes the implementation details of the chosen structures, documenting the efforts that went into optimisation the structures. All execution times given in this chapter were measured by executing sequences of structure operations five times and using the average of these times. This is described in greater detail later in the report, in Section \ref{sec:timing-operations}.
+This section describes the implementation details of the chosen structures, documenting the efforts that went into optimisation them. All execution times given in this chapter were measured by executing sequences of structure operations five times and using the average of these times. How the times were measured is described in detail later in the report, in Section \ref{sec:timing-operations}.
 
 \section{Evaluation Framework}
 
 Evaluation forms a major part of this project. It was decided a framework should be used to streamline this process and reduce the time it takes to generate the measurements required for evaluation.  The framework was created because performance analysis would be done very frequently, multiple times per iteration. Manually timing and profiling the code each time is time-consuming and error-prone. Putting more effort initially into creating a system that allows large sets of operations and index structures to be tested at once can save a significant amount of time later on. No tool for this task existed, so it was created for this project.
 
-The evaluation framework takes a specification containing all the datasets and index structures to test, and executes the Insert-Query-Delete operation list for the given datasets on all specified structures. The output is a set of text files containing the performance measures described in Section \ref{sec:performance-measures}. The text files the executable produces are fed into Python scripts to automatically generate tables and plots.
+The evaluation framework takes a specification containing all the datasets and index structures to test, and executes sequences of operations using the given datasets, on all specified structures. The output is a set of text files containing the performance measures described in the next chapter (in Section \ref{sec:performance-measures}). These text files are fed into Python scripts to automatically generate tables and plots.
 
 There are three core modules of the framework, which are shown in Figure \ref{fig:evaluation-framework} and listed below:
 \begin{itemize}
@@ -22,7 +22,7 @@ There are three core modules of the framework, which are shown in Figure \ref{fi
 \begin{figure}
 	\centering
 	\includegraphics[scale=0.6]{figures/evaluation_framework.pdf}
-	\caption{Modules of Evaluation Framework}
+	\caption{Dependency Graph of Evaluation Framework Modules}
 	\label{fig:evaluation-framework}
 \end{figure}
 
@@ -30,7 +30,7 @@ There are three core modules of the framework, which are shown in Figure \ref{fi
 
 Sequential scan was implemented using the C++ container \texttt{std::vector}, a dynamically resizeable array.  Point queries are performed in $O(n)$ time, as the query iterates through the array sequentially until the given point is found or the end of the array is reached. The structure must check if a point exists in the structure before inserting it, making \texttt{insert} take $O(n)$. \texttt{delete} is a standard array deletion, making it an $O(n)$ operation.
 
-The octree variant implemented is a bucket PR octree. The structure partitions the underlying data space into uniformly sized boxes, without using the points as pivots (unlike point quadtrees). It is a bucket octree because \textit{multiple} points can be stored in a single leaf node. The octree dynamically decomposes spatial regions based on its current contents. When the number of points in a leaf node exceeds a certain number, say $M$, then the region represented by the leaf is sub-divided, creating $2^d$ children. The $M + 1$ points are then scattered across the children. Therefore, dense regions of space have a finer decomposition than sparse regions.
+The octree variant implemented is a bucket PR octree. The structure partitions the underlying data space into uniformly sized boxes, without using the points as pivots (unlike point quadtrees). It is a bucket octree because \textit{multiple} points can be stored in a single leaf node. The octree dynamically decomposes spatial regions based on the stored points. When the number of points in a leaf node exceeds a certain number, say $M$, then the region represented by the leaf is sub-divided, creating $2^d$ children. The $M + 1$ points are then scattered across the children. Therefore, dense regions of space have a finer decomposition than sparse regions.
 
 When a point is deleted from a leaf, the leaf's contents and its siblings are checked. If all of these nodes are empty, they are removed and the sub-regions are collapsed into a single node representing the whole region. If the collapsed node and its siblings are empty, then they are collapsed into their parent. This is repeated until there is a parent whose children contain at least one point.
 
@@ -38,7 +38,7 @@ When a point is deleted from a leaf, the leaf's contents and its siblings are ch
 
 GCC\footnote{GCC, the GNU Compiler Collection -- \url{http://gcc.gnu.org/}} was the C++ compiler used in this project. GCC can automatically modify the compiled program to make it more efficient on the target platform. There are multiple optimisation levels, going from 0 (no optimisation) to 3 (maximum optimisation).
 
-Table \ref{tab:compiler-optimisation} shows the execution times of the two baselines on 10,000 random 10D points, when level 0 and level 3 optimisation is used. Level 3 optimisation consistently increased the structures, showing that the potential speed gains are huge. For example, the octree's point queries are approximately $6.5$ times faster, just by enabling level 3 optimisation.  In order to make the structures as fast as possible, level 3 optimisation will be used when compiling all index structures in the project.
+Table \ref{tab:compiler-optimisation} shows the execution times of the two baselines with 10,000 random 10D points, when level 0 and level 3 optimisation is used. Level 3 optimisation consistently increased performance, showing that the potential speed gains are huge. For example, the octree's point queries are approximately $6.5$ times faster, just by enabling level 3 optimisation.  In order to make the structures as fast as possible, level 3 optimisation will be used when compiling all index structures in the project.
 
 \begin{table}
 	\centering
@@ -62,7 +62,7 @@ Table \ref{tab:compiler-optimisation} shows the execution times of the two basel
 \section{Hash-Based Structures}
 \label{sec:iteration1}
 
-This section discusses the low-level implementation details of the hash-based structures developed in this project. Multiple implementations of are developed and analysed to determine which is the fastest.
+This section discusses the low-level implementation details of the hash-based structures developed in this project. Multiple implementations are developed and analysed to determine which is the fastest.
 
 \subsection{Initial Hash Structure Implementation}
 
@@ -71,16 +71,16 @@ An implementation of a generic hash structure, where the hashing function can be
 
 To determine if a point $p$ is stored in the structure, $p$ is first hashed into its one-dimensional representation. The corresponding bucket is then sequentially scanned until the point is found or the end of the bucket is reached. To reduce the number of floating point comparisons, especially for large $d$, the \textit{sums} of each point are stored when they are inserted. This way, a $O(d)$ point comparison only needs to be performed if the $O(1)$ point sum comparison passes.
 
-To delete a point $p$, the point is first hashed and the bucket containing the point is found. The index in the bucket pointing to $p$ is removed, but the actual point itself is not removed from the point array. This will not release memory now unused by the deleted point. This is not suitable if the structure is used as part of a long-running process because there is the potential to run out of memory. One of the core assumptions of this project is that data may be dynamic, meaning points may be inserted and deleted frequently. For this reason, memory must be released when deleting points.
+To delete a point $p$, the point is first hashed and the bucket containing the point is found. The index in the bucket pointing to $p$ is removed, but the actual point itself is not removed from the point array. This will not release the memory used by the deleted point. This is not suitable if the structure is used as part of a long-running process because there is the potential to run out of memory. One of the core assumptions of this project is that data may be dynamic, meaning points may be inserted and deleted frequently. For this reason, memory must be released when deleting points.
 
-The \textbf{Rebuild Hash Structure} releases memory when $R$ points have been removed, where $R$ is a configurable parameter. When a point is removed, the index of the element storing the point is marked. Once $R$ elements are marked, a rebuild procedure is performed. The entire hash structure is rebuilt by first clearing the structure and then inserting all the points \textit{not} marked for deletion. $n - R + 1$ points will be re-inserted and insertion in the worst case is $O(n)$, meaning the worst case complexity of \texttt{delete} is $O((n - R)n)$. The larger $R$ is, the less often the rebuild procedure executes, but a larger amount of allocated memory goes unused at a time.
+The \textbf{Rebuild Hash Structure} releases memory when $R$ points have been removed, where $R$ is a configurable parameter. When a point is removed, the index of the element storing the deleted point is marked. Once $R$ elements are marked, a rebuild procedure is performed. The entire hash structure is rebuilt by first clearing the structure and then inserting all the points \textit{not} marked for deletion. $n - (R + 1)$ points will be re-inserted and insertion in the worst case is $O(n)$, meaning the worst case complexity of \texttt{delete} is $O((n - R)n)$. The larger $R$ is, the less often the rebuild procedure executes, but a larger amount of allocated memory goes unused at a time.
 
 \subsection{Bucket Implementation}
 \label{sec:bucket-hash-structure}
 
-The rebuild implementation stores indices in buckets, meaning that points in the same bucket may not be stored contiguously in memory. Searching a bucket in the rebuild implementation is likely to incur a lot of cache misses, because accessing a point will incur random access into the single point array. Reading a point in a bucket also requires the CPU to fetch two elements from main memory -- the index of the point and the point itself. Furthermore, having a large point array makes \texttt{delete} operations more complicated because the indices stored in buckets must be maintained.
+The rebuild implementation stores indices in buckets, meaning that points in the same bucket may not be stored contiguously in memory. Searching a bucket in the rebuild implementation is likely to incur a lot of cache misses, because accessing a point will involve a  random access into the point array. Reading a point in a bucket also requires the CPU to fetch two elements from main memory -- the index of the point and the point itself. Furthermore, having a large point array makes \texttt{delete} operations more complicated because the indices stored in buckets must be maintained.
 
-\textbf{Bucket Hash Structure} is another implementation that was created which does not use a single array to store the points. Buckets contain actual points instead of indices to them. This should reduce cache misses since point array is searched sequentially. No rebuild procedure is necessary because the memory for a point is released immediately after it is removed, by simply erasing it from the corresponding bucket's array (which is much smaller than an array containing \textit{all} the points). The order the points are stored in a bucket do not matter, so the \textit{erase-remove} idiom\footnote{\url{http://en.cppreference.com/w/cpp/algorithm/remove}} has been used to delete elements from the bucket arrays.
+\textbf{Bucket Hash Structure} is another implementation that was created which does not use a single array to store the points. Buckets contain actual points instead of indices to them. This should reduce cache misses since point array is searched sequentially. No rebuild procedure is necessary because the memory for a point is released immediately after it is removed, by simply erasing it from the corresponding bucket's array. The order the points are stored in a bucket do not matter, so the \textit{erase-remove} idiom\footnote{\url{http://en.cppreference.com/w/cpp/algorithm/remove}} has been used to efficiently delete elements from a bucket's array.
 
 \subsection{Splay Tree Variant}
 
@@ -109,7 +109,7 @@ Table \ref{tab:perf1-cache-hit-rate} displays the cache miss rate when inserting
 
 \subsection{Fastest Implementation}
 
-Table \ref{tab:hash-implementation-speeds} shows the execution times of each operation on each of the structures, for 10,000 random 10D points. The Splay Hash Structure is the slowest for insertions and queries. Rebuild Hash Structure has the deletions (due to the rebuild procedure), but its insertion and query performance almost matches the Bucket Hash Structure. The Bucket Hash Structure outperforms the other implementations, coinciding with their cache miss rates. All hash-based structures will the Bucket Hash Structure implementation, with the hash function varying.
+Table \ref{tab:hash-implementation-speeds} shows the execution times of each operation on each of the structures, for 10,000 random 10D points. The Splay Hash Structure is the slowest for insertions and queries. Rebuild Hash Structure has the slowest deletions because of the rebuild procedure, but its insertion and query performance almost matches the Bucket Hash Structure. The Bucket Hash Structure outperforms the other implementations, coinciding with their cache miss rates. All hash-based structures will use the Bucket Hash Structure implementation for the performance evaluation in this report.
 
 \begin{table}
 	\centering
@@ -143,13 +143,13 @@ Table \ref{tab:hashtable-bplus-time-comparison} provides total execution times o
 		Point Query & 0.001534 & 0.002501 & 0.002808 \\
 		\hline
 	\end{tabular}
-	\caption{Total Execution Time (in Seconds) of Pyramid Tree With Different Underlying 1D Index Structures (10,000 10D Random Points)}
+	\caption{Total Execution Time (in seconds) of Pyramid Tree With Different Underlying 1D Index Structures (10,000 10D Random Points)}
 	\label{tab:hashtable-bplus-time-comparison}
 \end{table}
 
 \section{SSE Optimisation}
 
-Point equality tests have been accelerated using SSE. Considering point equality is used throughout all the index structures, there should be some noticeable speed gains in the structures themselves. It is also possible to parallelise the hashing functions used in this project. For this report, the Pyramid tree hashing function is considered. Both this hashing function and point equality are executed in $O(d)$ time. In both operations there is loop which iterates once for each dimension, where each iteration is independent of the others. If 32-bit floating point numbers are used, then four dimensions can be processed at once using 128 bit SSE registers. If the number of dimensions is less than four, there is little benefit using SSE. When $d<4$, the structures use the sequential version of the code instead.
+Point equality tests have been accelerated using SSE. Considering point equality is used throughout all the index structures, there should be some noticeable speed gains in the structures themselves. It is also possible to parallelise the hashing functions used in this project. In this section, the Pyramid tree hashing function is considered. Both this hashing function and point equality are executed in $O(d)$ time. In both operations there is loop which iterates once for each dimension, where each iteration is independent of the others. If 32-bit floating point numbers are used, then four dimensions can be processed at once using 128 bit SSE registers. If the number of dimensions is less than four, there is little benefit using SSE. When $d<4$, the structures use the sequential version of the code instead.
 
 Table \ref{tab:pyramid-sse} shows the execution times of the Pyramid Tree with and without SSE optimisation for its hash function and point equality. Across all three operations, the average speedup is approximately $1.37$ when there are 10 dimensions. Considering the ideal speedup is 4, it was expected the speed up would be higher. Nevertheless, parallelising point equality consistently achieves speed up for all structures. Other parts of the implementations have been accelerated using SSE, but for brevity have not been included in this report.
 
@@ -170,4 +170,4 @@ Table \ref{tab:pyramid-sse} shows the execution times of the Pyramid Tree with a
 
 \section{$kd$-tree Implementation}
 
-The point $kd$-tree variant described in Section \ref{sec:kd-tree-detail} was implemented. Each node is represented as a C-struct which stores a single point as well as pointers to its children. Every node is allocated using a call to \texttt{malloc()}, which allocates enough memory on the heap to store the node. This means each node may reside in different areas of the heap, resulting in fragmented memory. Array-based implementations that store $kd$-tree contiguously in memory exist, but this project will not explore these due to time constraints.
+The point $kd$-tree variant described in Section \ref{sec:kd-tree-detail} was implemented. Each node is represented as a C-struct which stores a single point as well as pointers to its children. Every node is allocated using a call to \texttt{malloc()}, which allocates enough memory on the heap to store the node. This means each node may reside in different areas of the heap, resulting in fragmented memory. Array-based implementations that store $kd$-tree contiguously in memory exist, but these have not been explored due to time constraints.

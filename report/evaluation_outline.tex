@@ -4,16 +4,14 @@
 \centerline{\rule{149mm}{.02in}}
 \vspace{0.75cm}
 
-The heart of this project is to determine which index structure performs the best for high-dimensional, scientific datasets. Doing this requires an evaluation of the implemented index structures. This section details the measurements and datasets used for evaluation.
+The heart of this project is to determine which index structure performs the best for high-dimensional, scientific datasets. Doing this requires an evaluation of the implemented index structures. This section details the measurements and datasets used for this evaluation.
 
 \section{Performance Measures}
 \label{sec:performance-measures}
 
-The project's core assumptions (see Section \ref{sec:core-assumptions}) state that the target data is dynamic, meaning points may be inserted or deleted at any time. They also state that the project's focus is point query performance. Therefore, index structures are evaluated against the performance of their \textbf{insert}, \textbf{delete} and \textbf{point query} operations. The \textbf{total execution time} of each operation is measured.
+The project's scope, as defined in Section \ref{sec:core-assumptions}, considers dynamic data, meaning points may be inserted or deleted at any time. Additionally, the project's focus is on point query performance. Therefore, index structures are evaluated against the performance of their \textbf{insert}, \textbf{delete} and \textbf{point query} operations. The \textbf{total execution time} of each operation is measured.
 
-The performance of index structures can be affected by their implementations. Therefore, additional measurements will be computed to factor in implementation performance. The first is \textbf{cache miss rate}, which is the rate of cache misses over all CPU reads. A cache miss occurs when the CPU has to fetch data from main memory, which introduces overhead. This overhead can add up and significantly impact the performance of applications.
-
-The second measurement is the \textbf{memory overhead factor}, which measures how much additional memory is needed to store points. An overhead factor of 1 would mean there is no overhead. A factor of 2 would mean \textit{twice} the minimum amount of memory (which is the data required for the actual points) is used. The tools discussed in Section \ref{sec:development-tools} are used to produce some of these measures.
+How much memory a structure uses is also an important factor to consider, especially if the input data is large. Therefore, the \textbf{memory overhead factor} will also be measured. The overhead factor measures how much additional memory is needed to store points. An overhead factor of 1 means there is no overhead. A factor of 2 would mean \textit{twice} the minimum amount of memory (which is the data required for the actual points) is used.
 
 \section{Timing Operations}
 \label{sec:timing-operations}
@@ -26,7 +24,7 @@ This project will use a similar concept for measuring the execution time of the 
 	\item \textbf{Query Points} -- query each point in the dataset
 	\item \textbf{Delete Points} -- delete each point in the dataset from the structure until it is empty
 \end{enumerate}
-Using this process allows the runtime of large numbers of \texttt{insert}, \texttt{delete} and point query operations to be measured. Any performance tests of sequences of operations will be performed five times, and the recorded time will be the \textit{average} of those five times.
+Using this process allows the runtime of large numbers of \texttt{insert}, \texttt{delete} and point query operations to be measured. Any performance tests using the Insert-Query-Delete operation list will be performed five times, and the recorded time will be the \textit{average} of those five times.
 
 \section{Datasets}
 \label{sec:datasets}
@@ -39,7 +37,9 @@ A variety of point distributions and number of dimensions may tease out the type
 
 Multiple instances of these datasets will be used, with varying numbers of dimensions. Using such datasets was inspired by Wang et al. and Berchtold et al., who used similar datasets to evaluate the performance of the PK-tree and pyramid tree respectively \cite{pk-tree, pyramid-tree}.
 
-Tu ensure the synthetic data is stastically fair, the Mersenne twister pseudorandom number generator (PRNG) \cite{mersenne-twister} was used to generate the points.  The Mersenne twister passes ``stringent statistical tests" of randomness \cite{mersenne-twister}. The Boost.Random\footnote{\url{http://www.boost.org/doc/libs/1_48_0/doc/html/boost_random.html}} library implements this PRNG. C/C++ have a built-in random number generator, used by invoking the \texttt{rand()} function. Boost.Random was chosen over \texttt{rand()} because the underlying PRNG used by the function is platform-dependent, giving no guarantees it is statistically fair.
+To ensure the synthetic data is stastically fair, the Mersenne twister pseudorandom number generator (PRNG) was used to generate the points.  The Mersenne twister passes ``stringent statistical tests" of randomness \cite{mersenne-twister}, ensuring a fair distribution of points. C/C++ provides built-in random number generator, used by invoking the \texttt{rand()} function. However, the underlying PRNG used by \texttt{rand()} is platform-dependent, so there are no guarantees it will be statistically fair. The Boost.Random\footnote{\url{http://www.boost.org/doc/libs/1_48_0/doc/html/boost_random.html}} library implements the Mersenne twister, and has been chosen over \texttt{rand()}. 
+
+
 
 Skewed data was generated by applying a power to the number. Let $p$ be a generated point. Since $0 \leq p_i \leq 1$ for all $i \in \lbrace 1, ..., d \rbrace$, this means $p_i^e \leq p_i$ for all $e \geq 1$. This makes smaller values more likely, generating a skewed distribution of points. Increasing $e$ increases the skew. $e = 1.5$ is used to the generate skewed datasets so there are still some points in the upper regions of the data space.
 
@@ -75,9 +75,9 @@ A single timestep is used for evaluation, which is timestep 100. This timestep w
 
 The second real dataset contains 13 scalar fields for every point on a $500 \times 100 \times 100$ mesh, over 48 timesteps. It is the result of a simulation of hurricane Isabel from 2003 \cite{hurricane-isabel-dataset}. Timestep 24 of this simulation will be used because, again, the data is highly sparse with dense regions of activity. In the original simulation, nothing was recorded in regions of space that contained ground. The points inside those regions have values of 1.0e+35 to mark they have not been recorded. Since these points given no useful information about the simulation, they have been removed from the dataset.
 
-The astrophysics and hurricane datasets were chosen because they are large and have a high number of dimensions (10 and 13 respectively). The core focus of the project is high-dimensional scientific data, so this data will provide a true test of how well the implementations perform with real instances of such data. Additionally, both datasets are used for scientific visualisation and contain continuous values. As discussed in Section \ref{sec:core-assumptions}, this type of data is what the project is targeting.
+The astrophysics and hurricane datasets were chosen because they are large and have a high number of dimensions (10 and 13 respectively). The core focus of the project is high-dimensional scientific data, so this data will provide a true test of how well the implementations perform with real instances of such data. Additionally, both datasets are used for scientific visualisation and contain continuous values. As discussed in Section \ref{sec:core-assumptions}, the project is targeting this type of data.
 
-Each of these datasets contains millions of points. It was decided that a smaller instance of these datasets would be used, sampling 500,000 points from both datasets. Sampling a sub-region of the grid or uniformly sampling can introduce \textit{bias} in the data, which affects the evaluation. Therefore, smaller instances of the dataset are generated by randomly sampling $n$ points from the original dataset, discarding and picking other points whenever a point that has already been sampled was chosen. The law of large numbers \cite{large-sample-theory} shows that, as the number of samples increase, the sampled dataset starts to become more representative of whole dataset, making this method statistically fairer.
+Each of these datasets contains millions of points. It was decided that a smaller instance of these datasets would be used, sampling 500,000 points from both datasets. Sampling a sub-region of the grid or uniformly sampling can introduce \textit{bias} in the data, which affects the evaluation. Therefore, smaller instances of the dataset are generated by randomly sampling $n$ points from the original dataset, discarding and picking other points whenever a point that has already been sampled was chosen. The law of large numbers \cite{large-sample-theory} shows that, as the number of samples increase, the sampled data becomes more representative of the whole dataset, making this method statistically fairer than uniform sampling.
 
 The final real dataset is a point cloud of a 3D armadillo from The Stanford 3D Scanning Repository \cite{armadillo-mesh}, which contains 435,544 points that represent a geometric mesh. This mesh has been used by other researchers to evaluate index structure performance applied to 3D graphics \cite{kd-tree-gpu, accelerating-kdtree-nn}. Appendix \ref{sec:app-real-datasets} shows visualisations of the three real datasets.
 
@@ -142,12 +142,12 @@ C/C++ comes with several timing mechanisms, such as \texttt{clock\_gettime()}, \
 \section{Initial Hypothesis}
 \label{sec:initial-hypothesis}
 
-Since there has been no published evaluations of the Pseudo-Pyramid Tree or Bit Hash, no hypotheses will be made regarding the performance of these structures. It is suspected that the Pseudo-Pyramid Tree will perform well on high-dimensional data, because it is a hash-based method, but little is currently known about how well the structure's hashing function performs, so there is a little basis for such suspicion. Based on the reported performance of the Pyramid Tree and $kd$-tree in a high-dimensional setting in the literature (discussed in Chapters \ref{chap:background_research} and \ref{chap:chosen-structures}), the following hypothesis was devised:
+Since there has been no published evaluations of the Pseudo-Pyramid Tree or Bit Hash, no hypotheses will be made regarding the performance of these structures. It is suspected these structures will perform well on high-dimensional data, because they are hash-based methods, but little is currently known about how well the hashing functions perform, so there is a little basis for such suspicion. Based on the reported performance of the Pyramid Tree and $kd$-tree in a high-dimensional setting in the literature (discussed in Chapters \ref{chap:background_research} and \ref{chap:chosen-structures}), the following hypothesis was devised:
 
 \paragraph{\textbf{HYPOTHESIS:}} Pyramid Tree will be faster than the baselines and $kd$-trees on scientific datasets containing high-dimensional data ($\geq 10$ dimensions).
 
 \section{Conclusion}
 
-Each index structure will be evaluated using a collection of synthetic and real datasets. For each dataset, all points will be inserted into each structure, then all points will be queried and finally, all points will be deleted. The total execution time of each operation type will be measured.
+Each index structure will be evaluated using a collection of synthetic and real datasets. For each dataset, all points will be inserted into each structure, then all points will be queried and finally, all points will be deleted. The total execution time of each operation type will be measured, alongside the memory overhead produced by the structures.
 
 Based on the existing literature, it is hypothesised that the Pyramid Tree will outperform the $kd$-tree on high-dimensional scientific datasets. The next chapter will now evaluate the performance of the chosen structures and determine if this hypothesis still holds.
