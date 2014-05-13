@@ -4,13 +4,15 @@
 \centerline{\rule{149mm}{.02in}}
 \vspace{0.75cm}
 
-The real world is complex and multi-variate, with high degrees of freedom. Multi-dimensional search can be used to effectively process this complex data. Many fields require or benefit from multi-dimensional search, including database querying, machine learning, computer vision and visualisation. In multi-dimensional search, individual data items are represented as points, vectors or regions in $n$-dimensional space. These are arranged in an index structure so relevant data can be retrieved quickly, even when the volume of data is huge.
+The real world is complex and multivariate, with high degrees of freedom. This is reflected in the complexity of data it can produce. Multi-dimensional search can be used to efficiently reason about this complex data.
 
-Since multi-dimensional search is a problem that appears in so many areas of computer science, developing fast, efficient ways of building and querying index structures has been the focus of many researchers over the past forty years. Dozens of multi-dimensional search structures have already been developed and there is still much ongoing work toward developing even more efficient search structures. 
+Many fields require or benefit from multi-dimensional search, including database querying, machine learning, computer vision and visualisation. In multi-dimensional search, individual data items are represented as points, vectors or regions in $n$-dimensional space. These are arranged in an index structure so relevant data can be retrieved quickly, even when the volume of data is huge.
+
+Since multi-dimensional search is a problem that appears in so many areas of computer science, developing fast, efficient ways of building and querying index structures has been the focus of many researchers over the past forty years. Dozens of multi-dimensional search structures have already been developed and there is still much ongoing work to develop even more efficient search structures. 
 
 \section{Aim}
 
-This project will survey existing multi-dimensional search structures that attempt to solve the multi-dimensional search problem efficiently. The major challenges in the field, and how they have guided the development of structures throughout the last two decades, will be identified. The core aim of the project is to implement one or more index structures, optimising them specifically for high-dimensional datasets. These implementations will then be evaluated with respect to their proposed performance in the literature and pre-defined baselines, using chosen test datasets. This evaluation will highlight performance bottlenecks in the implementations and fundamental limitations of the algorithms themselves.
+This project will survey existing multi-dimensional search structures that attempt to solve the multi-dimensional search problem efficiently. The major challenges in the field, and how they have guided the development of structures throughout the past four decades, will be identified. The core aim of the project is to implement one or more index structures, optimising them specifically for high-dimensional datasets. These implementations will then be evaluated with respect to their proposed performance in the literature and pre-defined baselines, using chosen test datasets. This evaluation will highlight performance bottlenecks in the implementations and fundamental limitations of the algorithms themselves.
 
 \newpage
 
@@ -72,7 +74,7 @@ There are several ways of querying the data stored inside index structures. The 
 
 \section{Report Structure}
 
-Chapter \ref{chap:methodology} explains how the project was scheduled and the technologies used to produce the software deliverables. Chapter \ref{chap:background_research} reviews the existing work performed in this field and the core challenges which have driven the development of index structures throughout the past forty years. This leads into Chapter \ref{chap:chosen-structures}, which describes the index structures to be implemented and evaluated in this project in detail, explaining why they were chosen.
+Chapter \ref{chap:methodology} explains how the project was scheduled and the technologies used to produce the software deliverables. Chapter \ref{chap:background_research} reviews the existing work performed in this field and the core challenges which have driven the development of index structures throughout the past forty years. This leads into Chapter \ref{chap:chosen-structures}, which describes the index structures to be implemented and evaluated in detail, explaining why they were chosen.
 
 Chapter \ref{chap:design-and-implementation} gives details on how the chosen index structures were implemented, documenting the low-level optimisation efforts performed to accelerate the structures. Chapter \ref{chap:evaluation-outline} covers what measurements and data will be used to evaluate the index structures' performance. Chapter \ref{chap:performance-evaluation} gives an evaluation of the implemented index structures using empirical performance timings. 
 
