@@ -54,12 +54,16 @@ Evaluation was present throughout the Chapters \ref{chap:performance-evaluation}
 
 All the minimum requirements were met and exceeded to varying degrees. In particular, the amount of optimisations and index structures that were implemented and evaluated was much larger than intended. This was done to ensure the evaluation was as comprehensive as possible within the project time frame.
 
+\section{mdsearch Library}
+
+mdsearch, a C++ library containing implementations of some of the index structures explored in the project, has been made open-source (see Appendix \ref{chap:mdsearch}). The performance of the structures implemented in this library have been measured in two scenarios. The first involves processing the \textit{full} astrophysics dataset. The second uses traces of structure operations from a real application that computes Joint Contour Nets \cite{jcn}. Appendix \ref{chap:mdsearch-application} contains the evaluation of the structures in these scenarios.
+
 \section{Deliverables}
 
 The deliverables described in Section \ref{sec:deliverables} were produced in the following ways:
 \begin{enumerate}
 	\item Source code of the evaluation framework and all implemented structures, along with documentation, has been submitted alongside this report
-	\item mdsearch, a C++ library containing implementations of some of the index structures explored in the project, has been released to the public. Where to get mdsearch, as well as documentation describing what features mdsearch provides and how to use them, is available in Appendix \ref{chap:mdsearch}.
+	\item Documentation describing what features mdsearch provides and how to use them is available in Appendix \ref{chap:mdsearch}
 	\item An evaluation of the index structures was performed as part of Requirement 4
 	\item Generated synthetic data can be re-produced using the data generators provided in the source code of Deliverable 1
 \end{enumerate}
