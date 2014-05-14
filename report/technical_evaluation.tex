@@ -62,7 +62,7 @@ Therefore, the astrophysics dataset is highly skewed because most points are clu
 
 \section{Effects of Data Distribution}
 
-We now explore the effects of the astrophysics dataset's distribution on the Pyramid Tree and $kd$-Tree.
+The effects of the astrophysics dataset's distribution on the Pyramid Tree and $kd$-Tree is explored in this section.
 
 \subsection{Pyramid Tree}
 
@@ -96,6 +96,8 @@ Histograms are equivalent to nearest-neighbour interpolation, so they do not sho
 To determine if clusters of points at boundaries is truly the main cause of large buckets, a heuristic called \textbf{No Boundary Coordinates} was developed. Let $v$ be a point and $min_i$ and $max_i$ be the minimum and maximum boundary values for dimension $i \in \lbrace 0, 1, ..., d - 1 \rbrace$. Let $j$ be the dimension $v$ is furthest away from the centre point in. If $v_j = min_j$ or $v_j = max_j$, then a new dimension $k$ is chosen, such that $v_k$ is the \textit{second} furthest coordinate from the centre point. If $v_k$ is at the boundary, then the \textit{third} furthest coordinate is chosen. This process is repeated until a coordinate which is not on a boundary is found. If all coordinates are on a boundary, then the first dimension is chosen.
 
 Table \ref{tab:final-bucket-size} shows how this simple heuristic decreases average bucket size. However, it is still significantly slower than the $kd$-tree, so boundary points are not the only problem with the dataset. Note that creating heuristics like this requires pre-existing knowledge of the point distribution, which may not be available, especially when the data is dynamic (i.e. all the points are not known in advance).
+
+The histograms for the three dimensions of the armadillo mesh are given in Appendix \ref{sec:armadillo-histograms}. The histograms show that the mesh's points are much more uniform than the astrophysics dataset. The Pyramid Tree performs substantially better with the armadillo mesh, showing that the structure is efficient with uniform distributions.
 
 \subsection{$kd$-Tree}
 
@@ -184,7 +186,7 @@ Figure \ref{fig:non-continuous-embedding} shows a dataset computed using the map
 
 Figure \ref{fig:continuous-embedding-pyramid} shows a 1-manifold. Here, the Pyramid Tree stores points on the manifold in just five buckets. Without the ability to adapt, the performance of the structure will rapidly degrade as more and more points are mapped to the same few buckets.
 
-Figure \ref{fig:continuous-embedding-octree} shows an Octree decomposition, which adapts the decomposition to provide greater discrimination between points in dense regions of space. The point $kd$-tree can be seen as an adaptive index structure to some extent, since decomposition of the underlying data space depends on the values of the given points. This is one of the reasons its performance is vastly superior to the Pyramid Tree with the two scientific datasets. Therefore, static decomposition may not be suitable for highly sparse distributions.
+Figure \ref{fig:continuous-embedding-octree} shows an Octree decomposition, which adapts the decomposition to provide greater discrimination between points in dense regions of space. The point $kd$-tree can be seen as an adaptive index structure, since decomposition of the underlying data space depends on the values of the given points. This is one of the reasons its performance is vastly superior to the Pyramid Tree with the two scientific datasets. Therefore, static decomposition may not be suitable for highly sparse distributions.
 
 \subsection{Case Study: Multigrid Tree}
 
@@ -208,7 +210,6 @@ Table \ref{tab:cell-size-effect} shows the effect of cell size on average bucket
 	$100,000^{10}$ & 10.7181 & 9,330 \\
 	$1,000,000^{10}$ & 9.10581 & 10,997 \\
 	$1,100,000^{10}$ & 9.06454 & 11,032 \\
-	$1,200,000^{10}$ & 9.06454 & 11,032 \\
 	$10,000,000^{10}$ & 9.06454 & 11,032 \\
 	\hline
 	\end{tabular}
@@ -230,7 +231,11 @@ Despite the adaptive point $kd$-tree performing worse on highly skewed data, the
 
 The point $kd$-tree shows that these structures can provide good performance with point queries. Existing literature often discusses how $kd$-trees degenerate to Sequential Scan with higher dimensions, but this is not the case for point queries, even with real datasets that are highly skewed.
 
+\vspace{-6pt}
+
 \section{Conclusion}
+
+\vspace{-6pt}
 
 The original hypothesis, discussed in Section \ref{sec:initial-hypothesis}, stated that the Pyramid Tree would provide faster point queries for high-dimensional scientific datasets. The empirical evidence from Chapter \ref{chap:performance-evaluation} has shown this hypothesis is false. The discussion in this chapter has produced four new hypotheses:
 

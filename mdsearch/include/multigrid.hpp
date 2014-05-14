@@ -86,12 +86,18 @@ namespace mdsearch
 
 	public:
 		Multigrid(const Boundary<D>& boundary,
-			Real intervalsPerDimension = 10000000,
+			Real intervalsPerDimension = 1000000000,
 			int bucketSize = 8) :
 			boundary(boundary),
 			intervalsPerDimension(intervalsPerDimension),
 			bucketSize(bucketSize)
 		{
+		}
+
+		inline void clear(const Boundary<D>& newBoundary)
+		{
+			boundary = newBoundary;
+			rootBuckets = BucketMap();
 		}
 
 		bool insert(const Point<D>& p)

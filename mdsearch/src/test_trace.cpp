@@ -1,6 +1,7 @@
 #include "kdtree.hpp"
 #include "pyramidtree.hpp"
 #include "bithash.hpp"
+#include "multigrid.hpp"
 #include "operationlist.hpp"
 #include "timing.hpp"
 #include <string>
@@ -21,6 +22,8 @@ int main(int argc, char* argv[])
 	Boundary<3> initialBoundary = { 0 };
 	PyramidTree<3> pyramidTree(initialBoundary);
 	OperationListExecutor<PyramidTree<3>, 3> pyramidTreeExecutor;
+	Multigrid<3> multigrid(initialBoundary);
+	OperationListExecutor<Multigrid<3>, 3> multigridExecutor;
 
 	double start = getTime();
 	kdTreeExecutor.execute(&kdTree, operationList);
@@ -31,4 +34,7 @@ int main(int argc, char* argv[])
 	start = getTime();
 	pyramidTreeExecutor.executeWithBoundary(&pyramidTree, operationList);
 	std::cout << "Pyramid Tree took " << getTime() - start << " seconds" << std::endl;
+	start = getTime();
+	multigridExecutor.executeWithBoundary(&multigrid, operationList);
+	std::cout << "Multigrid took " << getTime() - start << " seconds" << std::endl;
 }

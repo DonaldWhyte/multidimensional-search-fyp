@@ -6,6 +6,7 @@ add_executable(mdsearch_tests
 	# Source files
 	"src/test_structures.cpp"
 )
+target_link_libraries ( mdsearch_tests rt )
 
 # Executable for timing implemented structures on real program traces
 add_executable(mdsearch_trace_timings

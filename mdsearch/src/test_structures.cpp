@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "bithash.hpp"
 #include "multigrid.hpp"
 #include "dataset.hpp"
+#include "timing.hpp"
 #include <string>
 
 using namespace mdsearch;
@@ -127,26 +128,88 @@ void testStructure(const std::string& structureName, STRUCT_TYPE* structure, con
 		std::cout << "...FAILED." << std::endl;
 }
 
+static const double MAX_EXECUTION_TIME = 1800.0; // in seconds
+static const int intervalsToCheck = 300;
+
+template<typename STRUCT_TYPE>
+void timeStructure(const std::string& structureName, STRUCT_TYPE* structure, const PointList& points)
+{
+	std::cout << "TIMING " << structureName << "..." << std::endl;
+
+	double start = getTime();
+	for (unsigned int i = 0; (i < points.size()); i++)
+	{
+		structure->insert(points[i]);
+		if ((i % intervalsToCheck) == 0)
+		{
+			if ((getTime() - start) > MAX_EXECUTION_TIME)
+			{
+				std::cout << "\tAborted operation at point " << (i + 1) << std::endl;
+				break;
+			}
+		}
+	}
+	std::cout << "\tInsertion took " << getTime() - start << " seconds" << std::endl;
+
+	start = getTime();
+	for (unsigned int i = 0; (i < points.size()); i++)
+	{
+		structure->query(points[i]);
+		if ((i % intervalsToCheck) == 0)
+		{
+			if ((getTime() - start) > MAX_EXECUTION_TIME)
+			{
+				std::cout << "\tAborted operation at point " << (i + 1) << std::endl;
+				break;
+			}
+		}
+	}
+	std::cout << "\tQueries took " << getTime() - start << " seconds" << std::endl;
+	
+	start = getTime();
+	for (unsigned int i = 0; (i < points.size()); i++)
+	{
+		structure->remove(points[i]);
+		if ((i % intervalsToCheck) == 0)
+		{
+			if ((getTime() - start) > MAX_EXECUTION_TIME)
+			{
+				std::cout << "\tAborted operation at point " << (i + 1) << std::endl;
+				break;
+			}
+		}
+	}
+	std::cout << "\tDeletion took " << getTime() - start << " seconds" << std::endl;
+
+	std::cout << "...DONE." << std::endl;
+}
+
+
 
 int main(int argc, char* argv[])
 {
 	// Generate test data using random number generator
 	srand(time(NULL)); // seed generator to get different points every time!!
 	Dataset<NUM_DIMENSIONS> dataset;
-	dataset.load( generateRandomPoints(NUM_TEST_POINTS) );
+	//dataset.load( generateRandomPoints(NUM_TEST_POINTS) );
+
+	std::cout << "Loading data..." << std::endl;
+	dataset.load("/usr/not-backed-up/mdsearch-data/multifield.0099.dat");
+	Boundary<NUM_DIMENSIONS> datasetBoundary = dataset.computeBoundary();
+	std::cout << "...DONE." << std::endl;
 
 	// Test desired structures
 	KDTree<NUM_DIMENSIONS> kdTree;
-	testStructure< KDTree<NUM_DIMENSIONS> >("kd-tree", &kdTree, dataset.getPoints());
-
-	PyramidTree<NUM_DIMENSIONS> pyramidTree(dataset.computeBoundary());
-	testStructure< PyramidTree<NUM_DIMENSIONS> >("pyramidtree", &pyramidTree, dataset.getPoints());
+	timeStructure< KDTree<NUM_DIMENSIONS> >("kd-tree", &kdTree, dataset.getPoints());
 
 	BitHash<NUM_DIMENSIONS> bitHash;
-	testStructure< BitHash<NUM_DIMENSIONS> >("bithash", &bitHash, dataset.getPoints());
+	timeStructure< BitHash<NUM_DIMENSIONS> >("bithash", &bitHash, dataset.getPoints());
 
-	Multigrid<NUM_DIMENSIONS> multigrid(dataset.computeBoundary());
-	testStructure< Multigrid<NUM_DIMENSIONS> >("multigrid", &multigrid, dataset.getPoints());
+	Multigrid<NUM_DIMENSIONS> multigrid(datasetBoundary);
+	timeStructure< Multigrid<NUM_DIMENSIONS> >("multigrid", &multigrid, dataset.getPoints());
+
+	PyramidTree<NUM_DIMENSIONS> pyramidTree(datasetBoundary);
+	timeStructure< PyramidTree<NUM_DIMENSIONS> >("pyramidtree", &pyramidTree, dataset.getPoints());
 
 	return 0;
 }

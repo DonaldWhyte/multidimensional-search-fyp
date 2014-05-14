@@ -104,6 +104,8 @@ Let $B$ be a parameter which controls how likely points will be hashed to the sa
 
 The coefficient $M$ is used to increase the magnitude of $h_i(p)$ before it is truncated with the floor function. This spaces out the mappings of points, decreasing the likelihood two distinct points will be reduced to the same value (and be stored in the same bucket). Increasing $B$ will increase $M$ because $M$ is a power of $B$. Therefore, $B$ can be used to increase or decrease discrimination between points.
 
+$B$ will be set to 300,000 throughout the performance evaluation in this report, as it was found to provide best performance on the target hardware and datasets.
+
 \section{Bit Hash}
 \label{sec:bit-hash}
 
