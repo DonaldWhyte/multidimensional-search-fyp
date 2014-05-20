@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 
-def barPlot(outputFilename, groupData, groupLabels, barLabels, plot, maxYValue = None):
+def barPlot(outputFilename, groupData, groupLabels, barLabels, plot, maxYValue = None, legend = True):
 	# Number of GROUPS is size of inner list
 	numGroups = len(groupData[0])
 	# This needs to be a numpy range for xdata calculations to work
@@ -29,7 +29,8 @@ def barPlot(outputFilename, groupData, groupLabels, barLabels, plot, maxYValue =
 	    barRects = plot.bar(xdata, vals, width, color=COLOURS[num % len(COLOURS)], hatch=PATTERNS[num % len(PATTERNS)])
 	    plotObjects.append(barRects[0])
 
-	plot.legend(plotObjects, barLabels, loc=2)
+	if legend:
+		plot.legend(plotObjects, barLabels, loc=2)
 	plot.xlabel("Structure")
 	plot.ylabel("Execution Time (in seconds)")
 	if maxYValue:
@@ -49,7 +50,7 @@ def barPlot(outputFilename, groupData, groupLabels, barLabels, plot, maxYValue =
 	# Clear plot object now that it has been saved
 	plt.clf()
 
-def plotTimingData(outputFilename, timingData, maxYValue):
+def plotTimingData(outputFilename, timingData, maxYValue, legend):
 	# Sort operation keys and structure keys for consistent output
 	opNames = sorted(timingData.keys())
 	structureNames = sorted(timingData[opNames[0]].keys())
@@ -66,17 +67,17 @@ def plotTimingData(outputFilename, timingData, maxYValue):
 				opData.append( timingData[op][struct][0][1] )
 		groupData.append(opData)
 	# Plot the bar chart
-	barPlot(outputFilename, groupData, groupLabels, barLabels, plt, maxYValue=maxYValue)
+	barPlot(outputFilename, groupData, groupLabels, barLabels, plt, maxYValue=maxYValue, legend=legend)
 
 if __name__ == "__main__":
-	"""data = [ [1, 1, 1, 1], [2, 2, 2, 2], [0.5, 0.5, 0.5, 0.5] ]
-	data = [ np.array(x) for x in data ]
-	barPlot("test.pdf", data, ["G1", "G2", "G3", "G4"], ["Insert", "Delete", "Point Query"], plt)
-	sys.exit()"""
-
 	# Parse command line options
 	if len(sys.argv) < 2:
-		sys.exit("python %s \"<timingFilenameGlob>\" {<maxYValue>}" % sys.argv[0])
+		sys.exit("python %s \"<timingFilenameGlob>\" {<maxYValue>} {--no-legend}" % sys.argv[0])
+	if "--no-legend" in sys.argv:
+		legend = False
+		sys.argv.remove("--no-legend")
+	else:
+		legned = True
 	timingFilenameGlob = sys.argv[1]
 	if len(sys.argv) >= 3:
 		maxYValue = float(sys.argv[2])
@@ -102,4 +103,4 @@ if __name__ == "__main__":
 			continue
 
 		outputFilename = "%s_times.pdf" % data.title
-		plotTimingData(outputFilename, data.data, maxYValue=maxYValue)
+		plotTimingData(outputFilename, data.data, maxYValue=maxYValue, legend=legend)
