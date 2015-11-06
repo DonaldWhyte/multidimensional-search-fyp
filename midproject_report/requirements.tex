@@ -1,0 +1,38 @@
+\subsection{Requirements}
+
+The minimum requirements are closely related to the objectives of the project. They are:
+\begin{enumerate}
+	\item Produce literature review describing the current state of multi-dimensional search structures, comparing their strengths and weaknesses and highlighting core challenges of the field
+	\item Implement at least one index structure and perform performance analysis of the implementation
+	\item Perform one set of modifications to the implemented structure in an attempt to optimise its performance
+	\item Evaluate and compare performance of final implementations to pre-defined baselines, unoptimised structures and their reported performance in the literature
+\end{enumerate}
+
+Possible extensions of the project include:
+\begin{enumerate}
+	\item Parallelising implementations using technologies such as Haskell, CUDA (GPGPU) or MPI
+	\item Developing an entirely new index structure, which is also implemented and evaluated
+\end{enumerate}
+
+\subsection{Deliverables}
+
+The following will be delivered upon project completion:
+\begin{enumerate}
+	\item Documented source code of implemented index structures
+	\item User manual describing how to use the index structures
+	\item Evaluation of the performance of the implemented index structures, with respect to pre-specified test data
+	\item Generated synthetic data that is used for the evaluation
+\end{enumerate}
+
+\subsection{Core Assumptions}
+\label{sec:core-assumptions}
+
+Throughout the project, some assumptions have been made. These are used to narrow the scope of the project and allow more time to be spent focusing on the core aim of the project (high-dimensional data). The assumptions are:
+\begin{enumerate}
+	\item Datasets have a ``high" number of dimensions ($\geq 10$), meaning the performance of the index structures will be measured using data with at least 10 dimensions. However, data using a smaller number of dimensions may be used for the purposes of understanding how the implementations behave with respect to dimensionality.
+	\item Datasets will be able to fit into the main memory (i.e. RAM) of the machine used for evaluation. That is, none of the data is paged to secondary memory and page accesses causing reduced performance does not need to be considered.
+	\item Datasets are dynamic, meaning points may be inserted, deleted or updated at any time.
+\end{enumerate}
+Furthermore, the project is focused on the \textit{geometric} applications of multi-dimensional search and not databases. This is the primary reason assumption (2) has been made.
+
+No assumptions have been made about the distribution of data. This means the implementations' performance will be evaluated using a variety of distributions.

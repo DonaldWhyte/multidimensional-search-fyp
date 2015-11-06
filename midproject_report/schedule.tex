@@ -1,0 +1,57 @@
+\subsection{Schedule}
+\label{sec:schedule}
+
+The original schedule was devised near the end of the first week of the project, on 31/01/14. The schedule was broken down into the individual tasks required to complete the defined milestones. These tasks were then grouped into different \textbf{phases}, which run sequentially (with some in parallel). The phases of the project and their milestones are:
+\begin{enumerate}
+	\item ``Project Definition""
+	\begin{itemize}
+		\item \textbf{Project Outline Defined} -- defined outline of project's aims and objects
+	\end{itemize}
+	\item ``Literature Review and Data Collection"
+	\begin{itemize}	
+		\item \textbf{Literature Review Complete} -- produced literature review of multi-dimensional search
+		\item \textbf{Data Collected} --  decided and collected non-synthetic external test data sets
+	\end{itemize}
+	\item ``Initial Implementation"
+	\begin{itemize}	
+		\item \textbf{Software Deliverables Decided} -- determined index structures to implement and the technologies to use
+		\item \textbf{Initial Implementation Finished} -- completed initial, unoptimised implementations of chosen index structure(s)
+	\end{itemize}
+	\item ``Mid-project Presentation and Report"
+	\begin{itemize}	
+		\item \textbf{Mid-project Presentation Delivered} -- delivered mid-project presentation to relevant research group
+		\item \textbf{Mid-project Report Finished} -- submitted mid-project report
+	\end{itemize}	
+	\item ``Performance Tuning"
+	\begin{itemize}
+		\item \textbf{Software Deliverables Finished} -- produced final, optimised implementations of the index structure(s), which is ready for a final evaluation
+	\end{itemize}
+	\item ``Final Report Write-up"
+	\begin{itemize}
+		\item \textbf{Final Report Finished} -- submitted write-up of the final report
+	\end{itemize}
+	\item ``Student Symposium"
+	\begin{itemize}
+		\item \textbf{Final Presentation Delivered} -- delivered final project presentation
+	\end{itemize}
+\end{enumerate}
+
+The performance tests and evaluation of the initial implementation could produce unexpected results, showing that it may be beneficial to implement an entirely different index structure or use a different technology. Therefore, deciding on a \textit{fixed} set of index structures to implement  would be unwise. Doing means there is no way to go backwards and revise the project plan if performance tests highlight a poor index structure or technology. As such, a decision has been made on a \textit{single, initial} index structure to implement. This will be evaluated and based on that evaluation, it will be optimised or it will be discarded in favour of another index structure. This will be repeated in iterations, where each iteration contains the following sub-phases:
+\begin{enumerate}
+	\item \textbf{Design} -- plan exactly what needs to be done in the iteration and the architectural design of the system/implementation
+	\item \textbf{Build} -- implement an index structure or perform one or more optimisations
+	\item \textbf{Test} -- perform correctness tests on index structure to ensure it (still) works
+	\item \textbf{Performance Analysis} -- perform performance analysis on index structure developed/optimised
+	\item \textbf{Evaluation} -- evaluate the produced results and use it to decide what to implement or optimise in the next iteration
+\end{enumerate}
+When enough iterations have passed or there is no time left to spend on the Design and Implementation phase, the iterations will stop, with the evaluation of the optimised structure(s) in last phase being the final evaluation that is used in the Final Report Write-up phase. This iterative approach is illustrated in the full project process diagram shown in Figure \ref{fig:full-project-process} in the appendix.
+
+Figure \ref{fig:initial-schedule} and Figure \ref{fig:initial-milestone-timeline} show a Gantt chart of the phases and a timeline annotated with the project's milestones respectively. Due to the often uncertain nature of research projects, especially when one does not have much knowledge of the relevant field prior to the project, it was decided that the schedule will \textit{not} break down each phase into fine-grained sub-tasks. This is to avoid the likely situation of some of the tasks taken longer than others and having the project greatly trail away the original schedule, to the point where it's not used. Instead, these higher level phases and milestones will guide development, following the process shown in Figure \ref{fig:full-project-process}.
+
+The plan has changed since its initial conception. The original plan stated that the initial, unoptimised implementations of the index structures should be finished before the mid-project presentation or report. The idea behind this decision was that having implementations of index structures finished before the presentation, an initial evaluation of the index structures could be performed. The results from this evaluation could then used in the presentation and report as justification for project decisions. However, due to the scope of the research field, the literature take one more week than expected. This meant that there was little time between the end of the literature review and the start of the mid-project presentation and report.
+
+Furthermore, additional time was required to determine the nature of the data that to be used for evaluation. This knowledge informs the decisions on which index structures to implement, so it was felt that rushing into implementation may result in a poor decision on which structures to implement. Therefore, implementation has been pushed back until after the submission of the mid-project report. By doing this, there is more time to collect the research findings and make a more informed decision on the index structure to implement.
+
+Figure \ref{fig:revised-schedule} and Figure \ref{fig:revised-milestone-timeline} show a Gantt chart of the revised phases and a timeline marked with the new milestones. The date this report has been submitted is also marked on the Gantt chart, showing what phases and milestones are left to complete before the end of the project. With the new schedule, the ``Initial Implementation" phase has been removed and the ``Performance Tuning" phase has changed to ``Design and Implementation". As a consequence, the milestones \textbf{Software Deliverables Decided} and \textbf{Initial Implementations Finished} have been removed. The \textbf{Software Deliverables Finished} milestone remains, but now marks the end of ``Design and Implementation" phase.
+
+``Design and Implementation" encompasses the design, implementation and evaluation of the index structure. This will contain multiple iterations of the implementation process described previously. An unoptimised, functional implementation is the barest deliverable required to perform the final evaluation. To ensure this is developed, the \textbf{Initial Implementation of Software Deliverables Complete} milestone has been created. The first iteration of ``Design and Implementation" will be two weeks and will be used to develop the baselines and initial implementation of the chosen index structure. \textbf{Initial Implementation of Software Deliverables Complete} should be met at the end of this first iteration. Subsequent iterations will last a week to coincide with the weekly supervisor meetings, which will be at the start of each iteration. 

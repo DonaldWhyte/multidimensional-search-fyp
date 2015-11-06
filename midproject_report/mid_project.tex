@@ -1,0 +1,82 @@
+%
+% Name: Accelerating Multi-dimensional Search Mid-Project Report
+% Author: Donald Whyte (sc10dw@leeds.ac.uk)
+%
+
+\documentclass[notitlepage]{article}
+
+\usepackage[margin=2.5cm]{geometry} % easy page formatting
+	\geometry{letterpaper}
+\usepackage{doc} %special logo commands
+\usepackage{url} % formatting URLs
+\usepackage{datetime} % up-to-date, automatically generated times
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{multirow}
+% For graphic files
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\usepackage{pdflscape}
+\usepackage{rotating}
+\usepackage{wrapfig}
+
+\usepackage{cite} 
+
+\usepackage{caption}
+
+\usepackage{fancyhdr}
+\chead{Donald Whyte}
+\lhead{}
+\rhead{}
+
+
+\title{Accelerating Multi-dimensional Search \\ Mid-Project Report}
+\author{Donald Whyte}
+\date{\today}
+
+\pagestyle{fancy} % so header appears on each page
+
+\begin{document}
+
+\null  % Empty line
+\nointerlineskip  % No skip for prev line
+\vfill
+\let\snewpage \newpage
+\let\newpage \relax
+\maketitle
+\let \newpage \snewpage
+\vfill 
+\break % page break
+
+\tableofcontents
+
+\vspace{4em}
+
+\section{Introduction}
+	\input{introduction}
+	\input{aim}
+	\input{objectives}
+	\input{requirements}
+\section{Methodology}
+	\input{methodology}
+	\input{schedule}
+	\input{technology}
+\input{progress}
+\input{background_research}
+\input{evaluation}
+\input{next}
+
+% Include the bibliography
+\bibliographystyle{unsrt}
+\bibliography{refs}
+\appendix
+\setcounter{figure}{0} \renewcommand{\thefigure}{A.\arabic{figure}} 
+\setcounter{table}{0} \renewcommand{\thetable}{A.\arabic{table}} 
+\include{appendix}
+
+\end{document}

@@ -1,0 +1,160 @@
+\subsection{Existing Index Structures}
+\label{sec:structures}
+
+Many index structures have been developed throughout the past forty years,, such as quadtrees in the early 1970s \cite{quadtree} and splay quadtrees in 2012 \cite{splay-quadtree}. New structures are often based on older index structures, either by modifying an existing structure or combining two different structures in some way. Figure \ref{fig:structure-taxonomy} in the appendix shows a \textbf{taxonomy} of index structures and which structures are based on others. This section describes some of the widely used index structures, their limitations (with respect to the challenges discussed in Section \ref{sec:challenges}) and why this led onto the development of new structures.
+
+\subsubsection{Sequential Scan}
+
+Sequential scan refers to the brute-force approach of searching a data set. You simply store the dataset in a linear data structure (e.g. a list) and iterate through each data item until the desired point is found. This means searching is an $O(n)$ operation. Using a standard array, insertion is $O(1)$ if new points are inserted at the end of the array and deletion is $O(n)$. There is little memory overhead for this approach, but search times will be very long if there are large number of points. Nevertheless, if the number of data items is small, sequential scan might be fast enough to use, meaning a more complex index structure is not needed.
+
+\subsubsection{Search Trees}
+
+Trees are often used to order data items in a hierarchical fashion to accelerate search \cite{introduction-to-algorithms}. The binary search tree, for one-dimensional data, is one of the first of these trees and is the basis of many index structures. Each node stores a \textbf{key}, which is a total orderable element. Each non-leaf node has at most two children, where the left child's key is smaller than its parent's and the right child's key is larger than its parent's. This property is referred to as \textbf{key order} \cite{rst}. When inserting or deleting new points, the key order invariant must be maintained. Maintaining this invariant can be done in $O(n)$ time \cite{introduction-to-algorithms}, making insertion and deletion $O(n)$.
+
+A point query is equivalent to checking if a certain key is stored in the tree. In the best case, we get running time $O(\log_2 n)$ for the query, as the height of the tree is $\log_2 n$. However, this performance is not guaranteed. Skewed or sorted data may result in taller trees, where there are many nodes with only left or only right children. This makes the binary tree \textbf{unbalanced} (height greater than $\log_2 n$). Therefore, if balance is not guaranteed, the running time of a point query is $O(n)$ in the worst case (no better than a sequential search).
+
+Balanced search trees are trees which re-order the nodes to maintain balance (logarithmic height) when a node is inserted, updated or deleted, regardless of data skew. These operations cause dynamic index structure operations to become slower, but allow for faster queries. Examples of balanced search trees include red-black trees, AVL trees and Splay trees and treaps \cite{introduction-to-algorithms}.
+
+\subsubsection{Recursive Partitioning of Data Space}
+\label{sec:recursive-partition-structures}
+
+Index structures which decompose the data space into sub-spaces recursively are popular \cite{md-structures-samet}. The decomposed space is represented as a search tree. If $R$ is some $d$-dimensional data space, then $R_1,...,R_x$ are the decomposed sub-spaces (often disjoint) of $R$ . $R$ becomes the root node and $R_1,...,R_x$ become the children of $R$ in the tree representation. Each of those sub-spaces may then be decomposed in a similar way, increasing the depth of the tree. This is useful because it allows large amounts of the data space to be discarded from consideration at once. Consider a point query with a point $p$. $p \in R$ since R is the entire data space. Assuming a disjoint decomposition was used, if $p \in R_1$ then $p \not\in R_2,...,R_x$. Since it is known that $p$ is only in $R_1$, only $R_1$'s children need to be checked -- the rest of the tree can be \textbf{ignored}.
+
+\paragraph{\textbf{Quadtrees}}
+
+A quadtree is one of the earliest index structures based on disjoint recursive decomposition of space, specifically created for two-dimensional space \cite{original-quadtree}. \textbf{Octrees} are a generalisation of quadtrees to $d \geq 2$ dimensions. Throughout the past forty years, a large amount of variations of the quadtree have been produced. Hanan Samet produced a survey describing many uses and variants of this data structure in  \cite{quadtree} and twenty years later, there are even more variants. Several variants are discussed in this review, but it is beyond the scope of this document to list all of them
+
+PR quadtrees are a commonly used quadtree which partition the data space into four uniformly sized sub-spaces. This process can be repeated recursively to produce a grid with increasingly smaller cells. The left of Figure \ref{fig:quadtree-kdtree-clustered} shows an example of a PR quadtree decomposition of some data. Notice how the underlying data space is decomposed in the same way, regardless of where the points in the dataset are in the space.
+
+An advantage of PR quadtrees is that there is no overlap between the spatial regions represented by two sibling nodes. This greatly simplifies \texttt{insert}, \texttt{update} and \texttt{delete} operations. However, they do not perform well with \textbf{non-uniform} data. So if there are clusters or skews of data, then there will be many empty (or near empty) quadtree nodes/regions (see Figure \ref{fig:quadtree-kdtree-clustered}). These unnecessary nodes in sparse regions of the data space may be searched during a query, slowing queries down.
+
+\begin{wrapfigure}[12]{r}{0.4\textwidth}
+	\vspace{-40pt}
+	\begin{center}
+		\includegraphics[scale=0.35]{figures/quadtrees_kdtrees_clustered.pdf}
+	\end{center}
+	\vspace{-30pt}
+	\caption{PR quadtree and kd-tree decomposition of some clustered data on the left and right respectively}
+	\label{fig:quadtree-kdtree-clustered}
+\end{wrapfigure}
+
+\paragraph{\textbf{kd-Trees}}
+
+kd-trees are similar to quadtrees in that the data space is once again partitioned into disjoint regions \cite{kd-tree}. With point kd-trees, each split partitions a region into two sub-regions along a \textbf{single dimension} $d_i$. These sub-regions are represented as two nodes, with the original region's node as the parent. Some \textbf{pivot} value $p$ is chosen for $d_i$. The left and right children contain all the data items whose $d_i$th value is less than $p$ and greater than $p$ respectively. The way a kd-tree is built varies depends on how $d_i$ and $p$ are chosen, so there are many variations of this structure. A common way of choosing $d_i$ is to cycle through each dimension when repeatedly splitting. $p$ could be assigned the \textbf{median} of the $d_i$th value of each data item within the region being split.
+
+Unlike the PR quadtree, the size of partitions are non-uniform, meaning kd-trees can are better suited to skewed or clustered data. Figure \ref{fig:quadtree-kdtree-clustered} shows a PR quadtree and kd-tree partition of some clustered data. Notice how there are more (empty) regions in the quadtree than the kd-tree, thus having a less efficient partition of the data (resulting in slower queries).
+
+Like binary search trees, it is ideal to maintain a \textbf{balanced} tree to minimise height and ensure queries can be performed quickly. Dynamically inserting or deleting data items can unbalance the tree. Variants of the kd-tree have been developed to maintain a balanced tree and fast query times. An example of this is the KDB-tree, which is a combination of kd-trees and B${}^{+}$-trees that attempts to ``approximate" the multi-dimensional search efficiency of the kd-tree, as well as the height balance and I/O efficiency of B-trees \cite{kdb-tree}.
+
+\paragraph{\textbf{Binary Space Partitioning}}
+
+BSP (binary space partitioning) trees are a generalisation of kd-trees that use hyperplanes (lines in 2D, planes in 3D) to recursively partition the data space \cite{bsp-tree}. That is, it partitions data space $S$ into two disjoint sub-spaces $S_1$ and $S_2$. This process is repeated recursively using different hyperplanes for each split. A BSP tree decomposition is illustrated in Figure \ref{fig:bsp}.
+
+Optimal BSP trees allow efficient point queries to be performed by discarding as many points as possible at each level of the tree (i.e. the tree has low height). Finding optimal BSP trees for a given set of data points is an $\mathbb{NP}$-complete problem \cite{bsp-np-hard}. When inserting, updating or deleting points a new optimal partitioning must be computed to minimise tree height, making dynamic operations very slow. Therefore, BSP trees are better suited for static data because the tree can be \textbf{pre-computed} and loaded into main memory during program initialisation (avoiding solving an $\mathbb{NP}$-complete problem at runtime).
+
+\begin{wrapfigure}[12]{r}{0.4\textwidth}
+	\vspace{-40pt}
+	\begin{center}
+		\includegraphics[scale=0.4]{figures/bsp_tree.pdf}
+	\end{center}
+	\vspace{-30pt}
+	\caption{Binary Space Partition of Some Data Space}
+	\label{fig:bsp}
+\end{wrapfigure}
+
+\paragraph{\textbf{Skip Quadtree}}
+
+Despite the original quadtree structure being developed approximately forty years ago, researchers are still enhancing the index structure's performance in new ways. A relatively new data structure, the skip quadtree, is ``simple" to implement and benefits from low memory overhead \cite{skip-quadtree}. Skip quadtrees were developed with range queries in mind and are based on the concept of compressed quadtrees. Compressed quadtrees compress paths of nodes which only have a single non-empty child into a \textbf{single node} \cite{compressed-quadtree}, which combats the effects of skewed data.
+
+Skip quadtrees combine one-dimensional skip lists \cite{skip-quadtree} and compressed quadtrees to create an index structure with $O(\log n)$ point queries and $O(\epsilon^{1 - d} \log n + k)$ \textit{approximate} range queries, where $k$ is the size of the range and $\epsilon$ is the approximation factor that controls the accuracy of the range query \cite{skip-quadtree}. However, the skip quadtree was not constructed with paging in mind and may still suffer from the same problems quadtrees face in high dimensional spaces due to the tree's size being exponential with respect to $d$.
+
+
+\subsubsection{Bucket Methods}
+\label{sec:bucket-methods}
+
+\textbf{Bucket methods} were developed to increase I/O efficiency for large datasets that are paged in secondary memory. Such structures were designed to minimise the number of I/O operations (secondary memory access) required to perform queries (see Section \ref{sec:paging}). These methods group points into \textbf{buckets}, which are the same size as a page in secondary memory. To reduce the number of I/O operations required to perform a query (or pages from secondary memory to retrieve), bucket methods aim to fill each bucket with as many nodes as possible \cite{md-structures-samet}.
+
+\textbf{Fanout} refers to the amount of children each node have on average. Higher fanout means more nodes can be removed from consideration in one go (as the search moves through branches of the tree). Bucket methods aim to increase fanout, as it reduces the number of nodes in the tree which must be accessed to perform the desired query. Some bucket methods were developed with the aim of increasing fanout to reduce the height of the search tree, such as  the TV-tree \cite{tv-tree} and A-tree \cite{a-tree}.
+
+There are two types of bucket methods \cite{md-structures-samet}:
+\begin{itemize}
+	\item \textbf{Overlapping Decomposition} -- these ensure that each bucket has a \textbf{minimum} number of data items it must contain, which increases fanout and thus, search times. However, in the process of ensuring each bucket has a minimum amount of used capacity, the bounding regions of buckets in data space may begin overlapping. Overlapping regions means more nodes must be checked when performing a query, increasing search times.
+	\item \textbf{Disjoint Decomposition} -- these ensure that there is \textbf{no overlap} between buckets. This means less nodes need to be checked in a query, but there is no guarantee on how much each bucket is filled, potentially increasing the number of I/O operations performed
+\end{itemize}
+
+\paragraph{\textbf{B-Trees and B${}^{+}$-Trees}}
+
+The B-Tree was developed by Rudolf Bayer in 1972 and is often used for databases or file-systems \cite{ubiquitous-btree}. It is a one-dimensional search tree which allows for point queries, insertions and deletions to be performed in $O(\log n)$ time \cite{btree}. B-trees maintain key order, but allow nodes to have more than two children, making them a generalisation of binary search trees.
+
+B${}^{+}$-trees are B-trees where only the \textbf{leaves} contain the actual \textit{values} of the data \cite{ubiquitous-btree}. This means all non-leaves simply contain pointers to, or the keys of, their children. B${}^{+}$-trees ensure that each bucket is at least 50\% full \cite{md-structures-samet, ubiquitous-btree}, which leads to less I/O operations. This is a very attractive property, as it can greatly speed up query times for large data sets. There have been many attempts to generalise the B-tree to a multi-dimensional setting while retaining this property. The k-d-B tree \cite{kdb-tree} and BV-tree \cite{bv-tree} are two examples of such attempts. Freeston in \cite{bv-tree} discusses how this ``apparently simple" objective has proved extremely difficult to achieve.
+
+\paragraph{\textbf{R-Tree Family}}
+
+An R-tree can be thought of as a B${}^{+}$-tree that can handle multi-dimensional data, supporting data items that have non-zero size in data space (i.e. regions) \cite{r-tree}. That is, nodes are represented as \textbf{hyper-rectangles} (or intervals, one for each dimension), which define the region in which all of the node's children are contained in. If node $y$ is a child of node $x$, then all of $y$ is contained in $x$ in the data space. The running time for queries is $O(n)$ in the worst case, but expected performance is much higher. There are many variations of R-trees that have improved performance, such as R*-trees \cite{rstar-tree}, R+-trees \cite{rplus-tree}, SS-trees \cite{ss-tree}, RS-trees \cite{rs-tree} and Hilbert R-Trees \cite{hilbert-rtree}. Combinations of these variations also exist, such as SR-trees \cite{md-structures-samet} and RSR-trees \cite{rsr-tree}.
+
+R-tree based structures use overlapping decomposition, which is a key performance issue \cite{pyramid-tree}. If you have a point contained in $m$ nodes' regions, all $m$ nodes could be searched. This severely limits the performance of R-tree based index structures with data spaces that have a \textbf{large} number of dimensions. This is described in further detail in Section \ref{sec:curse-of-dimensionality}.
+
+\paragraph{\textbf{PK-Tree}}
+
+PK-trees (Pyramid K-instantiable trees) are a family of structures based on kd-trees that were created specifically to handle high-dimensional data \cite{pk-tree}. They are similar to bucket methods, but instead of imposing a minimum number of points per bucket, they impose a maximum. Imposing this maximum (called the $k$-instantiation value) results in a reduced amount of I/O operations \cite{md-structures-samet}. PK-trees bound the height of the tree ($O(\log n)$) for some data. Through tests on synthetic and real data, the PK-tree has been shown in greatly outperform the SR-tree and X-tree \cite{pk-tree}, especially for higher dimensions.
+
+However, there are some caveats. In order for the PK-tree to have $O(\log n)$ height, certain constraints must be applied to the distribution of the data. Furthermore, the pagination of the index structure which minimises I/O operations depends on the value of $K$ (the number of children a node can have) and the size of the actual hard disk pages used by the operating system \cite{pk-tree}. The amount to split each dimension at each level is also configurable, so there are many parameters to tweak to achieve the proposed performance. Additionally, as discussed in Section \ref{sec:curse-of-dimensionality}, the PK tree's performance on very high dimensional data will be still be poor, because most index structures that decompose the underlying data space perform poorly when $d$ is high.
+
+When compared to other modern data structures, such as RSR-trees or splay quadtrees, PK-trees are complex. This problem is exacerbated by having to tweak many different parameters and be careful about what kind of data is stored in the tree. Therefore, due to their complexity and poor performance on very high dimensional spaces, PK-trees have not been widely adopted \cite{md-structures-samet}.
+
+\paragraph{\textbf{VAMSplit Trees}}
+
+All of the bucket methods described so far are dynamic, making them usable for data that changes. If the dataset is static, then knowledge of the whole dataset can be used to construct highly optimised index structures. VAMSplit kd-Trees and VAMSplit R-trees \cite{md-structures-samet} are two static bucket methods which exploit the fact that knowledge of the entire dataset exists to efficiently decompose the data space.
+
+\subsubsection{Structures Tailored to High-Dimensional Data}
+
+Section \ref{sec:curse-of-dimensionality} discusses how higher dimensional data spaces cause index structures which perform well on low dimensional data to degenerate and provide poor performance. There have been efforts to develop index structures which still perform well in these data spaces. Many different approaches have been used, such as tree-based spatial decompositions, distance-based methods, dimension reduction and non-hierarchical, sequential methods. Some of the more influential data structures from the literature have been identified and are described here.
+
+\paragraph{\textbf{X-Tree}}
+
+R-tree based index structures often struggle to provide efficient queries in high-dimensional space, as the hyper-rectangles or spheres tend to overlap more \cite{pyramid-tree}. X-trees \cite{x-tree} try to avoid and reduce overlap, by extending the capacity of nodes/buckets if creating a new node would result in an overlap (these are called supernodes). X-trees outperform most R-tree variants \cite{x-tree}. However, Berchtold et al. show in  \cite{pyramid-tree} show the structure still degenerates at higher dimensions ($d \geq 10$) \cite{pyramid-tree}.
+
+\paragraph{\textbf{Distance-Based Methods}}
+
+When there are a large number of dimensions, determining which dimensions are actually relevant for searching can be difficult. In these cases, \textbf{distance-based methods} may be useful. They use the similarity (distance in data space) between each pair of points to deduce more information about the relationships in the data and provide faster search \cite{md-structures-samet}. There are two major types: \textbf{pivot-based}, which choose a subset of all points in the dataset to base distance measurements on, and \textbf{cluster-based}, which partition the dataset's points into spatial regions called clusters that are used to compute distances \cite{md-structures-samet}. A notable distance-based index structure is the M-tree, which combines R-trees with distance-based techniques to perform high dimensional search with dynamic datasets \cite{m-tree}.
+
+\paragraph{\textbf{Dimension Reduction}}
+
+One method of reducing the effects of the curse of dimensionality is reducing the dimensionality of the dataset using \textbf{dimension reduction} and then using one of the existing structures which perform well for low dimensional data. One example of this is principal component analysis (PCA) \cite{pca}, which transforms a data space into one with less dimensions, using correlations in the data to deduce with dimensions are the most useful for discrimination \cite{pca}. However, by reducing the dimensions using PCA some information is lost and the results of queries will not be exact. Note that PCA is an equivalent technique to SVD (Singular Value Decomposition)  \cite{md-structures-samet}.
+
+PCA struggles with dynamic data; if the data changes then the computed transformation will go out of sync and queries will be even less accurate. The transformation could be re-computed whenever a point is added, removed or changed but doing so takes a very long time, making dynamic operations really slow. Therefore, these dimension reducing techniques are mostly suitable to static datasets where full accuracy is not required.
+
+\paragraph{\textbf{Pyramid Tree}}
+
+The Pyramid tree is specifically targeted towards high-dimensional data \cite{pyramid-tree}. They partition the data space into $2d$ pyramids and map $d$-dimensional data items to \textbf{one-dimensional space}, storing the mapped 1D points in a B${}^{+}$-tree. This one-dimensional representation is achieved by describing a data point in terms of \textit{which} pyramid it is contained in and \textit{where} in the specified pyramid it is. Queries are given as $d$-dimensional points which are reduced to one dimension before they're applied, reducing the effects of the curse of dimensionality. Even though data points are stored in a one-dimensional B${}^{+}$-tree, the original data is maintained since the original $d$-dimensional point is stored alongside its 1D representation. Hence, pyramid trees reduce the dimensionality of the data but retain all of the original information (unlike PCA).
+
+B${}^{+}$-trees provide efficient \texttt{insert}, \texttt{update} and \texttt{delete} operations \cite{ubiquitous-btree}, meaning the corresponding operations are also efficient with pyramid trees. The query performance of the Pyramid tree \textit{relative} to other index structures, such as X-trees, increases as $d$ does \cite{pyramid-tree}. Only an extra 1D point for each of the $n$ data points and additional data required by B${}^{+}$-trees is used, so memory overhead is low.
+
+Since the Pyramid tree mitigates the curse of dimensionality, provides dynamic operations, uses a bucket method to store the 1D points and can be modified to handle skewed data (using the Extended Pyramid Technique from \cite{pyramid-tree}), the structure tackles all four challenges discussed in Section \ref{sec:challenges} and appears successful in many respects.
+
+\paragraph{\textbf{Embedding Methods}} are combinations of dimension reduction and distance-based methods \cite{md-structures-samet}. They use \textit{approximated} distances between points in reduced space to perform \textit{exact} queries. An example of an embedding method is FastMap \cite{fast-map}.
+
+\paragraph{\textbf{Non-Hierarchical Methods}}
+
+Focus is turning towards sequential scan and linear data structures for faster search with high-dimensional data. This is because hierarchical index structures based on data space partitioning perform poorly on a higher number of dimensions (see Section \ref{sec:curse-of-dimensionality}). Furthermore, for large datasets that must be stored in secondary memory, sequential scan may also outperform hierarchical methods, because data items are stored contiguously and read sequentially, thus requiring less I/O operations. The VA-file (vector approximation file) is a method based on sequential scan, which is shown to consistently outperform sequential scan and the X-tree as the number of dimensions increase on real datasets \cite{va-file}.
+
+Another non-hierarchical index structure that has been used are hash maps \cite{md-structures-samet}. One approach is to define one primary bucket in the hash map for each grid cell (region of data space), which can hold $x$ points. If a primary bucket has more than $x$ points, then an overflow bucket is constructed. This bucket is linked to the primary bucket it spawned from, similar to the chaining conflict resolution mechanism for 1D hash tables \cite{introduction-to-algorithms}. Notable hashing techniques for multi-dimensional search include MDEH (multi-dimensional extended hasing) and PLOP (piecewise linear order preserving) hashing \cite{md-structures-samet}.
+
+
+\subsubsection{History-sensitive Structures}
+
+Given the same data twice, most structures will behave exactly the same. That is, how the structure builds itself and access times have little, if any, variation. There are some structures which are \textbf{history-sensitive}, meaning that their behaviour is either non-deterministic, involving some element of randomness that affects how the structure performs over time, or self-adjusting, changing itself based on how the stored data is accessed. These can allow structures to be much more dynamic and adjust themselves to perform optimal search based on the application it's being used in. Two of these structures, the quadtreap and splay quadtree, are described here.
+
+\paragraph{\textbf{Quadtreap}}
+
+A treap is a randomised search tree used to store one-dimensional keys, which combines a binary search tree with a heap by maintaining both \textbf{key-order} and \textbf{heap-order} (nodes ordered by the randomly assigned probabilities) \cite{quadtreap}. The advantage of this structure is that there is little overhead when inserting, updating or deleting points and $O(\log n)$ height is still achieved with \textit{high probability}, allowing for fast queries.
+
+A quadtreap is a combination of a compressed quadtree and a treap \cite{quadtreap}. In order to maintain a balanced height $h \approx \log n$ when the tree is modified, tree rotations are used. The times for inserting and deleting points are $O(h)$ and $O(h^2)$ respectively, meaning the \textit{expected} times are $O(\log n)$ and $O(\log^2 n)$. Under certain conditions, approximate range and nearest neighbour queries can be achieved in $O(h + \frac{1}{\epsilon}^{d - 1})$, where $\epsilon$ is the approximation factor that controls the accuracy.
+
+\paragraph{\textbf{Splay Quadtree}}
+
+% ENTROPY-REF =  Ihara, Shunsuke (1993). Information theory for continuous systems. World Scientific. p. 2. ISBN 978-981-02-0985-8.
+
+Splay trees are one-dimensional index structures which make use of a splaying operation to achieve fast dynamic operations \cite{introduction-to-algorithms}. A Splay tree is \textbf{self-adjusting}, which means it is ``a data structure that reorganises itself to fit the pattern of access." \cite{splay-quadtree} This is achieved with the splaying operation, which performs a series of $O(1)$ tree rotations to maintain a balanced tree with low height.
+
+Park and Mount, the creators of the quadtreap \cite{quadtreap}, stated ``there is no comparable self-adjusting data structure for storing multi-dimensional point sets" with regard to splay trees \cite{splay-quadtree}. Hence, they developed the splay quadtree, which combines BBD-trees (box decomposition trees) with quadtrees by making use of an equivalent splaying operation on quadtrees. Using entropy, Park and Mount proved good bounds on the running time of dynamic operations and queries. Splay quadtrees are also relatively simple to implement and store little internal balancing information, meaning they have low memory overhead. This makes splay quadtrees a potentially powerful modern index structure. No papers discussing its performance with high-dimensional data appear to have been published, however, so it is not known how well the structure performs in a high dimensional setting.
